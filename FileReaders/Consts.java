@@ -2,7 +2,7 @@ package FileReaders;
 
 import java.io.*;
 public interface Consts{
-	public static final File CONFIGURE=new File("input/config.xml");
+	public static final String CONFIGURE="input/config.xml";
 	
 	public static final String DEFAULT_ENCODE="ISO-8859-1";
 	public static final String META_ROOT="MetaDataExchange";

@@ -1,5 +1,6 @@
 package FileReaders;
 
+import java.io.File;
 import java.util.*;
 
 
@@ -21,7 +22,7 @@ public class Instance implements Consts{
 		initialize(Assembly);
 	}
 	void initialize(String Assembly){
-		Config=new CfgReader(CONFIGURE);
+		Config=new CfgReader(new File(CONFIGURE));
 		this.Assembly=Assembly;
 		Annotations[] Annos=Config.getAnnotations(Assembly);
 		this.Annos=new Hashtable<String, Annotations>(Annos.length,1);
@@ -39,7 +40,7 @@ public class Instance implements Consts{
 	public String update(String chr,long start,long end,int window_width){
 		XmlWriter xw=new XmlWriter();
 		int chrid=check_chromosome(chr);
-		if(chrid>0){
+		if(chrid>=0){
 			Chr=chr;
 			Coordinate=check_coordinate(chrid,start,end);
 			bpp=(double)(Coordinate[1]-Coordinate[0])/(double)window_width;
