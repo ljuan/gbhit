@@ -12,11 +12,13 @@ import FileReaders.*;
 
 public class Interfaces extends HttpServlet{
 	
-	Instance ins=new Instance();
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
 		res.setContentType("application/xml");
+		HttpSession session=req.getSession();
+		if(session.getAttribute("Instance")==null)
+			session.setAttribute("Instance", new Instance());
+		Instance ins=(Instance) session.getAttribute("Instance");
 		
-		res.getWriter().println(req.getQueryString());
 		if (req.getParameter("action").equals("getAssemblies")){
 			String a=ins.get_Assemblies();
 			res.getWriter().print(a);
@@ -27,6 +29,7 @@ public class Interfaces extends HttpServlet{
 		}
 		else if (req.getParameter("action").equals("setAssembly")){
 			ins=new Instance(req.getParameter("assembly"));
+			session.setAttribute("Instance", ins);
 		}
 		else if (req.getParameter("action").equals("modiTracks")||req.getParameter("action").equals("addTracks")){
 			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));

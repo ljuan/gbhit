@@ -52,4 +52,13 @@ class CfgReader implements Consts{
 		}
 		return Annos;
 	}
+	Element write_metalist(Document doc,String[] metalist,String metatype){
+		StringBuffer temp=new StringBuffer();
+		for(int i=0;i<metalist.length;i++){
+			temp.append(metalist[i]);
+			if(i<metalist.length-1)
+				temp.append(",");
+		}
+		return XmlWriter.append_text_element(doc,doc.getElementsByTagName(META_ROOT).item(0),metatype,temp.toString());
+	}
 }

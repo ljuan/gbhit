@@ -3,6 +3,9 @@ package FileReaders;
 import java.io.*;
 import java.util.*;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /* 
  * This class is for reading fasta file, i.e. Reference Genome
  * We also keep a instance of FastaReader in user instance class,
@@ -46,6 +49,12 @@ class FastaReader implements Consts{
 		ByteBufferChannel bbc=new ByteBufferChannel(fasta_file,start+fasta_index[chr_info][1],end-start+1);
 		seq=bbc.ToString(DEFAULT_ENCODE).replaceAll("\n", "");
 		return seq.toUpperCase();
+	}
+	Element write_sequence(Document doc, String chr, long start, long end, String id){
+		String seq=extract_seq(chr,start,end);
+		Element sequence=XmlWriter.append_text_element(doc,doc.getElementsByTagName(DATA_ROOT).item(0),XML_TAG_SEQUENCE,seq);
+		sequence.setAttribute(XML_TAG_ID, id);
+		return sequence;
 	}
 	
 }

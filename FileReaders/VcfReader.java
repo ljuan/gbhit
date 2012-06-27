@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.*;
 //import org.broad.tribble.readers.TabixReader;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /*
  * This is for reading a VCF format file.
  * Represents one VCF file.
@@ -23,7 +26,7 @@ import java.util.*;
  * Challenging his coding ability means challenging more than half NGS researches.
  */
 
-class VcfReader{
+class VcfReader implements Consts{
 	TabixReader vcf_tb;
 	Hashtable<String,String> filter_header;
 	Hashtable<String,String[]> info_header;
@@ -113,5 +116,60 @@ class VcfReader{
 			e.printStackTrace();
 		}
 		return vcf_internal.toArray(new Vcf[vcf_internal.size()]);
+	}
+	Element write_vcf2variants(Document doc, String track, String mode, double bpp, String chr, long start, long end){//bpp:bases per pixel
+		Vcf[] vcf=extract_vcf(chr,start,end);
+		Element Variants=doc.createElement(XML_TAG_VARIANTS);
+		Variants.setAttribute(XML_TAG_ID, track);
+		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Variants);
+		long lastpos=0;
+		for(int i=0;i<vcf.length;i++){
+			String[] alt_temp=vcf[i].Alt.split(",");
+			int range=vcf[i].Ref.length()-alt_temp[0].length();
+			if(range<0)
+				range=0;
+			if(mode.equals(MODE_DENSE)&&vcf[i].Pos+range-lastpos<bpp)
+				continue;
+			Element Variant=doc.createElement(XML_TAG_VARIANT);
+			Variant.setAttribute(XML_TAG_ID, vcf[i].ID);
+			if(alt_temp.length>1)
+				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_MULTIPLE);
+			else if(alt_temp[0].length()<vcf[i].Ref.length())
+				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_DELETION);
+			else if(alt_temp[0].length()>vcf[i].Ref.length())
+				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_INSERTION);
+			else if(alt_temp[0].length()==vcf[i].Ref.length())
+				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_SNV);
+			else
+				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_OTHERS);
+			XmlWriter.append_text_element(doc,Variant,XML_TAG_FROM,String.valueOf(vcf[i].Pos));
+			XmlWriter.append_text_element(doc,Variant,XML_TAG_TO,String.valueOf(vcf[i].Pos+range));
+			lastpos=vcf[i].Pos+range;
+			if(!mode.equals(MODE_DENSE)&&bpp<0.5)
+				XmlWriter.append_text_element(doc,Variant,XML_TAG_LETTER,vcf[i].Alt);
+			if(mode.equals(MODE_DETAIL)){
+				StringBuffer Description=new StringBuffer();
+				Description.append("QUAL:");
+				Description.append(vcf[i].Qual);		
+				Description.append(";FILTER:");
+				Description.append(vcf[i].Filter);		
+				Description.append(";INFO:");
+				Description.append(vcf[i].Info);		
+				if(vcf[i].Samples.length>0){
+					Description.append(";FORMAT:");
+					Description.append(vcf[i].Format);
+					Description.append(";SAMPLES:");
+					for(int j=0;j<vcf[i].Samples.length;j++){
+						Description.append(vcf[i].Samples[j]);
+						if(j<vcf[i].Samples.length-1)
+							Description.append(",");
+					}
+				}
+				XmlWriter.append_text_element(doc,Variant,XML_TAG_DESCRIPTION,Description.toString());
+			}
+			Variants.appendChild(Variant);
+		}
+		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Variants);
+		return Variants;
 	}
 }

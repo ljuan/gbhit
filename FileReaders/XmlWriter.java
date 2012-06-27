@@ -20,22 +20,58 @@ class XmlWriter implements Consts{
 	XmlWriter(String roottag){
 		init(roottag);
 	}
-	void init(String roottag){
+	static Document init(String roottag){
+		Document doc;
 		DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder db=dbf.newDocumentBuilder();
 			doc=db.newDocument();
+			Element root=doc.createElement(roottag);
+			doc.appendChild(root);
+			return doc;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Element root=doc.createElement(roottag);
-		doc.appendChild(root);
+		return null;
 	}
-	Element append_text_element(Node parent,String tag,String text){
+	static Element append_text_element(Document doc,Node parent,String tag,String text){
 		Element offspring=doc.createElement(tag);
 		offspring.appendChild(doc.createTextNode(text));
 		parent.appendChild(offspring);
 		return offspring;
+	}
+	static String xml2string(Document doc){
+		String xml="";
+		try{
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			StringWriter writer = new StringWriter();
+			transformer.transform(new DOMSource(doc), new StreamResult(writer));
+			xml= writer.getBuffer().toString().replaceAll("\n|\r", "");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return xml;
+	}
+}
+/*
+ * We have moved functional writeXML method to corresponding classes:
+ * 1 write_bed2elements to BedReader/BedReaderTabix,
+ * 2 write_vcf2variants to VcfReader,
+ * 3 write_metalist to CfgReader,
+ * 4 write_sequence to FastaReader
+ * We will further deploy:
+ * 5 write_bam2reads in BamReader,
+ * 6 write_gff2elements in GffReader,
+ * 7 write_wig2values in WigReader,
+ * 8 write_bigwig2values in BigWigReader
+ * 9 write_bb2values in bbReader, etc.
+ * We keep some common method: xml2string, init, append_text_element in this class and make them static.
+ */
+/*	Element write_basic(Document doc,String text, String tag){
+		return XmlWriter.append_text_element(doc,doc.getElementsByTagName(DATA_ROOT).item(0),tag,text);
 	}
 	void write_metalist(String[] metalist,String metatype){
 		StringBuffer temp=new StringBuffer();
@@ -46,9 +82,7 @@ class XmlWriter implements Consts{
 		}
 		append_text_element(doc.getElementsByTagName(META_ROOT).item(0),metatype,temp.toString());
 	}
-	void write_basic(String text, String tag){
-		append_text_element(doc.getElementsByTagName(DATA_ROOT).item(0),tag,text);
-	}
+
 	void write_sequence(String seq, String id){
 		Element sequence=append_text_element(doc.getElementsByTagName(DATA_ROOT).item(0),XML_TAG_SEQUENCE,seq);
 		sequence.setAttribute(XML_TAG_ID, id);
@@ -195,20 +229,4 @@ class XmlWriter implements Consts{
 			}
 			Elements.appendChild(Ele);
 		}
-	}
-	String xml2string(){
-		String xml="";
-		try{
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			StringWriter writer = new StringWriter();
-			transformer.transform(new DOMSource(doc), new StreamResult(writer));
-			xml= writer.getBuffer().toString();//.replaceAll("\n|\r", "");
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-		return xml;
-	}
-}
+	}*/
