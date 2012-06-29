@@ -31,7 +31,7 @@ class XmlWriter implements Consts{
 			return doc;
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		} 
 		return null;
 	}
 	static Element append_text_element(Document doc,Node parent,String tag,String text){

@@ -16,10 +16,13 @@ class XmlReader implements Consts{
 	Document doc;
 	XmlReader(File xml){
 		DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
+		FileInputStream xmlis=null;
 		try {
 			DocumentBuilder db=dbf.newDocumentBuilder();
-			doc=db.parse(xml);
+			xmlis=new FileInputStream(xml);
+			doc=db.parse(xmlis);
 			doc.normalize();
+			xmlis.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

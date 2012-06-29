@@ -95,6 +95,11 @@ public class TabixReader
 			mFp = new BlockCompressedInputStream(new File(fn));
 		readIndex();
 	}
+	public void TabixReaderClose() throws IOException{
+		if(mFp != null) {
+			mFp.close();
+		}
+	}
 
 	private static int reg2bins(final int beg, final int _end, final int[] list) {
 		int i = 0, k, end = _end;

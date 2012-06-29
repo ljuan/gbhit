@@ -2,6 +2,7 @@ package FileReaders;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
@@ -23,8 +24,7 @@ class ByteBufferChannel {
 			FileChannel file_channel=new FileInputStream(file).getChannel();
 			file_byte_buffer=file_channel.map(FileChannel.MapMode.READ_ONLY, offset, length);
 			file_channel.close();
-		}
-		catch(Exception e){
+		} catch(Exception e){
 			e.printStackTrace();
 		}
 	}

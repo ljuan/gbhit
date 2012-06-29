@@ -26,17 +26,19 @@ class BedReaderTabix implements Consts{
 		querystr.append(start);
 		querystr.append('-');
 		querystr.append(end);
-		TabixReader.Iterator Query=bed_tb.query(querystr.toString());
 		ArrayList<Bed> bed_internal=new ArrayList<Bed>();
 		String line;
 		try{
+			TabixReader.Iterator Query=bed_tb.query(querystr.toString());
 			while((line=Query.next())!=null){
 				bed_internal.add(new Bed(line));
 			}
+			bed_tb.TabixReaderClose();
 		}
 		catch(IOException e){
 			e.printStackTrace();
 		}
+		
 		return bed_internal.toArray(new Bed[bed_internal.size()]);
 	}
 	Element write_bed2elements(Document doc,String track,String chr, long regionstart,long regionend){

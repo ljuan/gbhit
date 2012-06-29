@@ -99,10 +99,10 @@ class VcfReader implements Consts{
 		 * 1. TabixReader.chr2tid method is private, we can't obtain corresponding tid for a chromosome by maintaining Heng Li's TabixReader as it is.
 		 * 2. TabixReader.query require integer type for both start and end coordinate, while we define genomic coordinate as long type.
 		 */
-		TabixReader.Iterator Query=vcf_tb.query(querystr.toString());
 		ArrayList<Vcf> vcf_internal=new ArrayList<Vcf>();
 		String line;
 		try{
+			TabixReader.Iterator Query=vcf_tb.query(querystr.toString());
 			while((line=Query.next())!=null){
 				Vcf vcf_temp;
 				if(samples.length==0)
@@ -111,6 +111,7 @@ class VcfReader implements Consts{
 					vcf_temp=new Vcf(line,samples.length);
 				vcf_internal.add(vcf_temp);
 			}
+			vcf_tb.TabixReaderClose();
 		}
 		catch(IOException e){
 			e.printStackTrace();
