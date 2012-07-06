@@ -103,7 +103,7 @@ class VcfReader implements Consts{
 		String line;
 		try{
 			TabixReader.Iterator Query=vcf_tb.query(querystr.toString());
-			while((line=Query.next())!=null){
+			while(Query !=null && (line=Query.next()) != null){
 				Vcf vcf_temp;
 				if(samples.length==0)
 					vcf_temp=new Vcf(line);
