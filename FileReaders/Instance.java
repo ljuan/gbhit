@@ -105,7 +105,7 @@ public class Instance implements Consts{
 		Enumeration<Annotations> annos_enum=Annos.elements();
 		for(int i=0;i<Annos.size();i++){
 			Annotations temp=annos_enum.nextElement();
-			anno_names[i]=temp.get_ID()+temp.get_Mode();
+			anno_names[i]=temp.get_ID()+":"+temp.get_Mode();
 		}
 		Document doc=XmlWriter.init(META_ROOT);
 		Config.write_metalist(doc,anno_names, "AnnotationList");
@@ -121,15 +121,15 @@ public class Instance implements Consts{
 	void append_track(Annotations track, Document doc,String mode,double bpp){
 		if(!mode.equals(MODE_HIDE)){
 			if(track.get_Type().equals(FORMAT_BEDGZ)){
-				BedReaderTabix brt=new BedReaderTabix(track.get_Path());
+				BedReaderTabix brt=new BedReaderTabix(track.get_Path(Chr));
 				brt.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 			}
 			else if(track.get_Type().equals(FORMAT_BED)){
-				BedReader br=new BedReader(track.get_Path());
+				BedReader br=new BedReader(track.get_Path(Chr));
 				br.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 			}
 			else if (track.get_Type().equals(FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<1000000){
-				VcfReader vr=new VcfReader(track.get_Path());
+				VcfReader vr=new VcfReader(track.get_Path(Chr));
 				vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			}
 			else if (track.get_Type().equals(FORMAT_FASTA)&&bpp<0.5){

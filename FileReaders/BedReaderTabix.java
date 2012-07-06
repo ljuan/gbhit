@@ -54,86 +54,63 @@ class BedReaderTabix implements Consts{
 			
 			if(bed[i].fields > 3){
 				Ele.setAttribute(XML_TAG_ID, bed[i].name);
-				if(bed[i].fields >4){
-				XmlWriter.append_text_element(doc,Ele,XML_TAG_DIRECTION,bed[i].strand);
-				if(bed[i].fields>5){
-				if(bed[i].itemRgb != null && !bed[i].itemRgb.ToString().equals("0,0,0"))
-					XmlWriter.append_text_element(doc,Ele,XML_TAG_COLOR,bed[i].itemRgb.ToString());
-				else if(bed[i].score>0)
-					XmlWriter.append_text_element(doc,Ele,XML_TAG_COLOR,new Rgb(bed[i].score).ToString());
-				if(bed[i].fields>11){
-				for(int j=0;j<bed[i].blockCount;j++){
-					long substart=bed[i].blockStarts[j]+bed[i].chromStart;
-					long subend=bed[i].blockStarts[j]+bed[i].chromStart+bed[i].blockSizes[j];
-					if (substart<regionend && subend>=regionstart){
-						if(subend<=bed[i].thickStart || substart>=bed[i].thickEnd){
-							Element subele=doc.createElement(XML_TAG_SUBELEMENT);
-							XmlWriter.append_text_element(doc,subele,XML_TAG_FROM,String.valueOf(substart+1));
-							XmlWriter.append_text_element(doc,subele,XML_TAG_TO,String.valueOf(subend));
-							subele.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_BAND);
-							Ele.appendChild(subele);
+				if(bed[i].fields>4){
+					XmlWriter.append_text_element(doc,Ele,XML_TAG_DIRECTION,bed[i].strand);
+					if(bed[i].fields>5){
+						if(bed[i].itemRgb != null && !bed[i].itemRgb.ToString().equals("0,0,0"))
+							XmlWriter.append_text_element(doc,Ele,XML_TAG_COLOR,bed[i].itemRgb.ToString());
+						else if(bed[i].score>0)
+							XmlWriter.append_text_element(doc,Ele,XML_TAG_COLOR,new Rgb(bed[i].score).ToString());
+						if(bed[i].fields>11){
+							for(int j=0;j<bed[i].blockCount;j++){
+								long substart=bed[i].blockStarts[j]+bed[i].chromStart;
+								long subend=bed[i].blockStarts[j]+bed[i].chromStart+bed[i].blockSizes[j];
+								if (substart<regionend && subend>=regionstart){
+									deal_thick(doc, Ele, substart, subend, bed[i].thickStart, bed[i].thickEnd);
+								}
+								if (j<bed[i].blockCount-1 && subend<regionend && (bed[i].blockStarts[j+1]+bed[i].chromStart)>=regionstart){
+									append_subele(doc,Ele,String.valueOf(subend+1)
+											,String.valueOf(bed[i].blockStarts[j+1]+bed[i].chromStart),SUBELEMENT_TYPE_LINE);
+								}
+							}
 						}
-						else if(substart>=bed[i].thickStart && subend<=bed[i].thickEnd){
-							Element subele=doc.createElement(XML_TAG_SUBELEMENT);
-							XmlWriter.append_text_element(doc,subele,XML_TAG_FROM,String.valueOf(substart+1));
-							XmlWriter.append_text_element(doc,subele,XML_TAG_TO,String.valueOf(subend));
-							subele.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_BOX);
-							Ele.appendChild(subele);
+						else if(bed[i].fields > 7){
+							deal_thick(doc, Ele, bed[i].chromStart, bed[i].chromEnd, bed[i].thickStart, bed[i].thickEnd);
 						}
-						else if(substart<bed[i].thickStart && subend>bed[i].thickEnd){
-							Element subele1=doc.createElement(XML_TAG_SUBELEMENT);
-							XmlWriter.append_text_element(doc,subele1,XML_TAG_FROM,String.valueOf(substart+1));
-							XmlWriter.append_text_element(doc,subele1,XML_TAG_TO,String.valueOf(bed[i].thickStart));
-							subele1.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_BAND);
-							Ele.appendChild(subele1);
-							Element subele2=doc.createElement(XML_TAG_SUBELEMENT);
-							XmlWriter.append_text_element(doc,subele2,XML_TAG_FROM,String.valueOf(bed[i].thickStart+1));
-							XmlWriter.append_text_element(doc,subele2,XML_TAG_TO,String.valueOf(bed[i].thickEnd));
-							subele2.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_BOX);
-							Ele.appendChild(subele2);
-							Element subele3=doc.createElement(XML_TAG_SUBELEMENT);
-							XmlWriter.append_text_element(doc,subele3,XML_TAG_FROM,String.valueOf(bed[i].thickEnd+1));
-							XmlWriter.append_text_element(doc,subele3,XML_TAG_TO,String.valueOf(subend));
-							subele3.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_BAND);
-							Ele.appendChild(subele3);
-						}
-						else if(substart<bed[i].thickStart && subend>bed[i].thickStart){
-							Element subele1=doc.createElement(XML_TAG_SUBELEMENT);
-							XmlWriter.append_text_element(doc,subele1,XML_TAG_FROM,String.valueOf(substart+1));
-							XmlWriter.append_text_element(doc,subele1,XML_TAG_TO,String.valueOf(bed[i].thickStart));
-							subele1.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_BAND);
-							Ele.appendChild(subele1);
-							Element subele2=doc.createElement(XML_TAG_SUBELEMENT);
-							XmlWriter.append_text_element(doc,subele2,XML_TAG_FROM,String.valueOf(bed[i].thickStart+1));
-							XmlWriter.append_text_element(doc,subele2,XML_TAG_TO,String.valueOf(subend));
-							subele2.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_BOX);
-							Ele.appendChild(subele2);
-						}
-						else if(substart<bed[i].thickEnd && subend>bed[i].thickEnd){
-							Element subele2=doc.createElement(XML_TAG_SUBELEMENT);
-							XmlWriter.append_text_element(doc,subele2,XML_TAG_FROM,String.valueOf(substart+1));
-							XmlWriter.append_text_element(doc,subele2,XML_TAG_TO,String.valueOf(bed[i].thickEnd));
-							subele2.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_BOX);
-							Ele.appendChild(subele2);
-							Element subele3=doc.createElement(XML_TAG_SUBELEMENT);
-							XmlWriter.append_text_element(doc,subele3,XML_TAG_FROM,String.valueOf(bed[i].thickEnd+1));
-							XmlWriter.append_text_element(doc,subele3,XML_TAG_TO,String.valueOf(subend));
-							subele3.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_BAND);
-							Ele.appendChild(subele3);
-						}
-					}
-					if(j<bed[i].blockCount-1 && subend<regionend && (bed[i].blockStarts[j+1]+bed[i].chromStart)>=regionstart){
-						Element subele=doc.createElement(XML_TAG_SUBELEMENT);
-						XmlWriter.append_text_element(doc,subele,XML_TAG_FROM,String.valueOf(subend+1));
-						XmlWriter.append_text_element(doc,subele,XML_TAG_TO,String.valueOf(bed[i].blockStarts[j+1]+bed[i].chromStart));
-						subele.setAttribute(XML_TAG_TYPE, SUBELEMENT_TYPE_LINE);
-						Ele.appendChild(subele);
 					}
 				}
-			}}}}
+			}
 			Elements.appendChild(Ele);
 		}
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Elements);
 		return Elements;
+	}
+	private void deal_thick(Document doc, Element Ele, long substart, long subend, long thickStart, long thickEnd){
+		if(subend<=thickStart || substart>=thickEnd){
+			append_subele(doc,Ele,String.valueOf(substart+1),String.valueOf(subend),SUBELEMENT_TYPE_BAND);
+		}
+		else if(substart>=thickStart && subend<=thickEnd){
+			append_subele(doc,Ele,String.valueOf(substart+1),String.valueOf(subend),SUBELEMENT_TYPE_BOX);
+		}
+		else if(substart<thickStart && subend>thickEnd){
+			append_subele(doc,Ele,String.valueOf(substart+1),String.valueOf(thickStart),SUBELEMENT_TYPE_BAND);
+			append_subele(doc,Ele,String.valueOf(thickStart+1),String.valueOf(thickEnd),SUBELEMENT_TYPE_BOX);
+			append_subele(doc,Ele,String.valueOf(thickEnd+1),String.valueOf(subend),SUBELEMENT_TYPE_BAND);
+		}
+		else if(substart<thickStart && subend>thickStart){
+			append_subele(doc,Ele,String.valueOf(substart+1),String.valueOf(thickStart),SUBELEMENT_TYPE_BAND);
+			append_subele(doc,Ele,String.valueOf(thickStart+1),String.valueOf(subend),SUBELEMENT_TYPE_BOX);
+		}
+		else if(substart<thickEnd && subend>thickEnd){
+			append_subele(doc,Ele,String.valueOf(substart+1),String.valueOf(thickEnd),SUBELEMENT_TYPE_BOX);
+			append_subele(doc,Ele,String.valueOf(thickEnd+1),String.valueOf(subend),SUBELEMENT_TYPE_BAND);
+		}
+	}
+	private void append_subele(Document doc, Element Ele, String from, String to, String type){
+		Element subele=doc.createElement(XML_TAG_SUBELEMENT);
+		XmlWriter.append_text_element(doc,subele,XML_TAG_FROM,from);
+		XmlWriter.append_text_element(doc,subele,XML_TAG_TO,to);
+		subele.setAttribute(XML_TAG_TYPE, type);
+		Ele.appendChild(subele);
 	}
 }

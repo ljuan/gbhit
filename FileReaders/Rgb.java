@@ -1,9 +1,9 @@
 package FileReaders;
 
 class Rgb{
-	int Red;
-	int Green;
-	int Blue;
+	private int Red;
+	private int Green;
+	private int Blue;
 	Rgb(){
 		init(0,0,0);
 	}

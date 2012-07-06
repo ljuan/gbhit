@@ -1,6 +1,5 @@
 package FileReaders;
 
-import java.io.*;
 public interface Consts{
 	public static final String CONFIGURE="/home/ljuan/gbdata/config.xml";
 	
@@ -8,7 +7,7 @@ public interface Consts{
 	public static final String META_ROOT="MetaDataExchange";
 	public static final String DATA_ROOT="DataExchange";
 	
-	public static final int LIMIT_SEQ=400;
+	public static final int LIMIT_SEQ=900;
 	public static final int LIMIT_ELE=-1;
 	public static final int LIMIT_VAR=1000000;
 	
@@ -33,6 +32,7 @@ public interface Consts{
 	
 	public static final String XML_TAG_ID="id";
 	public static final String XML_TAG_TYPE="Type";
+	public static final String XML_TAG_KEY="key";
 	
 	public static final String XML_TAG_VARIANT="Variant";
 	public static final String XML_TAG_VARIANTS="Variants";
