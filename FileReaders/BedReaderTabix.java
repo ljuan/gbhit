@@ -52,15 +52,16 @@ class BedReaderTabix implements Consts{
 			XmlWriter.append_text_element(doc,Ele,XML_TAG_FROM,String.valueOf(bed[i].chromStart+1));
 			XmlWriter.append_text_element(doc,Ele,XML_TAG_TO,String.valueOf(bed[i].chromEnd));
 			
-			if(bed[i].name != null){
+			if(bed[i].fields > 3){
 				Ele.setAttribute(XML_TAG_ID, bed[i].name);
+				if(bed[i].fields >4){
 				XmlWriter.append_text_element(doc,Ele,XML_TAG_DIRECTION,bed[i].strand);
-				
-				if(!bed[i].itemRgb.ToString().equals("0,0,0"))
+				if(bed[i].fields>5){
+				if(bed[i].itemRgb != null && !bed[i].itemRgb.ToString().equals("0,0,0"))
 					XmlWriter.append_text_element(doc,Ele,XML_TAG_COLOR,bed[i].itemRgb.ToString());
 				else if(bed[i].score>0)
 					XmlWriter.append_text_element(doc,Ele,XML_TAG_COLOR,new Rgb(bed[i].score).ToString());
-				
+				if(bed[i].fields>11){
 				for(int j=0;j<bed[i].blockCount;j++){
 					long substart=bed[i].blockStarts[j]+bed[i].chromStart;
 					long subend=bed[i].blockStarts[j]+bed[i].chromStart+bed[i].blockSizes[j];
@@ -129,7 +130,7 @@ class BedReaderTabix implements Consts{
 						Ele.appendChild(subele);
 					}
 				}
-			}
+			}}}}
 			Elements.appendChild(Ele);
 		}
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Elements);

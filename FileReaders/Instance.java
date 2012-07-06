@@ -103,8 +103,10 @@ public class Instance implements Consts{
 	public String get_Annotations(){
 		String[] anno_names=new String[Annos.size()];
 		Enumeration<Annotations> annos_enum=Annos.elements();
-		for(int i=0;i<Annos.size();i++)
-			anno_names[i]=annos_enum.nextElement().get_ID();
+		for(int i=0;i<Annos.size();i++){
+			Annotations temp=annos_enum.nextElement();
+			anno_names[i]=temp.get_ID()+temp.get_Mode();
+		}
 		Document doc=XmlWriter.init(META_ROOT);
 		Config.write_metalist(doc,anno_names, "AnnotationList");
 		return XmlWriter.xml2string(doc);
