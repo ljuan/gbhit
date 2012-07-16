@@ -61,7 +61,7 @@ class BedReaderTabix implements Consts{
 							XmlWriter.append_text_element(doc,Ele,XML_TAG_COLOR,bed[i].itemRgb.ToString());
 						else if(bed[i].score>0)
 							XmlWriter.append_text_element(doc,Ele,XML_TAG_COLOR,new Rgb(bed[i].score).ToString());
-						if(bed[i].fields>11){
+						if(bed[i].fields > 11 && regionend-regionstart < 10000000){
 							for(int j=0;j<bed[i].blockCount;j++){
 								long substart=bed[i].blockStarts[j]+bed[i].chromStart;
 								long subend=bed[i].blockStarts[j]+bed[i].chromStart+bed[i].blockSizes[j];

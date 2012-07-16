@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="MetaDataExchange">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="AssemblyList" type="xs:string" minOccurs="0"/>
+				<xs:element name="AnnotationList" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DataExchange">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="xs:string" maxOccurs="unbounded" minOccurs="0"/>
+				<xs:element name="Assembly" type="xs:string"/>
+				<xs:element name="Chromosome" type="xs:string"/>
+				<xs:element name="Start" type="xs:long"/>
+				<xs:element name="End" type="xs:long"/>
+				<xs:element name="Length" type="xs:long"/>
+				
+				<xs:element name="Sequence" type="SeqLimit" maxOccurs="1" minOccurs="0">
+					<xs:complextType>
+						<xs:attribute name="id" type="xs:string"/>
+					</xs:complextType>
+				</xs:element>
+				<xs:element name="EVList" type="xs:string" maxOccurs="unbounded" minOccurs="0"/> <!--comma-seperated string for general position of variants or elements, well formatted-->
+				
+				<xs:element name="Variants" maxOccurs="unbounded" minOccurs="0"> <!--detail information of variants, only return when specific variant information is requested-->
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Variant" maxOccurs="unbounded" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="From" type="xs:long"/>
+										<xs:element name="To" type="xs:long"/>
+										<xs:element name="Letter" type="SeqLimit" minOccurs="0"/>
+										<xs:element name="Description" type="xs:string" minOccurs="0"/>
+									</xs:sequence>
+									<xs:attribute name="id" type="xs:string"/>
+									<xs:attribute name="Type" type="VariantType"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="id" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+				
+				<xs:element name="Elements" maxOccurs="unbounded" minOccurs="0"> <!--including cytoband, gene, mRNA, EST...-->
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Element" maxOccurs="unbounded" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="From" type="xs:long"/>
+										<xs:element name="To" type="xs:long"/>
+										<xs:element name="Direction" type="xs:string" minOccurs="0"/>
+										<xs:element name="Description" type="xs:string" minOccurs="0"/>
+										<xs:element name="Color" type="xs:string" minOccurs="0"/>
+										<xs:element name="SubElement" maxOccurs="unbounded" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="From" type="xs:long"/>
+													<xs:element name="To" type="xs:long"/>
+													<xs:element name="Direction" type="xs:string" minOccurs="0"/>													
+													<xs:element name="Discription" type="xs:string" minOccurs="0"/>
+												</xs:sequence>
+												<xs:attribute name="id" type="xs:string"/>
+												<xs:attribute name="Type" type="xs:SubElementType"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="id" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="id" type="xs:string"/>
+					</xs:complexType>
+				</xs:element>
+				
+				<xs:element name="Values" maxOccurs="unbounded" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="From" type="xs:long"/>
+							<xs:element name="To" type="xs:long"/>
+							<xs:element name="Step" type="xs:integer"/>
+							<xs:element name="Values" type="xs:string"/> <!--comma-seperated string for value of each step-->
+							<xs:element name="Description" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+						<xs:attribute name="id" type="xs:string" use="required"/>
+						<xs:attribute name="Type" type="ValueType"/>
+						<xs:attribute name="Mode" type="ValueMode" default="Grayscale"/>
+					</xs:complexType>
+				</xs:element>
+				
+				<xs:element name="Reads" maxOccurs="unbounded" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Read" maxOccurs="unbounded" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="From" type="xs:long"/>
+										<xs:element name="To" type="xs:long"/>
+										<xs:element name="Direction" type="xs:string" minOccurs="0"/>
+										<xs:element name="Mapq" type="xs:integer" minOccurs="0"/>
+										
+										<xs:element name="MD" type="xs:string" minOccurs="0"/>
+										
+										<xs:element name="Cigar" type="xs:string" minOccurs="0"/>
+										<xs:element name="Rnext" type="xs:string" minOccurs="0"/>
+										<xs:element name="Pnext" type="xs:string" minOccurs="0"/>
+										<xs:element name="Tlen" type="xs:string" minOccurs="0"/>
+										<xs:element name="Seq" type="SeqLimit" minOccurs="0"/>
+										<xs:element name="Qual" type="xs:string" minOccurs="0"/>
+										<xs:element name="Description" type="xs:string" minOccurs="0"/>
+									</xs:sequence>
+									<xs:attribute name="id" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="id" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+				
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+			
+	<xs:simpleType name="VariantType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SNV"/> <!--Single nucleotide Variant-->
+			<xs:enumeration value="INS"/> <!--Insertion-->
+			<xs:enumeration value="DEL"/> <!--Deletion-->
+			<xs:enumeration value="CNV"/> <!--Copy number Variation-->
+			<xs:enumeration value="INV"/> <!--Inversion-->
+			<xs:enumeration value="MUL"/> <!--Multi-Type-->
+			<xs:enumeration value="OTH"/> <!--Others-->
+			<xs:enumeration value="BLS"/> <!--Block Substitution-->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SeqLimit">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([ATCGN]+)"/>
+			<xs:minLength value="1"/>
+			<xs:maxLength value="400"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SubElementType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Box"/>
+			<xs:enumeration value="Line"/>
+			<xs:enumeration value="Band"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ValueType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CON"/> <!--Conservation-->
+			<xs:enumeration value="EXP"/> <!--Expression-->
+			<xs:enumeration value="REN"/> <!--Reads Enrichment-->
+			<xs:enumeration value="GCC"/> <!--GC content-->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ValueMode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Grayscale"/>
+			<xs:enumeration value="Curve"/>
+			<xs:enumeration value="Histogram"/>
+			<xs:enumeration value="Heatmap"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>

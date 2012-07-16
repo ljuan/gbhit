@@ -49,6 +49,10 @@ public interface Consts{
 	public static final String XML_TAG_MODE="Mode";
 	public static final String XML_TAG_STEP="Step";
 	public static final String XML_TAG_VALUE="Value";
+	public static final String XML_TAG_VALUES="Values";
+	
+	public static final String XML_TAG_READS="Reads";
+	public static final String XML_TAG_READ="Read";
 	
 	public static final String TEXT_TRUE="true";
 	public static final String TEXT_FALSE="false";
