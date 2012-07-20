@@ -83,7 +83,7 @@
 							<xs:element name="From" type="xs:long"/>
 							<xs:element name="To" type="xs:long"/>
 							<xs:element name="Step" type="xs:integer"/>
-							<xs:element name="Values" type="xs:string"/> <!--comma-seperated string for value of each step-->
+							<xs:element name="ValueList" type="xs:string"/> <!--comma-seperated string for value of each step-->
 							<xs:element name="Description" type="xs:string" minOccurs="0"/>
 						</xs:sequence>
 						<xs:attribute name="id" type="xs:string" use="required"/>
@@ -103,7 +103,18 @@
 										<xs:element name="Direction" type="xs:string" minOccurs="0"/>
 										<xs:element name="Mapq" type="xs:integer" minOccurs="0"/>
 										
-										<xs:element name="MD" type="xs:string" minOccurs="0"/>
+										<xs:element name="Variant" maxOccurs="unbounded" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="From" type="xs:long"/>
+													<xs:element name="To" type="xs:long"/>
+													<xs:element name="Letter" type="SeqLimit" minOccurs="0"/>
+													<xs:element name="Description" type="xs:string" minOccurs="0"/>
+												</xs:sequence>
+												<xs:attribute name="id" type="xs:string"/>
+												<xs:attribute name="Type" type="VariantType"/>
+											</xs:complexType>
+										</xs:element>
 										
 										<xs:element name="Cigar" type="xs:string" minOccurs="0"/>
 										<xs:element name="Rnext" type="xs:string" minOccurs="0"/>
