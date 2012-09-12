@@ -1,12 +1,11 @@
 package FileReaders;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import org.w3c.dom.Document;
-
-
-
 
 public class Instance implements Consts{
 	String Assembly;
@@ -17,6 +16,7 @@ public class Instance implements Consts{
 	FastaReader fr;
 	CfgReader Config;
 	double bpp;
+	int window_width;
 	public Instance (){
 		initialize("hg19");
 	}
@@ -45,6 +45,7 @@ public class Instance implements Consts{
 		if(chrid>=0){
 			Chr=chr;
 			Coordinate=check_coordinate(chrid,start,end);
+			this.window_width=window_width;
 			bpp=(double)(Coordinate[1]-Coordinate[0])/(double)window_width;
 			Enumeration<Annotations> annos_enum=Annos.elements();
 			
@@ -55,12 +56,12 @@ public class Instance implements Consts{
 
 			for(int i=0;i<Annos.size();i++){
 				Annotations anno_temp=annos_enum.nextElement();
-				append_track(anno_temp,doc,anno_temp.get_Mode(),bpp);
+				append_track(anno_temp,doc,anno_temp.get_Mode());
 			}
 			Enumeration<Annotations> externals_enum=Externals.elements();
 			for(int i=0;i<Externals.size();i++){
 				Annotations external_temp=externals_enum.nextElement();
-				append_track(external_temp,doc,external_temp.get_Mode(),bpp);
+				append_track(external_temp,doc,external_temp.get_Mode());
 			}	
 		}
 		else
@@ -72,9 +73,9 @@ public class Instance implements Consts{
 		for(int i=0;i<tracks.length;i++){
 			set_mode(tracks[i],modes[i]);
 			if(Annos.containsKey(tracks[i]))
-				append_track(Annos.get(tracks[i]),doc,Annos.get(tracks[i]).get_Mode(),bpp);
+				append_track(Annos.get(tracks[i]),doc,Annos.get(tracks[i]).get_Mode());
 			else if(Externals.containsKey(tracks[i]))
-				append_track(Externals.get(tracks[i]),doc,Externals.get(tracks[i]).get_Mode(),bpp);
+				append_track(Externals.get(tracks[i]),doc,Externals.get(tracks[i]).get_Mode());
 		}
 		return XmlWriter.xml2string(doc);
 	}
@@ -118,7 +119,7 @@ public class Instance implements Consts{
 		else if(Externals.containsKey(track))
 			Externals.get(track).set_Mode(mode);
 	}
-	void append_track(Annotations track, Document doc,String mode,double bpp){
+	void append_track(Annotations track, Document doc,String mode){
 		if(!mode.equals(MODE_HIDE)){
 			if(track.get_Type().equals(FORMAT_BEDGZ)){
 				BedReaderTabix brt=new BedReaderTabix(track.get_Path(Chr));
@@ -131,6 +132,18 @@ public class Instance implements Consts{
 			else if (track.get_Type().equals(FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<1000000){
 				VcfReader vr=new VcfReader(track.get_Path(Chr));
 				vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
+			}
+			else if (track.get_Type().equals(FORMAT_BAM)){
+				try {
+					BAMReader br2=new BAMReader(track.get_Path(Chr));
+					br2.readBAM(doc,Chr,(int)Coordinate[0],(int)Coordinate[1],window_width,mode,track.get_ID());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			else if (track.get_Type().equals(FORMAT_FASTA)&&bpp<0.5){
 				fr.write_sequence(doc, Chr, Coordinate[0], Coordinate[1], track.get_ID());
