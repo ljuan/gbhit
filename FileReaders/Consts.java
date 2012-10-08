@@ -16,6 +16,10 @@ public interface Consts{
 	public static final String FORMAT_WIG="WIG";
 	public static final String FORMAT_BEDGZ="BEDGZ";
 	public static final String FORMAT_FASTA="FASTA";
+	public static final String FORMAT_BAM="BAM";
+	public static final String FORMAT_GFF="GFF";
+	public static final String FORMAT_GTF="GTF";
+	public static final String FORMAT_GVF="GVF";
 	
 	public static final String XML_TAG_ASSEMBLY="Assembly";
 	public static final String XML_TAG_ANNOTATION="Anno";

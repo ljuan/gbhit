@@ -129,6 +129,36 @@ public class Instance implements Consts{
 				BedReader br=new BedReader(track.get_Path(Chr));
 				br.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 			}
+			else if(track.get_Type().equals(FORMAT_GFF)){
+				GFFReader gr;
+				try {
+					gr = new GFFReader(track.get_Path(Chr));
+					gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"gene_id");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else if(track.get_Type().equals(FORMAT_GTF)){
+				GTFReader gr;
+				try {
+					gr = new GTFReader(track.get_Path(Chr));
+					gr.write_gtf2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else if(track.get_Type().equals(FORMAT_GVF)){
+				GVFReader gr;
+				try {
+					gr = new GVFReader(track.get_Path(Chr));
+					gr.write_gvf2variants(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			else if (track.get_Type().equals(FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<1000000){
 				VcfReader vr=new VcfReader(track.get_Path(Chr));
 				vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);

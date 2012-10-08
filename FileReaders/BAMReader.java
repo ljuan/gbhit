@@ -1,27 +1,27 @@
-package FileReaders;
+﻿package FileReaders;
 
 import java.io.*;
 import java.net.*;
-import java.nio.*;
-import java.nio.channels.FileChannel;
 import java.util.*;
 import org.w3c.dom.*;
 import net.sf.samtools.*;
 import net.sf.samtools.SAMRecord.SAMTagAndValue;
-import FileReaders.*;
+import net.sf.samtools.util.SeekableBufferedStream;
+import net.sf.samtools.util.SeekableHTTPStream;
 
 /**
  * <pre>
  * usage:
  * Firstly, Get an instance of this class:
- *   public BAMReader(String filePath, String indexFilePath, boolean fromRemoteServer)
+ *   public BAMReader(String filePath)
+ *   if index file exists, use getIndexFilePath() to get .bai filepath through; else, throw FileNotFoundException 
  * Secondly: insert elements into Document Object:
  * 	 readBAM(Document doc, String chr, int start, int end, int size, String mode, String track)
  * 
  * @author YanChengWu
  * 
  */
-public class BAMReader {
+public class BAMReader implements Consts {
 
 	/**
 	 * BAM file path or url.
@@ -34,7 +34,7 @@ public class BAMReader {
 
 	/**
 	 * If the BAM file comes from remote server: fromRemoteServer=true, false
-	 * else. If fromRemoteServer=true, filePath is a path of a local BAM file,
+	 * else. If fromRemoteServer=false, filePath is a path of a local BAM file,
 	 * else an url of a remote BAM file.
 	 */
 	private boolean fromRemoteServer;
@@ -42,11 +42,6 @@ public class BAMReader {
 	private SAMFileReader samReader = null;
 
 	private static final int SIXTEENK = 16 * 1024;;
-
-	/**
-	 * total number of reads in the BAM file
-	 */
-	private int totalReadNum = 0;
 
 	/**
 	 * position of each chromosome's first read's first base in the BAM file.
@@ -60,9 +55,9 @@ public class BAMReader {
 	 */
 	private long[] chrLastLinearSpan = null;
 	/**
-	 * total number of reads of each chromosome in the BAM file
+	 * number of reads of the given chromosome in the BAM file
 	 */
-	private int[] chrReadNum = null;
+	private int chrReadNum;
 
 	/**
 	 * total number of linear bin of each chromosome in the BAM file
@@ -73,12 +68,6 @@ public class BAMReader {
 	 * number of chromosome in the BAM file
 	 */
 	private int sequenceNum = 0;
-
-	/**
-	 * If it is the first time use the method to read big region,
-	 * firstReadHead=true. Else false.
-	 */
-	private boolean firstReadHead = true;
 
 	public BAMReader() {
 	}
@@ -102,15 +91,62 @@ public class BAMReader {
 		this.indexFilePath = indexFilePath;
 		this.fromRemoteServer = fromRemoteServer;
 	}
-	
-	public BAMReader(String filePath) throws MalformedURLException, URISyntaxException {
-		this.filePath=filePath;
-		this.indexFilePath=filePath+".bai";
-		if(filePath.startsWith("http://") || filePath.startsWith("ftp://") || filePath.startsWith("https://")){
-			this.fromRemoteServer= true;
+
+	/**
+	 * if the index file does't exist, throw FileNotFoundException
+	 * 
+	 * @param filePath
+	 *            file path or url of the BAM file.
+	 * @param indexFilePath
+	 *            Temp path to store the index file. Influential only when BAM
+	 *            file is from remote server.
+	 * @throws MalformedURLException
+	 * @throws URISyntaxException
+	 * @throws FileNotFoundException
+	 */
+	public BAMReader(String filePath) throws MalformedURLException,
+			URISyntaxException, FileNotFoundException {
+		this.filePath = filePath;
+		if (filePath.startsWith("http://") || filePath.startsWith("ftp://")
+				|| filePath.startsWith("https://")) {
+			this.fromRemoteServer = true;
+
+			if (isRemoteFileExists(filePath + ".bai"))
+				this.indexFilePath = filePath + ".bai";
+			else if (isRemoteFileExists(filePath.replace(".bam", ".bai")))
+				this.indexFilePath = filePath.replace(".bam", ".bai");
+			else
+				throw new FileNotFoundException();
+		} else {
+			this.fromRemoteServer = false;
+			if (new File(filePath + ".bai").exists())
+				this.indexFilePath = filePath + ".bai";
+			else if (new File(filePath.replace(".bam", ".bai")).exists())
+				this.indexFilePath = filePath.replace(".bam", ".bai");
+			else
+				throw new FileNotFoundException();
 		}
-		else {
-			this.fromRemoteServer= false;
+	}
+
+	/**
+	 * Judge remote file exists
+	 */
+	private boolean isRemoteFileExists(String url) {
+		URL serverUrl;
+		try {
+			serverUrl = new URL(url);
+			HttpURLConnection urlcon = (HttpURLConnection) serverUrl
+					.openConnection();
+
+			String message = urlcon.getHeaderField(0);
+			if (message != null && message.startsWith("HTTP/1.1 200 OK")) {
+				return true;
+			}
+			return false;
+		} catch (MalformedURLException e) {
+			return false;
+		} catch (IOException e) {
+			return false;
 		}
 	}
 
@@ -149,7 +185,7 @@ public class BAMReader {
 			if (list == null) {
 				bpp = 1024;
 			} else {
-				if (mode.equalsIgnoreCase("detail")) {
+				if (mode.equalsIgnoreCase(MODE_DETAIL)) {
 					// output all field to the XML file
 					writeDetail(doc, list, track);
 				} else {
@@ -176,26 +212,35 @@ public class BAMReader {
 	}
 
 	private void writeDetail(Document doc, List<SAMRecord> list, String track) {
-		Element reads = doc.createElement("Reads");
-		setA(reads, "id", track);
+		Element reads = doc.createElement(XML_TAG_READS);
+		reads.setAttribute(XML_TAG_ID, track);
 
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
 			SAMRecord rec = itor.next();
-			Element read = doc.createElement("Read");
-			setA(read, "id", rec.getReadName()).addC(doc, read, "From",
-					rec.getAlignmentStart() + "").addC(doc, read, "To",
+			Element read = doc.createElement(XML_TAG_READ);
+			read.setAttribute(XML_TAG_ID, rec.getReadName());
+			XmlWriter.append_text_element(doc, read, XML_TAG_FROM,
+					rec.getAlignmentStart() + "");
+			XmlWriter.append_text_element(doc, read, XML_TAG_TO,
 					rec.getAlignmentEnd() + "");
 
-			addC(doc, read, "Direction",
-					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-")
-					.addC(doc, read, "Mapq", rec.getMappingQuality() + "")
-					.addC(doc, read, "Cigar", rec.getCigarString())
-					.addC(doc, read, "Rnext", rec.getMateReferenceName())
-					.addC(doc, read, "Pnext", rec.getMateAlignmentStart() + "")
-					.addC(doc, read, "Tlen", rec.getInferredInsertSize() + "")
-					.addC(doc, read, "Seq", rec.getReadString())
-					.addC(doc, read, "Qual", rec.getBaseQualityString());
+			XmlWriter.append_text_element(doc, read, XML_TAG_DIRECTION,
+					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
+			XmlWriter.append_text_element(doc, read, "Mapq",
+					rec.getMappingQuality() + "");
+			XmlWriter.append_text_element(doc, read, "Cigar",
+					rec.getCigarString());
+			XmlWriter.append_text_element(doc, read, "Rnext",
+					rec.getMateReferenceName());
+			XmlWriter.append_text_element(doc, read, "Pnext",
+					rec.getMateAlignmentStart() + "");
+			XmlWriter.append_text_element(doc, read, "Tlen",
+					rec.getInferredInsertSize() + "");
+			XmlWriter
+					.append_text_element(doc, read, "Seq", rec.getReadString());
+			XmlWriter.append_text_element(doc, read, "Qual",
+					rec.getBaseQualityString());
 
 			StringBuilder remain = new StringBuilder();
 			List<SAMTagAndValue> l = rec.getAttributes();
@@ -204,12 +249,13 @@ public class BAMReader {
 				if (i < l.size() - 1)
 					remain.append(";");
 			}
-			addC(doc, read, "Description", remain.toString());
+
+			XmlWriter.append_text_element(doc, read, XML_TAG_DESCRIPTION,
+					remain.toString());
 
 			reads.appendChild(read);
 		}
-		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(reads);//�������ڵ���ڸ�Ŀ¼��
-		//doc.appendChild(reads);
+		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
 	}
 
 	/**
@@ -223,24 +269,27 @@ public class BAMReader {
 	 */
 	private void writeNotDetail(Document doc, List<SAMRecord> list,
 			String track, String mode, boolean lt0point5) {
-		Element reads = doc.createElement("Reads");
+		Element reads = doc.createElement(XML_TAG_READS);
 
-		setA(reads, "id", track);
+		reads.setAttribute(XML_TAG_ID, track);
 
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
 			SAMRecord rec = itor.next();
-			Element read = doc.createElement("Read");
+			Element read = doc.createElement(XML_TAG_READ);
 
-			if (mode.equalsIgnoreCase("full") || mode.equalsIgnoreCase("pack"))
-				setA(read, "id", rec.getReadName());
+			if (mode.equalsIgnoreCase(MODE_FULL)
+					|| mode.equalsIgnoreCase(MODE_PACK))
+				read.setAttribute(XML_TAG_ID, rec.getReadName());
 
-			addC(doc, read, "From", rec.getAlignmentStart() + "").addC(doc,
-					read, "To", rec.getAlignmentEnd() + "");
-
-			addC(doc, read, "Direction",
-					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-").addC(doc,
-					read, "Mapq", rec.getMappingQuality() + "");
+			XmlWriter.append_text_element(doc, read, XML_TAG_FROM,
+					rec.getAlignmentStart() + "");
+			XmlWriter.append_text_element(doc, read, XML_TAG_TO,
+					rec.getAlignmentEnd() + "");
+			XmlWriter.append_text_element(doc, read, XML_TAG_DIRECTION,
+					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
+			XmlWriter.append_text_element(doc, read, "Mapq",
+					rec.getMappingQuality() + "");
 
 			if (lt0point5) {
 				addVariant(doc, read, rec);
@@ -288,29 +337,32 @@ public class BAMReader {
 					while (it.hasNext()) {
 						Integer next = it.next();
 						String s = snv.get(next);
-						Element ele = doc.createElement("Variant");
-						setA(ele, "Type", "SNV");
-						addC(doc, ele, "From", "" + next.intValue());
-						addC(doc, ele, "To", ""
+						Element ele = doc.createElement(XML_TAG_VARIANT);
+						ele.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_SNV);
+						XmlWriter.append_text_element(doc, ele, XML_TAG_FROM,
+								"" + next.intValue());
+						XmlWriter.append_text_element(doc, ele, XML_TAG_TO, ""
 								+ (next.intValue() + s.length() - 1));
-						addC(doc, ele, "Letter", s);
+						XmlWriter.append_text_element(doc, ele, XML_TAG_LETTER,
+								s);
 						read.appendChild(ele);
 					}
 				}
 			}
 			reads.appendChild(read);
 		}
-		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(reads);//�������ڵ���ڸ�Ŀ¼��
-		//doc.appendChild(reads);
+		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
 	}
 
 	private void writeBigRegion(Document doc, int start, int end, int[] list,
 			String track) {
-		Element values = doc.createElement("Values");
-		setA(values, "id", track).setA(values, "Type", "REN");
+		Element values = doc.createElement(XML_TAG_VALUES);
+		values.setAttribute(XML_TAG_ID, track);
+		values.setAttribute(XML_TAG_TYPE, "REN");
 
-		addC(doc, values, "From", start + "").addC(doc, values, "To", end + "")
-				.addC(doc, values, "Step", "2");
+		XmlWriter.append_text_element(doc, values, XML_TAG_FROM, start + "");
+		XmlWriter.append_text_element(doc, values, XML_TAG_TO, end + "");
+		XmlWriter.append_text_element(doc, values, XML_TAG_STEP, "2");
 
 		StringBuilder vl = new StringBuilder();
 		for (int i = 0; i < list.length; i++) {
@@ -318,46 +370,34 @@ public class BAMReader {
 			if (i < list.length - 1)
 				vl.append(";");
 		}
+		XmlWriter.append_text_element(doc, values, "ValueList", vl.toString());
 
-		addC(doc, values, "ValueList", vl.toString());
-		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(values);//�������ڵ���ڸ�Ŀ¼��
-		//doc.appendChild(values);
-	}
-
-	private BAMReader setA(Element e, String name, String value) {
-		e.setAttribute(name, value);
-		return this;
-	}
-
-	private BAMReader addC(Document doc, Element e, String name, String value) {
-		Element ele = doc.createElement(name);
-		Text text = doc.createTextNode(value);
-		ele.appendChild(text);
-		e.appendChild(ele);
-
-		return this;
+		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(values);
 	}
 
 	private void addVariant(Document doc, Element read, SAMRecord record) {
 		List<CigarElement> li = record.getCigar().getCigarElements();
 
-		Element ele = doc.createElement("Variant");
+		Element ele = doc.createElement(XML_TAG_VARIANT);
 
 		boolean hasException = false;
 		int pos = 1;
 		for (CigarElement ce : li) {
 			String name = ce.getOperator().name();
 			if (name.equals("D")) {
-				setA(ele, "Type", "DEL");
-				addC(doc, ele, "From", "" + pos);
-				addC(doc, ele, "To", "" + (pos + ce.getLength() - 1));
+				ele.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_DELETION);
+				XmlWriter.append_text_element(doc, ele, XML_TAG_FROM, "" + pos);
+				XmlWriter.append_text_element(doc, ele, XML_TAG_TO, ""
+						+ (pos + ce.getLength() - 1));
 				hasException = true;
 			} else if (name.equals("I")) {
-				setA(ele, "Type", "INS");
-				addC(doc, ele, "From", "" + (pos - 1));
-				addC(doc,
+				ele.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_INSERTION);
+				XmlWriter.append_text_element(doc, ele, XML_TAG_FROM, ""
+						+ (pos - 1));
+				XmlWriter.append_text_element(
+						doc,
 						ele,
-						"Letter",
+						XML_TAG_LETTER,
 						record.getReadString().substring(pos - 1,
 								pos + ce.getLength() - 1));
 				hasException = true;
@@ -383,9 +423,10 @@ public class BAMReader {
 	 *            end base int the chromosome. 1-base
 	 * @return
 	 * @throws MalformedURLException
+	 * @throws FileNotFoundException
 	 */
 	private List<SAMRecord> readSmallRegion(String chr, int start, int end)
-			throws MalformedURLException {
+			throws MalformedURLException, FileNotFoundException {
 		SAMRecordIterator itor = getIterator(chr, start, end);
 
 		if (itor == null) {
@@ -410,17 +451,7 @@ public class BAMReader {
 		if (null == list)
 			return null;
 
-		/*
-		 * Iterator<SAMRecord> it = list.iterator(); while (it.hasNext()) {
-		 * SAMRecord next = it.next(); if (next.getAttribute("MD") != null) {
-		 * String MD = (String) next.getAttribute("MD");
-		 * System.out.println("id:" + next.getReadName() + "\tMD:" + MD +
-		 * "\tCigar:" + next.getCigarString() + "\tstart:" +
-		 * next.getAlignmentStart()); } }
-		 */
-
 		return list;
-
 	}
 
 	/**
@@ -436,12 +467,12 @@ public class BAMReader {
 	 *            size of the browser in pixel
 	 * @return
 	 * @throws MalformedURLException
+	 * @throws FileNotFoundException
 	 */
 	private int[] readMiddleRegion(String chr, int start, int end,
-			int windowSize) throws MalformedURLException {
+			int windowSize) throws MalformedURLException, FileNotFoundException {
 
 		SAMRecordIterator itor = getIterator(chr, start, end);
-		// System.out.println(itor);
 
 		double smallRegionWidth = 0;
 		int[] starts = null;
@@ -497,29 +528,19 @@ public class BAMReader {
 	 */
 	private int[] readBigRegion(String chr, int start, int end, int windowSize)
 			throws IOException {
-
 		open(false);
+		/*
+		 * index of the given chromosome in BAM file order
+		 */
+		int refIndex = samReader.getFileHeader().getSequenceIndex(chr);
+		readReference(refIndex);
 
-		FileInputStream fileStream = new FileInputStream(indexFilePath);
-		FileChannel fileChannel = fileStream.getChannel();
-		MappedByteBuffer mbBuffer = fileChannel.map(
-				FileChannel.MapMode.READ_ONLY, 0L, fileChannel.size());
-		mbBuffer.order(ByteOrder.LITTLE_ENDIAN);
-		fileChannel.close();
-		fileStream.close();
+		InputStream is1 = getInputStream(indexFilePath);
+		readLinearIndex(is1);
+		is1.close();
 
-		if (firstReadHead) {
-			readReference();
-			readLinearIndex(mbBuffer);
-			firstReadHead = false;
-		}
 		int startLinear = LinearIndex.convertToLinearIndexOffset(start);
 		int endLinear = LinearIndex.convertToLinearIndexOffset(end);
-
-		/*
-		 * System.out.println("start:" + start + ", end:" + end +
-		 * ", startLinear:" + startLinear + ", endLinear:" + endLinear);
-		 */
 
 		int nLinearBins = endLinear - startLinear + 1;
 
@@ -528,15 +549,17 @@ public class BAMReader {
 		for (int i = 0; i <= nLinearBins; i++)
 			pos[i] = 0;
 
-		int refIndex = samReader.getFileHeader().getSequenceIndex(chr);
+		InputStream is2 = getInputStream(indexFilePath);
 
-		location(refIndex, mbBuffer, startLinear);
+		location(refIndex, is2, startLinear);
 
 		for (int i = 0; i < nLinearBins; i++) {
-			pos[i] = mbBuffer.getLong() >> 16;
+			pos[i] = TabixReader.readLong(is2) >> 16;
 		}
-		// ���򸲸ǵ����һ�������������������Ⱦɫ���ϵ����һ����������.
-		// ��ʱ��Ҫ��������Ⱦɫ��ֱ���ҵ���һ����0��������
+		// The last linear index of the given region may be the last linear
+		// index of the chromosome,
+		// so we must find the first linear index which != 0 from the next
+		// chromosomes backward.
 		if (endLinear + 1 == chrLinearBinNum[refIndex]) {
 			for (int i = refIndex + 1; i <= sequenceNum; i++) {
 				if (chrFileSize[i] != 0) {
@@ -545,15 +568,17 @@ public class BAMReader {
 				}
 			}
 		} else {
-			pos[nLinearBins] = mbBuffer.getLong() >> 16;
+			pos[nLinearBins] = TabixReader.readLong(is2) >> 16;
 		}
+		is2.close();
 
 		int[] regions = new int[nLinearBins];
 		for (int i = 0; i < nLinearBins; i++)
 			regions[i] = 0;
 
-		// ����һ������������0������Ҫ��ǰ��������Ⱦɫ������һ����0��������
-		// ֱ���ҵ���һ����0�����������п���һ��Ⱦɫ����û���κ�Read��
+		// If the first linear index equals 0, we must find the first linear
+		// index which != 0 from the previous
+		// chromosomes forward.
 		if (pos[0] == 0) {
 			long l = 0;
 			for (int i = refIndex - 1; i >= 0; i++) {
@@ -566,17 +591,10 @@ public class BAMReader {
 				pos[i] = l;
 		}
 
-		/*
-		 * for (int i = 0; i < pos.length; i++) System.out.println("��" + (i + 1)
-		 * + "��pos��" + pos[i]);
-		 */
-
 		long refSpan = chrFileSize[refIndex + 1] - chrFileSize[refIndex];
 		boolean firstZero = true;
 		int firstZeroIndex = 0;
 
-		// regions[0] = (int) (((pos[1] - pos[0]) * chrReadNum[refIndex]) /
-		// refSpan);
 		for (int i = 1; i < nLinearBins; i++) {
 			if (pos[i - 1] == pos[i]) {
 				if (firstZero) {
@@ -586,17 +604,14 @@ public class BAMReader {
 				regions[i] = 0;
 			} else {
 				if (!firstZero) {
-					regions[firstZeroIndex - 1] = (int) (((pos[i] - pos[i - 1]) * chrReadNum[refIndex]) / refSpan);
+					regions[firstZeroIndex - 1] = (int) (((pos[i] - pos[i - 1]) * chrReadNum) / refSpan);
 					firstZero = true;
 				}
-				regions[i] = (int) (((pos[i + 1] - pos[i]) * chrReadNum[refIndex]) / refSpan);
+				regions[i] = (int) (((pos[i + 1] - pos[i]) * chrReadNum) / refSpan);
 			}
 		}
 
-		/*
-		 * for (int i = 0; i < regions.length; i++) System.out.println((i + 1) +
-		 * ":" + regions[i]);
-		 */
+		close();
 
 		return getSpan(start % SIXTEENK,
 				(end - start + 1) / (windowSize / 2.0), windowSize / 2, regions);
@@ -648,74 +663,67 @@ public class BAMReader {
 		return res;
 	}
 
-	private void location(int refIndex, MappedByteBuffer mbBuffer, int start) {
-		mbBuffer.position(8);
+	private void location(int refIndex, InputStream is, int start)
+			throws IOException {
+		is.skip(8);
 
-		// System.out.println("refIndex:" + refIndex);
 		for (int i = 0; i < refIndex; i++) {
-			final int nBins = mbBuffer.getInt();
+			final int nBins = TabixReader.readInt(is);
 			for (int j = 0; j < nBins; j++) {
-				mbBuffer.getInt();
-				final int nChunks = mbBuffer.getInt();
-				mbBuffer.position(mbBuffer.position() + 16 * nChunks);
+				is.skip(4);
+				final int nChunks = TabixReader.readInt(is);
+				is.skip(16 * nChunks);
 			}
-			final int nLinearBins = mbBuffer.getInt();
-			mbBuffer.position(mbBuffer.position() + 8 * nLinearBins);
+			final int nLinearBins = TabixReader.readInt(is);
+			is.skip(8 * nLinearBins);
 		}
 
-		final int nBins = mbBuffer.getInt();
+		final int nBins = TabixReader.readInt(is);
 		for (int j = 0; j < nBins; j++) {
-			mbBuffer.getInt();
-			final int nChunks = mbBuffer.getInt();
-			mbBuffer.position(mbBuffer.position() + 16 * nChunks);
+			is.skip(4);
+			final int nChunks = TabixReader.readInt(is);
+			is.skip(16 * nChunks);
 		}
 
-		mbBuffer.position(mbBuffer.position() + 4 + 8 * start);
+		is.skip(4 + 8 * start);
 	}
 
-	private void readReference() {
+	private void readReference(int refIndex) {
 		AbstractBAMFileIndex index = (AbstractBAMFileIndex) samReader
 				.getIndex();
-
 		sequenceNum = index.getNumberOfReferences();
-		chrReadNum = new int[sequenceNum];
 		chrLinearBinNum = new int[sequenceNum];
 		chrLastLinearSpan = new long[sequenceNum];
 		chrFileSize = new long[sequenceNum + 1];
 
-		totalReadNum = 0;
-
-		for (int i = 0; i < sequenceNum; i++) {
-			chrReadNum[i] = index.getMetaData(i).getAlignedRecordCount();
-			totalReadNum += chrReadNum[i];
-		}
+		// read num of given chromosome
+		chrReadNum = index.getMetaData(refIndex).getAlignedRecordCount();
 	}
 
-	private void readLinearIndex(MappedByteBuffer mbBuffer)
-			throws MalformedURLException {
-		mbBuffer.position(8);
+	private void readLinearIndex(InputStream is) throws IOException {
+		is.skip(8);
 
 		for (int i = 0; i < sequenceNum; i++) {
-			final int nBins = mbBuffer.getInt();
+			final int nBins = TabixReader.readInt(is);
 			for (int j = 0; j < nBins; j++) {
-				mbBuffer.getInt();
-				final int nChunks = mbBuffer.getInt();
-				mbBuffer.position(mbBuffer.position() + 16 * nChunks);
+				is.skip(4);
+				final int nChunks = TabixReader.readInt(is);
+				is.skip(16 * nChunks);
 			}
 
-			final int nLinearBins = mbBuffer.getInt();
+			final int nLinearBins = TabixReader.readInt(is);
 			chrLinearBinNum[i] = nLinearBins;
 
 			int k = 0;
 			for (k = 1; k <= nLinearBins; k++) {
-				chrFileSize[i] = mbBuffer.getLong() >> 16;
-				if (chrFileSize[i] != 0)
+				chrFileSize[i] = TabixReader.readLong(is) >> 16;
+				if (chrFileSize[i] != 0) {
 					break;
+				}
 			}
 			if (k < nLinearBins) {
-				mbBuffer.position(mbBuffer.position() + 8
-						* (nLinearBins - k - 1));
-				chrLastLinearSpan[i] = mbBuffer.getLong() >> 16;
+				is.skip(8 * (nLinearBins - k - 1));
+				chrLastLinearSpan[i] = TabixReader.readLong(is) >> 16;
 			} else {
 				chrLastLinearSpan[i] = chrFileSize[i];
 			}
@@ -726,25 +734,26 @@ public class BAMReader {
 	}
 
 	private SAMRecordIterator getIterator(String chr, int start, int end)
-			throws MalformedURLException {
+			throws MalformedURLException, FileNotFoundException {
 		try {
 			open(false);
-			// samReader.enableFileSource(true);
 
 			SAMRecordIterator samRecItor = samReader.queryOverlapping(chr,
 					start, end);
 
 			return samRecItor;
 		} catch (SAMException e) {
-			// System.out.println(e.getMessage());
 			return null;
 		}
 	}
 
-	private void open(boolean b) throws MalformedURLException {
+	private void open(boolean b) throws MalformedURLException,
+			FileNotFoundException {
 		if (fromRemoteServer)
-			samReader = new SAMFileReader(new URL(filePath), new File(
-					indexFilePath), b);
+			samReader = new SAMFileReader(new SeekableBufferedStream(
+					new SeekableHTTPStream(new URL(filePath))),
+					new SeekableBufferedStream(new SeekableHTTPStream(new URL(
+							indexFilePath))), b);
 		else
 			samReader = new SAMFileReader(new File(filePath), new File(
 					indexFilePath), b);
@@ -755,5 +764,14 @@ public class BAMReader {
 			samReader.close();
 			samReader = null;
 		}
+	}
+
+	private InputStream getInputStream(String path)
+			throws MalformedURLException, FileNotFoundException {
+		if (fromRemoteServer)
+			return new SeekableBufferedStream(new SeekableHTTPStream(new URL(
+					path)));
+		else
+			return new FileInputStream(new File(path));
 	}
 }

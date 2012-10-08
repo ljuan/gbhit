@@ -385,6 +385,8 @@ public class TabixReader
 	
 	public Iterator query(final String reg) {
 		int[] x = parseReg(reg);
+		if(x[0]==-1)
+			return null;
 		return query(x[0], x[1], x[2]);
 	}
 
