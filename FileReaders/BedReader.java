@@ -77,7 +77,7 @@ class BedReader implements Consts {
 	}
 
 	Element write_bed2elements(Document doc, String track, String chr,
-			long regionstart, long regionend) {
+			long regionstart, long regionend, double bpp) {
 		Bed[] bed = extract_bed(chr, regionstart, regionend);
 		Element Elements = doc.createElement(XML_TAG_ELEMENTS);
 		Elements.setAttribute(XML_TAG_ID, track);
@@ -106,7 +106,8 @@ class BedReader implements Consts {
 									XML_TAG_COLOR,
 									new Rgb(bed[i].score).ToString());
 						if (bed[i].fields > 11
-								&& regionend - regionstart < 10000000) {
+						//		&& regionend - regionstart < 10000000) {
+								&& (bed[i].chromEnd-bed[i].chromStart)/bpp > bed[i].blockCount*2) {
 							for (int j = 0; j < bed[i].blockCount; j++) {
 								long substart = bed[i].blockStarts[j]
 										+ bed[i].chromStart;
