@@ -12,8 +12,11 @@ public interface Consts{
 	public static final int LIMIT_VAR=1000000;
 	
 	public static final String FORMAT_BED="BED";
+	public static final String FORMAT_BIGBED="BB";
+	public static final String FORMAT_BEDGRAPH="BG";
 	public static final String FORMAT_VCF="VCF";
 	public static final String FORMAT_WIG="WIG";
+	public static final String FORMAT_BIGWIG="BW";
 	public static final String FORMAT_BEDGZ="BEDGZ";
 	public static final String FORMAT_FASTA="FASTA";
 	public static final String FORMAT_BAM="BAM";

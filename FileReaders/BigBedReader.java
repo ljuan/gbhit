@@ -1,51 +1,110 @@
-﻿package FileReaders;
+package FileReaders;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
+import org.broad.igv.bbfile.BBFileHeader;
+import org.broad.igv.bbfile.BBFileReader;
+import org.broad.igv.bbfile.BedFeature;
+import org.broad.igv.bbfile.BigBedIterator;
+import org.broad.tribble.util.SeekableStream;
+
+import FileReaders.wiggle.CustomSeekableBufferedStream;
+import FileReaders.wiggle.CustomSeekableHTTPStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-/*
- * BedReader implemented by Tabix
- * Require sorted and indexed bed file
+/**
+ * Get Bed lines from bigBed.
+ * 
+ * <pre>
+ * Usage:
+ * new BigBedReader(String uri).getBigBed(String chrom, 
+ * int start, int end, boolean contained)
+ * @author Chengwu Yan
+ * revised by Liran Juan
+ * 
  */
-class BedReaderTabix implements Consts {
-	TabixReader bed_tb;
+public class BigBedReader implements Consts{
+	// open big file
+	private BBFileReader reader;
+	// get the big header
+	private BBFileHeader bbFileHdr;
 
-	BedReaderTabix(String bed) {
-		try {
-			bed_tb = new TabixReader(bed);
-		} catch (Exception e) {
-			e.printStackTrace();
+	/**
+	 * 
+	 * @param uri
+	 *            url or file path
+	 * @throws IOException
+	 */
+	public BigBedReader(String uri) throws IOException {
+		// open big file
+		if (uri.startsWith("http://") || uri.startsWith("ftp://")
+				|| uri.startsWith("https://")) {
+			if (!BAMReader.isRemoteFileExists(uri))
+				throw new FileNotFoundException("can't find file for:" + uri);
+			SeekableStream ss = new CustomSeekableBufferedStream(
+					new CustomSeekableHTTPStream(new URL(uri)));
+			reader = new BBFileReader(uri, ss);
+		} else {
+			reader = new BBFileReader(uri);
 		}
+		// get the big header
+		bbFileHdr = reader.getBBFileHeader();
 	}
 
-	Bed[] extract_bed(String chr, long start, long end) {
-		StringBuffer querystr = new StringBuffer();
-		querystr.append(chr);
-		querystr.append(':');
-		querystr.append(start);
-		querystr.append('-');
-		querystr.append(end);
-		ArrayList<Bed> bed_internal = new ArrayList<Bed>();
-		String line;
-		try {
-			TabixReader.Iterator Query = bed_tb.query(querystr.toString());
-			while ((line = Query.next()) != null) {
-				bed_internal.add(new Bed(line.split("\t")));
+	/**
+	 * 
+	 * @param chrom
+	 * @param start
+	 *            0-base
+	 * @param end
+	 *            0-base
+	 * @param contained
+	 *            whether allow overlaps
+	 *            true: not allow overlaps(completely contained only)
+	 *            false: allow overlaps
+	 * @return A list of Bed instances.
+	 * @throws IOException
+	 */
+	public List<Bed> getBigBed(String chrom, int start, int end,
+			boolean contained) throws IOException {
+		List<Bed> bigBeds = new ArrayList<Bed>();
+
+		if (chrom == null || !bbFileHdr.isHeaderOK() || !bbFileHdr.isBigBed())
+			return bigBeds;
+		// chromosome was specified, test if it exists in this file
+		if (!(new HashSet<String>(reader.getChromosomeNames()).contains(chrom)))
+			return bigBeds;
+
+		// get an iterator for BigBed features which occupy a chromosome
+		// selection region.
+		BigBedIterator iter = reader.getBigBedIterator(chrom, start, chrom,
+				end, contained);
+
+		// loop over iterator
+		while (iter.hasNext()) {
+			BedFeature f = iter.next();
+			ArrayList<String> bed = new ArrayList<String>();
+			bed.add(f.getChromosome());
+			bed.add(f.getStartBase() + "");
+			bed.add(f.getEndBase() + "");
+			for (String str : f.getRestOfFields()) {
+				bed.add(str);
 			}
-			bed_tb.TabixReaderClose();
-		} catch (IOException e) {
-			e.printStackTrace();
+			bigBeds.add(new Bed(bed.toArray(new String[bed.size()])));
 		}
-
-		return bed_internal.toArray(new Bed[bed_internal.size()]);
+		return bigBeds;
 	}
-
 	Element write_bed2elements(Document doc, String track, String chr,
-			long regionstart, long regionend, double bpp) {
-		Bed[] bed = extract_bed(chr, regionstart, regionend);
+			long regionstart, long regionend, double bpp) throws IOException {
+		List<Bed> bed_list;
+			bed_list = getBigBed(chr, (int) regionstart, (int) regionend, false);
+		Bed[] bed=new Bed[bed_list.size()];
+		bed_list.toArray(bed);
 		Element Elements = doc.createElement(XML_TAG_ELEMENTS);
 		Elements.setAttribute(XML_TAG_ID, track);
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Elements); // Elements
@@ -73,7 +132,7 @@ class BedReaderTabix implements Consts {
 									XML_TAG_COLOR,
 									new Rgb(bed[i].score).ToString());
 						if (bed[i].fields > 11
-					//			&& regionend - regionstart < 10000000) {
+						//		&& regionend - regionstart < 10000000) {
 								&& (bed[i].chromEnd-bed[i].chromStart)/bpp > bed[i].blockCount*2) {
 							for (int j = 0; j < bed[i].blockCount; j++) {
 								long substart = bed[i].blockStarts[j]

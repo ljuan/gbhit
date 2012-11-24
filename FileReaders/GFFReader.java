@@ -16,7 +16,7 @@ import FileReaders.TabixReader;
  * 		long regionstart, long regionend, String attributes)
  * </pre>
  * 
- * @author cwyan
+ * @author Chengwu Yan
  * 
  */
 class GFFReader implements Consts {
@@ -140,8 +140,8 @@ class GFFReader implements Consts {
 		return gffs;
 	}
 
-	private boolean overlaps(long region_start, long region_end,
-			long chr_start, long chr_end) {
+	public boolean overlaps(long region_start, long region_end, long chr_start,
+			long chr_end) {
 		if (chr_start >= region_start && chr_start <= region_end)
 			return true;
 		if (chr_end >= region_start && chr_end <= region_end)

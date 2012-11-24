@@ -6,13 +6,15 @@ import java.nio.channels.*;
 import java.nio.charset.*;
 
 import java.util.*;
-
+import net.sf.samtools.*;
 public class temp implements Consts{
 	public temp(){
 		Cf ccff=new Cf();
 		ccff.compare_filereaders();
+		LinearIndex li=new LinearIndex(0, 0, null);
 	}
 }
+
 class Cf{
 	public Cf(){
 		

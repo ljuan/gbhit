@@ -5,7 +5,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * @author cwyan
+ * @author Chengwu Yan
  */
 class GFF implements Comparable<GFF> {
 	/**

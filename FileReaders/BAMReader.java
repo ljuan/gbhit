@@ -18,7 +18,7 @@ import net.sf.samtools.util.SeekableHTTPStream;
  * Secondly: insert elements into Document Object:
  * 	 readBAM(Document doc, String chr, int start, int end, int size, String mode, String track)
  * 
- * @author YanChengWu
+ * @author Chengwu Yan
  * 
  */
 public class BAMReader implements Consts {
@@ -113,7 +113,7 @@ public class BAMReader implements Consts {
 
 			if (isRemoteFileExists(filePath + ".bai"))
 				this.indexFilePath = filePath + ".bai";
-			else if (isRemoteFileExists(filePath.replace(".bam", ".bai")))
+			else if (BAMReader.isRemoteFileExists(filePath.replace(".bam", ".bai")))
 				this.indexFilePath = filePath.replace(".bam", ".bai");
 			else
 				throw new FileNotFoundException();
@@ -131,7 +131,7 @@ public class BAMReader implements Consts {
 	/**
 	 * Judge remote file exists
 	 */
-	private boolean isRemoteFileExists(String url) {
+	public static boolean isRemoteFileExists(String url) {
 		URL serverUrl;
 		try {
 			serverUrl = new URL(url);

@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
  * 		long regionstart, long regionend)
  * </pre>
  * 
- * @author cwyan
+ * @author Chengwu Yan
  * 
  */
 public class GVFReader extends GFFReader {

@@ -106,7 +106,7 @@ public class Instance implements Consts{
 		Enumeration<Annotations> annos_enum=Annos.elements();
 		for(int i=0;i<Annos.size();i++){
 			Annotations temp=annos_enum.nextElement();
-			anno_names[i]=temp.get_ID()+":"+temp.get_Mode();
+			anno_names[i]=temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
 		}
 		Document doc=XmlWriter.init(META_ROOT);
 		Config.write_metalist(doc,anno_names, "AnnotationList");
@@ -119,15 +119,51 @@ public class Instance implements Consts{
 		else if(Externals.containsKey(track))
 			Externals.get(track).set_Mode(mode);
 	}
-	void append_track(Annotations track, Document doc,String mode){
+	void append_track(Annotations track, Document doc,String mode) {
 		if(!mode.equals(MODE_HIDE)){
 			if(track.get_Type().equals(FORMAT_BEDGZ)){
 				BedReaderTabix brt=new BedReaderTabix(track.get_Path(Chr));
-				brt.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
+				brt.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
 			}
 			else if(track.get_Type().equals(FORMAT_BED)){
 				BedReader br=new BedReader(track.get_Path(Chr));
-				br.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
+				br.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
+			}
+			else if(track.get_Type().equals(FORMAT_BIGBED)){
+				BigBedReader bbr;
+				try{
+					bbr=new BigBedReader(track.get_Path(Chr));
+					bbr.write_bed2elements(doc, track.get_ID(), Chr, Coordinate[0], Coordinate[1], bpp);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			else if(track.get_Type().equals(FORMAT_BEDGRAPH)){
+				BedGraphReader bgr;
+				try{
+					bgr=new BedGraphReader(track.get_Path(Chr));
+					bgr.write_bedGraph2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width);
+				} catch (IOException e){
+					e.printStackTrace();
+				}
+			}
+			else if(track.get_Type().equals(FORMAT_BIGWIG)){
+				WiggleReader wr;
+				try{
+					wr=new WiggleReader(track.get_Path(Chr),true);
+					wr.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width);
+				} catch (IOException e){
+					e.printStackTrace();
+				}
+			}
+			else if(track.get_Type().equals(FORMAT_WIG)){
+				WiggleReader wr2;
+				try{
+					wr2=new WiggleReader(track.get_Path(Chr),false);
+					wr2.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width);
+				} catch (IOException e){
+					e.printStackTrace();
+				}
 			}
 			else if(track.get_Type().equals(FORMAT_GFF)){
 				GFFReader gr;

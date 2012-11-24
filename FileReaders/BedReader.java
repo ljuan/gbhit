@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
  * compressed binary format, and thus we can tolerant unsorted or unindexed
  * files to display. For this purpose, we read the whole file into the memory
  * and traverse all of the records, to find the ones should be displayed in the
- * current window when a query is executed.
+ * current window when a query is performed.
  */
 
 class BedReader implements Consts {
@@ -180,21 +180,5 @@ class BedReader implements Consts {
 		XmlWriter.append_text_element(doc, subele, XML_TAG_TO, to);
 		subele.setAttribute(XML_TAG_TYPE, type);
 		Ele.appendChild(subele);
-	}
-
-	public static void main(String[] args) throws NumberFormatException,
-			IOException {
-		long start = System.currentTimeMillis();
-		Bed[] beds = new BedReader("BED/knownGene.hg19.bed").extract_bed(
-				"chr1", 100, 1000000);
-		System.out.println("索引读取共用时：" + (System.currentTimeMillis() - start));
-		System.out.println("共有：" + beds.length + "个对象");
-
-		long start2 = System.currentTimeMillis();
-		Bed[] beds2 = new BedReader("BED/knownGene.hg19.bed", false)
-				.extract_bed("chr1", 100, 1000000, false);
-		System.out.println("索引读取共用时：" + (System.currentTimeMillis() - start2));
-		System.out.println("共有：" + beds2.length + "个对象");
-
 	}
 }

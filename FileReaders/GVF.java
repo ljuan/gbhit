@@ -1,7 +1,7 @@
 package FileReaders;
 
 /**
- * @author cwyan
+ * @author Chengwu Yan
  */
 public class GVF extends GFF implements Consts {
 	String id;
