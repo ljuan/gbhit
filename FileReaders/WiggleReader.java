@@ -1,13 +1,11 @@
 package FileReaders;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import FileReaders.wiggle.DataValue;
+import FileReaders.wiggle.DataValueList;
 import FileReaders.wiggle.WiggleExtractor;
 
 /**
@@ -17,7 +15,7 @@ import FileReaders.wiggle.WiggleExtractor;
  * usage:
  * new WiggleReader(String filePath, boolean isBigWig).
  * 	 write_wiggle2Values(Document doc, String track, 
- * 						String chr, int start, int end)
+ * 						String chr, int start, int end, int windowSize, int step)
  * @author Chengwu Yan
  * 
  */
@@ -57,24 +55,26 @@ public class WiggleReader {
 	 *            1-base
 	 * @param end
 	 *            1-base
-	 * @param window
+	 * @param windowSize
 	 *            size, in pixel. Make sure that size Can be divided by 2
+	 * @param step
 	 * @throws IOException
 	 */
 	public void write_wiggle2Values(Document doc, String track, String chr, int start,
-			int end, int windowSize) throws IOException {
-		List<DataValue> extractor = new WiggleExtractor(filePath, chr, start,
-				end, isBigWig).extract();
+			int end, int windowSize, int step) throws IOException {
+		DataValueList values = new WiggleExtractor(filePath, chr, start,
+				end, isBigWig, windowSize, step).extract();
 
-		Collections.sort(extractor);
-
-		WiggleReader.writeDataValues2XML(doc, track, start, end, DataValue
-				.distributeDVsInWindowSize(windowSize, extractor, start, end,
-						chr));
+		WiggleReader.writeDataValues2XML(doc, track, start, end, values.toString());
 	}
 
 	/**
 	 * write dataValues to xml.
+	 * @param doc
+	 * @param track
+	 * @param start
+	 * @param end
+	 * @param valueList
 	 */
 	static void writeDataValues2XML(Document doc, String track,
 			int start, int end, String valueList) {

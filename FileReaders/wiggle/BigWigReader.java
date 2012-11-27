@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.List;
 
 import org.broad.igv.bbfile.*;
 import org.broad.tribble.util.SeekableStream;
@@ -53,19 +52,17 @@ public class BigWigReader {
 	 * 
 	 * @param chrom
 	 * @param start
-	 *            0-base
+	 *            1-base
 	 * @param end
-	 *            0-base
+	 *            1-base
 	 * @param contained
-	 *            whether allow overlaps
-	 *            true: not allow overlaps(completely contained only)
-	 *            false: allow overlaps
+	 *            whether allow contain
 	 * @param bigWigs
 	 * @return
 	 * @throws IOException
 	 */
 	public void getBigWig(String chrom, int start, int end, boolean contained,
-			List<DataValue> bigWigs) {
+			DataValueList bigWigs) {
 		// get the big header
 		bbFileHdr = reader.getBBFileHeader();
 
@@ -75,14 +72,14 @@ public class BigWigReader {
 		if (!(new HashSet<String>(reader.getChromosomeNames()).contains(chrom)))
 			return;
 		// iterator for BigWig values which occupy the specified
-		BigWigIterator iter = reader.getBigWigIterator(chrom, start, chrom,
+		BigWigIterator iter = reader.getBigWigIterator(chrom, start - 1, chrom,
 				end, contained);
 		// startChromosome region.
 		// loop over iterator
 		while (iter.hasNext()) {
 			WigItem f = iter.next();
-			bigWigs.add(new DataValue(f.getChromosome(), f.getStartBase(), f
-					.getEndBase(), f.getWigValue() + ""));
+			bigWigs.update(new DataValue(f.getChromosome(), f.getStartBase(), f
+					.getEndBase(), f.getWigValue()));
 		}
 		this.close();
 	}

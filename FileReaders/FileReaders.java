@@ -11,7 +11,7 @@ public class FileReaders implements Consts{
 		System.out.println(System.currentTimeMillis());
 		System.out.println(i1.get_Annotations());
 		System.out.println(System.currentTimeMillis());
-		System.out.println(i1.update("chr21", 11114426, 11154436,1000));
+		System.out.println(i1.update("chr21", 11114426, 38254436,1350));
 		System.out.println(System.currentTimeMillis());
 		String[] externals={"MCF7"};
 		String[] externals_links={"http://127.0.0.1/gbfiles/MCF7_DNAseq.variants.snpRecalibrated.vcf.bgz"};
@@ -31,7 +31,7 @@ public class FileReaders implements Consts{
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
-		externals[0]="GffTest";externals_links[0]="http://127.0.0.1/gbfiles/refGene.hg19.sorted.gtf.gz";externals_types[0]="GFF";externals_modes[0]=MODE_DENSE;
+/*		externals[0]="GffTest";externals_links[0]="http://127.0.0.1/gbfiles/refGene.hg19.sorted.gtf.gz";externals_types[0]="GFF";externals_modes[0]=MODE_DENSE;
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
@@ -48,7 +48,7 @@ public class FileReaders implements Consts{
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
-		externals[0]="bwTest";externals_links[0]="http://127.0.0.1/gbfiles/chr21.phyloP46way.placental.bigwig";externals_types[0]="BW";externals_modes[0]=MODE_DENSE;
+*/		externals[0]="bwTest";externals_links[0]="http://127.0.0.1/gbfiles/chr21.phyloP46way.placental.bigwig";externals_types[0]="BW";externals_modes[0]=MODE_DENSE;
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());

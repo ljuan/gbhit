@@ -5,20 +5,19 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.w3c.dom.Document;
 
 import FileReaders.wiggle.DataValue;
+import FileReaders.wiggle.DataValueList;
 
 /**
- * Get dataValues from BedGraph.
+ * Get ValueList from BedGraph.
  * 
  * <pre>
  * Usage:
  * new BedGraphReader(String uri).write_bedGraph2Values
- * 		(Document doc, String track, String chr, int start, int end)
+ * 		(Document doc, String track, String chr, int start, int end, int windowSize, int step)
  * @author Chengwu Yan
  * 
  */
@@ -28,6 +27,11 @@ public class BedGraphReader {
 	 */
 	private String filePath = null;
 
+	/**
+	 * 
+	 * @param filePath
+	 *            file path of the BedGraph file
+	 */
 	BedGraphReader(String filePath) {
 		this.filePath = filePath;
 	}
@@ -41,32 +45,26 @@ public class BedGraphReader {
 	 *            1-base
 	 * @param end
 	 *            1-base
-	 * @param window
+	 * @param windowSize
 	 *            size, in pixel. Make sure that size Can be divided by 2
+	 * @param step
+	 *            A step defines how many pixes show a grid.
 	 * @throws IOException
 	 */
 	public void write_bedGraph2Values(Document doc, String track, String chr,
-			int start, int end, int windowSize) throws IOException {
-		List<DataValue> values = getDataValues(chr, start - 1, end);
-
-		WiggleReader
-				.writeDataValues2XML(doc, track, start, end, DataValue
-						.distributeDVsInWindowSize(windowSize, values, start,
-								end, chr));
-	}
-
-	private List<DataValue> getDataValues(String chr, int start, int end) {
-		List<DataValue> values = new LinkedList<DataValue>();
+			int start, int end, int windowSize, int step) throws IOException {
+		DataValueList values = new DataValueList(start, end, windowSize, step);
 		BedGraph.BedGraphLineIterator itor = new BedGraph(filePath, chr, start,
 				end).iterator();
 		if (itor != null) {
 			while (itor.hasNext()) {
-				values.add(itor.next());
+				values.update(itor.next());
 			}
 			itor.close();
 		}
 
-		return values;
+		WiggleReader.writeDataValues2XML(doc, track, start, end,
+				values.toString());
 	}
 }
 

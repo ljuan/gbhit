@@ -142,7 +142,7 @@ public class Instance implements Consts{
 				BedGraphReader bgr;
 				try{
 					bgr=new BedGraphReader(track.get_Path(Chr));
-					bgr.write_bedGraph2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width);
+					bgr.write_bedGraph2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
 					e.printStackTrace();
 				}
@@ -151,7 +151,7 @@ public class Instance implements Consts{
 				WiggleReader wr;
 				try{
 					wr=new WiggleReader(track.get_Path(Chr),true);
-					wr.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width);
+					wr.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
 					e.printStackTrace();
 				}
@@ -160,7 +160,7 @@ public class Instance implements Consts{
 				WiggleReader wr2;
 				try{
 					wr2=new WiggleReader(track.get_Path(Chr),false);
-					wr2.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width);
+					wr2.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
 					e.printStackTrace();
 				}

@@ -1,11 +1,9 @@
 package FileReaders.wiggle;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * 
@@ -45,7 +43,7 @@ public class WiggleExtractor {
 	 */
 	private int bases = 0;
 
-	private List<DataValue> wiggles = new LinkedList<DataValue>();
+	private DataValueList wiggles;
 
 	/**
 	 * 
@@ -56,23 +54,25 @@ public class WiggleExtractor {
 	 * @param end
 	 *            1-base
 	 * @param isBigWig
+	 * @param windowSize
+	 * @param step
 	 */
 	public WiggleExtractor(String filePath, String chrom, int start, int end,
-			boolean isBigWig) {
+			boolean isBigWig, int windowSize, int step) {
 		this.filePath = filePath;
 		this.chrom = chrom;
 		this.start = start;
 		this.end = end;
 		this.isBigWig = isBigWig;
 		bases = this.end - this.start + 1;
+		wiggles = new DataValueList(start, end, windowSize, step);
 	}
 
-	public List<DataValue> extract() {
-		wiggles.clear();
+	public DataValueList extract() throws FileNotFoundException, IOException {
 		if (isBigWig) {
 			try {
 				new BigWigReader(this.filePath).getBigWig(this.chrom,
-						this.start - 1, this.end, false, this.wiggles);
+						this.start, this.end, false, this.wiggles);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -80,11 +80,6 @@ public class WiggleExtractor {
 			open();
 			extract_wiggle();
 			close();
-		}
-		if (!isBigWig) {
-			// Note: For uncompressed wiggle file, it may be unsorted, so we
-			// must sort it in correct order manually.
-			Collections.sort(this.wiggles);
 		}
 
 		return this.wiggles;
@@ -144,7 +139,8 @@ public class WiggleExtractor {
 			if (start > this.end) {
 				return nextStepLine();
 			}
-			wiggles.add(new DataValue(chrom, start - 1, end, line));
+			wiggles.update(new DataValue(chrom, start - 1, end, Float
+					.parseFloat(line)));
 			if (end > this.end)
 				end = this.end;
 			if (start < this.start)
@@ -323,8 +319,8 @@ public class WiggleExtractor {
 			for (; line_pos < line_length;) {
 				valueBuilder.append(char_line[line_pos++]);
 			}
-			wiggles.add(new DataValue(this.chrom, regionStart - 1, regionEnd,
-					valueBuilder.toString()));
+			wiggles.update(new DataValue(this.chrom, regionStart - 1,
+					regionEnd, Float.parseFloat(valueBuilder.toString())));
 
 			if (regionEnd > this.end)
 				regionEnd = this.end;
