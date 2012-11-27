@@ -16,7 +16,7 @@ import net.sf.samtools.util.SeekableHTTPStream;
  *   public BAMReader(String filePath)
  *   if index file exists, use getIndexFilePath() to get .bai filepath through; else, throw FileNotFoundException 
  * Secondly: insert elements into Document Object:
- * 	 readBAM(Document doc, String chr, int start, int end, int size, String mode, String track)
+ * 	 readBAM(Document doc, String chr, int start, int end, int windowSize, int step, String mode, String track)
  * 
  * @author Chengwu Yan
  * 
@@ -113,7 +113,8 @@ public class BAMReader implements Consts {
 
 			if (isRemoteFileExists(filePath + ".bai"))
 				this.indexFilePath = filePath + ".bai";
-			else if (BAMReader.isRemoteFileExists(filePath.replace(".bam", ".bai")))
+			else if (BAMReader.isRemoteFileExists(filePath.replace(".bam",
+					".bai")))
 				this.indexFilePath = filePath.replace(".bam", ".bai");
 			else
 				throw new FileNotFoundException();
@@ -161,7 +162,9 @@ public class BAMReader implements Consts {
 	 *            start base of the given region in the chromosome. 1-base
 	 * @param end
 	 *            end base of the given region in the chromosome. 1-base
-	 * @param size
+	 * @param step
+	 *            A step defines how many pixes show a grid.
+	 * @param windowSize
 	 *            window size, in pixel. Make sure that size Can be divided by 2
 	 * @param track
 	 * @param mode
@@ -171,12 +174,13 @@ public class BAMReader implements Consts {
 	 * 3:NotDetailBig
 	 * @throws IOException
 	 */
-	public void readBAM(Document doc, String chr, int start, int end, int size,
-			String mode, String track) throws IOException {
+	public void readBAM(Document doc, String chr, int start, int end,
+			int windowSize, int step, String mode, String track)
+			throws IOException {
 		double bpp = 0;
 		boolean already = false;
 
-		bpp = (end - start + 1) / (double) size;
+		bpp = (end - start + 1) / (double) windowSize;
 
 		if (bpp <= 25) {
 			List<SAMRecord> list = readSmallRegion(chr, start, end);
@@ -200,14 +204,14 @@ public class BAMReader implements Consts {
 		}
 		// middle region
 		if (bpp < 8 * 1024 && !already) {
-			int[] result = readMiddleRegion(chr, start, end, size);
-			writeBigRegion(doc, start, end, result, track);
+			int[] result = readMiddleRegion(chr, start, end, windowSize, step);
+			writeBigRegion(doc, start, end, step, result, track);
 			already = true;
 		}
 		// big region
 		if (bpp >= 8 * 1024 && !already) {
-			int[] result = readBigRegion(chr, start, end, size);
-			writeBigRegion(doc, start, end, result, track);
+			int[] result = readBigRegion(chr, start, end, windowSize, step);
+			writeBigRegion(doc, start, end, step, result, track);
 		}
 	}
 
@@ -354,15 +358,15 @@ public class BAMReader implements Consts {
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
 	}
 
-	private void writeBigRegion(Document doc, int start, int end, int[] list,
-			String track) {
+	private void writeBigRegion(Document doc, int start, int end, int step,
+			int[] list, String track) {
 		Element values = doc.createElement(XML_TAG_VALUES);
 		values.setAttribute(XML_TAG_ID, track);
 		values.setAttribute(XML_TAG_TYPE, "REN");
 
 		XmlWriter.append_text_element(doc, values, XML_TAG_FROM, start + "");
 		XmlWriter.append_text_element(doc, values, XML_TAG_TO, end + "");
-		XmlWriter.append_text_element(doc, values, XML_TAG_STEP, "2");
+		XmlWriter.append_text_element(doc, values, XML_TAG_STEP, step + "");
 
 		StringBuilder vl = new StringBuilder();
 		for (int i = 0; i < list.length; i++) {
@@ -465,28 +469,32 @@ public class BAMReader implements Consts {
 	 *            end base int the chromosome. 1-base
 	 * @param windowSize
 	 *            size of the browser in pixel
+	 * @param step
+	 *            A step defines how many pixes show a grid.
 	 * @return
 	 * @throws MalformedURLException
 	 * @throws FileNotFoundException
 	 */
 	private int[] readMiddleRegion(String chr, int start, int end,
-			int windowSize) throws MalformedURLException, FileNotFoundException {
+			int windowSize, int step) throws MalformedURLException,
+			FileNotFoundException {
 
 		SAMRecordIterator itor = getIterator(chr, start, end);
+		int harfWindowSize = windowSize / 2;
 
 		double smallRegionWidth = 0;
 		int[] starts = null;
 
-		smallRegionWidth = (end - start + 1) / (windowSize / 2.0);
-		starts = new int[(windowSize / 2) + 1];
-		for (int i = 0; i <= windowSize / 2; i++)
+		smallRegionWidth = (end - start + 1) / (windowSize / ((double) step));
+		starts = new int[(harfWindowSize) + 1];
+		for (int i = 0; i <= harfWindowSize; i++)
 			starts[i] = (int) Math.round(i * smallRegionWidth);
-		starts[windowSize / 2] = end - start + 1;
+		starts[harfWindowSize] = end - start + 1;
 
 		// result in double
-		double[] regions = new double[windowSize / 2];
+		double[] regions = new double[harfWindowSize];
 
-		for (int i = 0; i < windowSize / 2; i++)
+		for (int i = 0; i < harfWindowSize; i++)
 			regions[i] = 0;
 
 		int blockIndex = 0;
@@ -498,7 +506,7 @@ public class BAMReader implements Consts {
 			int overlapNum = 1;
 			int temppos = blockIndex;
 			while (starts[temppos + 1] < read.getAlignmentEnd() - start
-					&& temppos + 1 < windowSize / 2) {
+					&& temppos + 1 < harfWindowSize) {
 				overlapNum++;
 				temppos++;
 			}
@@ -508,8 +516,8 @@ public class BAMReader implements Consts {
 		}
 		close();
 
-		int[] num = new int[windowSize / 2];
-		for (int i = 0; i < windowSize / 2; i++)
+		int[] num = new int[harfWindowSize];
+		for (int i = 0; i < harfWindowSize; i++)
 			num[i] = (int) regions[i];
 
 		return num;
@@ -523,11 +531,13 @@ public class BAMReader implements Consts {
 	 * @param end
 	 *            end base. 1-base
 	 * @param windowSize
+	 * @param step
+	 *            A step defines how many pixes show a grid.
 	 * 
 	 * @return
 	 */
-	private int[] readBigRegion(String chr, int start, int end, int windowSize)
-			throws IOException {
+	private int[] readBigRegion(String chr, int start, int end, int windowSize,
+			int step) throws IOException {
 		open(false);
 		/*
 		 * index of the given chromosome in BAM file order
@@ -613,8 +623,8 @@ public class BAMReader implements Consts {
 
 		close();
 
-		return getSpan(start % SIXTEENK,
-				(end - start + 1) / (windowSize / 2.0), windowSize / 2, regions);
+		return getSpan(start % SIXTEENK, (end - start + 1)
+				/ (windowSize / ((double) step)), windowSize / step, regions);
 	}
 
 	/**

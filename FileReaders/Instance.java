@@ -202,7 +202,7 @@ public class Instance implements Consts{
 			else if (track.get_Type().equals(FORMAT_BAM)){
 				try {
 					BAMReader br2=new BAMReader(track.get_Path(Chr));
-					br2.readBAM(doc,Chr,(int)Coordinate[0],(int)Coordinate[1],window_width,mode,track.get_ID());
+					br2.readBAM(doc,Chr,(int)Coordinate[0],(int)Coordinate[1],window_width,2,mode,track.get_ID());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -53,7 +53,7 @@ public class DataValueList {
 	 * @param dv
 	 */
 	public void update(DataValue dv) {
-		int _start = dv.getStart();
+		int _start = dv.getStart() < (start - 1) ? (start - 1) : dv.getStart();
 		int _end = dv.getEnd();
 		float value = dv.getDataValue();
 		float curPos = _start;

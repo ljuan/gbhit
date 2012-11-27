@@ -60,30 +60,34 @@ public class WiggleReader {
 	 * @param step
 	 * @throws IOException
 	 */
-	public void write_wiggle2Values(Document doc, String track, String chr, int start,
-			int end, int windowSize, int step) throws IOException {
-		DataValueList values = new WiggleExtractor(filePath, chr, start,
-				end, isBigWig, windowSize, step).extract();
+	public void write_wiggle2Values(Document doc, String track, String chr,
+			int start, int end, int windowSize, int step) throws IOException {
+		DataValueList values = new WiggleExtractor(filePath, chr, start, end,
+				isBigWig, windowSize, step).extract();
 
-		WiggleReader.writeDataValues2XML(doc, track, start, end, values.toString());
+		WiggleReader.writeDataValues2XML(doc, track, start, end, step,
+				values.toString());
 	}
 
 	/**
 	 * write dataValues to xml.
+	 * 
 	 * @param doc
 	 * @param track
 	 * @param start
 	 * @param end
+	 * @param step
 	 * @param valueList
 	 */
-	static void writeDataValues2XML(Document doc, String track,
-			int start, int end, String valueList) {
+	static void writeDataValues2XML(Document doc, String track, int start,
+			int end, int step, String valueList) {
 		Element ele = doc.createElement(Consts.XML_TAG_VALUES);
 		ele.setAttribute(Consts.XML_TAG_ID, track);
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(ele); // Values
 		XmlWriter
 				.append_text_element(doc, ele, Consts.XML_TAG_FROM, start + "");
 		XmlWriter.append_text_element(doc, ele, Consts.XML_TAG_TO, end + "");
+		XmlWriter.append_text_element(doc, ele, Consts.XML_TAG_STEP, step + "");
 		XmlWriter.append_text_element(doc, ele, "ValueList", valueList);
 	}
 }

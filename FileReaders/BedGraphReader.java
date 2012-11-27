@@ -63,7 +63,7 @@ public class BedGraphReader {
 			itor.close();
 		}
 
-		WiggleReader.writeDataValues2XML(doc, track, start, end,
+		WiggleReader.writeDataValues2XML(doc, track, start, end, step,
 				values.toString());
 	}
 }
