@@ -102,6 +102,9 @@ class BedReaderTabix implements Consts {
 							deal_thick(doc, Ele, bed[i].chromStart,
 									bed[i].chromEnd, bed[i].thickStart,
 									bed[i].thickEnd);
+						} 
+						else {
+							deal_thick(doc, Ele, bed[i].chromStart, bed[i].chromEnd, bed[i].chromStart, bed[i].chromEnd);
 						}
 					}
 				}
