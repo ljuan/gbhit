@@ -28,61 +28,67 @@ import org.w3c.dom.Element;
 
 class VcfReader implements Consts{
 	TabixReader vcf_tb;
-	Hashtable<String,String> filter_header;
-	Hashtable<String,String[]> info_header;
-	Hashtable<String,String[]> format_header;
-	String[] samples;
-	boolean chromprefix=false;
-	VcfReader(String vcf){
+	Annotations track=null;
+	VcfReader(Annotations track, String Chr){
 		try {
-			vcf_tb=new TabixReader(vcf);
-			String line="";
-			filter_header=new Hashtable<String,String>();
-			filter_header.put("PASS", "PASS");
-			info_header=new Hashtable<String, String[]>();
-			format_header=new Hashtable<String,String[]>();
-			while((line=vcf_tb.readLine()).startsWith("#")){
-				if(line.substring(2,8).equalsIgnoreCase("FILTER")){
-					int left=line.indexOf('<');
-					int right=line.lastIndexOf('>');
-					String[] line_temp=line.substring(left+1, right).split("ID=|,Description=");
-					filter_header.put(line_temp[1],line_temp[2].substring(1, line_temp[2].length()-1));
-				}
-				else if(line.substring(2,6).equalsIgnoreCase("INFO")){
-					int left=line.indexOf('<');
-					int right=line.lastIndexOf('>');
-					String[] line_temp=line.substring(left+1, right).split("ID=|,Number=|,Type=|,Description=");
-					info_header.put(line_temp[1], Arrays.copyOfRange(line_temp, 2, 5));
-				}
-				else if(line.substring(2, 8).equalsIgnoreCase("FORMAT")){
-					int left=line.indexOf('<');
-					int right=line.lastIndexOf('>');
-					String[] line_temp=line.substring(left+1, right).split("ID=|,Number=|,Type=|,Description=");
-					format_header.put(line_temp[1], Arrays.copyOfRange(line_temp, 2, 5));
-				}
-				else if(line.startsWith("#CHROM")){
-					String[] line_temp=line.split("\t");
-					if(line_temp.length>9){
-						samples=new String[line_temp.length-9];
-						for(int i=9;i<line_temp.length;i++){
-							samples[i-9]=line_temp[i];
+			vcf_tb=new TabixReader(track.get_Path(Chr));
+			if (!(track.Parameter.containsKey(VCF_HEADER_FILTER) || track.Parameter.containsKey(VCF_HEADER_FORMAT) || 
+					track.Parameter.containsKey(VCF_HEADER_INFO) || track.Parameter.containsKey(VCF_HEADER_SAMPLE))){
+				HashMap<String,Boolean> filter_header=new HashMap<String,Boolean>();
+				Hashtable<String,String[]> info_header;
+				Hashtable<String,String[]> format_header;
+				String[] samples=null;
+				String line="";
+				filter_header.put("PASS", true);
+				info_header=new Hashtable<String, String[]>();
+				format_header=new Hashtable<String,String[]>();
+				while((line=vcf_tb.readLine()).startsWith("#")){
+					if(line.substring(2,8).equalsIgnoreCase("FILTER")){
+						int left=line.indexOf('<');
+						int right=line.lastIndexOf('>');
+						String[] line_temp=line.substring(left+1, right).split("ID=|,Description=");
+						filter_header.put(line_temp[1], false);
+					}
+					else if(line.substring(2,6).equalsIgnoreCase("INFO")){
+						int left=line.indexOf('<');
+						int right=line.lastIndexOf('>');
+						String[] line_temp=line.substring(left+1, right).split("ID=|,Number=|,Type=|,Description=");
+						info_header.put(line_temp[1], Arrays.copyOfRange(line_temp, 2, 5));
+					}
+					else if(line.substring(2, 8).equalsIgnoreCase("FORMAT")){
+						int left=line.indexOf('<');
+						int right=line.lastIndexOf('>');
+						String[] line_temp=line.substring(left+1, right).split("ID=|,Number=|,Type=|,Description=");
+						format_header.put(line_temp[1], Arrays.copyOfRange(line_temp, 2, 5));
+					}
+					else if(line.startsWith("#CHROM")){
+						String[] line_temp=line.split("\t");
+						if(line_temp.length>9){
+							samples=new String[line_temp.length-9];
+							for(int i=9;i<line_temp.length;i++){
+								samples[i-9]=line_temp[i];
+							}
 						}
 					}
-					else
-						samples=new String[0];
+					boolean chromprefix=false;
+					if(line.startsWith("chr"))
+						chromprefix=true;
+					track.Parameter.put(VCF_HEADER_FILTER, filter_header);
+					track.Parameter.put(VCF_HEADER_FORMAT, format_header);
+					track.Parameter.put(VCF_HEADER_INFO, info_header);
+					track.Parameter.put(VCF_HEADER_SAMPLE, samples);
+					track.Parameter.put(VCF_CHROM_PREFIX, chromprefix);
 				}
 			}
-			if(line.startsWith("chr"))
-				chromprefix=true;
-		}
-		catch (IOException e) {
+			this.track=track;
+		} catch (IOException e){
 			e.printStackTrace();
 		}
 	}
 	Vcf[] extract_vcf(String chr,long start,long end){
 		
 		StringBuffer querystr=new StringBuffer();
-		if(chromprefix)
+		if((Boolean)(track.Parameter.get(VCF_CHROM_PREFIX)))
 			querystr.append(chr);
 		else
 			querystr.append(chr.substring(3));
