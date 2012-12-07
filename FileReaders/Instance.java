@@ -88,8 +88,21 @@ public class Instance implements Consts{
 	}
 	public void add_Externals(String[] tracks,String[] links,String[] types,String[] modes){
 		for(int i=0;i<tracks.length;i++)
-			if(!Externals.containsKey(tracks[i]))
-				Externals.put(tracks[i], new Annotations(tracks[i],links[i],types[i],modes[i]));
+			if(!Externals.containsKey(tracks[i])){
+				if(links[i].indexOf(";")>0){
+					String[] links_temp=links[i].split(";");
+					String[][] links_table=new String[links_temp.length][2];
+					for(int j=0;j<links_temp.length;j++){
+						int colon=links_temp[j].indexOf(":");
+						links_table[j][0]=links_temp[j].substring(0, colon);
+						links_table[j][1]=links_temp[j].substring(colon+1);
+					}
+					Externals.put(tracks[i], new Annotations(tracks[i],links_table,types[i],modes[i]));
+				}
+				else{
+					Externals.put(tracks[i], new Annotations(tracks[i],links[i],types[i],modes[i]));
+				}
+			}
 	}
 	public void remove_Externals(String[] tracks){
 		for(int i=0;i<tracks.length;i++)
@@ -111,6 +124,14 @@ public class Instance implements Consts{
 		Document doc=XmlWriter.init(META_ROOT);
 		Config.write_metalist(doc,anno_names, "AnnotationList");
 		return XmlWriter.xml2string(doc);
+	}
+	public void set_Params(String[] tracks,String[] params,String[] values){
+		for(int i=0;i<tracks.length;i++){
+			if(Annos.containsKey(tracks[i]))
+				Annos.get(tracks[i]).CurrentSetting.put(params[i], values[i]);
+			else if(Externals.containsKey(tracks[i]))
+				Externals.get(tracks[i]).CurrentSetting.put(params[i], values[i]);
+		}
 	}
 	
 	void set_mode(String track,String mode){
@@ -196,7 +217,7 @@ public class Instance implements Consts{
 				}
 			}
 			else if (track.get_Type().equals(FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<1000000){
-				VcfReader vr=new VcfReader(track.get_Path(Chr));
+				VcfReader vr=new VcfReader(track,Chr);
 				vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			}
 			else if (track.get_Type().equals(FORMAT_BAM)){

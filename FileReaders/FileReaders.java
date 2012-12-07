@@ -11,7 +11,7 @@ public class FileReaders implements Consts{
 		System.out.println(System.currentTimeMillis());
 		System.out.println(i1.get_Annotations());
 		System.out.println(System.currentTimeMillis());
-		System.out.println(i1.update("chr21", 11114426, 11114436,1350));
+		System.out.println(i1.update("chr21", 33013741, 33014077,1350));
 		System.out.println(System.currentTimeMillis());
 		String[] externals={"MCF7"};
 		String[] externals_links={"http://127.0.0.1/gbfiles/MCF7_DNAseq.variants.snpRecalibrated.vcf.bgz"};

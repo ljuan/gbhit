@@ -18,35 +18,40 @@ public class Interfaces extends HttpServlet{
 		if(session.getAttribute("Instance")==null)
 			session.setAttribute("Instance", new Instance());
 		Instance ins=(Instance) session.getAttribute("Instance");
-		
-		if (req.getParameter("action").equals("getAssemblies")){
+		String action=req.getParameter("action");
+		if (action.equals("getAssemblies")){
 			String a=ins.get_Assemblies();
 			res.getWriter().print(a);
 		}
-		else if (req.getParameter("action").equals("getAnnotations")){
+		else if (action.equals("getAnnotations")){
 			String a=ins.get_Annotations();
 			res.getWriter().print(a);
 		}
-		else if (req.getParameter("action").equals("setAssembly")){
+		else if (action.equals("setAssembly")){
 			ins=new Instance(req.getParameter("assembly"));
 			session.setAttribute("Instance", ins);
 		}
-		else if (req.getParameter("action").equals("modiTracks")||req.getParameter("action").equals("addTracks")){
+		else if (action.equals("modiTracks")||action.equals("addTracks")){
 			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 			res.getWriter().print(a);
 		}
-		else if (req.getParameter("action").equals("removeTracks")){
+		else if (action.equals("setParams")){
+			ins.set_Params(req.getParameter("tracks").split(","), req.getParameter("params").split(","), req.getParameter("values").split(","));
+			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("removeTracks")){
 			ins.remove_Tracks(req.getParameter("tracks").split(","));
 		}
-		else if (req.getParameter("action").equals("addExternals")){
+		else if (action.equals("addExternals")){
 			ins.add_Externals(req.getParameter("tracks").split(","),req.getParameter("links").split(","), req.getParameter("types").split(","),req.getParameter("modes").split(","));
 			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 			res.getWriter().print(a);
 		}
-		else if (req.getParameter("action").equals("removeExternals")){
+		else if (action.equals("removeExternals")){
 			ins.remove_Externals(req.getParameter("tracks").split(","));
 		}
-		else if (req.getParameter("action").equals("update")){
+		else if (action.equals("update")){
 			String chr=req.getParameter("chr");
 			long start=Long.parseLong(req.getParameter("start"));
 			long end=Long.parseLong(req.getParameter("end"));

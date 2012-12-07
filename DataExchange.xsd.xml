@@ -34,12 +34,33 @@
 										<xs:element name="From" type="xs:long"/>
 										<xs:element name="To" type="xs:long"/>
 										<xs:element name="Letter" type="SeqLimit" minOccurs="0"/>
+										<xs:element name="ToChr" type="xs:string" minOccurs="0"/>
+										<xs:element name="Direction" type="xs:string" minOccurs="0"/>
 										<xs:element name="Description" type="xs:string" minOccurs="0"/>
 									</xs:sequence>
 									<xs:attribute name="id" type="xs:string"/>
 									<xs:attribute name="Type" type="VariantType"/>
 								</xs:complexType>
 							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="id" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+				
+				<xs:element name="Parameters" maxOccurs="unbounded" minOccurs="0"> 
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Parameter" type="xs:string" maxOccurs="unbounded" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="options" type="xs:string" maxOccurs="unbounded" minOccurs="0"> 
+											<!-- required when ParameterType=SELECTION or CHECKBOX
+											comma-separated option list
+											-->
+									</xs:sequence>
+									<xs:attribute name="name" type="xs:string"/>
+									<xs:attribute name="Type" type="ParameterType"/>
+								</xs:complexType>
 						</xs:sequence>
 						<xs:attribute name="id" type="xs:string" use="required"/>
 					</xs:complexType>
@@ -98,8 +119,8 @@
 							<xs:element name="Read" maxOccurs="unbounded" minOccurs="0">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="From" type="xs:long"/>
-										<xs:element name="To" type="xs:long"/>
+										<xs:element name="From" type="xs:string"/> <!--Comma-separated From list for RNA-seq reads-->
+										<xs:element name="To" type="xs:string"/> <!--Comma-separated To list for RNA-seq reads-->
 										<xs:element name="Direction" type="xs:string" minOccurs="0"/>
 										<xs:element name="Mapq" type="xs:integer" minOccurs="0"/>
 										
@@ -142,6 +163,7 @@
 			<xs:enumeration value="INS"/> <!--Insertion-->
 			<xs:enumeration value="DEL"/> <!--Deletion-->
 			<xs:enumeration value="CNV"/> <!--Copy number Variation-->
+			<xs:enumeration value="DUP"/> <!--Duplication-->
 			<xs:enumeration value="INV"/> <!--Inversion-->
 			<xs:enumeration value="MUL"/> <!--Multi-Type-->
 			<xs:enumeration value="OTH"/> <!--Others-->
@@ -168,6 +190,14 @@
 			<xs:enumeration value="EXP"/> <!--Expression-->
 			<xs:enumeration value="REN"/> <!--Reads Enrichment-->
 			<xs:enumeration value="GCC"/> <!--GC content-->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ParameterType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CHECKBOX"/> <!--Conservation-->
+			<xs:enumeration value="VALUE"/> <!--Reads Enrichment-->
+			<xs:enumeration value="STRING"/> <!--GC content-->
+			<xs:enumeration value="SELECTION"/> <!--GC content-->
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="ValueMode">

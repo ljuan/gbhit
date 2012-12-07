@@ -11,6 +11,12 @@ public interface Consts{
 	public static final int LIMIT_ELE=-1;
 	public static final int LIMIT_VAR=1000000;
 	
+	public static final String VCF_HEADER_FILTER="filters";
+	public static final String VCF_HEADER_INFO="info";
+	public static final String VCF_HEADER_FORMAT="format";
+	public static final String VCF_HEADER_SAMPLE="sample";
+	public static final String VCF_CHROM_PREFIX="chromprefix";
+	
 	public static final String FORMAT_BED="BED";
 	public static final String FORMAT_BIGBED="BB";
 	public static final String FORMAT_BEDGRAPH="BG";

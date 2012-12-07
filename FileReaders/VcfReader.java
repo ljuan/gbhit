@@ -74,16 +74,38 @@ class VcfReader implements Consts{
 					if(line.startsWith("chr"))
 						chromprefix=true;
 					track.Parameter.put(VCF_HEADER_FILTER, filter_header);
+					track.CurrentSetting.put(VCF_HEADER_FILTER, null);
 					track.Parameter.put(VCF_HEADER_FORMAT, format_header);
+					track.CurrentSetting.put(VCF_HEADER_FORMAT, null);
 					track.Parameter.put(VCF_HEADER_INFO, info_header);
+					track.CurrentSetting.put(VCF_HEADER_INFO, null);
 					track.Parameter.put(VCF_HEADER_SAMPLE, samples);
+					track.CurrentSetting.put(VCF_HEADER_SAMPLE, null);
 					track.Parameter.put(VCF_CHROM_PREFIX, chromprefix);
+					track.CurrentSetting.put(VCF_CHROM_PREFIX, null);
 				}
 			}
 			this.track=track;
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+	}
+	void set_Parameters(){
+		String[] params=new String[track.Parameter.size()];
+		track.Parameter.keySet().toArray(params);
+		for(int i=0;i<params.length;i++)
+			if(track.CurrentSetting.get(params[i])!=null && !track.CurrentSetting.get(params[i]).equals("")){
+				/* put new parameters in track.CurrentSetting into track.Parameter
+				 * There will be one single string in track.CurrentSetting
+				 * track.CurrentSetting
+				 * null means no change for the parameter params[i] after initializing (do nothing)
+				 * "" means no change since the last effective parameter setting (do nothing)
+				 * "SOME CONTENT(STRING)" means the settings have been changed since the last effective parameter setting
+				 * And these changes need to be update to the track.Parameters
+				 * You need to analyze the String in track.CurrentSetting.get(params[i]),
+				 * and update track.Parameters.get(params[i])
+				 */
+			}
 	}
 	Vcf[] extract_vcf(String chr,long start,long end){
 		
@@ -111,10 +133,10 @@ class VcfReader implements Consts{
 			TabixReader.Iterator Query=vcf_tb.query(querystr.toString());
 			while(Query !=null && (line=Query.next()) != null){
 				Vcf vcf_temp;
-				if(samples.length==0)
+				if(((String[])(track.Parameter.get(VCF_HEADER_SAMPLE)))==null)
 					vcf_temp=new Vcf(line);
 				else
-					vcf_temp=new Vcf(line,samples.length);
+					vcf_temp=new Vcf(line,((String[])(track.Parameter.get(VCF_HEADER_SAMPLE))).length);
 				vcf_internal.add(vcf_temp);
 			}
 			vcf_tb.TabixReaderClose();
