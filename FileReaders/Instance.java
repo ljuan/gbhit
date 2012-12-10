@@ -129,6 +129,15 @@ public class Instance implements Consts{
 		Config.write_metalist(doc,anno_names, "AnnotationList");
 		return XmlWriter.xml2string(doc);
 	}
+	public String get_Parameters(String[] tracks){
+		Document doc=XmlWriter.init(DATA_ROOT);
+		for(int i=0;i<tracks.length;i++)
+			if(Annos.containsKey(tracks[i]))
+				Annos.get(tracks[i]).write_anno2parameter(doc);
+			else if(Externals.containsKey(tracks[i]))
+				Externals.get(tracks[i]).write_anno2parameter(doc);
+		return XmlWriter.xml2string(doc);
+	}
 	public void set_Params(String[] tracks,String[] params,String[] values){
 		for(int i=0;i<tracks.length;i++){
 			if(Annos.containsKey(tracks[i]))

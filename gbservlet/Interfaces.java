@@ -40,6 +40,10 @@ public class Interfaces extends HttpServlet{
 			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 			res.getWriter().print(a);
 		}
+		else if (action.equals("getParams")){
+			String a=ins.get_Parameters(req.getParameter("tracks").split(","));
+			res.getWriter().print(a);
+		}
 		else if (action.equals("removeTracks")){
 			ins.remove_Tracks(req.getParameter("tracks").split(","));
 		}
