@@ -2,11 +2,20 @@ package FileReaders.wiggle;
 
 import java.text.NumberFormat;
 
+/**
+ * 
+ * @author Chengwu Yan
+ * 
+ */
 public class DataValueList {
 	/**
-	 * 1-base
+	 * 0-base. inclusive
 	 */
 	private int start;
+	/**
+	 * 0-base. exclusive
+	 */
+	private int end;
 
 	/**
 	 * ValueList in array format
@@ -35,8 +44,9 @@ public class DataValueList {
 	 *            A step defines how many pixes show a grid.
 	 */
 	public DataValueList(int start, int end, int windowSize, int step) {
-		this.start = start;
-		width = ((end - start + 1) < (windowSize / step)) ? (end - start + 1)
+		this.start = start - 1;
+		this.end = end;
+		width = ((this.end - this.start) < (windowSize / step)) ? (this.end - this.start)
 				: (windowSize / step);
 
 		values = new float[width];
@@ -53,17 +63,22 @@ public class DataValueList {
 	 * @param dv
 	 */
 	public void update(DataValue dv) {
-		int _start = dv.getStart() < (start - 1) ? (start - 1) : dv.getStart();
+		int _start = dv.getStart() < start ? start : dv.getStart();
 		int _end = dv.getEnd();
 		float value = dv.getDataValue();
-		float curPos = _start;
 
-		for (int index = (int) ((_start - start + 1) / span); curPos < _end
-				&& index < width; index++) {
-			float curEnd = (index + 1) * span + start - 1;
-			curEnd = (_end < curEnd) ? _end : curEnd;
-			values[index] += (curEnd - curPos) * value;
-			curPos = curEnd;
+		int startIndex = (int) ((_start - start) / span);
+		int endIndex = (int) ((_end - start) / span);
+		double thisStart = 0;
+		double thisEnd = 0;
+		float thisSpan = 0;
+		for (int index = startIndex; index <= endIndex && index < width; index++) {
+			thisStart = ((index == startIndex) ? (_start - start)
+					: (span * index));
+			thisEnd = (index == endIndex) ? (_end - start)
+					: (span * (index + 1));
+			thisSpan = (float) (thisEnd - thisStart);
+			values[index] += thisSpan * value;
 		}
 	}
 
@@ -74,15 +89,19 @@ public class DataValueList {
 		NumberFormat format = NumberFormat.getInstance();
 		format.setMaximumFractionDigits(3);
 
-		for (double value : values) {
-			builder.append(format.format(value / span));
+		for (int i = 0; i < values.length - 1; i++) {
+			builder.append(format.format(values[i] / span));
 			builder.append(";");
+		}
+		if (values.length > 0) {
+			builder.append(format.format(values[values.length - 1] / span));
 		}
 
 		return builder.toString();
 	}
 
 	public static void main(String[] args) {
+
 		DataValueList dvl1 = new DataValueList(1, 10, 16, 2);
 		dvl1.update(new DataValue("chr1", 1, 2, 0.1f));
 		dvl1.update(new DataValue("chr1", 3, 5, 0.2f));
@@ -96,5 +115,6 @@ public class DataValueList {
 		dvl2.update(new DataValue("chr1", 5, 6, 0.3f));
 		dvl2.update(new DataValue("chr1", 7, 9, 0.4f));
 		System.out.println(dvl2.toString());
+
 	}
 }

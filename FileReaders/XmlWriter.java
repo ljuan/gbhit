@@ -12,7 +12,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.*;
 
-class XmlWriter implements Consts{
+public class XmlWriter implements Consts{
 	Document doc;
 	XmlWriter(){
 		init(DATA_ROOT);
@@ -34,7 +34,7 @@ class XmlWriter implements Consts{
 		} 
 		return null;
 	}
-	static Element append_text_element(Document doc,Node parent,String tag,String text){
+	public static Element append_text_element(Document doc,Node parent,String tag,String text){
 		Element offspring=doc.createElement(tag);
 		offspring.appendChild(doc.createTextNode(text));
 		parent.appendChild(offspring);

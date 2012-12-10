@@ -120,6 +120,10 @@ public class Instance implements Consts{
 		for(int i=0;i<Annos.size();i++){
 			Annotations temp=annos_enum.nextElement();
 			anno_names[i]=temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
+			if(temp.has_visable_Parameter())
+				anno_names[i]=anno_names[i]+":P";
+			else
+				anno_names[i]=anno_names[i]+":NP";
 		}
 		Document doc=XmlWriter.init(META_ROOT);
 		Config.write_metalist(doc,anno_names, "AnnotationList");
@@ -128,12 +132,11 @@ public class Instance implements Consts{
 	public void set_Params(String[] tracks,String[] params,String[] values){
 		for(int i=0;i<tracks.length;i++){
 			if(Annos.containsKey(tracks[i]))
-				Annos.get(tracks[i]).CurrentSetting.put(params[i], values[i]);
+				Annos.get(tracks[i]).set_Parameters(params[i], values[i]);
 			else if(Externals.containsKey(tracks[i]))
-				Externals.get(tracks[i]).CurrentSetting.put(params[i], values[i]);
+				Externals.get(tracks[i]).set_Parameters(params[i], values[i]);
 		}
 	}
-	
 	void set_mode(String track,String mode){
 		if(Annos.containsKey(track))
 			Annos.get(track).set_Mode(mode);

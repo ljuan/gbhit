@@ -32,8 +32,7 @@ class VcfReader implements Consts{
 	VcfReader(Annotations track, String Chr){
 		try {
 			vcf_tb=new TabixReader(track.get_Path(Chr));
-			if (!(track.Parameter.containsKey(VCF_HEADER_FILTER) || track.Parameter.containsKey(VCF_HEADER_FORMAT) || 
-					track.Parameter.containsKey(VCF_HEADER_INFO) || track.Parameter.containsKey(VCF_HEADER_SAMPLE))){
+			if (track.get_Parameter(VCF_CHROM_PREFIX)==null){
 				HashMap<String,Boolean> filter_header=new HashMap<String,Boolean>();
 				Hashtable<String,String[]> info_header;
 				Hashtable<String,String[]> format_header;
@@ -73,16 +72,11 @@ class VcfReader implements Consts{
 					boolean chromprefix=false;
 					if(line.startsWith("chr"))
 						chromprefix=true;
-					track.Parameter.put(VCF_HEADER_FILTER, filter_header);
-					track.CurrentSetting.put(VCF_HEADER_FILTER, null);
-					track.Parameter.put(VCF_HEADER_FORMAT, format_header);
-					track.CurrentSetting.put(VCF_HEADER_FORMAT, null);
-					track.Parameter.put(VCF_HEADER_INFO, info_header);
-					track.CurrentSetting.put(VCF_HEADER_INFO, null);
-					track.Parameter.put(VCF_HEADER_SAMPLE, samples);
-					track.CurrentSetting.put(VCF_HEADER_SAMPLE, null);
-					track.Parameter.put(VCF_CHROM_PREFIX, chromprefix);
-					track.CurrentSetting.put(VCF_CHROM_PREFIX, null);
+					track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(samples), PARAMETER_TYPE_VCFSAMPLE);
+					track.initialize_Parameter(VCF_HEADER_FILTER, filter_header, PARAMETER_TYPE_CHECKBOX);
+					track.initialize_Parameter(VCF_HEADER_FORMAT, format_header, PARAMETER_TYPE_INVISABLE);
+					track.initialize_Parameter(VCF_HEADER_INFO, info_header, PARAMETER_TYPE_INVISABLE);
+					track.initialize_Parameter(VCF_CHROM_PREFIX, chromprefix, PARAMETER_TYPE_INVISABLE);
 				}
 			}
 			this.track=track;
@@ -90,27 +84,10 @@ class VcfReader implements Consts{
 			e.printStackTrace();
 		}
 	}
-	void set_Parameters(){
-		String[] params=new String[track.Parameter.size()];
-		track.Parameter.keySet().toArray(params);
-		for(int i=0;i<params.length;i++)
-			if(track.CurrentSetting.get(params[i])!=null && !track.CurrentSetting.get(params[i]).equals("")){
-				/* put new parameters in track.CurrentSetting into track.Parameter
-				 * There will be one single string in track.CurrentSetting
-				 * track.CurrentSetting
-				 * null means no change for the parameter params[i] after initializing (do nothing)
-				 * "" means no change since the last effective parameter setting (do nothing)
-				 * "SOME CONTENT(STRING)" means the settings have been changed since the last effective parameter setting
-				 * And these changes need to be update to the track.Parameters
-				 * You need to analyze the String in track.CurrentSetting.get(params[i]),
-				 * and update track.Parameters.get(params[i])
-				 */
-			}
-	}
 	Vcf[] extract_vcf(String chr,long start,long end){
 		
 		StringBuffer querystr=new StringBuffer();
-		if((Boolean)(track.Parameter.get(VCF_CHROM_PREFIX)))
+		if((Boolean)(track.get_Parameter(VCF_CHROM_PREFIX)))
 			querystr.append(chr);
 		else
 			querystr.append(chr.substring(3));
@@ -133,10 +110,10 @@ class VcfReader implements Consts{
 			TabixReader.Iterator Query=vcf_tb.query(querystr.toString());
 			while(Query !=null && (line=Query.next()) != null){
 				Vcf vcf_temp;
-				if(((String[])(track.Parameter.get(VCF_HEADER_SAMPLE)))==null)
+				if(((VcfSample)(track.get_Parameter(VCF_HEADER_SAMPLE))).SampleNames==null)
 					vcf_temp=new Vcf(line);
 				else
-					vcf_temp=new Vcf(line,((String[])(track.Parameter.get(VCF_HEADER_SAMPLE))).length);
+					vcf_temp=new Vcf(line,((VcfSample)(track.get_Parameter(VCF_HEADER_SAMPLE))).SampleNames.length);
 				vcf_internal.add(vcf_temp);
 			}
 			vcf_tb.TabixReaderClose();
@@ -150,7 +127,6 @@ class VcfReader implements Consts{
 		Vcf[] vcf=extract_vcf(chr,start,end);
 		Element Variants=doc.createElement(XML_TAG_VARIANTS);
 		Variants.setAttribute(XML_TAG_ID, track);
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Variants);
 		long lastpos=0;
 		for(int i=0;i<vcf.length;i++){
 			String[] alt_temp=vcf[i].Alt.split(",");

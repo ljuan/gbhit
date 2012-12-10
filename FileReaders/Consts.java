@@ -49,15 +49,20 @@ public interface Consts{
 	
 	public static final String XML_TAG_VARIANT="Variant";
 	public static final String XML_TAG_VARIANTS="Variants";
-	public static final String XML_TAG_ELEMENT="Element";
-	public static final String XML_TAG_ELEMENTS="Elements";
-	public static final String XML_TAG_SUBELEMENT="SubElement";
 	public static final String XML_TAG_DIRECTION="Direction";
 	public static final String XML_TAG_COLOR="Color";
 	public static final String XML_TAG_FROM="From";
 	public static final String XML_TAG_TO="To";
 	public static final String XML_TAG_LETTER="Letter";
 	public static final String XML_TAG_DESCRIPTION="Description";
+	
+	public static final String XML_TAG_ELEMENT="Element";
+	public static final String XML_TAG_ELEMENTS="Elements";
+	public static final String XML_TAG_SUBELEMENT="SubElement";
+	
+	public static final String XML_TAG_PARAMETER="Parameter";
+	public static final String XML_TAG_PARAMETERS="Parameters";
+	public static final String XML_TAG_OPTIONS="Options";
 	
 	public static final String XML_TAG_MODE="Mode";
 	public static final String XML_TAG_STEP="Step";
@@ -78,6 +83,7 @@ public interface Consts{
 	
 	public static final String VARIANT_TYPE_SNV="SNV";
 	public static final String VARIANT_TYPE_CNV="CNV";
+	public static final String VARIANT_TYPE_DUPLICATION="DUP";
 	public static final String VARIANT_TYPE_INSERTION="INS";
 	public static final String VARIANT_TYPE_INVERSION="INV";
 	public static final String VARIANT_TYPE_DELETION="DEL";
@@ -88,4 +94,9 @@ public interface Consts{
 	public static final String SUBELEMENT_TYPE_LINE="Line";
 	public static final String SUBELEMENT_TYPE_BAND="Band";
 	
+	public static final String PARAMETER_TYPE_CHECKBOX="CHECKBOX";
+	public static final String PARAMETER_TYPE_SELECTION="SELECTION";
+	public static final String PARAMETER_TYPE_STRING="STRING";
+	public static final String PARAMETER_TYPE_VCFSAMPLE="VCFSAMPLE";
+	public static final String PARAMETER_TYPE_INVISABLE="INVISABLE";
 }

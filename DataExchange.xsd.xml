@@ -56,9 +56,10 @@
 										<xs:element name="options" type="xs:string" maxOccurs="unbounded" minOccurs="0"> 
 											<!-- required when ParameterType=SELECTION or CHECKBOX
 											comma-separated option list
+											colon-separated option:currentvalue pair
 											-->
 									</xs:sequence>
-									<xs:attribute name="name" type="xs:string"/>
+									<xs:attribute name="id" type="xs:string"/>
 									<xs:attribute name="Type" type="ParameterType"/>
 								</xs:complexType>
 						</xs:sequence>
@@ -194,10 +195,11 @@
 	</xs:simpleType>
 	<xs:simpleType name="ParameterType">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="CHECKBOX"/> <!--Conservation-->
-			<xs:enumeration value="VALUE"/> <!--Reads Enrichment-->
-			<xs:enumeration value="STRING"/> <!--GC content-->
-			<xs:enumeration value="SELECTION"/> <!--GC content-->
+			<xs:enumeration value="CHECKBOX"/> <!--compatible options-->
+			<xs:enumeration value="STRING"/> <!--string-->
+			<xs:enumeration value="SELECTION"/> <!--drop-down menu or exclusive options-->
+			<xs:enumeration value="VCFSAMPLE"/> <!--vcf samples-->
+			<xs:enumeration value="INVISABLE"/> <!--internal parameters-->
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="ValueMode">

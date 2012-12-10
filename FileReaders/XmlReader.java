@@ -2,6 +2,7 @@ package FileReaders;
 
 import java.io.*;
 import javax.xml.parsers.*;
+
 import org.w3c.dom.*;
 
 /*
@@ -26,6 +27,18 @@ class XmlReader implements Consts{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	XmlReader(String xml){
+		DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
+		try {
+			DocumentBuilder db=dbf.newDocumentBuilder();
+			doc=db.parse(xml);
+			doc.normalize();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	Document getDoc(){
 		return doc;

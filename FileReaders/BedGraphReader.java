@@ -32,7 +32,7 @@ public class BedGraphReader {
 	 * @param filePath
 	 *            file path of the BedGraph file
 	 */
-	BedGraphReader(String filePath) {
+	public BedGraphReader(String filePath) {
 		this.filePath = filePath;
 	}
 
@@ -54,15 +54,14 @@ public class BedGraphReader {
 	public void write_bedGraph2Values(Document doc, String track, String chr,
 			int start, int end, int windowSize, int step) throws IOException {
 		DataValueList values = new DataValueList(start, end, windowSize, step);
-		BedGraph.BedGraphLineIterator itor = new BedGraph(filePath, chr, start,
-				end).iterator();
+		BedGraph.BedGraphLineIterator itor = new BedGraph(filePath, chr,
+				start - 1, end).iterator();
 		if (itor != null) {
 			while (itor.hasNext()) {
 				values.update(itor.next());
 			}
 			itor.close();
 		}
-
 		WiggleReader.writeDataValues2XML(doc, track, start, end, step,
 				values.toString());
 	}
