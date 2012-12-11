@@ -20,7 +20,8 @@ class VcfSample implements Consts{
 			Samples.put(SampleNames[i], false);
 		String[] selected_samples=selected_sample.split(":");
 		for(int i=0;i<selected_samples.length;i++)
-			Samples.put(selected_samples[i], true);
+			if(Samples.containsKey(selected_samples[i]))
+				Samples.put(selected_samples[i], true);
 	}
 	Element appendXMLcontent(Document doc, Element Param){
 		StringBuffer options_temp=new StringBuffer();

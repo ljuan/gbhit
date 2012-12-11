@@ -50,7 +50,8 @@ class Annotations implements Consts{
 				for(int j=0;j<optionList.length;j++)
 					options_param.put(optionList[j], false);
 				for(int j=0;j<value_temp.length;j++)
-					options_param.put(value_temp[j], true);
+					if(options_param.containsKey(value_temp[j]))
+						options_param.put(value_temp[j], true);
 				Parameter.put(ParameterList[i], options_param);
 			}
 			else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_STRING))
