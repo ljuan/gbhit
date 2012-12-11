@@ -42,24 +42,26 @@ class Annotations implements Consts{
 		String[] ParameterList=params.split(";");
 		String[] ValueList=values.split(";");
 		for(int i=0;i<ParameterList.length;i++){
-			if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_CHECKBOX)){
-				String[] value_temp=ValueList[i].split(":");
-				HashMap<String,Boolean> options_param=(HashMap<String,Boolean>)(Parameter.get(ParameterList[i]));
-				String[] optionList=new String[options_param.size()];
-				options_param.keySet().toArray(optionList);
-				for(int j=0;j<optionList.length;j++)
-					options_param.put(optionList[j], false);
-				for(int j=0;j<value_temp.length;j++)
-					if(options_param.containsKey(value_temp[j]))
-						options_param.put(value_temp[j], true);
-				Parameter.put(ParameterList[i], options_param);
+			if(Parameter.containsKey(ParameterList[i])){
+				if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_CHECKBOX)){
+					String[] value_temp=ValueList[i].split(":");
+					HashMap<String,Boolean> options_param=(HashMap<String,Boolean>)(Parameter.get(ParameterList[i]));
+					String[] optionList=new String[options_param.size()];
+					options_param.keySet().toArray(optionList);
+					for(int j=0;j<optionList.length;j++)
+						options_param.put(optionList[j], false);
+					for(int j=0;j<value_temp.length;j++)
+						if(options_param.containsKey(value_temp[j]))
+							options_param.put(value_temp[j], true);
+					Parameter.put(ParameterList[i], options_param);
+				}
+				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_STRING))
+					Parameter.put(ParameterList[i],ValueList[i]);
+				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_SELECTION))
+					((String[])(Parameter.get(ParameterList[i])))[0]=ValueList[i];
+				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_VCFSAMPLE))
+					((VcfSample)(Parameter.get(ParameterList[i]))).setSamples(ValueList[i]);
 			}
-			else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_STRING))
-				Parameter.put(ParameterList[i],ValueList[i]);
-			else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_SELECTION))
-				((String[])(Parameter.get(ParameterList[i])))[0]=ValueList[i];
-			else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_VCFSAMPLE))
-				((VcfSample)(Parameter.get(ParameterList[i]))).setSamples(ValueList[i]);
 		}
 	}
 	void initialize_Parameter(String Param, Object Values, String Type){

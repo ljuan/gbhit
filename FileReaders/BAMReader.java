@@ -8,6 +8,7 @@ import net.sf.samtools.*;
 import net.sf.samtools.SAMRecord.SAMTagAndValue;
 import net.sf.samtools.util.SeekableBufferedStream;
 import net.sf.samtools.util.SeekableHTTPStream;
+import static FileReaders.XmlWriter.append_text_element;
 
 /**
  * <pre>
@@ -41,7 +42,7 @@ public class BAMReader implements Consts {
 
 	private SAMFileReader samReader = null;
 
-	private static final int SIXTEENK = 16 * 1024;;
+	private static final int SIXTEENK = 16 * 1024;
 
 	/**
 	 * position of each chromosome's first read's first base in the BAM file.
@@ -97,9 +98,6 @@ public class BAMReader implements Consts {
 	 * 
 	 * @param filePath
 	 *            file path or url of the BAM file.
-	 * @param indexFilePath
-	 *            Temp path to store the index file. Influential only when BAM
-	 *            file is from remote server.
 	 * @throws MalformedURLException
 	 * @throws URISyntaxException
 	 * @throws FileNotFoundException
@@ -222,29 +220,26 @@ public class BAMReader implements Consts {
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
 			SAMRecord rec = itor.next();
+
+			if ("*".equals(rec.getCigarString()))
+				continue;
+
 			Element read = doc.createElement(XML_TAG_READ);
 			read.setAttribute(XML_TAG_ID, rec.getReadName());
-			XmlWriter.append_text_element(doc, read, XML_TAG_FROM,
-					rec.getAlignmentStart() + "");
-			XmlWriter.append_text_element(doc, read, XML_TAG_TO,
-					rec.getAlignmentEnd() + "");
+			writeStartEndByCigar(doc, read, rec);
 
-			XmlWriter.append_text_element(doc, read, XML_TAG_DIRECTION,
+			append_text_element(doc, read, XML_TAG_DIRECTION,
 					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
-			XmlWriter.append_text_element(doc, read, "Mapq",
-					rec.getMappingQuality() + "");
-			XmlWriter.append_text_element(doc, read, "Cigar",
-					rec.getCigarString());
-			XmlWriter.append_text_element(doc, read, "Rnext",
-					rec.getMateReferenceName());
-			XmlWriter.append_text_element(doc, read, "Pnext",
-					rec.getMateAlignmentStart() + "");
-			XmlWriter.append_text_element(doc, read, "Tlen",
-					rec.getInferredInsertSize() + "");
+			append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
+			append_text_element(doc, read, "Cigar", rec.getCigarString());
+			append_text_element(doc, read, "Rnext", rec.getMateReferenceName());
+			append_text_element(doc, read, "Pnext", rec.getMateAlignmentStart()
+					+ "");
+			append_text_element(doc, read, "Tlen", rec.getInferredInsertSize()
+					+ "");
 			XmlWriter
 					.append_text_element(doc, read, "Seq", rec.getReadString());
-			XmlWriter.append_text_element(doc, read, "Qual",
-					rec.getBaseQualityString());
+			append_text_element(doc, read, "Qual", rec.getBaseQualityString());
 
 			StringBuilder remain = new StringBuilder();
 			List<SAMTagAndValue> l = rec.getAttributes();
@@ -254,7 +249,7 @@ public class BAMReader implements Consts {
 					remain.append(";");
 			}
 
-			XmlWriter.append_text_element(doc, read, XML_TAG_DESCRIPTION,
+			append_text_element(doc, read, XML_TAG_DESCRIPTION,
 					remain.toString());
 
 			reads.appendChild(read);
@@ -273,6 +268,7 @@ public class BAMReader implements Consts {
 	 */
 	private void writeNotDetail(Document doc, List<SAMRecord> list,
 			String track, String mode, boolean lt0point5) {
+
 		Element reads = doc.createElement(XML_TAG_READS);
 
 		reads.setAttribute(XML_TAG_ID, track);
@@ -280,20 +276,19 @@ public class BAMReader implements Consts {
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
 			SAMRecord rec = itor.next();
+
+			if ("*".equals(rec.getCigarString()))
+				continue;
+
 			Element read = doc.createElement(XML_TAG_READ);
 
 			if (mode.equalsIgnoreCase(MODE_FULL)
 					|| mode.equalsIgnoreCase(MODE_PACK))
 				read.setAttribute(XML_TAG_ID, rec.getReadName());
-
-			XmlWriter.append_text_element(doc, read, XML_TAG_FROM,
-					rec.getAlignmentStart() + "");
-			XmlWriter.append_text_element(doc, read, XML_TAG_TO,
-					rec.getAlignmentEnd() + "");
-			XmlWriter.append_text_element(doc, read, XML_TAG_DIRECTION,
+			writeStartEndByCigar(doc, read, rec);
+			append_text_element(doc, read, XML_TAG_DIRECTION,
 					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
-			XmlWriter.append_text_element(doc, read, "Mapq",
-					rec.getMappingQuality() + "");
+			append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
 
 			if (lt0point5) {
 				addVariant(doc, read, rec);
@@ -343,12 +338,11 @@ public class BAMReader implements Consts {
 						String s = snv.get(next);
 						Element ele = doc.createElement(XML_TAG_VARIANT);
 						ele.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_SNV);
-						XmlWriter.append_text_element(doc, ele, XML_TAG_FROM,
+						append_text_element(doc, ele, XML_TAG_FROM,
 								"" + next.intValue());
-						XmlWriter.append_text_element(doc, ele, XML_TAG_TO, ""
-								+ (next.intValue() + s.length() - 1));
-						XmlWriter.append_text_element(doc, ele, XML_TAG_LETTER,
-								s);
+						append_text_element(doc, ele, XML_TAG_TO,
+								"" + (next.intValue() + s.length() - 1));
+						append_text_element(doc, ele, XML_TAG_LETTER, s);
 						read.appendChild(ele);
 					}
 				}
@@ -358,15 +352,43 @@ public class BAMReader implements Consts {
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
 	}
 
+	private void writeStartEndByCigar(Document doc, Element ele, SAMRecord rec) {
+		int pos = rec.getAlignmentStart();
+		StringBuilder starts = new StringBuilder();
+		StringBuilder ends = new StringBuilder();
+
+		List<CigarElement> ces = rec.getCigar().getCigarElements();
+
+		starts.append(pos);
+		for (int i = 0; i < ces.size(); i++) {
+			CigarElement ce = ces.get(i);
+			String op = ce.getOperator().toString();
+			if ("N".equals(op)) {
+				ends.append(pos - 1);
+				ends.append(",");
+				pos += ce.getLength();
+				starts.append(",");
+				starts.append(pos);
+				continue;
+			} else if ("M".equals(op) || "D".equals(op)) {
+				pos += ce.getLength();
+			}
+		}
+		ends.append(pos - 1);
+
+		append_text_element(doc, ele, XML_TAG_FROM, starts.toString());
+		append_text_element(doc, ele, XML_TAG_TO, ends.toString());
+	}
+
 	private void writeBigRegion(Document doc, int start, int end, int step,
 			int[] list, String track) {
 		Element values = doc.createElement(XML_TAG_VALUES);
 		values.setAttribute(XML_TAG_ID, track);
 		values.setAttribute(XML_TAG_TYPE, "REN");
 
-		XmlWriter.append_text_element(doc, values, XML_TAG_FROM, start + "");
-		XmlWriter.append_text_element(doc, values, XML_TAG_TO, end + "");
-		XmlWriter.append_text_element(doc, values, XML_TAG_STEP, step + "");
+		append_text_element(doc, values, XML_TAG_FROM, start + "");
+		append_text_element(doc, values, XML_TAG_TO, end + "");
+		append_text_element(doc, values, XML_TAG_STEP, step + "");
 
 		StringBuilder vl = new StringBuilder();
 		for (int i = 0; i < list.length; i++) {
@@ -374,7 +396,7 @@ public class BAMReader implements Consts {
 			if (i < list.length - 1)
 				vl.append(";");
 		}
-		XmlWriter.append_text_element(doc, values, "ValueList", vl.toString());
+		append_text_element(doc, values, "ValueList", vl.toString());
 
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(values);
 	}
@@ -390,15 +412,14 @@ public class BAMReader implements Consts {
 			String name = ce.getOperator().name();
 			if (name.equals("D")) {
 				ele.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_DELETION);
-				XmlWriter.append_text_element(doc, ele, XML_TAG_FROM, "" + pos);
-				XmlWriter.append_text_element(doc, ele, XML_TAG_TO, ""
-						+ (pos + ce.getLength() - 1));
+				append_text_element(doc, ele, XML_TAG_FROM, "" + pos);
+				append_text_element(doc, ele, XML_TAG_TO,
+						"" + (pos + ce.getLength() - 1));
 				hasException = true;
 			} else if (name.equals("I")) {
 				ele.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_INSERTION);
-				XmlWriter.append_text_element(doc, ele, XML_TAG_FROM, ""
-						+ (pos - 1));
-				XmlWriter.append_text_element(
+				append_text_element(doc, ele, XML_TAG_FROM, "" + (pos - 1));
+				append_text_element(
 						doc,
 						ele,
 						XML_TAG_LETTER,
@@ -498,6 +519,7 @@ public class BAMReader implements Consts {
 			regions[i] = 0;
 
 		int blockIndex = 0;
+
 		while (itor.hasNext()) {
 			SAMRecord read = itor.next();
 			while (read.getAlignmentStart() - start > starts[blockIndex + 1])
@@ -761,9 +783,9 @@ public class BAMReader implements Consts {
 			FileNotFoundException {
 		if (fromRemoteServer)
 			samReader = new SAMFileReader(new SeekableBufferedStream(
-					new SeekableHTTPStream(new URL(filePath))),
+					new SeekableHTTPStream(new URL(filePath)), SIXTEENK),
 					new SeekableBufferedStream(new SeekableHTTPStream(new URL(
-							indexFilePath))), b);
+							indexFilePath)), SIXTEENK), b);
 		else
 			samReader = new SAMFileReader(new File(filePath), new File(
 					indexFilePath), b);
