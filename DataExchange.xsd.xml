@@ -21,6 +21,7 @@
 				<xs:element name="Sequence" type="SeqLimit" maxOccurs="1" minOccurs="0">
 					<xs:complextType>
 						<xs:attribute name="id" type="xs:string"/>
+						<xs:attribute name="ifParam" type="xs:string"/>
 					</xs:complextType>
 				</xs:element>
 				<xs:element name="EVList" type="xs:string" maxOccurs="unbounded" minOccurs="0"/> <!--comma-seperated string for general position of variants or elements, well formatted-->
@@ -35,6 +36,7 @@
 						</xs:sequence>
 						<xs:attribute name="id" type="xs:string"/>
 						<xs:attribute name="gieStain" type="xs:string"/>
+						<xs:attribute name="ifParam" type="xs:string"/>
 					</xs:complextType>
 				</xs:element>
 				
@@ -57,6 +59,7 @@
 							</xs:element>
 						</xs:sequence>
 						<xs:attribute name="id" type="xs:string" use="required"/>
+						<xs:attribute name="ifParam" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
 				
@@ -109,6 +112,7 @@
 							</xs:element>
 						</xs:sequence>
 						<xs:attribute name="id" type="xs:string"/>
+						<xs:attribute name="ifParam" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
 				
@@ -124,6 +128,7 @@
 						<xs:attribute name="id" type="xs:string" use="required"/>
 						<xs:attribute name="Type" type="ValueType"/>
 						<xs:attribute name="Mode" type="ValueMode" default="Grayscale"/>
+						<xs:attribute name="ifParam" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
 				
@@ -164,6 +169,7 @@
 							</xs:element>
 						</xs:sequence>
 						<xs:attribute name="id" type="xs:string" use="required"/>
+						<xs:attribute name="ifParam" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
 				
