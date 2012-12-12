@@ -246,10 +246,15 @@ public class Instance implements Consts{
 				CytobandReader cbr=new CytobandReader(track.get_Path(Chr));
 				ele_temp=cbr.write_cytobands(doc, Chr, track);
 			}
-			if(ele_temp!=null&&track.has_visable_Parameter())
-				ele_temp.setAttribute(XML_TAG_IFP, TEXT_TRUE);
-			else if(ele_temp!=null)
-				ele_temp.setAttribute(XML_TAG_IFP, TEXT_FALSE);
+			
+			if(ele_temp!=null
+					&&!ele_temp.getTagName().equals(XML_TAG_PARAMETERS)
+					&&!type_temp.equals(FORMAT_CYTO)
+					&&!type_temp.equals(FORMAT_REF))
+				if(track.has_visable_Parameter())
+					ele_temp.setAttribute(XML_TAG_IFP, TEXT_TRUE);
+				else 
+					ele_temp.setAttribute(XML_TAG_IFP, TEXT_FALSE);
 		}
 	}
 
