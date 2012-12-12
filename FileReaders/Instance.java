@@ -9,11 +9,11 @@ import org.w3c.dom.Document;
 
 public class Instance implements Consts{
 	String Assembly;
-	String Chr;
+	String Chr=null;
 	long[] Coordinate;
 	Hashtable<String, Annotations> Annos;
 	Hashtable<String, Annotations> Externals;
-	FastaReader fr;
+	FastaReader rr;
 	CfgReader Config;
 	double bpp;
 	int window_width;
@@ -29,8 +29,8 @@ public class Instance implements Consts{
 		Annotations[] Annos=Config.getAnnotations(Assembly);
 		this.Annos=new Hashtable<String, Annotations>(Annos.length,1);
 		for(int i=0;i<Annos.length;i++){
-			if(Annos[i].get_ID().equals("Reference"))
-				fr=new FastaReader(Annos[i].get_Path());
+			if(Annos[i].get_Type().equals(FORMAT_REF))
+				rr=new FastaReader(Annos[i].get_Path());
 			this.Annos.put(Annos[i].get_ID(), Annos[i]);
 		}
 		Externals=new Hashtable<String, Annotations>();
@@ -52,7 +52,7 @@ public class Instance implements Consts{
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_CHROMOSOME, Chr);
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_START, String.valueOf(Coordinate[0]));
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_END, String.valueOf(Coordinate[1]));
-			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_LENGTH, String.valueOf(fr.fasta_index[chrid][0]));
+			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_LENGTH, String.valueOf(rr.fasta_index[chrid][0]));
 
 			for(int i=0;i<Annos.size();i++){
 				Annotations anno_temp=annos_enum.nextElement();
@@ -154,15 +154,16 @@ public class Instance implements Consts{
 	}
 	void append_track(Annotations track, Document doc,String mode) {
 		if(!mode.equals(MODE_HIDE)){
-			if(track.get_Type().equals(FORMAT_BEDGZ)){
+			String type_temp=track.get_Type();
+			if(type_temp.equals(FORMAT_BEDGZ)){
 				BedReaderTabix brt=new BedReaderTabix(track.get_Path(Chr));
 				brt.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
 			}
-			else if(track.get_Type().equals(FORMAT_BED)){
+			else if(type_temp.equals(FORMAT_BED)){
 				BedReader br=new BedReader(track.get_Path(Chr));
 				br.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
 			}
-			else if(track.get_Type().equals(FORMAT_BIGBED)){
+			else if(type_temp.equals(FORMAT_BIGBED)){
 				BigBedReader bbr;
 				try{
 					bbr=new BigBedReader(track.get_Path(Chr));
@@ -171,7 +172,7 @@ public class Instance implements Consts{
 					e.printStackTrace();
 				}
 			}
-			else if(track.get_Type().equals(FORMAT_BEDGRAPH)){
+			else if(type_temp.equals(FORMAT_BEDGRAPH)){
 				BedGraphReader bgr;
 				try{
 					bgr=new BedGraphReader(track.get_Path(Chr));
@@ -180,7 +181,7 @@ public class Instance implements Consts{
 					e.printStackTrace();
 				}
 			}
-			else if(track.get_Type().equals(FORMAT_BIGWIG)){
+			else if(type_temp.equals(FORMAT_BIGWIG)){
 				WiggleReader wr;
 				try{
 					wr=new WiggleReader(track.get_Path(Chr),true);
@@ -189,7 +190,7 @@ public class Instance implements Consts{
 					e.printStackTrace();
 				}
 			}
-			else if(track.get_Type().equals(FORMAT_WIG)){
+			else if(type_temp.equals(FORMAT_WIG)){
 				WiggleReader wr2;
 				try{
 					wr2=new WiggleReader(track.get_Path(Chr),false);
@@ -198,61 +199,64 @@ public class Instance implements Consts{
 					e.printStackTrace();
 				}
 			}
-			else if(track.get_Type().equals(FORMAT_GFF)){
+			else if(type_temp.equals(FORMAT_GFF)){
 				GFFReader gr;
 				try {
 					gr = new GFFReader(track.get_Path(Chr));
 					gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"gene_id");
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			else if(track.get_Type().equals(FORMAT_GTF)){
+			else if(type_temp.equals(FORMAT_GTF)){
 				GTFReader gr;
 				try {
 					gr = new GTFReader(track.get_Path(Chr));
 					gr.write_gtf2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			else if(track.get_Type().equals(FORMAT_GVF)){
+			else if(type_temp.equals(FORMAT_GVF)){
 				GVFReader gr;
 				try {
 					gr = new GVFReader(track.get_Path(Chr));
 					gr.write_gvf2variants(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			else if (track.get_Type().equals(FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<1000000){
+			else if (type_temp.equals(FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<1000000){
 				VcfReader vr=new VcfReader(track,Chr);
 				vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			}
-			else if (track.get_Type().equals(FORMAT_BAM)){
+			else if (type_temp.equals(FORMAT_BAM)){
 				try {
 					BAMReader br2=new BAMReader(track.get_Path(Chr));
-					br2.readBAM(doc,Chr,(int)Coordinate[0],(int)Coordinate[1],window_width,2,mode,track.get_ID());
+					br2.readBAM(doc,Chr,(int)Coordinate[0],(int)Coordinate[1],window_width,2, mode,track.get_ID());
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			else if (track.get_Type().equals(FORMAT_FASTA)&&bpp<0.5){
+			else if (type_temp.equals(FORMAT_REF)&&bpp<0.5){
+				rr.write_sequence(doc, Chr, Coordinate[0], Coordinate[1], track.get_ID());
+			}
+			else if (type_temp.equals(FORMAT_FASTA)&&bpp<0.5){
+				FastaReader fr=new FastaReader(track.get_Path());
 				fr.write_sequence(doc, Chr, Coordinate[0], Coordinate[1], track.get_ID());
+			}
+			else if (type_temp.equals(FORMAT_CYTO)){
+				CytobandReader cbr=new CytobandReader(track.get_Path(Chr));
+				cbr.write_cytobands(doc, Chr, track);
 			}
 		}
 	}
 
 	int check_chromosome(String chr){
-		if(fr.seq_name.containsKey(chr))
-			return fr.seq_name.get(chr);
+		if(rr.seq_name.containsKey(chr))
+			return rr.seq_name.get(chr);
 		else
 			return -1;
 	}
@@ -260,8 +264,8 @@ public class Instance implements Consts{
 		long[] coordinate=new long[2];
 		if (start<1)
 			start=1;
-		if (end>fr.fasta_index[chr_info][0])
-			end=fr.fasta_index[chr_info][0];
+		if (end>rr.fasta_index[chr_info][0])
+			end=rr.fasta_index[chr_info][0];
 		if(start<=end){
 			coordinate[0]=start;
 			coordinate[1]=end;

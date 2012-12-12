@@ -95,15 +95,16 @@ class Annotations implements Consts{
 				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_SELECTION)){
 					String[] optionList=(String[])(Parameter.get(ParameterList[i]));
 					StringBuffer options_temp=new StringBuffer();
-					for(int j=0;j<optionList.length;j++){
+					for(int j=1;j<optionList.length;j++){
 						options_temp.append(optionList[j]);
 						if(j<optionList.length-1)
 							options_temp.append(";");
 					}
 					XmlWriter.append_text_element(doc, Param, XML_TAG_OPTIONS, options_temp.toString());
+					Param.appendChild(doc.createTextNode(optionList[0]));
 				}
 				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_STRING))
-					XmlWriter.append_text_element(doc, Param, XML_TAG_OPTIONS, (String)(Parameter.get(ParameterList[i])));
+					Param.appendChild(doc.createTextNode((String)Parameter.get(ParameterList[i])));
 				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_VCFSAMPLE))
 					((VcfSample)(Parameter.get(ParameterList[i]))).appendXMLcontent(doc, Param);
 				Parameters.appendChild(Param);
@@ -129,6 +130,9 @@ class Annotations implements Consts{
 			return true;
 		else
 			return false;
+	}
+	boolean has_Parameter(String param){
+		return Parameter.containsKey(param);
 	}
 	String get_ID(){
 		return ID;

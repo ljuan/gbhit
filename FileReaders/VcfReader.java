@@ -32,7 +32,7 @@ class VcfReader implements Consts{
 	VcfReader(Annotations track, String Chr){
 		try {
 			vcf_tb=new TabixReader(track.get_Path(Chr));
-			if (track.get_Parameter(VCF_CHROM_PREFIX)==null){
+			if (!track.has_Parameter(VCF_CHROM_PREFIX)){
 				HashMap<String,Boolean> filter_header=new HashMap<String,Boolean>();
 				Hashtable<String,String[]> info_header;
 				Hashtable<String,String[]> format_header;
