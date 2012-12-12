@@ -38,7 +38,7 @@ public interface Consts{
 	public static final String XML_TAG_PATH="Path";
 	public static final String XML_TAG_DEFAULT="Default";
 	
-	public static final String XML_TAG_CHROMOSOME="Chromosome";
+	public static final String XML_TAG_CHROMOSOME="Chrovamosome";
 	public static final String XML_TAG_START="Start";
 	public static final String XML_TAG_END="End";
 	public static final String XML_TAG_LENGTH="Length";
@@ -46,7 +46,9 @@ public interface Consts{
 	public static final String XML_TAG_ERROR="Error";
 	
 	public static final String XML_TAG_ID="id";
+	public static final String XML_TAG_SUPERID="superid";
 	public static final String XML_TAG_TYPE="Type";
+	public static final String XML_TAG_IFP="ifParam";
 	public static final String XML_TAG_KEY="key";
 	
 	public static final String XML_TAG_VARIANT="Variant";

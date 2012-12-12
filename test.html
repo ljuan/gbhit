@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<style>
+xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
+</style>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Servlet Test</title>
+            <script type="text/javascript">
+			function createXMLHttpRequest() {
+				var xmlHttp = false;
+				if (window.XMLHttpRequest){
+					xmlHttp = new XMLHttpRequest();
+				} else if (window.ActiveXObject) {
+					try{
+						xmlHttp = new ActiveXObject("Msxm12.XMLHTTP");
+					}
+					catch(e1){
+						try{
+							xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						catch(e2){
+							
+						}
+					}
+				}
+				return xmlHttp;
+			}
+			var req = createXMLHttpRequest();
+			function update(){
+				 var param1=document.getElementById("p1").value;
+				 var param2=document.getElementById("p2").value;
+				 var param3=document.getElementById("p3").value;
+				 var param4=document.getElementById("p4").value;
+				 var param5=document.getElementById("p5").value;
+				 var querry="getAssemblies";
+				 req.onreadystatechange = getReadyStateHandler;
+				if(param5 == "getAssemblies" || param5 == "getAnnotations"){
+					querry="action="+param5;
+				} else if(param5 == "removeTracks" || param5 == "removeExternals" || param5 == "getParams"){
+					querry="action="+param5+"&tracks="+param4;
+				} else if(param5 == "setAssembly"){
+					querry="action="+param5+"&assembly="+param4;
+				} else if(param5 == "modiTracks" || param5 == "addTracks"){
+					querry="action="+param5+"&tracks="+param4+"&modes="+param3;
+				} else if(param5 == "addExternals"){
+					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&links="+param2+"&types="+param1;
+				} else if(param5 == "update"){
+					querry="action="+param5+"&width="+param4+"&chr="+param1+"&start="+param2+"&end="+param3;
+				} else if(param5 == "setParams"){
+					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&params="+param2+"&values="+param1;
+				} 
+				 req.open("GET","servlet/test.do?"+querry,true);
+			//	 req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+				 req.send(null);
+			}
+			function getReadyStateHandler() {
+				if (req.readyState == 4){
+					if (req.status == 200){
+						var pattern = /></g;
+						var pattern1 = /<\//;
+						var pattern2 = />/;
+						var pattern3 = /<.*?>/;
+						var pattern4 = /<.*?\/>/;
+						var pattern5 = /<\/.*?>/;
+						var pattern6 = /<.*?>.*<\/.*?>/;
+						var divvText=req.responseText.replace(pattern, ">\n<");
+						var divvTexts=divvText.split("\n");
+						var tabtemp=0;
+						for(var divvidx=0;divvidx<divvTexts.length;divvidx++){
+							if(pattern6.test(divvTexts[divvidx])){
+								for(var tabnum=0;tabnum<tabtemp;tabnum++){
+									divvTexts[divvidx]="\t"+divvTexts[divvidx];	
+								}		
+								divvTexts[divvidx]=divvTexts[divvidx].replace(pattern1, "\t<\/");
+								divvTexts[divvidx]=divvTexts[divvidx].replace(pattern2, ">\t");
+							} else if(pattern4.test(divvTexts[divvidx])){
+								for(var tabnum=0;tabnum<tabtemp;tabnum++){
+									divvTexts[divvidx]="\t"+divvTexts[divvidx];	
+								}		
+							} else if(pattern5.test(divvTexts[divvidx])){
+								tabtemp=tabtemp-1;
+								for(var tabnum=0;tabnum<tabtemp;tabnum++){
+									divvTexts[divvidx]="\t"+divvTexts[divvidx];	
+								}		
+							} else if(pattern3.test(divvTexts[divvidx])){
+								for(var tabnum=0;tabnum<tabtemp;tabnum++){
+									divvTexts[divvidx]="\t"+divvTexts[divvidx];	
+								}		
+								tabtemp=tabtemp+1;
+							}		
+						}
+						divvText=divvTexts.join("\n");	
+						document.getElementById("divv").innerHTML="<xmp>"+divvText+"</xmp>";
+					} else {
+						document.getElementById("divv").innerHTML=req.responseText;
+						//alert("HTTP error: "+req.status);
+					}
+				}
+			}
+
+		</script>
+    </head>
+    <body>
+        <h1>Servlet Test</h1>
+	<table width=80% border=1 align="center">
+		<tr>
+			<th>Input</th>
+			<th>update</th>
+			<th>addExternals</th>
+			<th>setParams</th>
+			<th>addTracks</th>
+			<th>modiTracks</th>
+			<th>removeTracks</th>
+			<th>removeExternals</th>
+			<th>getParams</th>
+			<th>setAssembly</th>
+			<th>getAssemblies</th>
+			<th>getAnnotations</th>
+		<tr align="center">
+			<td><input id="p1" type="text"/></td>
+			<td>Chromosome</td>
+			<td>Types</td>
+			<td>Values</td>
+			<td colspan="8"></td>
+		</tr>
+		<tr align="center">
+			<td><input id="p2" type="text"/></td>
+			<td>Start</td>
+			<td>Links</td>
+			<td>Params</td>
+			<td colspan="8"></td>
+		</tr>
+		<tr align="center">
+			<td><input id="p3" type="text"/></td>
+			<td>End</td>
+			<td>modes</td>
+			<td>modes</td>
+			<td>modes</td>
+			<td>modes</td>
+			<td colspan="6"></td>
+		</tr>
+		<tr align="center">
+			<td><input id="p4" type="text"/></td>
+			<td>WindowWidth</td>
+			<td>tracks</td>
+			<td>tracks</td>
+			<td>tracks</td>
+			<td>tracks</td>
+			<td>tracks</td>
+			<td>tracks</td>
+			<td>tracks</td>
+			<td>assembly</td>
+			<td colspan="2"></td>
+		</tr>
+		<tr align="center">
+			<td><input id="p5" type="text"/></td>
+			<td>action</td>
+			<td>action</td>
+			<td>action</td>
+			<td>action</td>
+			<td>action</td>
+			<td>action</td>
+			<td>action</td>
+			<td>action</td>
+			<td>action</td>
+			<td>action</td>
+			<td>action</td>
+		</tr>
+		<tr><td colspan="12"><button id="buttonn" onclick="update()">update</button></td></tr>
+		<tr><td colspan="12" style="word-break:break-all"><div id="divv"></div></td></tr>
+	</table>
+	
+    </body>
+</html>
