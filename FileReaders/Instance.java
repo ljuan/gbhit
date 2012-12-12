@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class Instance implements Consts{
 	String Assembly;
@@ -117,10 +118,6 @@ public class Instance implements Consts{
 		for(int i=0;i<Annos.size();i++){
 			Annotations temp=annos_enum.nextElement();
 			anno_names[i]=temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
-			if(temp.has_visable_Parameter())
-				anno_names[i]=anno_names[i]+":P";
-			else
-				anno_names[i]=anno_names[i]+":NP";
 		}
 		Document doc=XmlWriter.init(META_ROOT);
 		Config.write_metalist(doc,anno_names, "AnnotationList");
@@ -151,20 +148,21 @@ public class Instance implements Consts{
 	}
 	void append_track(Annotations track, Document doc,String mode) {
 		if(!mode.equals(MODE_HIDE)){
+			Element ele_temp=null;
 			String type_temp=track.get_Type();
 			if(type_temp.equals(FORMAT_BEDGZ)){
 				BedReaderTabix brt=new BedReaderTabix(track.get_Path(Chr));
-				brt.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
+				ele_temp=brt.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
 			}
 			else if(type_temp.equals(FORMAT_BED)){
 				BedReader br=new BedReader(track.get_Path(Chr));
-				br.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
+				ele_temp=br.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
 			}
 			else if(type_temp.equals(FORMAT_BIGBED)){
 				BigBedReader bbr;
 				try{
 					bbr=new BigBedReader(track.get_Path(Chr));
-					bbr.write_bed2elements(doc, track.get_ID(), Chr, Coordinate[0], Coordinate[1], bpp);
+					ele_temp=bbr.write_bed2elements(doc, track.get_ID(), Chr, Coordinate[0], Coordinate[1], bpp);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -225,7 +223,7 @@ public class Instance implements Consts{
 			}
 			else if (type_temp.equals(FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<1000000){
 				VcfReader vr=new VcfReader(track,Chr);
-				vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
+				ele_temp=vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			}
 			else if (type_temp.equals(FORMAT_BAM)){
 				try {
@@ -242,12 +240,16 @@ public class Instance implements Consts{
 			}
 			else if (type_temp.equals(FORMAT_FASTA)&&bpp<0.5){
 				FastaReader fr=new FastaReader(track.get_Path());
-				fr.write_sequence(doc, Chr, Coordinate[0], Coordinate[1], track.get_ID());
+				ele_temp=fr.write_sequence(doc, Chr, Coordinate[0], Coordinate[1], track.get_ID());
 			}
 			else if (type_temp.equals(FORMAT_CYTO)){
 				CytobandReader cbr=new CytobandReader(track.get_Path(Chr));
-				cbr.write_cytobands(doc, Chr, track);
+				ele_temp=cbr.write_cytobands(doc, Chr, track);
 			}
+			if(ele_temp!=null&&track.has_visable_Parameter())
+				ele_temp.setAttribute(XML_TAG_IFP, TEXT_TRUE);
+			else if(ele_temp!=null)
+				ele_temp.setAttribute(XML_TAG_IFP, TEXT_FALSE);
 		}
 	}
 
