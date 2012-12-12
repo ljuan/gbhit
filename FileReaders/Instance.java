@@ -81,10 +81,7 @@ public class Instance implements Consts{
 	}
 	public void remove_Tracks(String[] tracks){
 		for(int i=0;i<tracks.length;i++)
-			if(Annos.containsKey(tracks[i]))
-				Annos.get(tracks[i]).set_Mode(MODE_HIDE);
-			else if(Externals.containsKey(tracks[i]))
-				Externals.get(tracks[i]).set_Mode(MODE_HIDE);
+			set_mode(tracks[i],MODE_HIDE);
 	}
 	public void add_Externals(String[] tracks,String[] links,String[] types,String[] modes){
 		for(int i=0;i<tracks.length;i++)

@@ -37,6 +37,8 @@ class Annotations implements Consts{
 	}
 	void set_Mode(String Mode){
 		this.Mode=Mode;
+		if(Mode.equals(MODE_HIDE))
+			Parameter.clear();
 	}
 	void set_Parameters(String params, String values){
 		String[] ParameterList=params.split(";");
