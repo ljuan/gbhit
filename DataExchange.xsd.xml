@@ -25,6 +25,19 @@
 				</xs:element>
 				<xs:element name="EVList" type="xs:string" maxOccurs="unbounded" minOccurs="0"/> <!--comma-seperated string for general position of variants or elements, well formatted-->
 				
+				<xs:element name="Cytobands" type="xs:string" maxOccurs="1" minOccurs="0">
+					<xs:complextType>
+						<xs:sequence>
+							<xs:element name="Cytoband" type="xs:string" maxOccurs="unbounded" minOccurs="1">
+								<xs:element name="From" type="xs:long"/>
+								<xs:element name="To" type="xs:long"/>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="id" type="xs:string"/>
+						<xs:attribute name="gieStain" type="xs:string"/>
+					</xs:complextType>
+				</xs:element>
+				
 				<xs:element name="Variants" maxOccurs="unbounded" minOccurs="0"> <!--detail information of variants, only return when specific variant information is requested-->
 					<xs:complexType>
 						<xs:sequence>
