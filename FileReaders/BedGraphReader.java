@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import FileReaders.wiggle.DataValue;
 import FileReaders.wiggle.DataValueList;
@@ -51,8 +52,9 @@ public class BedGraphReader {
 	 *            A step defines how many pixes show a grid.
 	 * @throws IOException
 	 */
-	public void write_bedGraph2Values(Document doc, String track, String chr,
-			int start, int end, int windowSize, int step) throws IOException {
+	public Element write_bedGraph2Values(Document doc, String track,
+			String chr, int start, int end, int windowSize, int step)
+			throws IOException {
 		DataValueList values = new DataValueList(start, end, windowSize, step);
 		BedGraph.BedGraphLineIterator itor = new BedGraph(filePath, chr,
 				start - 1, end).iterator();
@@ -62,7 +64,8 @@ public class BedGraphReader {
 			}
 			itor.close();
 		}
-		WiggleReader.writeDataValues2XML(doc, track, start, end, step,
+
+		return WiggleReader.writeDataValues2XML(doc, track, start, end, step,
 				values.toString());
 	}
 }

@@ -31,8 +31,9 @@ public class GTFReader extends GFFReader {
 	 *            chromosome name
 	 * @param regionstart
 	 * @param regionend
+	 * @return
 	 */
-	public void write_gtf2elements(Document doc, String track, String chr,
+	public Element write_gtf2elements(Document doc, String track, String chr,
 			long regionstart, long regionend) {
 		List<GTF> gtfs = new ArrayList<GTF>();
 
@@ -47,7 +48,7 @@ public class GTFReader extends GFFReader {
 			Collections.sort(gtfs);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return;
+			return null;
 		}
 
 		String transcript_id = null;
@@ -67,15 +68,18 @@ public class GTFReader extends GFFReader {
 				new _Element(transcript_id, gs, true).addToElements(doc,
 						elements);
 		}
+
+		return elements;
 	}
 
 	@Override
-	public void write_gff2elements(Document doc, String track, String chr,
+	public Element write_gff2elements(Document doc, String track, String chr,
 			long regionstart, long regionend, String attributes) {
 		try {
 			throw new Exception("Unsupport method!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 }

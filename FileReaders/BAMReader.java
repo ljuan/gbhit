@@ -4,6 +4,10 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import org.w3c.dom.*;
+
+import FileReaders.bam.BAMValueList;
+import FileReaders.bam.VariantResolver;
+import FileReaders.vcf.Variant;
 import net.sf.samtools.*;
 import net.sf.samtools.SAMRecord.SAMTagAndValue;
 import net.sf.samtools.util.SeekableBufferedStream;
@@ -172,9 +176,10 @@ public class BAMReader implements Consts {
 	 * 3:NotDetailBig
 	 * @throws IOException
 	 */
-	public void readBAM(Document doc, String chr, int start, int end,
+	public Element readBAM(Document doc, String chr, int start, int end,
 			int windowSize, int step, String mode, String track)
-			throws IOException {
+			throws SAMFormatException, IOException {
+		Element ele = null;
 		double bpp = 0;
 		boolean already = false;
 
@@ -189,45 +194,45 @@ public class BAMReader implements Consts {
 			} else {
 				if (mode.equalsIgnoreCase(MODE_DETAIL)) {
 					// output all field to the XML file
-					writeDetail(doc, list, track);
+					ele = writeDetail(doc, list, track);
 				} else {
-					if (bpp <= 0.5) {
-						writeNotDetail(doc, list, track, mode, true);
-					} else {
-						writeNotDetail(doc, list, track, mode, false);
-					}
+					ele = writeNotDetail(doc, list, track, mode, bpp <= 0.5);
 				}
 				already = true;
 			}
 		}
 		// middle region
 		if (bpp < 8 * 1024 && !already) {
-			int[] result = readMiddleRegion(chr, start, end, windowSize, step);
-			writeBigRegion(doc, start, end, step, result, track);
+			String result = readMiddleRegion(chr, start, end, windowSize, step);
+			ele = writeBigRegion(doc, start, end, step, result, track);
 			already = true;
 		}
 		// big region
 		if (bpp >= 8 * 1024 && !already) {
-			int[] result = readBigRegion(chr, start, end, windowSize, step);
-			writeBigRegion(doc, start, end, step, result, track);
+			String result = readBigRegion(chr, start, end, windowSize, step);
+			ele = writeBigRegion(doc, start, end, step, result, track);
 		}
+
+		return ele;
 	}
 
-	private void writeDetail(Document doc, List<SAMRecord> list, String track) {
+	private Element writeDetail(Document doc, List<SAMRecord> list, String track) {
 		Element reads = doc.createElement(XML_TAG_READS);
+		SAMRecord rec = null;
+		Element read = null;
 		reads.setAttribute(XML_TAG_ID, track);
 
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
-			SAMRecord rec = itor.next();
-
-			if ("*".equals(rec.getCigarString()))
-				continue;
-
-			Element read = doc.createElement(XML_TAG_READ);
+			rec = itor.next();
+			read = doc.createElement(XML_TAG_READ);
 			read.setAttribute(XML_TAG_ID, rec.getReadName());
-			writeStartEndByCigar(doc, read, rec);
 
+			int[][] startEnds = getStartEndByCigar(rec);
+			append_text_element(doc, read, XML_TAG_FROM,
+					BAMValueList.intArray2IntString(startEnds[0], ','));
+			append_text_element(doc, read, XML_TAG_TO,
+					BAMValueList.intArray2IntString(startEnds[1], ','));
 			append_text_element(doc, read, XML_TAG_DIRECTION,
 					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
 			append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
@@ -255,6 +260,8 @@ public class BAMReader implements Consts {
 			reads.appendChild(read);
 		}
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
+
+		return reads;
 	}
 
 	/**
@@ -266,122 +273,84 @@ public class BAMReader implements Consts {
 	 * @param lt0point5
 	 *            True if bpp less than 0.5, false else
 	 */
-	private void writeNotDetail(Document doc, List<SAMRecord> list,
+	private Element writeNotDetail(Document doc, List<SAMRecord> list,
 			String track, String mode, boolean lt0point5) {
-
 		Element reads = doc.createElement(XML_TAG_READS);
-
+		SAMRecord rec = null;
+		Element read = null;
 		reads.setAttribute(XML_TAG_ID, track);
 
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
-			SAMRecord rec = itor.next();
-
-			if ("*".equals(rec.getCigarString()))
-				continue;
-
-			Element read = doc.createElement(XML_TAG_READ);
+			rec = itor.next();
+			read = doc.createElement(XML_TAG_READ);
 
 			if (mode.equalsIgnoreCase(MODE_FULL)
 					|| mode.equalsIgnoreCase(MODE_PACK))
 				read.setAttribute(XML_TAG_ID, rec.getReadName());
-			writeStartEndByCigar(doc, read, rec);
+			int[][] startEnds = getStartEndByCigar(rec);
+			append_text_element(doc, read, XML_TAG_FROM,
+					BAMValueList.intArray2IntString(startEnds[0], ','));
+			append_text_element(doc, read, XML_TAG_TO,
+					BAMValueList.intArray2IntString(startEnds[1], ','));
 			append_text_element(doc, read, XML_TAG_DIRECTION,
 					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
 			append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
 
 			if (lt0point5) {
-				addVariant(doc, read, rec);
-
-				if (rec.getAttribute("MD") != null) {
-					String MD = (String) rec.getAttribute("MD");
-
-					// <pos, replacedStr>
-					SortedMap<Integer, String> snv = new TreeMap<Integer, String>();
-					int MDpos = 1;
-					String str = "";
-					for (int i = 0; i < MD.length(); i++) {
-						char c = MD.charAt(i);
-						// read a digit
-						if (c >= '0' && c <= '9') {// match
-							str += c;
-						} else if (c == '^') {// DEL
-							// read number finish
-							MDpos += Integer.parseInt(str);
-							str = "";
-							for (int j = i + 1; j < MD.length(); j++) {
-								if (MD.charAt(j) >= '0' && MD.charAt(j) <= '9')
-									break;
-								i++;
-								MDpos++;
-							}
-						} else {// SNV
-							// read number finish
-							MDpos += Integer.parseInt(str);
-							str = "";
-							if (snv.size() == 0
-									|| snv.lastKey().intValue()
-											+ snv.get(snv.lastKey()).length() != MDpos) {
-								snv.put(new Integer(MDpos), c + "");
-							} else {
-								snv.put(snv.lastKey(), snv.get(snv.lastKey())
-										+ c);
-							}
-							MDpos++;
-						}
-					}
-
-					Set<Integer> set = snv.keySet();
-					Iterator<Integer> it = set.iterator();
-					while (it.hasNext()) {
-						Integer next = it.next();
-						String s = snv.get(next);
-						Element ele = doc.createElement(XML_TAG_VARIANT);
-						ele.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_SNV);
-						append_text_element(doc, ele, XML_TAG_FROM,
-								"" + next.intValue());
-						append_text_element(doc, ele, XML_TAG_TO,
-								"" + (next.intValue() + s.length() - 1));
-						append_text_element(doc, ele, XML_TAG_LETTER, s);
-						read.appendChild(ele);
-					}
+				Variant[] vs = new VariantResolver(rec).getVariants();
+				for (Variant v : vs) {
+					v.write2xml(doc, read);
 				}
 			}
 			reads.appendChild(read);
 		}
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
+		return reads;
 	}
 
-	private void writeStartEndByCigar(Document doc, Element ele, SAMRecord rec) {
+	private int[][] getStartEndByCigar(SAMRecord rec) {
 		int pos = rec.getAlignmentStart();
-		StringBuilder starts = new StringBuilder();
-		StringBuilder ends = new StringBuilder();
+		CigarOperator op = null;
+		int[][] startEnds = new int[2][10];
+		int len = 10;
+		int count = 0;
 
-		List<CigarElement> ces = rec.getCigar().getCigarElements();
-
-		starts.append(pos);
-		for (int i = 0; i < ces.size(); i++) {
-			CigarElement ce = ces.get(i);
-			String op = ce.getOperator().toString();
-			if ("N".equals(op)) {
-				ends.append(pos - 1);
-				ends.append(",");
+		startEnds[0][count] = pos;
+		for (CigarElement ce : rec.getCigar().getCigarElements()) {
+			op = ce.getOperator();
+			if (op == CigarOperator.M || op == CigarOperator.D) {
 				pos += ce.getLength();
-				starts.append(",");
-				starts.append(pos);
+			} else if (op == CigarOperator.N) {
+				startEnds[1][count++] = pos - 1;
+				if (len == count) {
+					startEnds = expandCapacity(len, startEnds);
+					len += len;
+				}
+				pos += ce.getLength();
+				startEnds[0][count] = pos;
 				continue;
-			} else if ("M".equals(op) || "D".equals(op)) {
-				pos += ce.getLength();
 			}
 		}
-		ends.append(pos - 1);
+		startEnds[1][count++] = pos - 1;
 
-		append_text_element(doc, ele, XML_TAG_FROM, starts.toString());
-		append_text_element(doc, ele, XML_TAG_TO, ends.toString());
+		int[][] dest = new int[2][count];
+		System.arraycopy(startEnds[0], 0, dest[0], 0, count);
+		System.arraycopy(startEnds[1], 0, dest[1], 0, count);
+
+		return dest;
 	}
 
-	private void writeBigRegion(Document doc, int start, int end, int step,
-			int[] list, String track) {
+	private int[][] expandCapacity(int len, int[][] src) {
+		int[][] dest = new int[2][len + len];
+		System.arraycopy(src[0], 0, dest[0], 0, len);
+		System.arraycopy(src[1], 0, dest[1], 0, len);
+
+		return dest;
+	}
+
+	private Element writeBigRegion(Document doc, int start, int end, int step,
+			String list, String track) {
 		Element values = doc.createElement(XML_TAG_VALUES);
 		values.setAttribute(XML_TAG_ID, track);
 		values.setAttribute(XML_TAG_TYPE, "REN");
@@ -389,49 +358,10 @@ public class BAMReader implements Consts {
 		append_text_element(doc, values, XML_TAG_FROM, start + "");
 		append_text_element(doc, values, XML_TAG_TO, end + "");
 		append_text_element(doc, values, XML_TAG_STEP, step + "");
-
-		StringBuilder vl = new StringBuilder();
-		for (int i = 0; i < list.length; i++) {
-			vl.append(list[i]);
-			if (i < list.length - 1)
-				vl.append(";");
-		}
-		append_text_element(doc, values, "ValueList", vl.toString());
+		append_text_element(doc, values, "ValueList", list);
 
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(values);
-	}
-
-	private void addVariant(Document doc, Element read, SAMRecord record) {
-		List<CigarElement> li = record.getCigar().getCigarElements();
-
-		Element ele = doc.createElement(XML_TAG_VARIANT);
-
-		boolean hasException = false;
-		int pos = 1;
-		for (CigarElement ce : li) {
-			String name = ce.getOperator().name();
-			if (name.equals("D")) {
-				ele.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_DELETION);
-				append_text_element(doc, ele, XML_TAG_FROM, "" + pos);
-				append_text_element(doc, ele, XML_TAG_TO,
-						"" + (pos + ce.getLength() - 1));
-				hasException = true;
-			} else if (name.equals("I")) {
-				ele.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_INSERTION);
-				append_text_element(doc, ele, XML_TAG_FROM, "" + (pos - 1));
-				append_text_element(
-						doc,
-						ele,
-						XML_TAG_LETTER,
-						record.getReadString().substring(pos - 1,
-								pos + ce.getLength() - 1));
-				hasException = true;
-			}
-			pos += ce.getLength();
-		}
-
-		if (hasException)
-			read.appendChild(ele);
+		return values;
 	}
 
 	/**
@@ -451,7 +381,8 @@ public class BAMReader implements Consts {
 	 * @throws FileNotFoundException
 	 */
 	private List<SAMRecord> readSmallRegion(String chr, int start, int end)
-			throws MalformedURLException, FileNotFoundException {
+			throws MalformedURLException, FileNotFoundException,
+			SAMFormatException {
 		SAMRecordIterator itor = getIterator(chr, start, end);
 
 		if (itor == null) {
@@ -462,25 +393,25 @@ public class BAMReader implements Consts {
 		List<SAMRecord> list = new LinkedList<SAMRecord>();
 
 		int num = 0;
+		SAMRecord rec = null;
 		while (itor.hasNext()) {
+			rec = itor.next();
+			if ("*".equals(rec.getCigarString()))
+				continue;
 			num++;
 			if (num > 20000) {
 				list = null;
 				break;
 			}
-			list.add(itor.next());
+			list.add(rec);
 		}
 
 		close();
-
-		if (null == list)
-			return null;
 
 		return list;
 	}
 
 	/**
-	 * lack exception
 	 * 
 	 * @param chr
 	 *            name of chromosome
@@ -496,53 +427,24 @@ public class BAMReader implements Consts {
 	 * @throws MalformedURLException
 	 * @throws FileNotFoundException
 	 */
-	private int[] readMiddleRegion(String chr, int start, int end,
+	private String readMiddleRegion(String chr, int start, int end,
 			int windowSize, int step) throws MalformedURLException,
 			FileNotFoundException {
-
 		SAMRecordIterator itor = getIterator(chr, start, end);
-		int harfWindowSize = windowSize / 2;
-
-		double smallRegionWidth = 0;
-		int[] starts = null;
-
-		smallRegionWidth = (end - start + 1) / (windowSize / ((double) step));
-		starts = new int[(harfWindowSize) + 1];
-		for (int i = 0; i <= harfWindowSize; i++)
-			starts[i] = (int) Math.round(i * smallRegionWidth);
-		starts[harfWindowSize] = end - start + 1;
-
-		// result in double
-		double[] regions = new double[harfWindowSize];
-
-		for (int i = 0; i < harfWindowSize; i++)
-			regions[i] = 0;
-
-		int blockIndex = 0;
-
+		BAMValueList list = new BAMValueList(start, end, windowSize, step);
+		SAMRecord read = null;
 		while (itor.hasNext()) {
-			SAMRecord read = itor.next();
-			while (read.getAlignmentStart() - start > starts[blockIndex + 1])
-				blockIndex++;
-
-			int overlapNum = 1;
-			int temppos = blockIndex;
-			while (starts[temppos + 1] < read.getAlignmentEnd() - start
-					&& temppos + 1 < harfWindowSize) {
-				overlapNum++;
-				temppos++;
+			read = itor.next();
+			if ("*".equals(read.getCigarString()))
+				continue;
+			int[][] startEnds = getStartEndByCigar(read);
+			for (int i = 0; i < startEnds[0].length; i++) {
+				list.update(startEnds[0][i] - start, startEnds[1][i] - start);
 			}
-			for (int i = blockIndex; i < blockIndex + overlapNum; i++)
-				regions[i] += 1.0 / overlapNum;
-
 		}
 		close();
 
-		int[] num = new int[harfWindowSize];
-		for (int i = 0; i < harfWindowSize; i++)
-			num[i] = (int) regions[i];
-
-		return num;
+		return BAMValueList.doubleArray2IntString(list.getResults(), ';');
 	}
 
 	/**
@@ -558,8 +460,8 @@ public class BAMReader implements Consts {
 	 * 
 	 * @return
 	 */
-	private int[] readBigRegion(String chr, int start, int end, int windowSize,
-			int step) throws IOException {
+	private String readBigRegion(String chr, int start, int end,
+			int windowSize, int step) throws IOException {
 		open(false);
 		/*
 		 * index of the given chromosome in BAM file order
@@ -645,8 +547,9 @@ public class BAMReader implements Consts {
 
 		close();
 
-		return getSpan(start % SIXTEENK, (end - start + 1)
-				/ (windowSize / ((double) step)), windowSize / step, regions);
+		return BAMValueList.doubleArray2IntString(getSpan(start % SIXTEENK,
+				(end - start + 1) / (windowSize / ((double) step)), windowSize
+						/ step, regions), ';');
 	}
 
 	/**
@@ -654,13 +557,13 @@ public class BAMReader implements Consts {
 	 * @param startTh
 	 *            startTh = start%16K;
 	 * @param width
-	 *            width=(end - start + 1)/(windowSize/2.0);
+	 *            width=(end - start + 1)/(windowSize/(double) step);
 	 * @param size
-	 *            size=windowSize/2;
+	 *            size=windowSize/step;
 	 * @param regions
 	 * @return
 	 */
-	private int[] getSpan(int startTh, double width, int size, int[] regions) {
+	private double[] getSpan(int startTh, double width, int size, int[] regions) {
 		double[] result = new double[size];
 		for (int i = 0; i < size; i++)
 			result[i] = 0;
@@ -668,12 +571,16 @@ public class BAMReader implements Consts {
 		int bin = 0;
 		double curpos = startTh;
 
+		boolean b;
+		double endpos;
+		double len;
+		double binEndPos;
 		for (int i = 0; i < size; i++) {
-			boolean b = true;
-			double endpos = startTh + (i + 1) * width - 1;
+			b = true;
+			endpos = startTh + (i + 1) * width - 1;
 			while (b) {
-				double len = 0;
-				double binEndPos = (bin + 1) * SIXTEENK;
+				len = 0;
+				binEndPos = (bin + 1) * SIXTEENK;
 				if (endpos > binEndPos) {
 					len = binEndPos - curpos;
 					result[i] += (len / SIXTEENK) * regions[bin];
@@ -688,32 +595,31 @@ public class BAMReader implements Consts {
 			}
 		}
 
-		int[] res = new int[size];
-		for (int i = 0; i < size; i++)
-			res[i] = (int) result[i];
-
-		return res;
+		return result;
 	}
 
 	private void location(int refIndex, InputStream is, int start)
 			throws IOException {
 		is.skip(8);
 
+		int nBins;
+		int nChunks;
+		int nLinearBins;
 		for (int i = 0; i < refIndex; i++) {
-			final int nBins = TabixReader.readInt(is);
+			nBins = TabixReader.readInt(is);
 			for (int j = 0; j < nBins; j++) {
 				is.skip(4);
-				final int nChunks = TabixReader.readInt(is);
+				nChunks = TabixReader.readInt(is);
 				is.skip(16 * nChunks);
 			}
-			final int nLinearBins = TabixReader.readInt(is);
+			nLinearBins = TabixReader.readInt(is);
 			is.skip(8 * nLinearBins);
 		}
 
-		final int nBins = TabixReader.readInt(is);
+		nBins = TabixReader.readInt(is);
 		for (int j = 0; j < nBins; j++) {
 			is.skip(4);
-			final int nChunks = TabixReader.readInt(is);
+			nChunks = TabixReader.readInt(is);
 			is.skip(16 * nChunks);
 		}
 
@@ -735,15 +641,18 @@ public class BAMReader implements Consts {
 	private void readLinearIndex(InputStream is) throws IOException {
 		is.skip(8);
 
+		int nBins;
+		int nChunks;
+		int nLinearBins;
 		for (int i = 0; i < sequenceNum; i++) {
-			final int nBins = TabixReader.readInt(is);
+			nBins = TabixReader.readInt(is);
 			for (int j = 0; j < nBins; j++) {
 				is.skip(4);
-				final int nChunks = TabixReader.readInt(is);
+				nChunks = TabixReader.readInt(is);
 				is.skip(16 * nChunks);
 			}
 
-			final int nLinearBins = TabixReader.readInt(is);
+			nLinearBins = TabixReader.readInt(is);
 			chrLinearBinNum[i] = nLinearBins;
 
 			int k = 0;
@@ -783,9 +692,9 @@ public class BAMReader implements Consts {
 			FileNotFoundException {
 		if (fromRemoteServer)
 			samReader = new SAMFileReader(new SeekableBufferedStream(
-					new SeekableHTTPStream(new URL(filePath)), SIXTEENK),
+					new SeekableHTTPStream(new URL(filePath))),
 					new SeekableBufferedStream(new SeekableHTTPStream(new URL(
-							indexFilePath)), SIXTEENK), b);
+							indexFilePath))), b);
 		else
 			samReader = new SAMFileReader(new File(filePath), new File(
 					indexFilePath), b);

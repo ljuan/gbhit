@@ -24,7 +24,7 @@ public class GVFReader extends GFFReader {
 		super(filePath);
 	}
 
-	public void write_gvf2variants(Document doc, String track, String chr,
+	public Element write_gvf2variants(Document doc, String track, String chr,
 			long regionstart, long regionend) {
 		List<GVF> gvfs = new ArrayList<GVF>();
 
@@ -39,7 +39,7 @@ public class GVFReader extends GFFReader {
 			Collections.sort(gvfs);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return;
+			return null;
 		}
 
 		for (GVF gvf : gvfs) {
@@ -55,15 +55,19 @@ public class GVFReader extends GFFReader {
 
 			variants.appendChild(variant);
 		}
+
+		return variants;
 	}
 
 	@Override
-	public void write_gff2elements(Document doc, String track, String chr,
+	public Element write_gff2elements(Document doc, String track, String chr,
 			long regionstart, long regionend, String attributes) {
 		try {
 			throw new Exception("Unsupport method!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		return null;
 	}
 }

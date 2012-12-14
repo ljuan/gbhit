@@ -171,7 +171,7 @@ public class Instance implements Consts{
 				BedGraphReader bgr;
 				try{
 					bgr=new BedGraphReader(track.get_Path(Chr));
-					bgr.write_bedGraph2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
+					ele_temp=bgr.write_bedGraph2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
 					e.printStackTrace();
 				}
@@ -180,7 +180,7 @@ public class Instance implements Consts{
 				WiggleReader wr;
 				try{
 					wr=new WiggleReader(track.get_Path(Chr),true);
-					wr.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
+					ele_temp=wr.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
 					e.printStackTrace();
 				}
@@ -189,7 +189,7 @@ public class Instance implements Consts{
 				WiggleReader wr2;
 				try{
 					wr2=new WiggleReader(track.get_Path(Chr),false);
-					wr2.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
+					ele_temp=wr2.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
 					e.printStackTrace();
 				}
@@ -198,7 +198,7 @@ public class Instance implements Consts{
 				GFFReader gr;
 				try {
 					gr = new GFFReader(track.get_Path(Chr));
-					gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"gene_id");
+					ele_temp=gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"gene_id");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -207,7 +207,7 @@ public class Instance implements Consts{
 				GTFReader gr;
 				try {
 					gr = new GTFReader(track.get_Path(Chr));
-					gr.write_gtf2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
+					ele_temp=gr.write_gtf2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -216,7 +216,7 @@ public class Instance implements Consts{
 				GVFReader gr;
 				try {
 					gr = new GVFReader(track.get_Path(Chr));
-					gr.write_gvf2variants(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
+					ele_temp=gr.write_gvf2variants(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -228,7 +228,7 @@ public class Instance implements Consts{
 			else if (type_temp.equals(FORMAT_BAM)){
 				try {
 					BAMReader br2=new BAMReader(track.get_Path(Chr));
-					br2.readBAM(doc,Chr,(int)Coordinate[0],(int)Coordinate[1],window_width,2, mode,track.get_ID());
+					ele_temp=br2.readBAM(doc,Chr,(int)Coordinate[0],(int)Coordinate[1],window_width,2, mode,track.get_ID());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (URISyntaxException e) {

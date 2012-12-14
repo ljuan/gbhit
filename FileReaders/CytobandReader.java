@@ -1,6 +1,5 @@
 package FileReaders;
 
-import java.util.*;
 import java.io.*;
 
 import org.w3c.dom.Document;
@@ -18,7 +17,7 @@ class CytobandReader implements Consts {
 	}
 
 	Element write_cytobands(Document doc, String chr, Annotations track){
-		if (!track.has_Parameter("pChr")||!((String)track.get_Parameter("pChr")).equals(chr)){
+		if (!track.has_Parameter(CYTOBAND_PREVIOUS_CHR)||!track.get_Parameter(CYTOBAND_PREVIOUS_CHR).equals(chr)){
 			Element Cytobands = doc.createElement(XML_TAG_CYTOBANDS);
 			for (int i = 0; i < cytobands.length; i++) 
 				if(cytobands[i].startsWith(chr+"\t")){
@@ -31,10 +30,14 @@ class CytobandReader implements Consts {
 					Cytobands.appendChild(Cytoband);
 				}
 			doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Cytobands);
-			track.set_Parameters("pChr", chr);
+			if(!track.has_Parameter(CYTOBAND_PREVIOUS_CHR))
+				track.initialize_Parameter(CYTOBAND_PREVIOUS_CHR, chr, PARAMETER_TYPE_INVISABLE);
+			else
+				track.set_Parameter(CYTOBAND_PREVIOUS_CHR, chr);
 			return Cytobands;
 		}
 		else
 			return null;
+		
 	}
 }

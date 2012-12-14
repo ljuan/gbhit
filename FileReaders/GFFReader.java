@@ -60,8 +60,9 @@ class GFFReader implements Consts {
 	 * @param regionend
 	 * @param attributes
 	 *            use attributes to group
+	 * @return
 	 */
-	public void write_gff2elements(Document doc, String track, String chr,
+	public Element write_gff2elements(Document doc, String track, String chr,
 			long regionstart, long regionend, String attributes) {
 		List<GFF> gffs = new ArrayList<GFF>();
 
@@ -90,8 +91,10 @@ class GFFReader implements Consts {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			return;
+			return null;
 		}
+
+		return elements;
 	}
 
 	List<String[]> extract(String chr, long start, long end) throws IOException {

@@ -11,7 +11,7 @@ public class FileReaders implements Consts{
 		System.out.println(System.currentTimeMillis());
 		System.out.println(i1.get_Annotations());
 		System.out.println(System.currentTimeMillis());
-		System.out.println(i1.update("chr21", 33013741, 33014077,1350));
+		System.out.println(i1.update("chr21",39755333,39755846,1350));
 		System.out.println(System.currentTimeMillis());
 		String[] externals={"MCF7"};
 		String[] externals_links={"http://127.0.0.1/gbfiles/MCF7_DNAseq.variants.snpRecalibrated.vcf.bgz"};
@@ -27,7 +27,11 @@ public class FileReaders implements Consts{
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
-		externals[0]="BamTest";externals_links[0]="http://127.0.0.1/gbfiles/MCF7_DNAseq.hg19.sorted.bam";externals_types[0]="BAM";externals_modes[0]=MODE_DENSE;
+		externals[0]="cytoband";externals_links[0]="input/cytoBand.hg19.txt";externals_types[0]="CYTO";externals_modes[0]=MODE_DENSE;
+		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
+		System.out.println(i1.add_Tracks(externals,externals_modes));
+		System.out.println(System.currentTimeMillis());
+		externals[0]="BamTest";externals_links[0]="http://202.118.228.68/gbfiles/BS01.lincRegion.hg18.novel_junctions.merged.sorted.bam";externals_types[0]="BAM";externals_modes[0]=MODE_DETAIL;
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
@@ -48,7 +52,7 @@ public class FileReaders implements Consts{
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
-*/		externals[0]="bwTest";externals_links[0]="http://127.0.0.1/gbfiles/chr21.phyloP46way.placental.bigwig";externals_types[0]="BW";externals_modes[0]=MODE_DENSE;
+		externals[0]="bwTest";externals_links[0]="http://127.0.0.1/gbfiles/chr21.phyloP46way.placental.bigwig";externals_types[0]="BW";externals_modes[0]=MODE_DENSE;
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
@@ -60,7 +64,7 @@ public class FileReaders implements Consts{
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
-//		System.out.println(i1.update("chr2", 224754110, 224855430,1000));
-//		System.out.println(System.currentTimeMillis());
-	}
+		System.out.println(i1.update("chr2", 24754110, 24855430,1000));
+		System.out.println(System.currentTimeMillis());
+*/	}
 }

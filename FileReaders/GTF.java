@@ -33,14 +33,6 @@ public class GTF extends GFF {
 		}
 	}
 
-	@Override
-	public String toString() {
-		return this.seqname + "\t" + this.source + "\t" + this.feature + "\t"
-				+ this.start + "\t" + this.end + "\t" + this.score + "\t"
-				+ this.strand + "\t" + this.frame + "\t" + this.group + "\t"
-				+ this.t_id;
-	}
-
 	public int compareTo(GTF o) {
 		if (!this.t_id.equals(o.t_id))
 			return this.t_id.compareTo(o.t_id);

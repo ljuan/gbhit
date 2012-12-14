@@ -11,17 +11,18 @@ public class GVF extends GFF implements Consts {
 	GVF(String[] str) {
 		super(str);
 
-		if (VARIANT_TYPE_SNV.equals(str[2])) {
+		String t = str[2];
+		if (VARIANT_TYPE_SNV.equals(t)) {
 			this.type = VARIANT_TYPE_SNV;
-		} else if (VARIANT_TYPE_DELETION.equals(str[2])) {
+		} else if (VARIANT_TYPE_DELETION.equals(t)) {
 			this.type = VARIANT_TYPE_DELETION;
-		} else if (VARIANT_TYPE_INSERTION.equals(str[2])) {
+		} else if (VARIANT_TYPE_INSERTION.equals(t)) {
 			this.type = VARIANT_TYPE_INSERTION;
-		} else if (VARIANT_TYPE_INVERSION.equals(str[2])) {
+		} else if (VARIANT_TYPE_INVERSION.equals(t)) {
 			this.type = VARIANT_TYPE_INVERSION;
-		} else if (VARIANT_TYPE_MULTIPLE.equals(str[2])) {
+		} else if (VARIANT_TYPE_MULTIPLE.equals(t)) {
 			this.type = VARIANT_TYPE_MULTIPLE;
-		} else if (VARIANT_TYPE_CNV.equals(str[2])) {
+		} else if (VARIANT_TYPE_CNV.equals(t)) {
 			this.type = VARIANT_TYPE_CNV;
 		} else {
 			this.type = VARIANT_TYPE_OTHERS;
@@ -44,14 +45,6 @@ public class GVF extends GFF implements Consts {
 				break;
 			}
 		}
-	}
-
-	@Override
-	public String toString() {
-		return this.seqname + "\t" + this.source + "\t" + this.feature + "\t"
-				+ this.start + "\t" + this.end + "\t" + this.score + "\t"
-				+ this.strand + "\t" + this.frame + "\t" + this.id + "\t"
-				+ this.type + "\t" + this.letter;
 	}
 
 	@Override

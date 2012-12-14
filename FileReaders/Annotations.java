@@ -66,6 +66,10 @@ class Annotations implements Consts{
 			}
 		}
 	}
+	void set_Parameter(String param, Object value){
+		if(Parameter.containsKey(param)&&ParameterType.get(param).equals(PARAMETER_TYPE_INVISABLE))
+			Parameter.put(param, value);
+	}
 	void initialize_Parameter(String Param, Object Values, String Type){
 		ParameterType.put(Param, Type);
 		Parameter.put(Param, Values);

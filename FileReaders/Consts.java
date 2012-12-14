@@ -17,6 +17,8 @@ public interface Consts{
 	public static final String VCF_HEADER_SAMPLE="sample";
 	public static final String VCF_CHROM_PREFIX="chromprefix";
 	
+	public static final String CYTOBAND_PREVIOUS_CHR="pChr";
+	
 	public static final String FORMAT_BED="BED";
 	public static final String FORMAT_BIGBED="BB";
 	public static final String FORMAT_BEDGRAPH="BG";
@@ -38,7 +40,7 @@ public interface Consts{
 	public static final String XML_TAG_PATH="Path";
 	public static final String XML_TAG_DEFAULT="Default";
 	
-	public static final String XML_TAG_CHROMOSOME="Chrovamosome";
+	public static final String XML_TAG_CHROMOSOME="Chromosome";
 	public static final String XML_TAG_START="Start";
 	public static final String XML_TAG_END="End";
 	public static final String XML_TAG_LENGTH="Length";
@@ -57,6 +59,7 @@ public interface Consts{
 	public static final String XML_TAG_COLOR="Color";
 	public static final String XML_TAG_FROM="From";
 	public static final String XML_TAG_TO="To";
+	public static final String XML_TAG_TOCHR="ToChr";
 	public static final String XML_TAG_LETTER="Letter";
 	public static final String XML_TAG_DESCRIPTION="Description";
 	
@@ -91,6 +94,7 @@ public interface Consts{
 	
 	public static final String VARIANT_TYPE_SNV="SNV";
 	public static final String VARIANT_TYPE_CNV="CNV";
+	public static final String VARIANT_TYPE_BLS="BLS";
 	public static final String VARIANT_TYPE_DUPLICATION="DUP";
 	public static final String VARIANT_TYPE_INSERTION="INS";
 	public static final String VARIANT_TYPE_INVERSION="INV";
@@ -101,6 +105,7 @@ public interface Consts{
 	public static final String SUBELEMENT_TYPE_BOX="Box";
 	public static final String SUBELEMENT_TYPE_LINE="Line";
 	public static final String SUBELEMENT_TYPE_BAND="Band";
+	
 	
 	public static final String PARAMETER_TYPE_CHECKBOX="CHECKBOX";
 	public static final String PARAMETER_TYPE_SELECTION="SELECTION";

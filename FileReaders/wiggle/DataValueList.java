@@ -3,41 +3,38 @@ package FileReaders.wiggle;
 import java.text.NumberFormat;
 
 /**
- * 
  * @author Chengwu Yan
  * 
  */
 public class DataValueList {
 	/**
-	 * 0-base. inclusive
+	 * start base of the region. 0-base
 	 */
 	private int start;
-	/**
-	 * 0-base. exclusive
-	 */
-	private int end;
-
 	/**
 	 * ValueList in array format
 	 */
 	private float[] values;
+	/**
+	 * Number of DataValue of each grid.
+	 */
+	private int[] numOfGrids;
 
 	/**
 	 * size of values
 	 */
 	private int width = 0;
-
 	/**
-	 * How many bases an element of values contained.
+	 * width / total bases
 	 */
-	private float span = 1;
+	private float wPerBase;
 
 	/**
 	 * 
 	 * @param start
-	 *            1-base start base of the region
+	 *            start base of the region. 1-base
 	 * @param end
-	 *            1-base end base of the region
+	 *            end base of the region. 1-base
 	 * @param windowSize
 	 *            width of screen
 	 * @param step
@@ -45,16 +42,13 @@ public class DataValueList {
 	 */
 	public DataValueList(int start, int end, int windowSize, int step) {
 		this.start = start - 1;
-		this.end = end;
-		width = ((this.end - this.start) < (windowSize / step)) ? (this.end - this.start)
+		width = ((end - this.start) < (windowSize / step)) ? (end - this.start)
 				: (windowSize / step);
-
 		values = new float[width];
-
+		numOfGrids = new int[width];
 		for (int i = 0; i < width; i++)
 			values[i] = 0;
-
-		span = (float) ((end - start + 1.0) / width);
+		this.wPerBase = (float) width / (end - this.start);
 	}
 
 	/**
@@ -63,23 +57,35 @@ public class DataValueList {
 	 * @param dv
 	 */
 	public void update(DataValue dv) {
-		int _start = dv.getStart() < start ? start : dv.getStart();
-		int _end = dv.getEnd();
-		float value = dv.getDataValue();
-
-		int startIndex = (int) ((_start - start) / span);
-		int endIndex = (int) ((_end - start) / span);
-		double thisStart = 0;
-		double thisEnd = 0;
-		float thisSpan = 0;
-		for (int index = startIndex; index <= endIndex && index < width; index++) {
-			thisStart = ((index == startIndex) ? (_start - start)
-					: (span * index));
-			thisEnd = (index == endIndex) ? (_end - start)
-					: (span * (index + 1));
-			thisSpan = (float) (thisEnd - thisStart);
-			values[index] += thisSpan * value;
+		DataValue[] dvs = distribute(dv);
+		int pos = 0;
+		
+		for (DataValue d : dvs) {
+			pos = (int) ((d.getStart() - start) * wPerBase);
+			if (pos < 0)
+				pos = 0;
+			values[pos] += d.getDataValue();
+			numOfGrids[pos]++;
 		}
+	}
+
+	/**
+	 * <pre>
+	 * For example, dv={[1, 5): 0.5}, return
+	 * [{[1, 2): 0.5}, {[2, 3): 0.5}, {[3, 4): 0.5}, {[4, 5): 0.5}]
+	 * @param dv
+	 * @return
+	 */
+	private DataValue[] distribute(DataValue dv) {
+		String chr = dv.getChr();
+		int start = dv.getStart();
+		int end = dv.getEnd();
+		float value = dv.getDataValue();
+		DataValue[] dvs = new DataValue[end - start];
+		for (int i = start; i < end; i++) {
+			dvs[i - start] = new DataValue(chr, i, i + 1, value);
+		}
+		return dvs;
 	}
 
 	@Override
@@ -88,33 +94,21 @@ public class DataValueList {
 
 		NumberFormat format = NumberFormat.getInstance();
 		format.setMaximumFractionDigits(3);
-
+		String formatNum = null;
 		for (int i = 0; i < values.length - 1; i++) {
-			builder.append(format.format(values[i] / span));
+			formatNum = format.format(numOfGrids[i] == 0 ? 0
+					: (values[i] / numOfGrids[i]));
+			builder.append(formatNum);
 			builder.append(";");
 		}
 		if (values.length > 0) {
-			builder.append(format.format(values[values.length - 1] / span));
+			formatNum = format
+					.format(numOfGrids[values.length - 1] == 0 ? 0
+							: (values[values.length - 1] / numOfGrids[values.length - 1]));
+			builder.append(formatNum);
 		}
 
 		return builder.toString();
 	}
 
-	public static void main(String[] args) {
-
-		DataValueList dvl1 = new DataValueList(1, 10, 16, 2);
-		dvl1.update(new DataValue("chr1", 1, 2, 0.1f));
-		dvl1.update(new DataValue("chr1", 3, 5, 0.2f));
-		dvl1.update(new DataValue("chr1", 5, 6, 0.3f));
-		dvl1.update(new DataValue("chr1", 7, 9, 0.4f));
-		System.out.println(dvl1.toString());
-
-		DataValueList dvl2 = new DataValueList(1, 10, 32, 2);
-		dvl2.update(new DataValue("chr1", 1, 2, 0.1f));
-		dvl2.update(new DataValue("chr1", 3, 5, 0.2f));
-		dvl2.update(new DataValue("chr1", 5, 6, 0.3f));
-		dvl2.update(new DataValue("chr1", 7, 9, 0.4f));
-		System.out.println(dvl2.toString());
-
-	}
 }

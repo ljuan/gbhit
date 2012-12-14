@@ -82,13 +82,6 @@ class GFF implements Comparable<GFF> {
 	}
 
 	@Override
-	public String toString() {
-		return this.seqname + "\t" + this.source + "\t" + this.feature + "\t"
-				+ this.start + "\t" + this.end + "\t" + this.score + "\t"
-				+ this.strand + "\t" + this.frame + "\t" + this.attributes;
-	}
-
-	@Override
 	public int compareTo(GFF o) {
 		return this.attributes.compareTo(o.attributes);
 	}

@@ -58,14 +58,15 @@ public class WiggleReader {
 	 * @param windowSize
 	 *            size, in pixel. Make sure that size Can be divided by 2
 	 * @param step
+	 * @return
 	 * @throws IOException
 	 */
-	public void write_wiggle2Values(Document doc, String track, String chr,
+	public Element write_wiggle2Values(Document doc, String track, String chr,
 			int start, int end, int windowSize, int step) throws IOException {
 		DataValueList values = new WiggleExtractor(filePath, chr, start, end,
 				isBigWig, windowSize, step).extract();
 
-		WiggleReader.writeDataValues2XML(doc, track, start, end, step,
+		return WiggleReader.writeDataValues2XML(doc, track, start, end, step,
 				values.toString());
 	}
 
@@ -75,11 +76,15 @@ public class WiggleReader {
 	 * @param doc
 	 * @param track
 	 * @param start
+	 *            1-base
 	 * @param end
+	 *            1-base
 	 * @param step
+	 *            A step defines how many pixes show a grid.
 	 * @param valueList
+	 * @return
 	 */
-	static void writeDataValues2XML(Document doc, String track, int start,
+	static Element writeDataValues2XML(Document doc, String track, int start,
 			int end, int step, String valueList) {
 		Element ele = doc.createElement(Consts.XML_TAG_VALUES);
 		ele.setAttribute(Consts.XML_TAG_ID, track);
@@ -89,5 +94,6 @@ public class WiggleReader {
 		XmlWriter.append_text_element(doc, ele, Consts.XML_TAG_TO, end + "");
 		XmlWriter.append_text_element(doc, ele, Consts.XML_TAG_STEP, step + "");
 		XmlWriter.append_text_element(doc, ele, "ValueList", valueList);
+		return ele;
 	}
 }
