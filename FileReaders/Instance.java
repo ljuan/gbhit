@@ -221,7 +221,7 @@ public class Instance implements Consts{
 					e.printStackTrace();
 				}
 			}
-			else if (type_temp.equals(FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<1000000){
+			else if (type_temp.equals(FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<10000000){
 				VcfReader vr=new VcfReader(track,Chr);
 				ele_temp=vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			}

@@ -12,7 +12,7 @@ import FileReaders.XmlWriter;
  * @author Chengwu Yan
  * 
  */
-public class Variant implements Consts {
+public class Variant implements Consts, Comparable<Variant> {
 	private int from;
 	private int to;
 	private String letter;
@@ -87,18 +87,31 @@ public class Variant implements Consts {
 	}
 
 	/**
-	 * Write to xml in an Variants element.
+	 * Write to xml in an Variants element of BAMRecords.
 	 * 
 	 * @param doc
+	 * @param parent
 	 */
 	public void write2xml(Document doc, Element parent) {
+		this.write2xml(doc, parent, true);
+	}
+
+	/**
+	 * Write to xml in an Variants element of VCFRecords.
+	 * 
+	 * @param doc
+	 * @param parent
+	 * @param outputLetter
+	 *            Whether to output LETTER
+	 */
+	public void write2xml(Document doc, Element parent, boolean outputLetter) {
 		Element v = doc.createElement(XML_TAG_VARIANT);
 		parent.appendChild(v);
 		v.setAttribute(XML_TAG_ID, id);
 		v.setAttribute(XML_TAG_TYPE, type);
 		XmlWriter.append_text_element(doc, v, XML_TAG_FROM, from + "");
 		XmlWriter.append_text_element(doc, v, XML_TAG_TO, to + "");
-		if (letter != null)
+		if (letter != null && outputLetter)
 			XmlWriter.append_text_element(doc, v, XML_TAG_LETTER, letter);
 		if (toChr != null)
 			XmlWriter.append_text_element(doc, v, XML_TAG_TOCHR, toChr);
@@ -107,5 +120,11 @@ public class Variant implements Consts {
 		if (description != null)
 			XmlWriter.append_text_element(doc, v, XML_TAG_DESCRIPTION,
 					description);
+	}
+
+	@Override
+	public int compareTo(Variant o) {
+		// TODO Auto-generated method stub
+		return this.to - o.to;
 	}
 }

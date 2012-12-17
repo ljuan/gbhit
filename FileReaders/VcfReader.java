@@ -1,12 +1,15 @@
 package FileReaders;
 
-
 import java.io.IOException;
 import java.util.*;
 //import org.broad.tribble.readers.TabixReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import FileReaders.vcf.Variant;
+import FileReaders.vcf.Variants;
+import FileReaders.vcf.Vcf;
 
 /*
  * This is for reading a VCF format file.
@@ -26,155 +29,179 @@ import org.w3c.dom.Element;
  * Challenging his coding ability means challenging more than half NGS researches.
  */
 
-class VcfReader implements Consts{
-	TabixReader vcf_tb;
-	Annotations track=null;
-	VcfReader(Annotations track, String Chr){
+class VcfReader implements Consts {
+	private TabixReader vcf_tb;
+	private Annotations track = null;
+
+	VcfReader(Annotations track, String Chr) {
 		try {
-			vcf_tb=new TabixReader(track.get_Path(Chr));
-			if (!track.has_Parameter(VCF_CHROM_PREFIX)){
-				HashMap<String,Boolean> filter_header=new HashMap<String,Boolean>();
-				Hashtable<String,String[]> info_header;
-				Hashtable<String,String[]> format_header;
-				String[] samples=null;
-				String line="";
+			vcf_tb = new TabixReader(track.get_Path(Chr));
+			if (track.get_Parameter(VCF_CHROM_PREFIX) == null) {
+				Map<String, Boolean> filter_header = new HashMap<String, Boolean>();
+				Map<String, String[]> info_header = new HashMap<String, String[]>();
+				Map<String, String[]> format_header = new HashMap<String, String[]>();
+				String[] samples = null;
+				String line = "";
 				filter_header.put("PASS", true);
-				info_header=new Hashtable<String, String[]>();
-				format_header=new Hashtable<String,String[]>();
-				while((line=vcf_tb.readLine()).startsWith("#")){
-					if(line.substring(2,8).equalsIgnoreCase("FILTER")){
-						int left=line.indexOf('<');
-						int right=line.lastIndexOf('>');
-						String[] line_temp=line.substring(left+1, right).split("ID=|,Description=");
+				String str = null;
+				while ((line = vcf_tb.readLine()).startsWith("#")) {
+					str = line.substring(2, 8);
+					if (str.equalsIgnoreCase("FILTER")) {
+						int left = line.indexOf('<');
+						int right = line.lastIndexOf('>');
+						String[] line_temp = line.substring(left + 1, right)
+								.split("ID=|,Description=");
 						filter_header.put(line_temp[1], false);
-					}
-					else if(line.substring(2,6).equalsIgnoreCase("INFO")){
-						int left=line.indexOf('<');
-						int right=line.lastIndexOf('>');
-						String[] line_temp=line.substring(left+1, right).split("ID=|,Number=|,Type=|,Description=");
-						info_header.put(line_temp[1], Arrays.copyOfRange(line_temp, 2, 5));
-					}
-					else if(line.substring(2, 8).equalsIgnoreCase("FORMAT")){
-						int left=line.indexOf('<');
-						int right=line.lastIndexOf('>');
-						String[] line_temp=line.substring(left+1, right).split("ID=|,Number=|,Type=|,Description=");
-						format_header.put(line_temp[1], Arrays.copyOfRange(line_temp, 2, 5));
-					}
-					else if(line.startsWith("#CHROM")){
-						String[] line_temp=line.split("\t");
-						if(line_temp.length>9){
-							samples=new String[line_temp.length-9];
-							for(int i=9;i<line_temp.length;i++){
-								samples[i-9]=line_temp[i];
+					} else if (line.substring(2, 6).equalsIgnoreCase("INFO")) {
+						int left = line.indexOf('<');
+						int right = line.lastIndexOf('>');
+						String[] line_temp = line.substring(left + 1, right)
+								.split("ID=|,Number=|,Type=|,Description=");
+						info_header.put(line_temp[1],
+								Arrays.copyOfRange(line_temp, 2, 5));
+					} else if (str.equalsIgnoreCase("FORMAT")) {
+						int left = line.indexOf('<');
+						int right = line.lastIndexOf('>');
+						String[] line_temp = line.substring(left + 1, right)
+								.split("ID=|,Number=|,Type=|,Description=");
+						format_header.put(line_temp[1],
+								Arrays.copyOfRange(line_temp, 2, 5));
+					} else if (line.startsWith("#CHROM")) {
+						String[] line_temp = line.split("\t");
+						if (line_temp.length > 9) {
+							samples = new String[line_temp.length - 9];
+							for (int i = 9; i < line_temp.length; i++) {
+								samples[i - 9] = line_temp[i];
 							}
 						}
 					}
-					boolean chromprefix=false;
-					if(line.startsWith("chr"))
-						chromprefix=true;
-					track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(samples), PARAMETER_TYPE_VCFSAMPLE);
-					track.initialize_Parameter(VCF_HEADER_FILTER, filter_header, PARAMETER_TYPE_CHECKBOX);
-					track.initialize_Parameter(VCF_HEADER_FORMAT, format_header, PARAMETER_TYPE_INVISABLE);
-					track.initialize_Parameter(VCF_HEADER_INFO, info_header, PARAMETER_TYPE_INVISABLE);
-					track.initialize_Parameter(VCF_CHROM_PREFIX, chromprefix, PARAMETER_TYPE_INVISABLE);
 				}
+				track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(
+						samples), PARAMETER_TYPE_VCFSAMPLE);
+				track.initialize_Parameter(VCF_HEADER_FILTER, filter_header,
+						PARAMETER_TYPE_CHECKBOX);
+				track.initialize_Parameter(VCF_HEADER_FORMAT, format_header,
+						PARAMETER_TYPE_INVISABLE);
+				track.initialize_Parameter(VCF_HEADER_INFO, info_header,
+						PARAMETER_TYPE_INVISABLE);
+				track.initialize_Parameter(VCF_CHROM_PREFIX,
+						vcf_tb.hasChromPrefix(), PARAMETER_TYPE_INVISABLE);
+				track.initialize_Parameter("QUALLIMIT", "-1",
+						PARAMETER_TYPE_STRING);
 			}
-			this.track=track;
-		} catch (IOException e){
+			this.track = track;
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	Vcf[] extract_vcf(String chr,long start,long end){
-		
-		StringBuffer querystr=new StringBuffer();
-		if((Boolean)(track.get_Parameter(VCF_CHROM_PREFIX)))
-			querystr.append(chr);
-		else
-			querystr.append(chr.substring(3));
-		querystr.append(':');
-		querystr.append(start);
-		querystr.append('-');
-		querystr.append(end);
-		
-		/* 
-		 * This is stupid, TabixReader read colon-hyphen seperated genomic region
-		 * AND three integers represent chr, start, end respectively by over-loading, which is also public.
-		 * AND in TabixReader, genomic region in colon-hyphen form is going to be transformed to three-integers form first.
-		 * The reason we use this stupid method because:
-		 * 1. TabixReader.chr2tid method is private, we can't obtain corresponding tid for a chromosome by maintaining Heng Li's TabixReader as it is.
-		 * 2. TabixReader.query require integer type for both start and end coordinate, while we define genomic coordinate as long type.
-		 */
-		ArrayList<Vcf> vcf_internal=new ArrayList<Vcf>();
-		String line;
-		try{
-			TabixReader.Iterator Query=vcf_tb.query(querystr.toString());
-			while(Query !=null && (line=Query.next()) != null){
-				Vcf vcf_temp;
-				if(((VcfSample)(track.get_Parameter(VCF_HEADER_SAMPLE))).SampleNames==null)
-					vcf_temp=new Vcf(line);
-				else
-					vcf_temp=new Vcf(line,((VcfSample)(track.get_Parameter(VCF_HEADER_SAMPLE))).SampleNames.length);
-				vcf_internal.add(vcf_temp);
+
+	Element write_vcf2variants(Document doc, String track, String mode,
+			double bpp/* bases per pixel */, String chr, long start, long end) {
+		VcfSample vcfSample = (VcfSample) this.track
+				.get_Parameter(VCF_HEADER_SAMPLE);
+		// vcfSample.setSamples("MCF7");
+		int samplesNum = vcfSample.getSamplesNum();
+
+		float qualLimit = Float.parseFloat((String) (this.track
+				.get_Parameter("QUALLIMIT")));
+		String[] filterLimit = getFilterLimit();
+
+		Variants[] vss;
+		int[] selectedIndexes = vcfSample.getSelectedIndexes();
+		if (samplesNum == 0 || selectedIndexes == null) {
+			// DBSnp or Personal genemic VCF whitout choose any SAMPLEs
+			vss = new Variants[1];
+			vss[0] = new Variants(track, doc, mode, bpp, -1, null);
+		} else {
+			// Personal Genemic VCF
+			vss = new Variants[selectedIndexes.length];
+			String[] selectedNames = vcfSample.getSelectedNames();
+			String prefix = track + "_";
+			int selectedLen = selectedIndexes.length;
+			for (int i = 0; i < selectedLen; i++) {
+				vss[i] = new Variants(prefix + selectedNames[i], doc, mode,
+						bpp, qualLimit, filterLimit);
 			}
-			vcf_tb.TabixReaderClose();
 		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
-		return vcf_internal.toArray(new Vcf[vcf_internal.size()]);
-	}
-	Element write_vcf2variants(Document doc, String track, String mode, double bpp, String chr, long start, long end){//bpp:bases per pixel
-		Vcf[] vcf=extract_vcf(chr,start,end);
-		Element Variants=doc.createElement(XML_TAG_VARIANTS);
-		Variants.setAttribute(XML_TAG_ID, track);
-		long lastpos=0;
-		for(int i=0;i<vcf.length;i++){
-			String[] alt_temp=vcf[i].Alt.split(",");
-			int range=vcf[i].Ref.length()-alt_temp[0].length();
-			if(range<0)
-				range=0;
-			if(mode.equals(MODE_DENSE)&&vcf[i].Pos+range-lastpos<bpp)
-				continue;
-			Element Variant=doc.createElement(XML_TAG_VARIANT);
-			Variant.setAttribute(XML_TAG_ID, vcf[i].ID);
-			if(alt_temp.length>1)
-				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_MULTIPLE);
-			else if(alt_temp[0].length()<vcf[i].Ref.length())
-				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_DELETION);
-			else if(alt_temp[0].length()>vcf[i].Ref.length())
-				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_INSERTION);
-			else if(alt_temp[0].length()==vcf[i].Ref.length())
-				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_SNV);
-			else
-				Variant.setAttribute(XML_TAG_TYPE, VARIANT_TYPE_OTHERS);
-			XmlWriter.append_text_element(doc,Variant,XML_TAG_FROM,String.valueOf(vcf[i].Pos));
-			XmlWriter.append_text_element(doc,Variant,XML_TAG_TO,String.valueOf(vcf[i].Pos+range));
-			lastpos=vcf[i].Pos+range;
-			if(!mode.equals(MODE_DENSE)&&bpp<0.5)
-				XmlWriter.append_text_element(doc,Variant,XML_TAG_LETTER,vcf[i].Alt);
-			if(mode.equals(MODE_DETAIL)){
-				StringBuffer Description=new StringBuffer();
-				Description.append("QUAL:");
-				Description.append(vcf[i].Qual);		
-				Description.append(";FILTER:");
-				Description.append(vcf[i].Filter);		
-				Description.append(";INFO:");
-				Description.append(vcf[i].Info);		
-				if(vcf[i].Samples.length>0){
-					Description.append(";FORMAT:");
-					Description.append(vcf[i].Format);
-					Description.append(";SAMPLES:");
-					for(int j=0;j<vcf[i].Samples.length;j++){
-						Description.append(vcf[i].Samples[j]);
-						if(j<vcf[i].Samples.length-1)
-							Description.append(",");
+
+		String line = null;
+		Vcf vcf = null;
+		try {
+			String chrom = vcf_tb.hasChromPrefix() ? chr : chr.substring(3);
+			if ("M".equalsIgnoreCase(chrom)) {
+				chrom = "MT";
+			}
+			TabixReader.Iterator Query = vcf_tb.query(chrom + ":" + start + "-"
+					+ end);
+			if (Query != null) {
+				int len = vss.length;
+				Variant[] vs;
+				while ((line = Query.next()) != null) {
+					vcf = new Vcf(line, samplesNum, selectedIndexes);
+					if (vcf.whetherAltIsDot())
+						continue;
+					if (!vcf.isDBSnp() && selectedIndexes != null) {
+						// Personal Genemic VCF
+						if (vcf.shouldBeFilteredByQualLimit(qualLimit)
+								|| vcf.shouldBeFilteredByFilterLimit(filterLimit))
+							continue;
+						for (int i = 0; i < len; i++) {
+							vs = vcf.getVariants(i);
+							if (vs != null)
+								vss[i].addVariant(vcf, vs);
+						}
+
+					} else {
+						// DBSnp or Personal genemic VCF whitout choose any
+						// SAMPLEs, vss.length must be 1.
+						vs = vcf.getVariants();
+						if (vs != null)
+							vss[0].addVariant(vcf, vs);
 					}
 				}
-				XmlWriter.append_text_element(doc,Variant,XML_TAG_DESCRIPTION,Description.toString());
 			}
-			Variants.appendChild(Variant);
+			vcf_tb.TabixReaderClose();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Variants);
-		return Variants;
+
+		return vss[0].getVariantsElement();
+	}
+
+	private String[] getFilterLimit() {
+		Object o = this.track.get_Parameter(VCF_HEADER_FILTER);
+		if (o == null)
+			return null;
+		String[] filterLimit = new String[20];
+		int count = 0;
+		int len = 20;
+		@SuppressWarnings("unchecked")
+		Map<String, Boolean> filters = (Map<String, Boolean>) o;
+		Iterator<String> itor = filters.keySet().iterator();
+		String key;
+		Boolean selected = false;
+		while (itor.hasNext()) {
+			key = itor.next();
+			selected = (Boolean) filters.get(key);
+			if (selected) {
+				if (count == len) {
+					filterLimit = expandCapacity(filterLimit, len);
+					len += len;
+				}
+				filterLimit[count++] = key;
+			}
+		}
+
+		if (count == 0)
+			return null;
+		String[] dest = new String[count];
+		System.arraycopy(filterLimit, 0, dest, 0, count);
+		return dest;
+	}
+
+	private String[] expandCapacity(String[] src, int len) {
+		String[] dest = new String[len + len];
+		System.arraycopy(src, 0, dest, 0, len);
+		return dest;
 	}
 }
