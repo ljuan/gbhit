@@ -76,14 +76,18 @@ class VcfReader implements Consts {
 						}
 					}
 				}
-				track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(
-						samples), PARAMETER_TYPE_VCFSAMPLE);
-				track.initialize_Parameter(VCF_HEADER_FILTER, filter_header,
-						PARAMETER_TYPE_CHECKBOX);
-				track.initialize_Parameter(VCF_HEADER_FORMAT, format_header,
-						PARAMETER_TYPE_INVISABLE);
-				track.initialize_Parameter(VCF_HEADER_INFO, info_header,
-						PARAMETER_TYPE_INVISABLE);
+				if(samples!=null)
+					track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(
+							samples), PARAMETER_TYPE_VCFSAMPLE);
+				if(!filter_header.isEmpty())
+					track.initialize_Parameter(VCF_HEADER_FILTER, filter_header,
+							PARAMETER_TYPE_CHECKBOX);
+				if(!format_header.isEmpty())
+					track.initialize_Parameter(VCF_HEADER_FORMAT, format_header,
+							PARAMETER_TYPE_INVISABLE);
+				if(!info_header.isEmpty())
+					track.initialize_Parameter(VCF_HEADER_INFO, info_header,
+							PARAMETER_TYPE_INVISABLE);
 				track.initialize_Parameter(VCF_CHROM_PREFIX,
 						vcf_tb.hasChromPrefix(), PARAMETER_TYPE_INVISABLE);
 				track.initialize_Parameter("QUALLIMIT", "-1",
@@ -97,17 +101,22 @@ class VcfReader implements Consts {
 
 	Element write_vcf2variants(Document doc, String track, String mode,
 			double bpp/* bases per pixel */, String chr, long start, long end) {
-		VcfSample vcfSample = (VcfSample) this.track
-				.get_Parameter(VCF_HEADER_SAMPLE);
-		// vcfSample.setSamples("MCF7");
-		int samplesNum = vcfSample.getSamplesNum();
-
+		
 		float qualLimit = Float.parseFloat((String) (this.track
 				.get_Parameter("QUALLIMIT")));
 		String[] filterLimit = getFilterLimit();
-
 		Variants[] vss;
-		int[] selectedIndexes = vcfSample.getSelectedIndexes();
+		int samplesNum = 0;
+		int[] selectedIndexes = null;
+		VcfSample vcfSample = null;
+		
+		if(this.track.has_Parameter(VCF_HEADER_SAMPLE)){
+			vcfSample = (VcfSample) this.track
+				.get_Parameter(VCF_HEADER_SAMPLE);
+		// vcfSample.setSamples("MCF7");
+			samplesNum = vcfSample.getSamplesNum();
+			selectedIndexes = vcfSample.getSelectedIndexes();
+		}
 		if (samplesNum == 0 || selectedIndexes == null) {
 			// DBSnp or Personal genemic VCF whitout choose any SAMPLEs
 			vss = new Variants[1];
