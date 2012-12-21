@@ -44,6 +44,9 @@ public class Instance implements Consts{
 		Document doc=XmlWriter.init(DATA_ROOT);
 		int chrid=check_chromosome(chr);
 		if(chrid>=0){
+			if(Chr!=null && Chr.equals(chr) && Coordinate[0]==start && Coordinate[1]==end)
+				if(Annos.get("cytoBand").has_Parameter(CYTOBAND_PREVIOUS_CHR))
+					Annos.get("cytoBand").set_Parameter(CYTOBAND_PREVIOUS_CHR, "chr0");
 			Chr=chr;
 			Coordinate=check_coordinate(chrid,start,end);
 			this.window_width=window_width;
@@ -147,21 +150,22 @@ public class Instance implements Consts{
 			Externals.get(track).set_Mode(mode);
 	}
 	void append_track(Annotations track, Document doc,String mode) {
-		if(!mode.equals(MODE_HIDE)){
+		String path_temp=track.get_Path(Chr);
+		if(!mode.equals(MODE_HIDE) && path_temp!=null){
 			Element ele_temp=null;
 			String type_temp=track.get_Type();
 			if(type_temp.equals(FORMAT_BEDGZ)){
-				BedReaderTabix brt=new BedReaderTabix(track.get_Path(Chr));
+				BedReaderTabix brt=new BedReaderTabix(path_temp);
 				ele_temp=brt.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
 			}
 			else if(type_temp.equals(FORMAT_BED)){
-				BedReader br=new BedReader(track.get_Path(Chr));
+				BedReader br=new BedReader(path_temp);
 				ele_temp=br.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
 			}
 			else if(type_temp.equals(FORMAT_BIGBED)){
 				BigBedReader bbr;
 				try{
-					bbr=new BigBedReader(track.get_Path(Chr));
+					bbr=new BigBedReader(path_temp);
 					ele_temp=bbr.write_bed2elements(doc, track.get_ID(), Chr, Coordinate[0], Coordinate[1], bpp);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -170,7 +174,7 @@ public class Instance implements Consts{
 			else if(type_temp.equals(FORMAT_BEDGRAPH)){
 				BedGraphReader bgr;
 				try{
-					bgr=new BedGraphReader(track.get_Path(Chr));
+					bgr=new BedGraphReader(path_temp);
 					ele_temp=bgr.write_bedGraph2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
 					e.printStackTrace();
@@ -179,7 +183,7 @@ public class Instance implements Consts{
 			else if(type_temp.equals(FORMAT_BIGWIG)){
 				WiggleReader wr;
 				try{
-					wr=new WiggleReader(track.get_Path(Chr),true);
+					wr=new WiggleReader(path_temp,true);
 					ele_temp=wr.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
 					e.printStackTrace();
@@ -188,7 +192,7 @@ public class Instance implements Consts{
 			else if(type_temp.equals(FORMAT_WIG)){
 				WiggleReader wr2;
 				try{
-					wr2=new WiggleReader(track.get_Path(Chr),false);
+					wr2=new WiggleReader(path_temp,false);
 					ele_temp=wr2.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
 					e.printStackTrace();
@@ -197,7 +201,7 @@ public class Instance implements Consts{
 			else if(type_temp.equals(FORMAT_GFF)){
 				GFFReader gr;
 				try {
-					gr = new GFFReader(track.get_Path(Chr));
+					gr = new GFFReader(path_temp);
 					ele_temp=gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"gene_id");
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -206,7 +210,7 @@ public class Instance implements Consts{
 			else if(type_temp.equals(FORMAT_GTF)){
 				GTFReader gr;
 				try {
-					gr = new GTFReader(track.get_Path(Chr));
+					gr = new GTFReader(path_temp);
 					ele_temp=gr.write_gtf2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -215,7 +219,7 @@ public class Instance implements Consts{
 			else if(type_temp.equals(FORMAT_GVF)){
 				GVFReader gr;
 				try {
-					gr = new GVFReader(track.get_Path(Chr));
+					gr = new GVFReader(path_temp);
 					ele_temp=gr.write_gvf2variants(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -227,7 +231,7 @@ public class Instance implements Consts{
 			}
 			else if (type_temp.equals(FORMAT_BAM)){
 				try {
-					BAMReader br2=new BAMReader(track.get_Path(Chr));
+					BAMReader br2=new BAMReader(path_temp);
 					ele_temp=br2.readBAM(doc,Chr,(int)Coordinate[0],(int)Coordinate[1],window_width,2, mode,track.get_ID());
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -239,11 +243,11 @@ public class Instance implements Consts{
 				rr.write_sequence(doc, Chr, Coordinate[0], Coordinate[1], track.get_ID());
 			}
 			else if (type_temp.equals(FORMAT_FASTA)&&bpp<0.5){
-				FastaReader fr=new FastaReader(track.get_Path());
+				FastaReader fr=new FastaReader(path_temp);
 				ele_temp=fr.write_sequence(doc, Chr, Coordinate[0], Coordinate[1], track.get_ID());
 			}
 			else if (type_temp.equals(FORMAT_CYTO)){
-				CytobandReader cbr=new CytobandReader(track.get_Path(Chr));
+				CytobandReader cbr=new CytobandReader(path_temp);
 				ele_temp=cbr.write_cytobands(doc, Chr, track);
 			}
 			
