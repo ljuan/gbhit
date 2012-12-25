@@ -32,7 +32,7 @@ class BedReaderTabix implements Consts {
 		String line;
 		try {
 			TabixReader.Iterator Query = bed_tb.query(querystr.toString());
-			while ((line = Query.next()) != null) {
+			while (Query!=null&&(line = Query.next()) != null) {
 				bed_internal.add(new Bed(line.split("\t")));
 			}
 			bed_tb.TabixReaderClose();
@@ -58,56 +58,53 @@ class BedReaderTabix implements Consts {
 			XmlWriter.append_text_element(doc, Ele, XML_TAG_TO,
 					String.valueOf(bed[i].chromEnd));
 
-			if (bed[i].fields > 3) {
+			if (bed[i].fields > 3) 
 				Ele.setAttribute(XML_TAG_ID, bed[i].name);
-				if (bed[i].fields > 4) {
-					XmlWriter.append_text_element(doc, Ele, XML_TAG_DIRECTION,
-							bed[i].strand);
-					if (bed[i].fields > 5) {
-						if (bed[i].itemRgb != null
-								&& !bed[i].itemRgb.ToString().equals("0,0,0"))
-							XmlWriter.append_text_element(doc, Ele,
-									XML_TAG_COLOR, bed[i].itemRgb.ToString());
-						else if (bed[i].score > 0)
-							XmlWriter.append_text_element(doc, Ele,
-									XML_TAG_COLOR,
-									new Rgb(bed[i].score).ToString());
-						if (bed[i].fields > 11
-					//			&& regionend - regionstart < 10000000) {
-								&& (bed[i].chromEnd-bed[i].chromStart)/bpp > bed[i].blockCount*2) {
-							for (int j = 0; j < bed[i].blockCount; j++) {
-								long substart = bed[i].blockStarts[j]
-										+ bed[i].chromStart;
-								long subend = bed[i].blockStarts[j]
-										+ bed[i].chromStart
-										+ bed[i].blockSizes[j];
-								if (substart < regionend
-										&& subend >= regionstart) {
-									deal_thick(doc, Ele, substart, subend,
-											bed[i].thickStart, bed[i].thickEnd);
-								}
-								if (j < bed[i].blockCount - 1
-										&& subend < regionend
-										&& (bed[i].blockStarts[j + 1] + bed[i].chromStart) >= regionstart) {
-									append_subele(
-											doc,
-											Ele,
-											String.valueOf(subend + 1),
-											String.valueOf(bed[i].blockStarts[j + 1]
-													+ bed[i].chromStart),
-											SUBELEMENT_TYPE_LINE);
-								}
-							}
-						} else if (bed[i].fields > 7) {
-							deal_thick(doc, Ele, bed[i].chromStart,
-									bed[i].chromEnd, bed[i].thickStart,
-									bed[i].thickEnd);
-						} 
-						else {
-							deal_thick(doc, Ele, bed[i].chromStart, bed[i].chromEnd, bed[i].chromStart, bed[i].chromEnd);
-						}
+			if (bed[i].fields > 4) 
+				if (bed[i].itemRgb != null
+						&& !bed[i].itemRgb.ToString().equals("0,0,0"))
+					XmlWriter.append_text_element(doc, Ele,
+							XML_TAG_COLOR, bed[i].itemRgb.ToString());
+				else if (bed[i].score > 0)
+					XmlWriter.append_text_element(doc, Ele,
+							XML_TAG_COLOR,
+							new Rgb(bed[i].score).ToString());
+			if (bed[i].fields > 5)
+				XmlWriter.append_text_element(doc, Ele, XML_TAG_DIRECTION,
+						bed[i].strand);
+			if (bed[i].fields > 11
+		//			&& regionend - regionstart < 10000000) {
+					&& (bed[i].chromEnd-bed[i].chromStart)/bpp > bed[i].blockCount*2) {
+				for (int j = 0; j < bed[i].blockCount; j++) {
+					long substart = bed[i].blockStarts[j]
+							+ bed[i].chromStart;
+					long subend = bed[i].blockStarts[j]
+							+ bed[i].chromStart
+							+ bed[i].blockSizes[j];
+					if (substart < regionend
+							&& subend >= regionstart) {
+						deal_thick(doc, Ele, substart, subend,
+								bed[i].thickStart, bed[i].thickEnd);
+					}
+					if (j < bed[i].blockCount - 1
+							&& subend < regionend
+							&& (bed[i].blockStarts[j + 1] + bed[i].chromStart) >= regionstart) {
+						append_subele(
+								doc,
+								Ele,
+								String.valueOf(subend + 1),
+								String.valueOf(bed[i].blockStarts[j + 1]
+										+ bed[i].chromStart),
+								SUBELEMENT_TYPE_LINE);
 					}
 				}
+			} else if (bed[i].fields > 7) {
+				deal_thick(doc, Ele, bed[i].chromStart,
+						bed[i].chromEnd, bed[i].thickStart,
+						bed[i].thickEnd);
+			} 
+			else {
+				deal_thick(doc, Ele, bed[i].chromStart, bed[i].chromEnd, bed[i].chromStart, bed[i].chromEnd);
 			}
 			Elements.appendChild(Ele);
 		}
