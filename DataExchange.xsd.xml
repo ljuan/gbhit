@@ -79,6 +79,7 @@
 							</xs:element>
 						</xs:sequence>
 						<xs:attribute name="id" type="xs:string" use="required"/>
+						<xs:attribute name="subid" type="xs:string" use="required"/>
 						<xs:attribute name="ifParam" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
@@ -100,7 +101,19 @@
 													<xs:element name="From" type="xs:long"/>
 													<xs:element name="To" type="xs:long"/>
 													<xs:element name="Direction" type="xs:string" minOccurs="0"/>													
-													<xs:element name="Discription" type="xs:string" minOccurs="0"/>
+													<xs:element name="Description" type="xs:string" minOccurs="0"/>
+													<xs:element name="Variant" maxOccurs="unbounded" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="From" type="xs:long"/>
+																<xs:element name="To" type="xs:long"/>
+																<xs:element name="Letter" type="xs:string" minOccurs="0"/>
+																<xs:element name="Description" type="xs:string" minOccurs="0"/>
+															</xs:sequence>
+															<xs:attribute name="id" type="xs:string"/>
+															<xs:attribute name="Type" type="VariantType"/>
+														</xs:complexType>
+													</xs:element>
 												</xs:sequence>
 												<xs:attribute name="id" type="xs:string"/>
 												<xs:attribute name="Type" type="xs:SubElementType"/>
@@ -108,6 +121,7 @@
 										</xs:element>
 									</xs:sequence>
 									<xs:attribute name="id" type="xs:string" use="required"/>
+									<xs:attribute name="Type" type="xs:ElementType"/>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
@@ -202,6 +216,19 @@
 			<xs:enumeration value="Box"/>
 			<xs:enumeration value="Line"/>
 			<xs:enumeration value="Band"/>
+			<xs:enumeration value="retained_Line"/>
+			<xs:enumeration value="lost_Box"/>
+			<xs:enumeration value="lost_Band"/>
+			<xs:enumeration value="shift_Box"/>
+			<xs:enumeration value="endless_Band"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ElementType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Enhance"/>
+			<xs:enumeration value="Silence"/>
+			<xs:enumeration value="Inhibit"/>
+			<xs:enumeration value="Changed"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="ValueType">
