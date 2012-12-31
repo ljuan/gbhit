@@ -86,7 +86,12 @@ class VcfSample implements Consts {
 	public int[] getSelectedIndexes() {
 		return selectedIndexes;
 	}
-
+	public boolean ifSelected(String SampleName){
+		for(int i=0;i<selectedNames.length;i++)
+			if(SampleName.equals(selectedNames[i]))
+				return true;
+		return false;
+	}
 	public String[] getSelectedNames() {
 		return selectedNames;
 	}

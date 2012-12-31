@@ -35,6 +35,37 @@ public class Interfaces extends HttpServlet{
 			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 			res.getWriter().print(a);
 		}
+		else if (action.equals("removeTracks")){
+			ins.remove_Tracks(req.getParameter("tracks").split(","));
+		}
+		else if (action.equals("modiPvar")||action.equals("addPvar")){
+			String a=ins.add_Pvar(req.getParameter("tracks"),req.getParameter("modes"),req.getParameter("id"));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("removePvar")){
+			ins.remove_Pvar();
+		}
+		else if (action.equals("modiPanno")||action.equals("addPanno")){
+			String a=ins.add_Panno(req.getParameter("tracks"),req.getParameter("modes"));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("removePanno")){
+			ins.remove_Panno();
+		}
+		else if (action.equals("modiPfanno")||action.equals("addPfanno")){
+			String a=ins.add_Pfanno(req.getParameter("tracks"),req.getParameter("modes"));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("removePfanno")){
+			ins.remove_Pfanno();
+		}
+		else if (action.equals("modiPclns")||action.equals("addPclns")){
+			String a=ins.add_Pclns(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("removePclns")){
+			ins.remove_Pclns(req.getParameter("tracks").split(","));
+		}
 		else if (action.equals("setParams")){
 			ins.set_Params(req.getParameter("tracks").split(","), req.getParameter("params").split(","), req.getParameter("values").split(","));
 			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
@@ -43,9 +74,6 @@ public class Interfaces extends HttpServlet{
 		else if (action.equals("getParams")){
 			String a=ins.get_Parameters(req.getParameter("tracks").split(","));
 			res.getWriter().print(a);
-		}
-		else if (action.equals("removeTracks")){
-			ins.remove_Tracks(req.getParameter("tracks").split(","));
 		}
 		else if (action.equals("addExternals")){
 			ins.add_Externals(req.getParameter("tracks").split(","),req.getParameter("links").split(","), req.getParameter("types").split(","),req.getParameter("modes").split(","));

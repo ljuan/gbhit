@@ -15,6 +15,7 @@ public interface Consts{
 	public static final String VCF_HEADER_INFO="info";
 	public static final String VCF_HEADER_FORMAT="format";
 	public static final String VCF_HEADER_SAMPLE="sample";
+	public static final String VCF_QUAL_LIMIT="QUALLIMIT";
 	public static final String VCF_CHROM_PREFIX="chromprefix";
 	
 	public static final String CYTOBAND_PREVIOUS_CHR="pChr";
@@ -32,7 +33,11 @@ public interface Consts{
 	public static final String FORMAT_GFF="GFF";
 	public static final String FORMAT_GTF="GTF";
 	public static final String FORMAT_GVF="GVF";
+	public static final String FORMAT_GDF="GDF";
+	public static final String FORMAT_GRF="GRF";
 	public static final String FORMAT_CYTO="CYTO";
+	public static final String FORMAT_ANNO="ANNO";
+	public static final String FORMAT_FUNCTIONANNO="FANNO";
 	
 	public static final String XML_TAG_ASSEMBLY="Assembly";
 	public static final String XML_TAG_ANNOTATION="Anno";
@@ -49,6 +54,7 @@ public interface Consts{
 	
 	public static final String XML_TAG_ID="id";
 	public static final String XML_TAG_SUPERID="superid";
+	public static final String XML_TAG_SUBID="subid";
 	public static final String XML_TAG_TYPE="Type";
 	public static final String XML_TAG_IFP="ifParam";
 	public static final String XML_TAG_KEY="key";
@@ -105,6 +111,15 @@ public interface Consts{
 	public static final String SUBELEMENT_TYPE_BOX="Box";
 	public static final String SUBELEMENT_TYPE_LINE="Line";
 	public static final String SUBELEMENT_TYPE_BAND="Band";
+	public static final String SUBELEMENT_TYPE_LOSTBAND="lost_Band";
+	public static final String SUBELEMENT_TYPE_LOSTBOX="lost_Box";
+	public static final String SUBELEMENT_TYPE_RETAINEDLINE="retained_Line";
+	public static final String SUBELEMENT_TYPE_SHIFTBOX="shift_Box";
+	public static final String SUBELEMENT_TYPE_ENDLESSBAND="endless_Band";
+	public static final String ELEMENT_TYPE_ENHANCE="Enhance";
+	public static final String ELEMENT_TYPE_INHIBIT="Inhibit";
+	public static final String ELEMENT_TYPE_SILENCE="Silence";
+	public static final String ELEMENT_TYPE_CHANGED="Changed";
 	
 	
 	public static final String PARAMETER_TYPE_CHECKBOX="CHECKBOX";

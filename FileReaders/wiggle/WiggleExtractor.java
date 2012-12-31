@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
+ * Extract all WigItem from given wiggle file or bigwig file, given chromosome,
+ * given region, given windowSize and given step. And deal them to ValueList.
  * 
  * @author Chengwu Yan
  * 
@@ -55,7 +57,9 @@ public class WiggleExtractor {
 	 *            1-base
 	 * @param isBigWig
 	 * @param windowSize
+	 *            width of screen
 	 * @param step
+	 *            A step defines how many pixes show in a grid
 	 */
 	public WiggleExtractor(String filePath, String chrom, int start, int end,
 			boolean isBigWig, int windowSize, int step) {
@@ -68,11 +72,22 @@ public class WiggleExtractor {
 		wiggles = new DataValueList(start, end, windowSize, step);
 	}
 
+	/**
+	 * Extract all WigItem from given wiggle file or bigwig file, given
+	 * chromosome, given region, given windowSize and given step. And deal them
+	 * to ValueList.
+	 * 
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public DataValueList extract() throws FileNotFoundException, IOException {
 		if (isBigWig) {
 			try {
 				new BigWigReader(this.filePath).getBigWig(this.chrom,
-						this.start, this.end, false, this.wiggles);
+						this.start, this.end, false, this.wiggles,
+						this.wiggles.getWindowSize(), this.wiggles.getStep())
+						.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -88,8 +103,7 @@ public class WiggleExtractor {
 	private void extract_wiggle() {
 		String decLine = skipHead();
 		while (decLine != null) {
-			char first = decLine.charAt(0);
-			decLine = (first == 'f') ? dealFixedStep(decLine)
+			decLine = (decLine.charAt(0) == 'f') ? dealFixedStep(decLine)
 					: dealVariableStep(decLine);
 		}
 	}
@@ -294,16 +308,16 @@ public class WiggleExtractor {
 		while ((line = nextLine()) != null) {
 			if (line.charAt(0) == 'f' || line.charAt(0) == 'v')
 				break;
-			char[] char_line = line.toCharArray();
 
 			int regionStart = 0;
 			int line_pos = 0;
 			for (;;) {
-				if (char_line[line_pos] == separator) {
+				if (line.charAt(line_pos) == ' '
+						|| line.charAt(line_pos) == '\t') {
 					line_pos++;
 					break;
 				}
-				regionStart = regionStart * 10 + (char_line[line_pos++] - 48);
+				regionStart = regionStart * 10 + (line.charAt(line_pos++) - 48);
 			}
 
 			int regionEnd = regionStart + span - 1;
@@ -314,13 +328,8 @@ public class WiggleExtractor {
 				return nextStepLine();
 			}
 
-			StringBuilder valueBuilder = new StringBuilder();
-			int line_length = line.length();
-			for (; line_pos < line_length;) {
-				valueBuilder.append(char_line[line_pos++]);
-			}
 			wiggles.update(new DataValue(this.chrom, regionStart - 1,
-					regionEnd, Float.parseFloat(valueBuilder.toString())));
+					regionEnd, Float.parseFloat(line.substring(line_pos))));
 
 			if (regionEnd > this.end)
 				regionEnd = this.end;

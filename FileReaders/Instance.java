@@ -1,5 +1,7 @@
 package FileReaders;
 
+import FileReaders.gff.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,6 +20,13 @@ public class Instance implements Consts{
 	CfgReader Config;
 	double bpp;
 	int window_width;
+	
+	String PvarID=null;
+	Annotations Pvar=null;
+	Annotations Panno=null;
+	Annotations Pfanno=null;
+	Hashtable<String,Annotations> Pclns=null;
+	
 	public Instance (){
 		initialize("hg19");
 	}
@@ -51,13 +60,13 @@ public class Instance implements Consts{
 			Coordinate=check_coordinate(chrid,start,end);
 			this.window_width=window_width;
 			bpp=(double)(Coordinate[1]-Coordinate[0])/(double)window_width;
-			Enumeration<Annotations> annos_enum=Annos.elements();
 			
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_CHROMOSOME, Chr);
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_START, String.valueOf(Coordinate[0]));
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_END, String.valueOf(Coordinate[1]));
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_LENGTH, String.valueOf(rr.fasta_index[chrid][0]));
 
+			Enumeration<Annotations> annos_enum=Annos.elements();
 			for(int i=0;i<Annos.size();i++){
 				Annotations anno_temp=annos_enum.nextElement();
 				append_track(anno_temp,doc,anno_temp.get_Mode());
@@ -67,6 +76,20 @@ public class Instance implements Consts{
 				Annotations external_temp=externals_enum.nextElement();
 				append_track(external_temp,doc,external_temp.get_Mode());
 			}	
+			if(Pvar!=null){
+				append_Ptrack(Pvar,doc,Pvar.get_Mode());
+				if(Pfanno!=null)
+					append_Ptrack(Pfanno,doc,Pfanno.get_Mode());
+				if(Panno!=null){
+					append_Ptrack(Panno,doc,Panno.get_Mode());
+
+					Enumeration<Annotations> pclns_enum=Pclns.elements();
+					for(int i=0;i<Externals.size();i++){
+						Annotations pclns_temp=pclns_enum.nextElement();
+						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode());
+					}	
+				}
+			}
 		}
 		else
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(DATA_ROOT).item(0), XML_TAG_ERROR,"Invalid Chromosome name");
@@ -110,6 +133,92 @@ public class Instance implements Consts{
 			if(Externals.containsKey(tracks[i]))
 				Externals.remove(tracks[i]);
 	}
+	public String add_Pvar(String track,String mode,String PvarID){
+		Document doc=XmlWriter.init(DATA_ROOT);
+		if(Annos.containsKey(track)){
+			if(PvarID.equals(track)
+					||(Annos.get(track).has_Parameter(VCF_HEADER_SAMPLE)
+							&&((VcfSample)(Annos.get(track).get_Parameter(VCF_HEADER_SAMPLE))).ifSelected(PvarID))){
+				this.PvarID=PvarID;
+				this.Pvar=Annos.get(track);
+				Pvar.set_Mode(mode);
+				append_Ptrack(Pvar,doc,Pvar.get_Mode());
+			}
+		}
+		else if(Externals.containsKey(track)){
+			if(PvarID.equals(track)
+					||(Externals.get(track).has_Parameter(VCF_HEADER_SAMPLE)
+							&&((VcfSample)(Externals.get(track).get_Parameter(VCF_HEADER_SAMPLE))).ifSelected(PvarID))){
+				this.PvarID=PvarID;
+				this.Pvar=Externals.get(track);
+				Pvar.set_Mode(mode);
+				append_Ptrack(Pvar,doc,Pvar.get_Mode());
+			}
+		}
+		return XmlWriter.xml2string(doc);
+	}
+	public void remove_Pvar(){
+		Pvar=null;
+		PvarID=null;
+	}
+	public String add_Panno(String track,String mode){
+		Document doc=XmlWriter.init(DATA_ROOT);
+		if(Annos.containsKey(track)&&Annos.get(track).get_Type().equals(FORMAT_ANNO)){
+			Panno=Annos.get(track);
+			Panno.set_Mode(mode);
+			append_Ptrack(Panno,doc,Panno.get_Mode());
+		}
+		else if(Externals.containsKey(track)&&Externals.get(track).get_Type().equals(FORMAT_ANNO)){
+			Panno=Externals.get(track);
+			Panno.set_Mode(mode);
+			append_Ptrack(Panno,doc,Panno.get_Mode());
+		}
+		return XmlWriter.xml2string(doc);
+	}
+	public void remove_Panno(){
+		Panno=null;
+	}
+	public String add_Pfanno(String track,String mode){
+		Document doc=XmlWriter.init(DATA_ROOT);
+		if(Annos.containsKey(track)&&Annos.get(track).get_Type().equals(FORMAT_GRF)){
+			Pfanno=Annos.get(track);
+			Pfanno.set_Mode(mode);
+			append_Ptrack(Pfanno,doc,Pfanno.get_Mode());
+			if(Panno!=null)
+				append_Ptrack(Panno,doc,Panno.get_Mode());
+		}
+		else if(Externals.containsKey(track)&&Externals.get(track).get_Type().equals(FORMAT_GRF)){
+			Pfanno=Externals.get(track);
+			Pfanno.set_Mode(mode);
+			append_Ptrack(Pfanno,doc,Pfanno.get_Mode());
+			if(Panno!=null)
+				append_Ptrack(Panno,doc,Panno.get_Mode());
+		}
+		return XmlWriter.xml2string(doc);
+	}
+	public void remove_Pfanno(){
+		Pfanno=null;
+	}
+	public String add_Pclns(String[] tracks,String[] modes){
+		Document doc=XmlWriter.init(DATA_ROOT);
+		for(int i=0;i<tracks.length;i++)
+			if(Annos.containsKey(tracks[i])&&Annos.get(tracks[i]).get_Type().equals(FORMAT_GDF)){
+				Pclns.put(tracks[i],Annos.get(tracks[i]));
+				Pclns.get(tracks[i]).set_Mode(modes[i]);
+				append_Ptrack(Pclns.get(tracks[i]),doc,Pclns.get(tracks[i]).get_Mode());
+			}
+			else if(Externals.containsKey(tracks[i])&&Externals.get(tracks[i]).get_Type().equals(FORMAT_GDF)){
+				Pclns.put(tracks[i],Externals.get(tracks[i]));
+				Pclns.get(tracks[i]).set_Mode(modes[i]);
+				append_Ptrack(Pclns.get(tracks[i]),doc,Pclns.get(tracks[i]).get_Mode());
+			}
+		return XmlWriter.xml2string(doc);
+	}
+	public void remove_Pclns(String[] tracks){
+		for(int i=0;i<tracks.length;i++)
+			if(Pclns.containsKey(tracks[i]))
+				Pclns.remove(tracks[i]);
+	}
 	public String get_Assemblies(){
 		Document doc=XmlWriter.init(META_ROOT);
 		Config.write_metalist(doc,Config.getAssemblies(),"AssemblyList");
@@ -149,12 +258,35 @@ public class Instance implements Consts{
 		else if(Externals.containsKey(track))
 			Externals.get(track).set_Mode(mode);
 	}
+	void append_Ptrack(Annotations track,Document doc,String mode){
+		String type_temp=track.get_Type();
+		if(track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(FORMAT_VCF)){
+			if(track.get_ID().equals(PvarID))
+				append_track(track,doc,mode);
+			else 
+				append_track(track,doc,mode);
+		}
+		else if(track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(FORMAT_GVF))
+			append_track(track,doc,mode);
+		else if(track.get_ID().equals(Panno.get_ID())&&type_temp.equals(FORMAT_ANNO))
+			append_track(track,doc,mode);
+		else if(track.get_ID().equals(Pfanno.get_ID())&&type_temp.equals(FORMAT_GRF))
+			append_track(track,doc,mode);
+		else if(Pclns.containsKey(track.get_ID())&&type_temp.equals(FORMAT_GDF))
+			append_track(track,doc,mode);
+		else 
+			append_track(track,doc,mode);
+	}
 	void append_track(Annotations track, Document doc,String mode) {
 		String path_temp=track.get_Path(Chr);
 		if(!mode.equals(MODE_HIDE) && path_temp!=null){
 			Element ele_temp=null;
 			String type_temp=track.get_Type();
 			if(type_temp.equals(FORMAT_BEDGZ)){
+				BedReaderTabix brt=new BedReaderTabix(path_temp);
+				ele_temp=brt.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
+			}
+			else if(type_temp.equals(FORMAT_ANNO)){
 				BedReaderTabix brt=new BedReaderTabix(path_temp);
 				ele_temp=brt.write_bed2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],bpp);
 			}
@@ -195,6 +327,24 @@ public class Instance implements Consts{
 					wr2=new WiggleReader(path_temp,false);
 					ele_temp=wr2.write_wiggle2Values(doc, track.get_ID(), Chr, (int) Coordinate[0], (int) Coordinate[1], window_width, 2);
 				} catch (IOException e){
+					e.printStackTrace();
+				}
+			}
+			else if(type_temp.equals(FORMAT_GRF)){
+				GFFReader gr;
+				try {
+					gr = new GFFReader(path_temp);
+					ele_temp=gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"gene_id");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			else if(type_temp.equals(FORMAT_GDF)){
+				GFFReader gr;
+				try {
+					gr = new GFFReader(path_temp);
+					ele_temp=gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"gene_id");
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
