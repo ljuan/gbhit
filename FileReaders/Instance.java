@@ -121,10 +121,10 @@ public class Instance implements Consts{
 						links_table[j][0]=links_temp[j].substring(0, colon);
 						links_table[j][1]=links_temp[j].substring(colon+1);
 					}
-					Externals.put(tracks[i], new Annotations(tracks[i],links_table,types[i],modes[i]));
+					Externals.put(tracks[i], new Annotations(tracks[i],links_table,types[i],modes[i],Consts.GROUP_CLASS_USR));
 				}
 				else{
-					Externals.put(tracks[i], new Annotations(tracks[i],links[i],types[i],modes[i]));
+					Externals.put(tracks[i], new Annotations(tracks[i],links[i],types[i],modes[i],Consts.GROUP_CLASS_USR));
 				}
 			}
 	}
@@ -229,7 +229,7 @@ public class Instance implements Consts{
 		Enumeration<Annotations> annos_enum=Annos.elements();
 		for(int i=0;i<Annos.size();i++){
 			Annotations temp=annos_enum.nextElement();
-			anno_names[i]=temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
+			anno_names[i]=temp.get_Group()+"-"+temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
 		}
 		Document doc=XmlWriter.init(META_ROOT);
 		Config.write_metalist(doc,anno_names, "AnnotationList");

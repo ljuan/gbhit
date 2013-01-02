@@ -45,12 +45,13 @@ class CfgReader implements Consts{
 		for(int i=0;i<annolist.getLength();i++){
 			Element anno=(Element)annolist.item(i);
 			String name=anno.getAttributes().getNamedItem(XML_TAG_ID).getTextContent();
+			String group=anno.getAttributes().getNamedItem(XML_TAG_GROUP).getTextContent();
 			String format=anno.getElementsByTagName(XML_TAG_FORMAT).item(0).getTextContent();
 			String mode=anno.getElementsByTagName(XML_TAG_DEFAULT).item(0).getTextContent();
 			NodeList pathlist=anno.getElementsByTagName(XML_TAG_PATH);
 			if(pathlist.getLength() == 1){
 				String path=pathlist.item(0).getTextContent();
-				Annos[i]=new Annotations(name,path,format,mode);
+				Annos[i]=new Annotations(name,path,format,mode,group);
 			}
 			else if(pathlist.getLength() > 1){
 				String[][] paths=new String[pathlist.getLength()][2];
@@ -58,7 +59,7 @@ class CfgReader implements Consts{
 					paths[j][0]=pathlist.item(j).getAttributes().getNamedItem(XML_TAG_KEY).getTextContent();
 					paths[j][1]=pathlist.item(j).getTextContent();
 				}
-				Annos[i]=new Annotations(name,paths,format,mode);
+				Annos[i]=new Annotations(name,paths,format,mode,group);
 			}
 		}
 		return Annos;

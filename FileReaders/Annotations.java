@@ -14,24 +14,27 @@ class Annotations implements Consts{
 	private String Path=null;
 	private String Type;
 	private String Mode;
+	private String Group=null;
 	private HashMap<String,String> Paths;
 	private HashMap<String,Object> Parameter;
 	private HashMap<String,String> ParameterType;
-	Annotations(String ID, String Path, String Type, String Mode){
+	Annotations(String ID, String Path, String Type, String Mode, String Group){
 		this.ID=ID;
 		this.Path=Path;
 		this.Type=Type;
 		this.Mode=Mode;
+		this.Group=Group;
 		this.Parameter=new HashMap<String,Object>();
 		this.ParameterType=new HashMap<String,String>();
 	}
-	Annotations(String ID, String[][] Paths, String Type, String Mode){
+	Annotations(String ID, String[][] Paths, String Type, String Mode, String Group){
 		this.ID=ID;
 		this.Paths=new HashMap<String,String>();
 		for(int i=0;i<Paths.length;i++)
 			this.Paths.put(Paths[i][0], Paths[i][1]);
 		this.Type=Type;
 		this.Mode=Mode;
+		this.Group=Group;
 		this.Parameter=new HashMap<String,Object>();
 		this.ParameterType=new HashMap<String,String>();
 	}
@@ -143,14 +146,19 @@ class Annotations implements Consts{
 	String get_ID(){
 		return ID;
 	}
+	String get_Group(){
+		return Group;
+	}
 	String get_Path(){
 		return Path;
 	}
 	String get_Path(String key){
-		if(Path != null)
+		if(Path != null || Paths.isEmpty())
 			return Path;
-		else
+		else if(Paths.containsKey(key))
 			return Paths.get(key);
+		else 
+			return Paths.values().iterator().next();
 	}
 	String get_Type(){
 		return Type;

@@ -39,6 +39,18 @@ public interface Consts{
 	public static final String FORMAT_ANNO="ANNO";
 	public static final String FORMAT_FUNCTIONANNO="FANNO";
 	
+	public static final String XML_TAG_GROUP="group";
+	public static final String GROUP_CLASS_SEQ="Sequence";
+	public static final String GROUP_CLASS_USR="User";
+	public static final String GROUP_CLASS_REP="Repeat";
+	public static final String GROUP_CLASS_GCC="GC";
+	public static final String GROUP_CLASS_GENE="Gene";
+	public static final String GROUP_CLASS_DBSNP="dbSNP";
+	public static final String GROUP_CLASS_KG="1000g";
+	public static final String GROUP_CLASS_PG="pGenome";
+	public static final String GROUP_CLASS_RNA="RNA";
+	public static final String GROUP_CLASS_DATA="data";
+	
 	public static final String XML_TAG_ASSEMBLY="Assembly";
 	public static final String XML_TAG_ANNOTATION="Anno";
 	public static final String XML_TAG_FORMAT="Format";
