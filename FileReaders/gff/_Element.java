@@ -16,7 +16,7 @@ import FileReaders.XmlWriter;
  * @author Chengwu Yan
  * 
  */
-public class _Element implements Consts {
+public class _Element {
 	private List<GFF> gffs = null;
 	private String id;
 	private long from = Long.MAX_VALUE;
@@ -65,20 +65,20 @@ public class _Element implements Consts {
 	void addToElements(Document doc, Element elements) {
 		analyse();
 
-		Element element = doc.createElement(XML_TAG_ELEMENT);
-		element.setAttribute(XML_TAG_ID, this.id);
-		XmlWriter.append_text_element(doc, element, XML_TAG_FROM, this.from
+		Element element = doc.createElement(Consts.XML_TAG_ELEMENT);
+		element.setAttribute(Consts.XML_TAG_ID, this.id);
+		XmlWriter.append_text_element(doc, element, Consts.XML_TAG_FROM, this.from
 				+ "");
-		XmlWriter.append_text_element(doc, element, XML_TAG_TO, this.to + "");
-		XmlWriter.append_text_element(doc, element, XML_TAG_DIRECTION,
+		XmlWriter.append_text_element(doc, element, Consts.XML_TAG_TO, this.to + "");
+		XmlWriter.append_text_element(doc, element, Consts.XML_TAG_DIRECTION,
 				this.direction);
 
 		for (SubElement sub : ses) {
-			Element subE = doc.createElement(XML_TAG_SUBELEMENT);
-			subE.setAttribute(XML_TAG_TYPE, sub.type);
-			XmlWriter.append_text_element(doc, subE, XML_TAG_FROM, sub.from
+			Element subE = doc.createElement(Consts.XML_TAG_SUBELEMENT);
+			subE.setAttribute(Consts.XML_TAG_TYPE, sub.type);
+			XmlWriter.append_text_element(doc, subE, Consts.XML_TAG_FROM, sub.from
 					+ "");
-			XmlWriter.append_text_element(doc, subE, XML_TAG_TO, sub.to + "");
+			XmlWriter.append_text_element(doc, subE, Consts.XML_TAG_TO, sub.to + "");
 			element.appendChild(subE);
 		}
 
@@ -103,7 +103,7 @@ public class _Element implements Consts {
 
 		for (GFF gff : gffs) {
 			if (gff.feature.equals("CDS")) {
-				CDSs.add(new SubElement(SUBELEMENT_TYPE_BOX, gff.start, gff.end));
+				CDSs.add(new SubElement(Consts.SUBELEMENT_TYPE_BOX, gff.start, gff.end));
 			} else if (gff.feature.equals("exon")) {
 				exons.add(gff);
 			}
@@ -130,7 +130,7 @@ public class _Element implements Consts {
 		int size = ses.size();
 		for (int k = 0; k < size - 1; k++) {
 			if (ses.get(k).to + 1 < ses.get(k + 1).from)
-				ses.add(new SubElement(SUBELEMENT_TYPE_LINE, ses.get(k).to + 1,
+				ses.add(new SubElement(Consts.SUBELEMENT_TYPE_LINE, ses.get(k).to + 1,
 						ses.get(k + 1).from - 1));
 		}
 
@@ -141,17 +141,17 @@ public class _Element implements Consts {
 		long cur_pos = exon.start;
 		for (SubElement se : CDS) {
 			if (cur_pos < se.from)
-				ses.add(new SubElement(SUBELEMENT_TYPE_BAND, cur_pos,
+				ses.add(new SubElement(Consts.SUBELEMENT_TYPE_BAND, cur_pos,
 						se.from - 1));
 			cur_pos = se.to + 1;
 		}
 		if (cur_pos <= exon.end)
-			ses.add(new SubElement(SUBELEMENT_TYPE_BAND, cur_pos, exon.end));
+			ses.add(new SubElement(Consts.SUBELEMENT_TYPE_BAND, cur_pos, exon.end));
 	}
 
 	private void analyse_GFF() {
 		for (GFF gff : gffs)
-			ses.add(new SubElement(SUBELEMENT_TYPE_BOX, gff.start, gff.end));
+			ses.add(new SubElement(Consts.SUBELEMENT_TYPE_BOX, gff.start, gff.end));
 		Collections.sort(ses);
 	}
 

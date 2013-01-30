@@ -9,7 +9,7 @@ import org.w3c.dom.Element;
  * Class for annotations stored in the configure file.
  */
 
-class Annotations implements Consts{
+class Annotations {
 	private String ID;
 	private String Path=null;
 	private String Type;
@@ -40,7 +40,7 @@ class Annotations implements Consts{
 	}
 	void set_Mode(String Mode){
 		this.Mode=Mode;
-		if(Mode.equals(MODE_HIDE))
+		if(Mode.equals(Consts.MODE_HIDE))
 			Parameter.clear();
 	}
 	void set_Parameters(String params, String values){
@@ -48,7 +48,7 @@ class Annotations implements Consts{
 		String[] ValueList=values.split(";");
 		for(int i=0;i<ParameterList.length;i++){
 			if(Parameter.containsKey(ParameterList[i])){
-				if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_CHECKBOX)){
+				if(ParameterType.get(ParameterList[i]).equals(Consts.PARAMETER_TYPE_CHECKBOX)){
 					String[] value_temp=ValueList[i].split(":");
 					HashMap<String,Boolean> options_param=(HashMap<String,Boolean>)(Parameter.get(ParameterList[i]));
 					String[] optionList=new String[options_param.size()];
@@ -60,17 +60,17 @@ class Annotations implements Consts{
 							options_param.put(value_temp[j], true);
 					Parameter.put(ParameterList[i], options_param);
 				}
-				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_STRING))
+				else if(ParameterType.get(ParameterList[i]).equals(Consts.PARAMETER_TYPE_STRING))
 					Parameter.put(ParameterList[i],ValueList[i]);
-				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_SELECTION))
+				else if(ParameterType.get(ParameterList[i]).equals(Consts.PARAMETER_TYPE_SELECTION))
 					((String[])(Parameter.get(ParameterList[i])))[0]=ValueList[i];
-				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_VCFSAMPLE))
+				else if(ParameterType.get(ParameterList[i]).equals(Consts.PARAMETER_TYPE_VCFSAMPLE))
 					((VcfSample)(Parameter.get(ParameterList[i]))).setSamples(ValueList[i]);
 			}
 		}
 	}
 	void set_Parameter(String param, Object value){
-		if(Parameter.containsKey(param)&&ParameterType.get(param).equals(PARAMETER_TYPE_INVISABLE))
+		if(Parameter.containsKey(param)&&ParameterType.get(param).equals(Consts.PARAMETER_TYPE_INVISABLE))
 			Parameter.put(param, value);
 	}
 	void initialize_Parameter(String Param, Object Values, String Type){
@@ -78,15 +78,15 @@ class Annotations implements Consts{
 		Parameter.put(Param, Values);
 	}
 	Element write_anno2parameter(Document doc){
-		Element Parameters = doc.createElement(XML_TAG_PARAMETERS);
-		Parameters.setAttribute(XML_TAG_ID, this.ID);
+		Element Parameters = doc.createElement(Consts.XML_TAG_PARAMETERS);
+		Parameters.setAttribute(Consts.XML_TAG_ID, this.ID);
 		String[] ParameterList=get_Parameters();
 		for(int i=0;i<ParameterList.length;i++){
-			if(!ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_INVISABLE)){
-				Element Param=doc.createElement(XML_TAG_PARAMETER);
-				Param.setAttribute(XML_TAG_ID, ParameterList[i]);
-				Param.setAttribute(XML_TAG_TYPE, ParameterType.get(ParameterList[i]));
-				if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_CHECKBOX)){
+			if(!ParameterType.get(ParameterList[i]).equals(Consts.PARAMETER_TYPE_INVISABLE)){
+				Element Param=doc.createElement(Consts.XML_TAG_PARAMETER);
+				Param.setAttribute(Consts.XML_TAG_ID, ParameterList[i]);
+				Param.setAttribute(Consts.XML_TAG_TYPE, ParameterType.get(ParameterList[i]));
+				if(ParameterType.get(ParameterList[i]).equals(Consts.PARAMETER_TYPE_CHECKBOX)){
 					HashMap<String,Boolean> options_param=(HashMap<String,Boolean>)(Parameter.get(ParameterList[i]));
 					String[] optionList=new String[options_param.size()];
 					options_param.keySet().toArray(optionList);
@@ -99,9 +99,9 @@ class Annotations implements Consts{
 						if(j<optionList.length-1)
 							options_temp.append(";");
 					}
-					XmlWriter.append_text_element(doc, Param, XML_TAG_OPTIONS, options_temp.toString());
+					XmlWriter.append_text_element(doc, Param, Consts.XML_TAG_OPTIONS, options_temp.toString());
 				}
-				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_SELECTION)){
+				else if(ParameterType.get(ParameterList[i]).equals(Consts.PARAMETER_TYPE_SELECTION)){
 					String[] optionList=(String[])(Parameter.get(ParameterList[i]));
 					StringBuffer options_temp=new StringBuffer();
 					for(int j=1;j<optionList.length;j++){
@@ -109,16 +109,16 @@ class Annotations implements Consts{
 						if(j<optionList.length-1)
 							options_temp.append(";");
 					}
-					XmlWriter.append_text_element(doc, Param, XML_TAG_OPTIONS, options_temp.toString());
+					XmlWriter.append_text_element(doc, Param, Consts.XML_TAG_OPTIONS, options_temp.toString());
 					Param.appendChild(doc.createTextNode(optionList[0]));
 				}
-				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_STRING))
+				else if(ParameterType.get(ParameterList[i]).equals(Consts.PARAMETER_TYPE_STRING))
 					Param.appendChild(doc.createTextNode((String)Parameter.get(ParameterList[i])));
-				else if(ParameterType.get(ParameterList[i]).equals(PARAMETER_TYPE_VCFSAMPLE))
+				else if(ParameterType.get(ParameterList[i]).equals(Consts.PARAMETER_TYPE_VCFSAMPLE))
 					((VcfSample)(Parameter.get(ParameterList[i]))).appendXMLcontent(doc, Param);
 				Parameters.appendChild(Param);
 			}
-			doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Parameters);
+			doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Parameters);
 		}
 		return Parameters;
 	}
@@ -134,8 +134,8 @@ class Annotations implements Consts{
 			return null;
 	}
 	boolean has_visable_Parameter(){
-		if(ParameterType.containsValue(PARAMETER_TYPE_CHECKBOX)||ParameterType.containsValue(PARAMETER_TYPE_SELECTION)
-		||ParameterType.containsValue(PARAMETER_TYPE_STRING)||ParameterType.containsValue(PARAMETER_TYPE_VCFSAMPLE))
+		if(ParameterType.containsValue(Consts.PARAMETER_TYPE_CHECKBOX)||ParameterType.containsValue(Consts.PARAMETER_TYPE_SELECTION)
+		||ParameterType.containsValue(Consts.PARAMETER_TYPE_STRING)||ParameterType.containsValue(Consts.PARAMETER_TYPE_VCFSAMPLE))
 			return true;
 		else
 			return false;

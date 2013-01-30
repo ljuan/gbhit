@@ -7,7 +7,7 @@ import java.nio.charset.*;
 
 import java.util.*;
 import net.sf.samtools.*;
-public class temp implements Consts{
+public class temp {
 	public temp(){
 		Cf ccff=new Cf();
 		ccff.compare_filereaders();

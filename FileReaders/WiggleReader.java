@@ -93,7 +93,7 @@ public class WiggleReader {
 				.append_text_element(doc, ele, Consts.XML_TAG_FROM, start + "");
 		XmlWriter.append_text_element(doc, ele, Consts.XML_TAG_TO, end + "");
 		XmlWriter.append_text_element(doc, ele, Consts.XML_TAG_STEP, step + "");
-		XmlWriter.append_text_element(doc, ele, "ValueList", valueList);
+		XmlWriter.append_text_element(doc, ele, Consts.XML_TAG_VALUE_LIST, valueList);
 		return ele;
 	}
 }

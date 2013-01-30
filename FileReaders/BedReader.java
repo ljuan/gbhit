@@ -1,10 +1,11 @@
 ﻿package FileReaders;
 
-import java.util.*;
 import java.io.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import edu.hit.mlg.Tools.StringSplit;
 
 /**
  * This is for reading BED files. We don't interpret the specific content in
@@ -19,49 +20,12 @@ import org.w3c.dom.Element;
  * current window when a query is performed.
  */
 
-class BedReader implements Consts {
+class BedReader {
 	String beds[];
 	String bedPath;
 
 	BedReader(String bed) {
-		File bed_file = new File(bed);
-		ByteBufferChannel bbc = new ByteBufferChannel(bed_file, 0,
-				bed_file.length());
-		String temp = bbc.ToString(DEFAULT_ENCODE);
-		beds = temp.split("\n");
-	}
-
-	BedReader(String bedPath, boolean b) {
-		this.bedPath = bedPath;
-	}
-
-	Bed[] extract_bed(String chr, long start, long end) {
-		ArrayList<Bed> beds_internal = new ArrayList<Bed>();
-		for (int i = 0; i < beds.length; i++) {
-			Bed bed_temp = new Bed(beds[i].split("\t"));
-			if (bed_temp.chrom.equals(chr) && bed_temp.chromStart < end
-					&& bed_temp.chromEnd >= start) {
-				beds_internal.add(bed_temp);
-			}
-		}
-		return beds_internal.toArray(new Bed[beds_internal.size()]);
-	}
-
-	Bed[] extract_bed(String chr, long start, long end, boolean b)
-			throws NumberFormatException, IOException {
-		BufferedReader br = new BufferedReader(new FileReader(bedPath));
-		ArrayList<Bed> beds = new ArrayList<Bed>();
-
-		String line = null;
-		while ((line = br.readLine()) != null) {
-			if (line.startsWith(chr + "\t")) {
-				String[] str = line.split("\t");
-				if (overlaps(start, end, Long.parseLong(str[1]),
-						Long.parseLong(str[2])))
-					beds.add(new Bed(str));
-			}
-		}
-		return beds.toArray(new Bed[beds.size()]);
+		this.bedPath = bed;
 	}
 
 	private boolean overlaps(long region_start, long region_end,
@@ -75,110 +39,145 @@ class BedReader implements Consts {
 
 		return false;
 	}
-
-	Element write_bed2elements(Document doc, String track, String chr,
-			long regionstart, long regionend, double bpp) {
-		Bed[] bed = extract_bed(chr, regionstart, regionend);
-		Element Elements = doc.createElement(XML_TAG_ELEMENTS);
-		Elements.setAttribute(XML_TAG_ID, track);
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Elements); // Elements
-																			// node
-
-		for (int i = 0; i < bed.length; i++) {
-			Element Ele = doc.createElement(XML_TAG_ELEMENT);
-			XmlWriter.append_text_element(doc, Ele, XML_TAG_FROM,
-					String.valueOf(bed[i].chromStart + 1));
-			XmlWriter.append_text_element(doc, Ele, XML_TAG_TO,
-					String.valueOf(bed[i].chromEnd));
-
-			if (bed[i].fields > 3) 
-				Ele.setAttribute(XML_TAG_ID, bed[i].name);
-			if (bed[i].fields > 4) 
-				if (bed[i].itemRgb != null
-						&& !bed[i].itemRgb.ToString().equals("0,0,0"))
-					XmlWriter.append_text_element(doc, Ele,
-							XML_TAG_COLOR, bed[i].itemRgb.ToString());
-				else if (bed[i].score > 0)
-					XmlWriter.append_text_element(doc, Ele,
-							XML_TAG_COLOR,
-							new Rgb(bed[i].score).ToString());
-			if (bed[i].fields > 5) 
-				XmlWriter.append_text_element(doc, Ele, XML_TAG_DIRECTION,
-						bed[i].strand);
-			if (bed[i].fields > 11
-			//		&& regionend - regionstart < 10000000) {
-					&& (bed[i].chromEnd-bed[i].chromStart)/bpp > bed[i].blockCount*2) {
-				for (int j = 0; j < bed[i].blockCount; j++) {
-					long substart = bed[i].blockStarts[j]
-							+ bed[i].chromStart;
-					long subend = bed[i].blockStarts[j]
-							+ bed[i].chromStart
-							+ bed[i].blockSizes[j];
-					if (substart < regionend
-							&& subend >= regionstart) {
-						deal_thick(doc, Ele, substart, subend,
-								bed[i].thickStart, bed[i].thickEnd);
-					}
-					if (j < bed[i].blockCount - 1
-							&& subend < regionend
-							&& (bed[i].blockStarts[j + 1] + bed[i].chromStart) >= regionstart) {
-						append_subele(
-								doc,
-								Ele,
-								String.valueOf(subend + 1),
-								String.valueOf(bed[i].blockStarts[j + 1]
-										+ bed[i].chromStart),
-								SUBELEMENT_TYPE_LINE);
-					}
+	Element get_detail(Document doc, String track, String id, String chr, long regionstart, long regionend) throws IOException{
+		Element Elements = doc.createElement(Consts.XML_TAG_ELEMENTS);
+		Elements.setAttribute(Consts.XML_TAG_ID, track);
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Elements); // Elements
+		Element Ele = null;
+		BufferedReader br = new BufferedReader(new FileReader(bedPath));
+		String line = null;
+		StringSplit split = new StringSplit('\t');
+		while ((line = br.readLine()) != null) {
+			if (line.startsWith(chr + "\t")) {
+				split.split(line);
+				if (regionstart==Integer.parseInt(split.getResultByIndex(1))+1&&regionend==Integer.parseInt(split.getResultByIndex(2))&&split.getResultByIndex(3).equals(id)) {
+					Ele = doc.createElement(Consts.XML_TAG_ELEMENT);
+					Bed bed=new Bed(split.getResult(), split.getResultNum());
+					XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_FROM,Integer.toString(bed.chromStart + 1, 10));
+					XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_TO,Integer.toString(bed.chromEnd, 10));
+					if (bed.fields > 3) 
+						Ele.setAttribute(Consts.XML_TAG_ID, bed.name);
+					if (bed.fields > 4) 
+						if (bed.itemRgb != null	&& !bed.itemRgb.ToString().equals("0,0,0"))
+							XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_COLOR, bed.itemRgb.ToString());
+						else if (bed.score > 0)
+							XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_COLOR, new Rgb(bed.score).ToString());
+					if (bed.fields > 5) 
+						XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_DIRECTION, bed.strand);
+					if (bed.fields > 11) {
+						for (int j = 0; j < bed.blockCount; j++) {
+							long substart = bed.blockStarts[j] + bed.chromStart;
+							long subend = bed.blockStarts[j] + bed.chromStart + bed.blockSizes[j];
+							deal_thick(doc, Ele, substart, subend, bed.thickStart, bed.thickEnd);
+							if (j < bed.blockCount - 1) 
+								append_subele(doc, Ele,	Long.toString(subend + 1, 10), Long.toString(bed.blockStarts[j + 1]	+ bed.chromStart, 10), Consts.SUBELEMENT_TYPE_LINE);
+						}
+					} 
+					else if (bed.fields > 7) 
+						deal_thick(doc, Ele, bed.chromStart, bed.chromEnd, bed.thickStart, bed.thickEnd);
+					Elements.appendChild(Ele);
+					break;
 				}
-			} else if (bed[i].fields > 7) {
-				deal_thick(doc, Ele, bed[i].chromStart,
-						bed[i].chromEnd, bed[i].thickStart,
-						bed[i].thickEnd);
 			}
-			else {
-				deal_thick(doc, Ele, bed[i].chromStart, bed[i].chromEnd, bed[i].chromStart, bed[i].chromEnd);
-			}
-			Elements.appendChild(Ele);
 		}
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Elements);
+		br.close();
+		
+		return Elements;
+	}
+	Element write_bed2elements(Document doc, String track, String chr,
+			long regionstart, long regionend, double bpp)
+			throws NumberFormatException, IOException {
+		Element Elements = doc.createElement(Consts.XML_TAG_ELEMENTS);
+		Elements.setAttribute(Consts.XML_TAG_ID, track);
+		// node
+		Element Ele = null;
+
+		BufferedReader br = new BufferedReader(new FileReader(bedPath));
+		String line = null;
+		StringSplit split = new StringSplit('\t');
+		while ((line = br.readLine()) != null) {
+			if (line.startsWith(chr + "\t")) {
+				split.split(line);
+				if (overlaps(regionstart, regionend,
+						Integer.parseInt(split.getResultByIndex(1)),
+						Integer.parseInt(split.getResultByIndex(2)))) {
+					Ele = doc.createElement(Consts.XML_TAG_ELEMENT);
+					append2Element(doc, regionstart, regionend, bpp, Ele,
+							new Bed(split.getResult(), split.getResultNum()));
+					Elements.appendChild(Ele);
+				}
+			}
+		}
+		br.close();
+
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Elements);
 		return Elements;
 	}
 
-	private void deal_thick(Document doc, Element Ele, long substart,
+	static void append2Element(Document doc, long regionstart, long regionend,
+			double bpp, Element Ele, Bed bed) {
+		XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_FROM,
+				Integer.toString(bed.chromStart + 1, 10));
+		XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_TO,
+				Integer.toString(bed.chromEnd, 10));
+
+		if (bed.fields > 3) 
+			Ele.setAttribute(Consts.XML_TAG_ID, bed.name);
+		if (bed.fields > 4) 
+			if (bed.itemRgb != null	&& !bed.itemRgb.ToString().equals("0,0,0"))
+				XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_COLOR, bed.itemRgb.ToString());
+			else if (bed.score > 0)
+				XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_COLOR, new Rgb(bed.score).ToString());
+		if (bed.fields > 5) 
+			XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_DIRECTION, bed.strand);
+		if (bed.fields > 11	&& (bed.chromEnd - bed.chromStart) / bpp > bed.blockCount * 2) {
+			for (int j = 0; j < bed.blockCount; j++) {
+				long substart = bed.blockStarts[j] + bed.chromStart;
+				long subend = bed.blockStarts[j] + bed.chromStart + bed.blockSizes[j];
+				if (substart < regionend && subend >= regionstart) 
+					deal_thick(doc, Ele, substart, subend, bed.thickStart, bed.thickEnd);
+				if (j < bed.blockCount - 1 && subend < regionend && (bed.blockStarts[j + 1] + bed.chromStart) >= regionstart) 
+					append_subele(doc, Ele,	Long.toString(subend + 1, 10), Long.toString(bed.blockStarts[j + 1]	+ bed.chromStart, 10), Consts.SUBELEMENT_TYPE_LINE);
+			}
+		} 
+		else if (bed.fields > 7 && (bed.chromEnd - bed.chromStart) / bpp > bed.blockCount * 2) 
+			deal_thick(doc, Ele, bed.chromStart, bed.chromEnd, bed.thickStart, bed.thickEnd);
+	}
+
+	static void deal_thick(Document doc, Element Ele, long substart,
 			long subend, long thickStart, long thickEnd) {
 		if (subend <= thickStart || substart >= thickEnd) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BAND);
+			append_subele(doc, Ele, Long.toString(substart + 1, 10),
+					Long.toString(subend, 10), Consts.SUBELEMENT_TYPE_BAND);
 		} else if (substart >= thickStart && subend <= thickEnd) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BOX);
+			append_subele(doc, Ele, Long.toString(substart + 1, 10),
+					Long.toString(subend, 10), Consts.SUBELEMENT_TYPE_BOX);
 		} else if (substart < thickStart && subend > thickEnd) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(thickStart), SUBELEMENT_TYPE_BAND);
-			append_subele(doc, Ele, String.valueOf(thickStart + 1),
-					String.valueOf(thickEnd), SUBELEMENT_TYPE_BOX);
-			append_subele(doc, Ele, String.valueOf(thickEnd + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BAND);
+			append_subele(doc, Ele, Long.toString(substart + 1, 10),
+					Long.toString(thickStart, 10), Consts.SUBELEMENT_TYPE_BAND);
+			append_subele(doc, Ele, Long.toString(thickStart + 1, 10),
+					Long.toString(thickEnd), Consts.SUBELEMENT_TYPE_BOX);
+			append_subele(doc, Ele, Long.toString(thickEnd + 1, 10),
+					Long.toString(subend, 10), Consts.SUBELEMENT_TYPE_BAND);
 		} else if (substart < thickStart && subend > thickStart) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(thickStart), SUBELEMENT_TYPE_BAND);
-			append_subele(doc, Ele, String.valueOf(thickStart + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BOX);
+			append_subele(doc, Ele, Long.toString(substart + 1, 10),
+					Long.toString(thickStart), Consts.SUBELEMENT_TYPE_BAND);
+			append_subele(doc, Ele, Long.toString(thickStart + 1, 10),
+					Long.toString(subend, 10), Consts.SUBELEMENT_TYPE_BOX);
 		} else if (substart < thickEnd && subend > thickEnd) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(thickEnd), SUBELEMENT_TYPE_BOX);
-			append_subele(doc, Ele, String.valueOf(thickEnd + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BAND);
+			append_subele(doc, Ele, Long.toString(substart + 1, 10),
+					Long.toString(thickEnd, 10), Consts.SUBELEMENT_TYPE_BOX);
+			append_subele(doc, Ele, Long.toString(thickEnd + 1, 10),
+					Long.toString(subend, 10), Consts.SUBELEMENT_TYPE_BAND);
 		}
 	}
 
-	private void append_subele(Document doc, Element Ele, String from,
+	static void append_subele(Document doc, Element Ele, String from,
 			String to, String type) {
-		Element subele = doc.createElement(XML_TAG_SUBELEMENT);
-		XmlWriter.append_text_element(doc, subele, XML_TAG_FROM, from);
-		XmlWriter.append_text_element(doc, subele, XML_TAG_TO, to);
-		subele.setAttribute(XML_TAG_TYPE, type);
+		Element subele = doc.createElement(Consts.XML_TAG_SUBELEMENT);
+		XmlWriter.append_text_element(doc, subele, Consts.XML_TAG_FROM, from);
+		XmlWriter.append_text_element(doc, subele, Consts.XML_TAG_TO, to);
+		subele.setAttribute(Consts.XML_TAG_TYPE, type);
 		Ele.appendChild(subele);
 	}
 }

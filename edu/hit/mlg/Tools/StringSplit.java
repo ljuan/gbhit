@@ -133,43 +133,4 @@ public class StringSplit {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		StringBuilder builder = new StringBuilder();
-		for (int i = 1; i <= 10000; i++) {
-			builder.append(i);
-			builder.append(";");
-		}
-		String testStr = builder.toString();
-
-		long start = System.currentTimeMillis();
-		String[] strs;
-		for (int i = 0; i < 1000; i++) {
-			strs = testStr.split(";");
-			for (String str : strs) {
-
-			}
-		}
-		System.out.println(System.currentTimeMillis() - start);
-		start = System.currentTimeMillis();
-		StringTokenizer tokenizer;
-		String str;
-		for (int i = 0; i < 1000; i++) {
-			tokenizer = new StringTokenizer(testStr, ";");
-			while (tokenizer.hasMoreTokens()) {
-				str = tokenizer.nextToken();
-			}
-		}
-		System.out.println(System.currentTimeMillis() - start);
-		start = System.currentTimeMillis();
-		StringSplit ss = new StringSplit(';', 10000);
-		int resultNum = 0;
-		for (int i = 0; i < 1000; i++) {
-			ss.split(testStr);
-			resultNum = ss.getResultNum();
-			for (int index = 0; index < resultNum; index++) {
-				str = ss.getResultByIndex(index);
-			}
-		}
-		System.out.println(System.currentTimeMillis() - start);
-	}
 }

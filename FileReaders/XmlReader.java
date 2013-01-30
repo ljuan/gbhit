@@ -13,7 +13,7 @@ import org.w3c.dom.*;
  * to instead the raw/directly strategy in class CfgReader.
  */
 
-class XmlReader implements Consts{
+class XmlReader {
 	Document doc;
 	XmlReader(File xml){
 		DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();

@@ -1,11 +1,13 @@
 package FileReaders;
 
+import static FileReaders.BedReader.append2Element;
+import static FileReaders.BedReader.append_subele;
+import static FileReaders.BedReader.deal_thick;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 import org.broad.igv.bbfile.BBFileHeader;
 import org.broad.igv.bbfile.BBFileReader;
@@ -17,18 +19,19 @@ import FileReaders.wiggle.CustomSeekableBufferedStream;
 import FileReaders.wiggle.CustomSeekableHTTPStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 /**
  * Get Bed lines from bigBed.
  * 
  * <pre>
  * Usage:
- * new BigBedReader(String uri).getBigBed(String chrom, 
+ * new BigBedReader(String uri).getBigBed(String chrom,
  * int start, int end, boolean contained)
  * @author Chengwu Yan
  * revised by Liran Juan
  * 
  */
-public class BigBedReader implements Consts{
+public class BigBedReader {
 	// open big file
 	private BBFileReader reader;
 	// get the big header
@@ -56,156 +59,104 @@ public class BigBedReader implements Consts{
 		bbFileHdr = reader.getBBFileHeader();
 	}
 
-	/**
-	 * 
-	 * @param chrom
-	 * @param start
-	 *            0-base
-	 * @param end
-	 *            0-base
-	 * @param contained
-	 *            whether allow overlaps
-	 *            true: not allow overlaps(completely contained only)
-	 *            false: allow overlaps
-	 * @return A list of Bed instances.
-	 * @throws IOException
-	 */
-	public List<Bed> getBigBed(String chrom, int start, int end,
-			boolean contained) throws IOException {
-		List<Bed> bigBeds = new ArrayList<Bed>();
+	Element get_detail(Document doc, String track, String id,String chr,long regionstart, long regionend ) throws IOException {
+		Element Elements = doc.createElement(Consts.XML_TAG_ELEMENTS);
+		Elements.setAttribute(Consts.XML_TAG_ID, track);
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Elements); // Elements
 
-		if (chrom == null || !bbFileHdr.isHeaderOK() || !bbFileHdr.isBigBed())
-			return bigBeds;
+		if (chr == null || !bbFileHdr.isHeaderOK() || !bbFileHdr.isBigBed())
+			return Elements;
 		// chromosome was specified, test if it exists in this file
-		if (!(new HashSet<String>(reader.getChromosomeNames()).contains(chrom)))
-			return bigBeds;
+		if (!(new HashSet<String>(reader.getChromosomeNames()).contains(chr)))
+			return Elements;
 
 		// get an iterator for BigBed features which occupy a chromosome
 		// selection region.
-		BigBedIterator iter = reader.getBigBedIterator(chrom, start, chrom,
-				end, contained);
+		BigBedIterator iter = reader.getBigBedIterator(chr, (int) regionstart,
+				chr, (int) regionend, false);
 
+		String[] temp = new String[12];
+		int fields = 0;
+		Element Ele = null;
+		BedFeature f = null;
 		// loop over iterator
 		while (iter.hasNext()) {
-			BedFeature f = iter.next();
-			ArrayList<String> bed = new ArrayList<String>();
-			bed.add(f.getChromosome());
-			bed.add(f.getStartBase() + "");
-			bed.add(f.getEndBase() + "");
-			for (String str : f.getRestOfFields()) {
-				bed.add(str);
+			f = iter.next();
+			fields = 0;
+			temp[fields++] = f.getChromosome();
+			temp[fields++] = f.getStartBase() + "";
+			temp[fields++] = f.getEndBase() + "";
+			for (String str : f.getRestOfFields()) 
+				temp[fields++] = str;
+
+			if (regionstart==f.getStartBase()+1&&regionend==f.getEndBase()&&temp[3].equals(id)) {
+				Ele = doc.createElement(Consts.XML_TAG_ELEMENT);
+				Bed bed=new Bed(temp,fields);
+				XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_FROM,Integer.toString(bed.chromStart + 1, 10));
+				XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_TO,Integer.toString(bed.chromEnd, 10));
+				if (bed.fields > 3) 
+					Ele.setAttribute(Consts.XML_TAG_ID, bed.name);
+				if (bed.fields > 4) 
+					if (bed.itemRgb != null	&& !bed.itemRgb.ToString().equals("0,0,0"))
+						XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_COLOR, bed.itemRgb.ToString());
+					else if (bed.score > 0)
+						XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_COLOR, new Rgb(bed.score).ToString());
+				if (bed.fields > 5) 
+					XmlWriter.append_text_element(doc, Ele, Consts.XML_TAG_DIRECTION, bed.strand);
+				if (bed.fields > 11) {
+					for (int j = 0; j < bed.blockCount; j++) {
+						long substart = bed.blockStarts[j] + bed.chromStart;
+						long subend = bed.blockStarts[j] + bed.chromStart + bed.blockSizes[j];
+						deal_thick(doc, Ele, substart, subend, bed.thickStart, bed.thickEnd);
+						if (j < bed.blockCount - 1) 
+							append_subele(doc, Ele,	Long.toString(subend + 1, 10), Long.toString(bed.blockStarts[j + 1]	+ bed.chromStart, 10), Consts.SUBELEMENT_TYPE_LINE);
+					}
+				} 
+				else if (bed.fields > 7) 
+					deal_thick(doc, Ele, bed.chromStart, bed.chromEnd, bed.thickStart, bed.thickEnd);
+				Elements.appendChild(Ele);
+				break;
 			}
-			bigBeds.add(new Bed(bed.toArray(new String[bed.size()])));
 		}
-		return bigBeds;
+		return Elements;
 	}
 	Element write_bed2elements(Document doc, String track, String chr,
 			long regionstart, long regionend, double bpp) throws IOException {
-		List<Bed> bed_list;
-			bed_list = getBigBed(chr, (int) regionstart, (int) regionend, false);
-		Bed[] bed=new Bed[bed_list.size()];
-		bed_list.toArray(bed);
-		Element Elements = doc.createElement(XML_TAG_ELEMENTS);
-		Elements.setAttribute(XML_TAG_ID, track);
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Elements); // Elements
-																			// node
+		Element Elements = doc.createElement(Consts.XML_TAG_ELEMENTS);
+		Elements.setAttribute(Consts.XML_TAG_ID, track);
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Elements); // Elements
 
-		for (int i = 0; i < bed.length; i++) {
-			Element Ele = doc.createElement(XML_TAG_ELEMENT);
-			XmlWriter.append_text_element(doc, Ele, XML_TAG_FROM,
-					String.valueOf(bed[i].chromStart + 1));
-			XmlWriter.append_text_element(doc, Ele, XML_TAG_TO,
-					String.valueOf(bed[i].chromEnd));
+		if (chr == null || !bbFileHdr.isHeaderOK() || !bbFileHdr.isBigBed())
+			return Elements;
+		// chromosome was specified, test if it exists in this file
+		if (!(new HashSet<String>(reader.getChromosomeNames()).contains(chr)))
+			return Elements;
 
-			if (bed[i].fields > 3) 
-				Ele.setAttribute(XML_TAG_ID, bed[i].name);
-			if (bed[i].fields > 4) 
-				if (bed[i].itemRgb != null
-						&& !bed[i].itemRgb.ToString().equals("0,0,0"))
-					XmlWriter.append_text_element(doc, Ele,
-							XML_TAG_COLOR, bed[i].itemRgb.ToString());
-				else if (bed[i].score > 0)
-					XmlWriter.append_text_element(doc, Ele,
-							XML_TAG_COLOR,
-							new Rgb(bed[i].score).ToString());
-			if (bed[i].fields > 5) 
-				XmlWriter.append_text_element(doc, Ele, XML_TAG_DIRECTION,
-						bed[i].strand);
-			if (bed[i].fields > 11
-		//		&& regionend - regionstart < 10000000) {
-					&& (bed[i].chromEnd-bed[i].chromStart)/bpp > bed[i].blockCount*2) {
-				for (int j = 0; j < bed[i].blockCount; j++) {
-					long substart = bed[i].blockStarts[j]
-							+ bed[i].chromStart;
-					long subend = bed[i].blockStarts[j]
-							+ bed[i].chromStart
-							+ bed[i].blockSizes[j];
-					if (substart < regionend
-							&& subend >= regionstart) {
-						deal_thick(doc, Ele, substart, subend,
-								bed[i].thickStart, bed[i].thickEnd);
-					}
-					if (j < bed[i].blockCount - 1
-							&& subend < regionend
-							&& (bed[i].blockStarts[j + 1] + bed[i].chromStart) >= regionstart) {
-						append_subele(
-								doc,
-								Ele,
-								String.valueOf(subend + 1),
-								String.valueOf(bed[i].blockStarts[j + 1]
-										+ bed[i].chromStart),
-								SUBELEMENT_TYPE_LINE);
-					}
-				}
+		// get an iterator for BigBed features which occupy a chromosome
+		// selection region.
+		BigBedIterator iter = reader.getBigBedIterator(chr, (int) regionstart,
+				chr, (int) regionend, false);
+
+		String[] temp = new String[12];
+		int fields = 0;
+		Element Ele = null;
+		BedFeature f = null;
+		// loop over iterator
+		while (iter.hasNext()) {
+			f = iter.next();
+			fields = 0;
+			temp[fields++] = f.getChromosome();
+			temp[fields++] = f.getStartBase() + "";
+			temp[fields++] = f.getEndBase() + "";
+			for (String str : f.getRestOfFields()) {
+				temp[fields++] = str;
 			}
-			else if (bed[i].fields > 7) {
-				deal_thick(doc, Ele, bed[i].chromStart,
-						bed[i].chromEnd, bed[i].thickStart,
-						bed[i].thickEnd);
-			}
-			else {
-				deal_thick(doc, Ele, bed[i].chromStart, bed[i].chromEnd, bed[i].chromStart, bed[i].chromEnd);
-			}
+			Ele = doc.createElement(Consts.XML_TAG_ELEMENT);
+			append2Element(doc, regionstart, regionend, bpp, Ele, new Bed(temp,
+					fields));
 			Elements.appendChild(Ele);
 		}
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Elements);
+
 		return Elements;
-	}
-
-	private void deal_thick(Document doc, Element Ele, long substart,
-			long subend, long thickStart, long thickEnd) {
-		if (subend <= thickStart || substart >= thickEnd) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BAND);
-		} else if (substart >= thickStart && subend <= thickEnd) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BOX);
-		} else if (substart < thickStart && subend > thickEnd) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(thickStart), SUBELEMENT_TYPE_BAND);
-			append_subele(doc, Ele, String.valueOf(thickStart + 1),
-					String.valueOf(thickEnd), SUBELEMENT_TYPE_BOX);
-			append_subele(doc, Ele, String.valueOf(thickEnd + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BAND);
-		} else if (substart < thickStart && subend > thickStart) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(thickStart), SUBELEMENT_TYPE_BAND);
-			append_subele(doc, Ele, String.valueOf(thickStart + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BOX);
-		} else if (substart < thickEnd && subend > thickEnd) {
-			append_subele(doc, Ele, String.valueOf(substart + 1),
-					String.valueOf(thickEnd), SUBELEMENT_TYPE_BOX);
-			append_subele(doc, Ele, String.valueOf(thickEnd + 1),
-					String.valueOf(subend), SUBELEMENT_TYPE_BAND);
-		}
-	}
-
-	private void append_subele(Document doc, Element Ele, String from,
-			String to, String type) {
-		Element subele = doc.createElement(XML_TAG_SUBELEMENT);
-		XmlWriter.append_text_element(doc, subele, XML_TAG_FROM, from);
-		XmlWriter.append_text_element(doc, subele, XML_TAG_TO, to);
-		subele.setAttribute(XML_TAG_TYPE, type);
-		Ele.appendChild(subele);
 	}
 }

@@ -79,6 +79,9 @@ class GFF implements Comparable<GFF> {
 	String[] getAttribute() {
 		return this.attribute;
 	}
+	String getAttributesInString(){
+		return this.attributes;
+	}
 
 	@Override
 	public int compareTo(GFF o) {

@@ -9,7 +9,7 @@ import org.w3c.dom.*;
  * But many functions are deeply coupling with XmlReader.
  */
 
-class CfgReader implements Consts{
+class CfgReader{
 	Document doc;
 	String[] Assemblies;
 	CfgReader(File cfg){
@@ -17,7 +17,7 @@ class CfgReader implements Consts{
 		assem_list();
 	}
 	void assem_list(){
-		NodeList assemlist = doc.getElementsByTagName(XML_TAG_ASSEMBLY);
+		NodeList assemlist = doc.getElementsByTagName(Consts.XML_TAG_ASSEMBLY);
 		Assemblies=new String[assemlist.getLength()];
 		for(int i=0;i<assemlist.getLength();i++){
 			Assemblies[i]=assemlist.item(i).getAttributes().item(0).getTextContent();
@@ -28,10 +28,10 @@ class CfgReader implements Consts{
 	}
 	Annotations[] getAnnotations(String assemblyid){
 		
-		NodeList assemlist = doc.getElementsByTagName(XML_TAG_ASSEMBLY);
+		NodeList assemlist = doc.getElementsByTagName(Consts.XML_TAG_ASSEMBLY);
 		int id=0;
 		while(id<assemlist.getLength()){
-			if (assemlist.item(id).getAttributes().getNamedItem(XML_TAG_ID).getTextContent().equals(assemblyid))
+			if (assemlist.item(id).getAttributes().getNamedItem(Consts.XML_TAG_ID).getTextContent().equals(assemblyid))
 				break;
 			id++;
 		}
@@ -40,15 +40,15 @@ class CfgReader implements Consts{
 			return null;
 		}
 		Element assembly=(Element)assemlist.item(id);
-		NodeList annolist=assembly.getElementsByTagName(XML_TAG_ANNOTATION);
+		NodeList annolist=assembly.getElementsByTagName(Consts.XML_TAG_ANNOTATION);
 		Annotations[] Annos=new Annotations[annolist.getLength()];
 		for(int i=0;i<annolist.getLength();i++){
 			Element anno=(Element)annolist.item(i);
-			String name=anno.getAttributes().getNamedItem(XML_TAG_ID).getTextContent();
-			String group=anno.getAttributes().getNamedItem(XML_TAG_GROUP).getTextContent();
-			String format=anno.getElementsByTagName(XML_TAG_FORMAT).item(0).getTextContent();
-			String mode=anno.getElementsByTagName(XML_TAG_DEFAULT).item(0).getTextContent();
-			NodeList pathlist=anno.getElementsByTagName(XML_TAG_PATH);
+			String name=anno.getAttributes().getNamedItem(Consts.XML_TAG_ID).getTextContent();
+			String group=anno.getAttributes().getNamedItem(Consts.XML_TAG_GROUP).getTextContent();
+			String format=anno.getElementsByTagName(Consts.XML_TAG_FORMAT).item(0).getTextContent();
+			String mode=anno.getElementsByTagName(Consts.XML_TAG_DEFAULT).item(0).getTextContent();
+			NodeList pathlist=anno.getElementsByTagName(Consts.XML_TAG_PATH);
 			if(pathlist.getLength() == 1){
 				String path=pathlist.item(0).getTextContent();
 				Annos[i]=new Annotations(name,path,format,mode,group);
@@ -56,7 +56,7 @@ class CfgReader implements Consts{
 			else if(pathlist.getLength() > 1){
 				String[][] paths=new String[pathlist.getLength()][2];
 				for(int j=0;j<pathlist.getLength();j++){
-					paths[j][0]=pathlist.item(j).getAttributes().getNamedItem(XML_TAG_KEY).getTextContent();
+					paths[j][0]=pathlist.item(j).getAttributes().getNamedItem(Consts.XML_TAG_KEY).getTextContent();
 					paths[j][1]=pathlist.item(j).getTextContent();
 				}
 				Annos[i]=new Annotations(name,paths,format,mode,group);
@@ -71,6 +71,6 @@ class CfgReader implements Consts{
 			if(i<metalist.length-1)
 				temp.append(",");
 		}
-		return XmlWriter.append_text_element(doc,doc.getElementsByTagName(META_ROOT).item(0),metatype,temp.toString());
+		return XmlWriter.append_text_element(doc,doc.getElementsByTagName(Consts.META_ROOT).item(0),metatype,temp.toString());
 	}
 }

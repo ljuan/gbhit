@@ -12,10 +12,10 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.*;
 
-public class XmlWriter implements Consts{
+public class XmlWriter {
 	Document doc;
 	XmlWriter(){
-		init(DATA_ROOT);
+		init(Consts.DATA_ROOT);
 	}
 	XmlWriter(String roottag){
 		init(roottag);

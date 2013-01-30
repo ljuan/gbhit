@@ -1,5 +1,7 @@
 package FileReaders;
 
+import edu.hit.mlg.Tools.StringSplit;
+
 /**
  * BED Format Class Represents one BED record It seems BED file should be either
  * 3 column or 12 column, no other option. This class is more flexible in column
@@ -8,24 +10,24 @@ package FileReaders;
 
 class Bed {
 	String chrom;
-	long chromStart;
-	long chromEnd;
+	int chromStart;
+	int chromEnd;
 	String name;
 	int score;
 	String strand;
-	long thickStart;
-	long thickEnd;
+	int thickStart;
+	int thickEnd;
 	Rgb itemRgb = null;
 	int blockCount;
-	long[] blockSizes;
-	long[] blockStarts;
+	int[] blockSizes;
+	int[] blockStarts;
 	int fields;
 
-	Bed(String[] temp) {
-		fields = temp.length;
+	Bed(String[] temp, int fields) {
+		this.fields = fields;
 		chrom = temp[0];
-		chromStart = Long.parseLong(temp[1]);
-		chromEnd = Long.parseLong(temp[2]);
+		chromStart = Integer.parseInt(temp[1]);
+		chromEnd = Integer.parseInt(temp[2]);
 		if (fields > 3) {
 			name = temp[3];
 			if (fields > 4) {
@@ -33,19 +35,26 @@ class Bed {
 				if (fields > 5) {
 					strand = temp[5];
 					if (fields > 7) {
-						thickStart = Long.parseLong(temp[6]);
-						thickEnd = Long.parseLong(temp[7]);
+						thickStart = Integer.parseInt(temp[6]);
+						thickEnd = Integer.parseInt(temp[7]);
 						if (fields > 8) {
 							itemRgb = new Rgb(temp[8]);
 							if (fields > 11) {
 								blockCount = Integer.parseInt(temp[9]);
-								String[] starts = temp[11].split(",");
-								String[] sizes = temp[10].split(",");
-								blockSizes = new long[blockCount];
-								blockStarts = new long[blockCount];
+								StringSplit startsSplit = new StringSplit(',',
+										blockCount);
+								StringSplit sizesSplit = new StringSplit(',',
+										blockCount);
+								startsSplit.split(temp[11]);
+								sizesSplit.split(temp[10]);
+								blockSizes = new int[blockCount];
+								blockStarts = new int[blockCount];
 								for (int i = 0; i < blockCount; i++) {
-									blockSizes[i] = Long.parseLong(sizes[i]);
-									blockStarts[i] = Long.parseLong(starts[i]);
+									blockSizes[i] = Integer.parseInt(sizesSplit
+											.getResultByIndex(i));
+									blockStarts[i] = Integer
+											.parseInt(startsSplit
+													.getResultByIndex(i));
 								}
 							}
 						}

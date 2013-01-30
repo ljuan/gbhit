@@ -7,7 +7,7 @@ import org.w3c.dom.*;
 
 import FileReaders.bam.BAMValueList;
 import FileReaders.bam.VariantResolver;
-import FileReaders.vcf.Variant;
+import edu.hit.mlg.individual.vcf.Variant;
 import net.sf.samtools.*;
 import net.sf.samtools.SAMRecord.SAMTagAndValue;
 import net.sf.samtools.util.SeekableBufferedStream;
@@ -26,7 +26,7 @@ import static FileReaders.XmlWriter.append_text_element;
  * @author Chengwu Yan
  * 
  */
-public class BAMReader implements Consts {
+public class BAMReader {
 
 	/**
 	 * BAM file path or url.
@@ -176,6 +176,13 @@ public class BAMReader implements Consts {
 	 * 3:NotDetailBig
 	 * @throws IOException
 	 */
+	public Element get_detail(Document doc, String track, String id, String chr, int start, int end) throws SAMFormatException, IOException{
+		Element ele = null;
+		List<SAMRecord> list = readSmallRegion(chr, start, end);
+		ele = writeDetail(doc, list, track, id, start, end);
+		return ele;
+		
+	}
 	public Element readBAM(Document doc, String chr, int start, int end,
 			int windowSize, int step, String mode, String track)
 			throws SAMFormatException, IOException {
@@ -192,12 +199,7 @@ public class BAMReader implements Consts {
 			if (list == null) {
 				bpp = 1024;
 			} else {
-				if (mode.equalsIgnoreCase(MODE_DETAIL)) {
-					// output all field to the XML file
-					ele = writeDetail(doc, list, track);
-				} else {
-					ele = writeNotDetail(doc, list, track, mode, bpp <= 0.5);
-				}
+				ele = writeNotDetail(doc, list, track, mode, bpp <= 0.5);
 				already = true;
 			}
 		}
@@ -216,50 +218,53 @@ public class BAMReader implements Consts {
 		return ele;
 	}
 
-	private Element writeDetail(Document doc, List<SAMRecord> list, String track) {
-		Element reads = doc.createElement(XML_TAG_READS);
+	private Element writeDetail(Document doc, List<SAMRecord> list, String track, String id, int start, int end) {
+		Element reads = doc.createElement(Consts.XML_TAG_READS);
 		SAMRecord rec = null;
 		Element read = null;
-		reads.setAttribute(XML_TAG_ID, track);
+		reads.setAttribute(Consts.XML_TAG_ID, track);
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(reads);
 
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
 			rec = itor.next();
-			read = doc.createElement(XML_TAG_READ);
-			read.setAttribute(XML_TAG_ID, rec.getReadName());
-
-			int[][] startEnds = getStartEndByCigar(rec);
-			append_text_element(doc, read, XML_TAG_FROM,
-					BAMValueList.intArray2IntString(startEnds[0], ','));
-			append_text_element(doc, read, XML_TAG_TO,
-					BAMValueList.intArray2IntString(startEnds[1], ','));
-			append_text_element(doc, read, XML_TAG_DIRECTION,
-					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
-			append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
-			append_text_element(doc, read, "Cigar", rec.getCigarString());
-			append_text_element(doc, read, "Rnext", rec.getMateReferenceName());
-			append_text_element(doc, read, "Pnext", rec.getMateAlignmentStart()
-					+ "");
-			append_text_element(doc, read, "Tlen", rec.getInferredInsertSize()
-					+ "");
-			XmlWriter
-					.append_text_element(doc, read, "Seq", rec.getReadString());
-			append_text_element(doc, read, "Qual", rec.getBaseQualityString());
-
-			StringBuilder remain = new StringBuilder();
-			List<SAMTagAndValue> l = rec.getAttributes();
-			for (int i = 0; i < l.size(); i++) {
-				remain.append(l.get(i).tag + ":" + l.get(i).value);
-				if (i < l.size() - 1)
-					remain.append(";");
+			if(id.equals(rec.getReadName()) && start==rec.getAlignmentStart() && end==rec.getAlignmentEnd()){
+				read = doc.createElement(Consts.XML_TAG_READ);
+				read.setAttribute(Consts.XML_TAG_ID, rec.getReadName());
+	
+				int[][] startEnds = getStartEndByCigar(rec);
+				append_text_element(doc, read, Consts.XML_TAG_FROM,
+						BAMValueList.intArray2IntString(startEnds[0], ','));
+				append_text_element(doc, read, Consts.XML_TAG_TO,
+						BAMValueList.intArray2IntString(startEnds[1], ','));
+				append_text_element(doc, read, Consts.XML_TAG_DIRECTION,
+						((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
+				append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
+				append_text_element(doc, read, "Cigar", rec.getCigarString());
+				append_text_element(doc, read, "Rnext", rec.getMateReferenceName());
+				append_text_element(doc, read, "Pnext", rec.getMateAlignmentStart()
+						+ "");
+				append_text_element(doc, read, "Tlen", rec.getInferredInsertSize()
+						+ "");
+				XmlWriter
+						.append_text_element(doc, read, "Seq", rec.getReadString());
+				append_text_element(doc, read, "Qual", rec.getBaseQualityString());
+	
+				StringBuilder remain = new StringBuilder();
+				List<SAMTagAndValue> l = rec.getAttributes();
+				for (int i = 0; i < l.size(); i++) {
+					remain.append(l.get(i).tag + ":" + l.get(i).value);
+					if (i < l.size() - 1)
+						remain.append(";");
+				}
+	
+				append_text_element(doc, read, Consts.XML_TAG_DESCRIPTION,
+						remain.toString());
+	
+				reads.appendChild(read);
+				break;
 			}
-
-			append_text_element(doc, read, XML_TAG_DESCRIPTION,
-					remain.toString());
-
-			reads.appendChild(read);
 		}
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
 
 		return reads;
 	}
@@ -275,25 +280,25 @@ public class BAMReader implements Consts {
 	 */
 	private Element writeNotDetail(Document doc, List<SAMRecord> list,
 			String track, String mode, boolean lt0point5) {
-		Element reads = doc.createElement(XML_TAG_READS);
+		Element reads = doc.createElement(Consts.XML_TAG_READS);
 		SAMRecord rec = null;
 		Element read = null;
-		reads.setAttribute(XML_TAG_ID, track);
+		reads.setAttribute(Consts.XML_TAG_ID, track);
 
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
 			rec = itor.next();
-			read = doc.createElement(XML_TAG_READ);
+			read = doc.createElement(Consts.XML_TAG_READ);
 
-			if (mode.equalsIgnoreCase(MODE_FULL)
-					|| mode.equalsIgnoreCase(MODE_PACK))
-				read.setAttribute(XML_TAG_ID, rec.getReadName());
+			if (mode.equalsIgnoreCase(Consts.MODE_FULL)
+					|| mode.equalsIgnoreCase(Consts.MODE_PACK))
+				read.setAttribute(Consts.XML_TAG_ID, rec.getReadName());
 			int[][] startEnds = getStartEndByCigar(rec);
-			append_text_element(doc, read, XML_TAG_FROM,
+			append_text_element(doc, read, Consts.XML_TAG_FROM,
 					BAMValueList.intArray2IntString(startEnds[0], ','));
-			append_text_element(doc, read, XML_TAG_TO,
+			append_text_element(doc, read, Consts.XML_TAG_TO,
 					BAMValueList.intArray2IntString(startEnds[1], ','));
-			append_text_element(doc, read, XML_TAG_DIRECTION,
+			append_text_element(doc, read, Consts.XML_TAG_DIRECTION,
 					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
 			append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
 
@@ -305,7 +310,7 @@ public class BAMReader implements Consts {
 			}
 			reads.appendChild(read);
 		}
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(reads);
 		return reads;
 	}
 
@@ -351,16 +356,16 @@ public class BAMReader implements Consts {
 
 	private Element writeBigRegion(Document doc, int start, int end, int step,
 			String list, String track) {
-		Element values = doc.createElement(XML_TAG_VALUES);
-		values.setAttribute(XML_TAG_ID, track);
-		values.setAttribute(XML_TAG_TYPE, "REN");
+		Element values = doc.createElement(Consts.XML_TAG_VALUES);
+		values.setAttribute(Consts.XML_TAG_ID, track);
+		values.setAttribute(Consts.XML_TAG_TYPE, "REN");
 
-		append_text_element(doc, values, XML_TAG_FROM, start + "");
-		append_text_element(doc, values, XML_TAG_TO, end + "");
-		append_text_element(doc, values, XML_TAG_STEP, step + "");
-		append_text_element(doc, values, "ValueList", list);
+		append_text_element(doc, values, Consts.XML_TAG_FROM, start + "");
+		append_text_element(doc, values, Consts.XML_TAG_TO, end + "");
+		append_text_element(doc, values, Consts.XML_TAG_STEP, step + "");
+		append_text_element(doc, values, Consts.XML_TAG_VALUE_LIST, list);
 
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(values);
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(values);
 		return values;
 	}
 

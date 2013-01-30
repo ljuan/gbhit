@@ -5,14 +5,14 @@ import net.sf.samtools.CigarElement;
 import net.sf.samtools.CigarOperator;
 import net.sf.samtools.SAMRecord;
 import FileReaders.Consts;
-import FileReaders.vcf.Variant;
+import edu.hit.mlg.individual.vcf.Variant;
 
 /**
  * 
  * @author Chengwu Yan
  * 
  */
-public class VariantResolver implements Consts {
+public class VariantResolver {
 	private Variant[] variants = null;
 	private int len;
 	private int count;
@@ -40,7 +40,7 @@ public class VariantResolver implements Consts {
 			} else if (ce.getOperator() == CigarOperator.X) {
 				// Mean SNV
 				v = new Variant();
-				v.setType(VARIANT_TYPE_SNV);
+				v.setType(Consts.VARIANT_TYPE_SNV);
 				from = record.getReferencePositionAtReadPosition(pos);
 				v.setFrom(from);
 				v.setTo(from);
@@ -50,7 +50,7 @@ public class VariantResolver implements Consts {
 				pos += ce.getLength();
 			} else if (ce.getOperator() == CigarOperator.D) {
 				v = new Variant();
-				v.setType(VARIANT_TYPE_DELETION);
+				v.setType(Consts.VARIANT_TYPE_DELETION);
 				from = record.getReferencePositionAtReadPosition(pos - 1);
 				v.setFrom(from + 1);
 				v.setTo(from + ce.getLength());
@@ -58,7 +58,7 @@ public class VariantResolver implements Consts {
 				variants[count++] = v;
 			} else if (ce.getOperator() == CigarOperator.I) {
 				v = new Variant();
-				v.setType(VARIANT_TYPE_INSERTION);
+				v.setType(Consts.VARIANT_TYPE_INSERTION);
 				from = record.getReferencePositionAtReadPosition(pos - 1);
 				v.setFrom(from);
 				v.setTo(from + 1);

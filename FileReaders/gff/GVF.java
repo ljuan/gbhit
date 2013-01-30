@@ -27,6 +27,7 @@ class GVF extends GFF {
 	String letter = "";
 	String[][] variants;
 	int variantNum = 0;
+	int homo = 0;
 
 	GVF(String[] str) {
 		super(str);
@@ -40,12 +41,12 @@ class GVF extends GFF {
 		StringSplit attrSplit = new StringSplit(';').split(str8);
 		StringSplit split = new StringSplit('=');
 		String s = null;
-		boolean hasReadID = false, hasReadSeq = false;
+		boolean hasReadID = false, hasReadSeq = false, hasReadGenotype = false;
 		for (int index = 0, len = attrSplit.getResultNum(); index < len; index++) {
 			s = attrSplit.getResultByIndex(index);
 			if (s.startsWith("ID=")) {
 				this.id = split.split(s).getResultByIndex(1);
-				if (hasReadSeq)
+				if (hasReadSeq && hasReadGenotype)
 					break;
 				hasReadID = true;
 				continue;
@@ -97,10 +98,20 @@ class GVF extends GFF {
 					}
 				}
 
-				if (hasReadID)
+				if (hasReadID && hasReadGenotype)
 					break;
 				hasReadSeq = true;
 				continue;
+			} else if (s.startsWith("Genotype=")) {
+				StringSplit ss = new StringSplit(':').split(split.split(s)
+						.getResultByIndex(1));
+				if (ss.getResultNum() == 2) {
+					if (ss.getResultByIndex(0).equals(ss.getResultByIndex(1))) {
+						this.homo = 1;
+					} else {
+						this.homo = 2;
+					}
+				}
 			}
 		}
 	}

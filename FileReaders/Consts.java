@@ -2,6 +2,7 @@ package FileReaders;
 
 public interface Consts{
 	public static final String CONFIGURE="/home/ljuan/gbdata/config.xml";
+	public static final String GENE_DATA="/home/ljuan/gbdata/hg19/hgnc.hg19.sorted.txt";
 	
 	public static final String DEFAULT_ENCODE="ISO-8859-1";
 	public static final String META_ROOT="MetaDataExchange";
@@ -15,7 +16,7 @@ public interface Consts{
 	public static final String VCF_HEADER_INFO="info";
 	public static final String VCF_HEADER_FORMAT="format";
 	public static final String VCF_HEADER_SAMPLE="sample";
-	public static final String VCF_QUAL_LIMIT="QUALLIMIT";
+	public static final String VCF_QUAL_LIMIT="qualimit";
 	public static final String VCF_CHROM_PREFIX="chromprefix";
 	
 	public static final String CYTOBAND_PREVIOUS_CHR="pChr";
@@ -80,6 +81,7 @@ public interface Consts{
 	public static final String XML_TAG_TOCHR="ToChr";
 	public static final String XML_TAG_LETTER="Letter";
 	public static final String XML_TAG_DESCRIPTION="Description";
+	public static final String XML_TAG_HOMO="homo";
 	
 	public static final String XML_TAG_CYTOBANDS="Cytobands";
 	public static final String XML_TAG_CYTOBAND="Cytoband";
@@ -97,9 +99,20 @@ public interface Consts{
 	public static final String XML_TAG_STEP="Step";
 	public static final String XML_TAG_VALUE="Value";
 	public static final String XML_TAG_VALUES="Values";
+	public static final String XML_TAG_VALUE_LIST="ValueList";
 	
 	public static final String XML_TAG_READS="Reads";
 	public static final String XML_TAG_READ="Read";
+	
+	public static final String XML_TAG_GENES="Genes";
+	public static final String XML_TAG_GENE="Gene";
+	public static final String XML_TAG_HGNC="HGNC";
+	public static final String XML_TAG_REFSEQ="RefSeq";
+	public static final String XML_TAG_UCSC="UCSC";
+	public static final String XML_TAG_SYMBOL="Symbol";
+	public static final String XML_TAG_NAME="Name";
+	public static final String XML_TAG_ENTREZ="Entrez";
+	public static final String XML_TAG_ENSEMBL="Ensembl";
 	
 	public static final String TEXT_TRUE="true";
 	public static final String TEXT_FALSE="false";
@@ -120,23 +133,26 @@ public interface Consts{
 	public static final String VARIANT_TYPE_MULTIPLE="MUL";
 	public static final String VARIANT_TYPE_OTHERS="OTH";
 	
-	public static final String SUBELEMENT_TYPE_BOX="Box";
 	public static final String SUBELEMENT_TYPE_LINE="Line";
-	public static final String SUBELEMENT_TYPE_BAND="Band";
-	public static final String SUBELEMENT_TYPE_LOSTBAND="lost_Band";
-	public static final String SUBELEMENT_TYPE_LOSTBOX="lost_Box";
-	public static final String SUBELEMENT_TYPE_RETAINEDLINE="retained_Line";
-	public static final String SUBELEMENT_TYPE_SHIFTBOX="shift_Box";
-	public static final String SUBELEMENT_TYPE_ENDLESSBAND="endless_Band";
-	public static final String ELEMENT_TYPE_ENHANCE="Enhance";
-	public static final String ELEMENT_TYPE_INHIBIT="Inhibit";
-	public static final String ELEMENT_TYPE_SILENCE="Silence";
-	public static final String ELEMENT_TYPE_CHANGED="Changed";
+	public static final String SUBELEMENT_TYPE_SKIP_BAND="sBand";
+	public static final String SUBELEMENT_TYPE_SKIP_BOX="sBox";
 	
+	public static final String SUBELEMENT_TYPE_BAND="Band";
+	public static final String SUBELEMENT_TYPE_EXTEND_BAND="eBand";
+	public static final String SUBELEMENT_TYPE_LOST_BOX="lBox";
+	
+	public static final String SUBELEMENT_TYPE_BOX="Box";
+	public static final String SUBELEMENT_TYPE_EXTEND_BOX="eBox";
+	public static final String SUBELEMENT_TYPE_SHIFT_BOX="sBox";
+	public static final String SUBELEMENT_TYPE_SHIFT_EXTEND_BOX="seBox";
+	
+	public static final String SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX="psBox";
+	public static final String SUBELEMENT_TYPE_POSSIBLE_SHIFT_EXTEND_BOX="pseBox";
 	
 	public static final String PARAMETER_TYPE_CHECKBOX="CHECKBOX";
 	public static final String PARAMETER_TYPE_SELECTION="SELECTION";
 	public static final String PARAMETER_TYPE_STRING="STRING";
 	public static final String PARAMETER_TYPE_VCFSAMPLE="VCFSAMPLE";
 	public static final String PARAMETER_TYPE_INVISABLE="INVISABLE";
+	
 }
