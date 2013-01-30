@@ -60,6 +60,23 @@
 					</xs:complextType>
 				</xs:element>
 				
+				<xs:element name="Genes" maxOccurs="unbounded" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Chromosome" type="xs:string" minOccurs="0"/>
+							<xs:element name="From" type="xs:integer" minOccurs="0"/>
+							<xs:element name="To" type="xs:integer" minOccurs="0"/>
+							<xs:element name="HGNC" type="xs:integer" minOccurs="0"/>
+							<xs:element name="Entrez" type="xs:integer" minOccurs="0"/>
+							<xs:element name="RefSeq" type="xs:string" minOccurs="0"/>
+							<xs:element name="UCSC" type="xs:string" minOccurs="0"/>
+							<xs:element name="Ensembl" type="xs:string" minOccurs="0"/>
+							<xs:element name="Name" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+						<xs:attribute name="id" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+				
 				<xs:element name="Variants" maxOccurs="unbounded" minOccurs="0"> <!--detail information of variants, only return when specific variant information is requested-->
 					<xs:complexType>
 						<xs:sequence>
@@ -79,7 +96,7 @@
 							</xs:element>
 						</xs:sequence>
 						<xs:attribute name="id" type="xs:string" use="required"/>
-						<xs:attribute name="subid" type="xs:string" use="required"/>
+						<xs:attribute name="superid" type="xs:string" use="required"/>
 						<xs:attribute name="ifParam" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
@@ -90,6 +107,7 @@
 							<xs:element name="Element" maxOccurs="unbounded" minOccurs="0">
 								<xs:complexType>
 									<xs:sequence>
+										<xs:element name="Status" type="xs:string"/>
 										<xs:element name="From" type="xs:long"/>
 										<xs:element name="To" type="xs:long"/>
 										<xs:element name="Direction" type="xs:string" minOccurs="0"/>
@@ -108,7 +126,6 @@
 																<xs:element name="From" type="xs:long"/>
 																<xs:element name="To" type="xs:long"/>
 																<xs:element name="Letter" type="xs:string" minOccurs="0"/>
-																<xs:element name="Description" type="xs:string" minOccurs="0"/>
 															</xs:sequence>
 															<xs:attribute name="id" type="xs:string"/>
 															<xs:attribute name="Type" type="VariantType"/>
@@ -121,7 +138,6 @@
 										</xs:element>
 									</xs:sequence>
 									<xs:attribute name="id" type="xs:string" use="required"/>
-									<xs:attribute name="Type" type="xs:ElementType"/>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
@@ -216,19 +232,15 @@
 			<xs:enumeration value="Box"/>
 			<xs:enumeration value="Line"/>
 			<xs:enumeration value="Band"/>
-			<xs:enumeration value="retained_Line"/>
-			<xs:enumeration value="lost_Box"/>
-			<xs:enumeration value="lost_Band"/>
-			<xs:enumeration value="shift_Box"/>
-			<xs:enumeration value="endless_Band"/>
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:simpleType name="ElementType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="Enhance"/>
-			<xs:enumeration value="Silence"/>
-			<xs:enumeration value="Inhibit"/>
-			<xs:enumeration value="Changed"/>
+			<xs:enumeration value="eBox"/>
+			<xs:enumeration value="sBand"/>
+			<xs:enumeration value="sBox"/>
+			<xs:enumeration value="lBox"/>
+			<xs:enumeration value="sBox"/>
+			<xs:enumeration value="psBox"/>
+			<xs:enumeration value="eBand"/>
+			<xs:enumeration value="seBand"/>
+			<xs:enumeration value="pseBand"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="ValueType">
