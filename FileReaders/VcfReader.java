@@ -125,11 +125,17 @@ public class VcfReader {
 			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start
 					+ "-" + end);
 			if (Query != null) {
+				ArrayList<Variant> vs_list=new ArrayList<Variant>();
 				Variant[] vs;
 				while (Query.next() != null) {
 					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar,	0, null);
-					if(vcf.getID().equals(id)){
-						vs = vcf.getVariants();
+					Variant[] vs_temp=vcf.getVariants();
+					for(int vs_i=0;vs_i<vs_temp.length;vs_i++)
+						if(vcf.getID().equals(id)&&vs_temp[vs_i].getFrom()==start&&vs_temp[vs_i].getTo()==end)
+							vs_list.add(vs_temp[vs_i]);
+					if(!vs_list.isEmpty()){
+						vs=new Variant[vs_list.size()];
+						vs_list.toArray(vs);
 						variants[0].addVariant(vcf, vs);
 						break;
 					}

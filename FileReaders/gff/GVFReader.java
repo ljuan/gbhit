@@ -62,7 +62,9 @@ public class GVFReader {
 			e.printStackTrace();
 			return null;
 		}
-
+		if (gvf==null){
+			return variants;
+		}
 		String[][] vs;
 		Element variant = null;
 		String homo = "";

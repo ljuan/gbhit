@@ -290,8 +290,7 @@ public class BAMReader {
 			rec = itor.next();
 			read = doc.createElement(Consts.XML_TAG_READ);
 
-			if (mode.equalsIgnoreCase(Consts.MODE_FULL)
-					|| mode.equalsIgnoreCase(Consts.MODE_PACK))
+			if (!mode.equalsIgnoreCase(Consts.MODE_DENSE))
 				read.setAttribute(Consts.XML_TAG_ID, rec.getReadName());
 			int[][] startEnds = getStartEndByCigar(rec);
 			append_text_element(doc, read, Consts.XML_TAG_FROM,

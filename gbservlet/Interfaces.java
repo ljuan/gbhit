@@ -71,6 +71,22 @@ public class Interfaces extends HttpServlet{
 			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 			res.getWriter().print(a);
 		}
+		else if (action.equals("getDetail")){
+			String a=ins.get_Detail(req.getParameter("tracks"), req.getParameter("id"), Integer.parseInt(req.getParameter("start")), Integer.parseInt(req.getParameter("end")));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("findGene")){
+			String a=ins.find_Gene(req.getParameter("prefix"));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("getGene")){
+			String a=ins.get_Geneinfo(req.getParameter("gene"));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("overlapGene")){
+			String a=ins.get_OverlapGenes(req.getParameter("chr"), Integer.parseInt(req.getParameter("start")), Integer.parseInt(req.getParameter("end")));
+			res.getWriter().print(a);
+		}
 		else if (action.equals("getParams")){
 			String a=ins.get_Parameters(req.getParameter("tracks").split(","));
 			res.getWriter().print(a);

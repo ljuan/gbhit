@@ -225,7 +225,7 @@ public class Instance {
 			if(Pclns.containsKey(tracks[i]))
 				Pclns.remove(tracks[i]);
 	}
-	public String get_Detail(String trackname, String id,String chr,int start,int end){
+	public String get_Detail(String trackname, String id,int start,int end){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		Annotations track=null;
 		if(Annos.containsKey(trackname))
@@ -235,19 +235,19 @@ public class Instance {
 		if(track!=null){
 			Element ele_temp=null;
 			String type_temp=track.get_Type();
-			String path_temp=track.get_Path(chr);
+			String path_temp=track.get_Path(Chr);
 			if(type_temp.equals(Consts.FORMAT_BEDGZ)){
 				BedReaderTabix brt=new BedReaderTabix(path_temp);
-				ele_temp=brt.get_detail(doc, track.get_ID(), id, chr, (long)start, (long)end);
+				ele_temp=brt.get_detail(doc, track.get_ID(), id, Chr, (long)start, (long)end);
 			}
 			else if(type_temp.equals(Consts.FORMAT_ANNO)){
 				BasicAnnosReader bar=new BasicAnnosReader(path_temp);
-				ele_temp=bar.get_detail(doc, track.get_ID(), id, chr, (long)start, (long)end);
+				ele_temp=bar.get_detail(doc, track.get_ID(), id, Chr, (long)start, (long)end);
 			}
 			else if(type_temp.equals(Consts.FORMAT_BED)){
 				BedReader br=new BedReader(path_temp);
 				try {
-					ele_temp=br.get_detail(doc, track.get_ID(), id, chr, start, end);
+					ele_temp=br.get_detail(doc, track.get_ID(), id, Chr, start, end);
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -258,7 +258,7 @@ public class Instance {
 				BigBedReader bbr;
 				try{
 					bbr=new BigBedReader(path_temp);
-					ele_temp=bbr.get_detail(doc, track.get_ID(), id, chr, start, end);
+					ele_temp=bbr.get_detail(doc, track.get_ID(), id, Chr, start, end);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -285,19 +285,19 @@ public class Instance {
 				GVFReader gr;
 				try {
 					gr = new GVFReader(path_temp);
-					ele_temp=gr.get_detail(doc, track.get_ID(), id, chr, start, end);
+					ele_temp=gr.get_detail(doc, track.get_ID(), id, Chr, start, end);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			else if (type_temp.equals(Consts.FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<10000000){
+			else if (type_temp.equals(Consts.FORMAT_VCF)){
 				VcfReader vr=new VcfReader(track,Chr);
-				ele_temp=vr.get_detail(doc, track.get_ID(), id, chr, start, end);
+				ele_temp=vr.get_detail(doc, track.get_ID(), id, Chr, start, end);
 			}
 			else if (type_temp.equals(Consts.FORMAT_BAM)){
 				try {
 					BAMReader br2=new BAMReader(path_temp);
-					ele_temp=br2.get_detail(doc, track.get_ID(), id, chr, start, end);
+					ele_temp=br2.get_detail(doc, track.get_ID(), id, Chr, start, end);
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (URISyntaxException e) {
@@ -440,10 +440,10 @@ public class Instance {
 				}
 			}
 			else if(type_temp.equals(Consts.FORMAT_GRF)){
-				GFFReader gr;
+				GRFReader gr2;
 				try {
-					gr = new GFFReader(path_temp);
-					ele_temp=gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"NONE");
+					gr2 = new GRFReader(path_temp);
+					ele_temp=gr2.write_grf2elements(doc, track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

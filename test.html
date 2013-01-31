@@ -36,16 +36,26 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 				 var param5=document.getElementById("p5").value;
 				 var querry="getAssemblies";
 				 req.onreadystatechange = getReadyStateHandler;
-				if(param5 == "getAssemblies" || param5 == "getAnnotations"){
+				if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno"){
 					querry="action="+param5;
-				} else if(param5 == "removeTracks" || param5 == "removeExternals" || param5 == "getParams"){
+				} else if(param5 == "removeTracks" || param5 == "removeExternals" || param5 == "getParams" || param5 == "removePclns"){
 					querry="action="+param5+"&tracks="+param4;
 				} else if(param5 == "setAssembly"){
 					querry="action="+param5+"&assembly="+param4;
-				} else if(param5 == "modiTracks" || param5 == "addTracks"){
+				} else if(param5 == "getGene"){
+					querry="action="+param5+"&gene="+param4;
+				} else if(param5 == "findGene"){
+					querry="action="+param5+"&prefix="+param4;
+				} else if(param5 == "modiTracks" || param5 == "addTracks" || param5 == "modiPanno" || param5 == "modiPfanno" || param5 == "addPanno" || param5 == "addPfanno" || param5 == "addPclns" || param5 == "modiPclns"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3;
+				} else if(param5 == "addPvar" || param5 == "modiPvar"){
+					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&id="+param2;
+				} else if(param5 == "overlapGene"){
+					querry="action="+param5+"&chr="+param1+"&start="+param2+"&end="+param3;
 				} else if(param5 == "addExternals"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&links="+param2+"&types="+param1;
+				} else if(param5 == "getDetail"){
+					querry="action="+param5+"&tracks="+param4+"&id="+param1+"&start="+param2+"&end="+param3;
 				} else if(param5 == "update"){
 					querry="action="+param5+"&width="+param4+"&chr="+param1+"&start="+param2+"&end="+param3;
 				} else if(param5 == "setParams"){
@@ -104,42 +114,49 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
     </head>
     <body>
         <h1>Servlet Test</h1>
-	<table width=80% border=1 align="center">
+	<table width=80% border=1 valign="middle" align="center">
 		<tr>
 			<th>Input</th>
 			<th>update</th>
+			<th>getDetail</th>
 			<th>addExternals</th>
 			<th>setParams</th>
-			<th>addTracks</th>
-			<th>modiTracks</th>
-			<th>removeTracks</th>
-			<th>removeExternals</th>
-			<th>getParams</th>
+			<th>overlapGene</th>
+			<th>addPvar<br>modiPvar</th>
+			<th>addTracks/modiTracks<br>addPanno/modiPanno<br>addPfanno/modiPfanno<br>addPclns/modiPclns</th>
+			<th>removeTracks<br>removeExternals<br>removePclns<br>getParams</th>
+			<th>getGene<br>findGene</th>
 			<th>setAssembly</th>
-			<th>getAssemblies</th>
-			<th>getAnnotations</th>
+			<th>removePvar<br>removePanno<br>removePfanno<br>getAssemblies<br>getAnnotations</th>
 		<tr align="center">
 			<td><input id="p1" type="text"/></td>
 			<td>Chromosome</td>
+			<td>id</td>
 			<td>Types</td>
 			<td>Values</td>
-			<td colspan="8"></td>
+			<td>Chromosome</td>
+			<td colspan="6"></td>
 		</tr>
 		<tr align="center">
 			<td><input id="p2" type="text"/></td>
 			<td>Start</td>
+			<td>Start</td>
 			<td>Links</td>
 			<td>Params</td>
-			<td colspan="8"></td>
+			<td>Start</td>
+			<td>id</td>
+			<td colspan="5"></td>
 		</tr>
 		<tr align="center">
 			<td><input id="p3" type="text"/></td>
 			<td>End</td>
+			<td>End</td>
 			<td>modes</td>
 			<td>modes</td>
+			<td>End</td>
 			<td>modes</td>
 			<td>modes</td>
-			<td colspan="6"></td>
+			<td colspan="4"></td>
 		</tr>
 		<tr align="center">
 			<td><input id="p4" type="text"/></td>
@@ -147,12 +164,13 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td>tracks</td>
 			<td>tracks</td>
 			<td>tracks</td>
+			<td></td>
 			<td>tracks</td>
 			<td>tracks</td>
 			<td>tracks</td>
-			<td>tracks</td>
+			<td>prefix/gene</td>
 			<td>assembly</td>
-			<td colspan="2"></td>
+			<td></td>
 		</tr>
 		<tr align="center">
 			<td><input id="p5" type="text"/></td>

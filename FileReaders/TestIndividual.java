@@ -16,14 +16,15 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import FileReaders.gff.GRFReader;
+
 import edu.hit.mlg.individual.EctypalElements;
-import edu.hit.mlg.individual.GRFReader;
 
 
 public class TestIndividual {
 	public static void main(String[] args) throws Exception {
-		FastaReader fr = new FastaReader("F:\\基因组\\fasta\\hg19.fa");//这个是fasta文件的位置
-		String bedPath = "F:\\基因组\\BED\\ensGene.hg19.bed";//这个是BED文件的位置
+		FastaReader fr = new FastaReader("input/hg19.fa");//这个是fasta文件的位置
+		String bedPath = "";//这个是BED文件的位置
 		String grfPath = "F:\\基因组\\GRF\\ensemblRegulation.hg19.grf.gz";//这个是GRF文件的位置
 		//下面这个是个人基因组的vcf文件的位置
 		String vcfPath = "F:\\基因组\\VCF\\ALL.chr1.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz";
@@ -49,7 +50,7 @@ public class TestIndividual {
 		System.out.println("Read Bed time:" + (System.currentTimeMillis() - ll));
 		ll = System.currentTimeMillis();
 
-		ctrlArea = new GRFReader(grfPath).read(doc, chr, start - 2000, end + 2000);
+		ctrlArea = new GRFReader(grfPath).write_grf2elements(doc, "regulation",chr, start - 2000, end + 2000);
 		System.out.println("Read ctrlArea time:" + (System.currentTimeMillis() - ll));
 		ll = System.currentTimeMillis();
 
