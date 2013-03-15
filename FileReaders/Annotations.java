@@ -1,5 +1,6 @@
 package FileReaders;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import org.w3c.dom.Document;
@@ -9,7 +10,7 @@ import org.w3c.dom.Element;
  * Class for annotations stored in the configure file.
  */
 
-class Annotations {
+class Annotations implements Serializable{
 	private String ID;
 	private String Path=null;
 	private String Type;

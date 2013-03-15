@@ -18,10 +18,10 @@ import static FileReaders.XmlWriter.append_text_element;
  * <pre>
  * usage:
  * Firstly, Get an instance of this class:
- *   public BAMReader(String filePath)
- *   if index file exists, use getIndexFilePath() to get .bai filepath through; else, throw FileNotFoundException 
+ * public BAMReader(String filePath)
+ * if index file exists, use getIndexFilePath() to get .bai filepath through; else, throw FileNotFoundException
  * Secondly: insert elements into Document Object:
- * 	 readBAM(Document doc, String chr, int start, int end, int windowSize, int step, String mode, String track)
+ * readBAM(Document doc, String chr, int start, int end, int windowSize, int step, String mode, String track)
  * 
  * @author Chengwu Yan
  * 
@@ -176,13 +176,16 @@ public class BAMReader {
 	 * 3:NotDetailBig
 	 * @throws IOException
 	 */
-	public Element get_detail(Document doc, String track, String id, String chr, int start, int end) throws SAMFormatException, IOException{
+	public Element get_detail(Document doc, String track, String id,
+			String chr, int start, int end) throws SAMFormatException,
+			IOException {
 		Element ele = null;
 		List<SAMRecord> list = readSmallRegion(chr, start, end);
 		ele = writeDetail(doc, list, track, id, start, end);
 		return ele;
-		
+
 	}
+
 	public Element readBAM(Document doc, String chr, int start, int end,
 			int windowSize, int step, String mode, String track)
 			throws SAMFormatException, IOException {
@@ -218,7 +221,8 @@ public class BAMReader {
 		return ele;
 	}
 
-	private Element writeDetail(Document doc, List<SAMRecord> list, String track, String id, int start, int end) {
+	private Element writeDetail(Document doc, List<SAMRecord> list,
+			String track, String id, int start, int end) {
 		Element reads = doc.createElement(Consts.XML_TAG_READS);
 		SAMRecord rec = null;
 		Element read = null;
@@ -228,10 +232,12 @@ public class BAMReader {
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
 			rec = itor.next();
-			if(id.equals(rec.getReadName()) && start==rec.getAlignmentStart() && end==rec.getAlignmentEnd()){
+			if (id.equals(rec.getReadName())
+					&& start == rec.getAlignmentStart()
+					&& end == rec.getAlignmentEnd()) {
 				read = doc.createElement(Consts.XML_TAG_READ);
 				read.setAttribute(Consts.XML_TAG_ID, rec.getReadName());
-	
+
 				int[][] startEnds = getStartEndByCigar(rec);
 				append_text_element(doc, read, Consts.XML_TAG_FROM,
 						BAMValueList.intArray2IntString(startEnds[0], ','));
@@ -239,17 +245,20 @@ public class BAMReader {
 						BAMValueList.intArray2IntString(startEnds[1], ','));
 				append_text_element(doc, read, Consts.XML_TAG_DIRECTION,
 						((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
-				append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
+				append_text_element(doc, read, "Mapq", rec.getMappingQuality()
+						+ "");
 				append_text_element(doc, read, "Cigar", rec.getCigarString());
-				append_text_element(doc, read, "Rnext", rec.getMateReferenceName());
-				append_text_element(doc, read, "Pnext", rec.getMateAlignmentStart()
-						+ "");
-				append_text_element(doc, read, "Tlen", rec.getInferredInsertSize()
-						+ "");
-				XmlWriter
-						.append_text_element(doc, read, "Seq", rec.getReadString());
-				append_text_element(doc, read, "Qual", rec.getBaseQualityString());
-	
+				append_text_element(doc, read, "Rnext",
+						rec.getMateReferenceName());
+				append_text_element(doc, read, "Pnext",
+						rec.getMateAlignmentStart() + "");
+				append_text_element(doc, read, "Tlen",
+						rec.getInferredInsertSize() + "");
+				XmlWriter.append_text_element(doc, read, "Seq",
+						rec.getReadString());
+				append_text_element(doc, read, "Qual",
+						rec.getBaseQualityString());
+
 				StringBuilder remain = new StringBuilder();
 				List<SAMTagAndValue> l = rec.getAttributes();
 				for (int i = 0; i < l.size(); i++) {
@@ -257,10 +266,10 @@ public class BAMReader {
 					if (i < l.size() - 1)
 						remain.append(";");
 				}
-	
+
 				append_text_element(doc, read, Consts.XML_TAG_DESCRIPTION,
 						remain.toString());
-	
+
 				reads.appendChild(read);
 				break;
 			}
@@ -448,7 +457,7 @@ public class BAMReader {
 		}
 		close();
 
-		return BAMValueList.doubleArray2IntString(list.getResults(), ';');
+		return BAMValueList.doubleArray2IntString(list.getResults());
 	}
 
 	/**
@@ -551,9 +560,9 @@ public class BAMReader {
 
 		close();
 
-		return BAMValueList.doubleArray2IntString(getSpan(start % SIXTEENK,
-				(end - start + 1) / (windowSize / ((double) step)), windowSize
-						/ step, regions), ';');
+		return BAMValueList.doubleArray2IntString(getSpan(start % SIXTEENK, 
+				(end - start + 1) / (windowSize / ((double) step)), windowSize / step,
+						regions));
 	}
 
 	/**

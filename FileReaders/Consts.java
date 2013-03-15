@@ -3,6 +3,7 @@ package FileReaders;
 public interface Consts{
 	public static final String CONFIGURE="/home/ljuan/gbdata/config.xml";
 	public static final String GENE_DATA="/home/ljuan/gbdata/hg19/hgnc.hg19.sorted.txt";
+	public static final String DBSNP_DATA="/home/ljuan/gbdata/hg19/dbsnp135.hg19.vcf.bgz";
 	
 	public static final String DEFAULT_ENCODE="ISO-8859-1";
 	public static final String META_ROOT="MetaDataExchange";
@@ -20,6 +21,12 @@ public interface Consts{
 	public static final String VCF_CHROM_PREFIX="chromprefix";
 	
 	public static final String CYTOBAND_PREVIOUS_CHR="pChr";
+	
+	public static final int PTRACK_CLASS_VAR=0;
+	public static final int PTRACK_CLASS_FANNO=1;
+	public static final int PTRACK_CLASS_ANNO=2;
+	public static final int PTRACK_CLASS_CLN=3;
+	public static final int PTRACK_CLASS_OTH=4;
 	
 	public static final String FORMAT_BED="BED";
 	public static final String FORMAT_BIGBED="BB";

@@ -1,15 +1,77 @@
 package edu.hit.mlg.individual;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import edu.hit.mlg.Tools.LinkedArrayList;
+import edu.hit.mlg.Tools.LinkedArrayList.Entry;
 import edu.hit.mlg.individual.vcf.Variant;
+
 import static FileReaders.Consts.*;
 import FileReaders.XmlWriter;
 
 public class EctypalSubElement {
-	private Variant[] variants;// All variation of this SubElement
+	////////////////////////////////static field
+	final static Map<String, Map<String, String>> currentNeedToMap = new HashMap<String, Map<String,String>>();
+	final static Map<String, String> currentIsBOX = new HashMap<String, String>();
+	final static Map<String, String> currentIsExtendBOX = new HashMap<String, String>();
+	final static Map<String, String> currentIsSkipBOX = new HashMap<String, String>();
+	static{
+		currentNeedToMap.put(SUBELEMENT_TYPE_BOX, currentIsBOX);
+		currentNeedToMap.put(SUBELEMENT_TYPE_EXTEND_BOX, currentIsExtendBOX);
+		currentNeedToMap.put(SUBELEMENT_TYPE_SKIP_BOX, currentIsSkipBOX);
+		///////////////////////////
+		currentIsBOX.put(SUBELEMENT_TYPE_BOX, SUBELEMENT_TYPE_BOX);
+		currentIsBOX.put(SUBELEMENT_TYPE_LOST_BOX, SUBELEMENT_TYPE_LOST_BOX);
+		currentIsBOX.put(SUBELEMENT_TYPE_EXTEND_BAND, SUBELEMENT_TYPE_LOST_BOX);
+		currentIsBOX.put(SUBELEMENT_TYPE_SKIP_BAND, SUBELEMENT_TYPE_LOST_BOX);
+		currentIsBOX.put(SUBELEMENT_TYPE_SHIFT_BOX, SUBELEMENT_TYPE_SHIFT_BOX);
+		currentIsBOX.put(SUBELEMENT_TYPE_EXTEND_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX);
+		currentIsBOX.put(SUBELEMENT_TYPE_SKIP_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX);
+		currentIsBOX.put(SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX);
+		currentIsBOX.put(SUBELEMENT_TYPE_SHIFT_EXTEND_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX);
+		currentIsBOX.put(SUBELEMENT_TYPE_POSSIBLE_SHIFT_EXTEND_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX);
+		/////////////////////////
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_BOX, SUBELEMENT_TYPE_EXTEND_BOX);
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_LOST_BOX, SUBELEMENT_TYPE_EXTEND_BAND);
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_EXTEND_BAND, SUBELEMENT_TYPE_EXTEND_BAND);
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_SKIP_BAND, SUBELEMENT_TYPE_EXTEND_BAND);
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_SHIFT_BOX, SUBELEMENT_TYPE_SHIFT_EXTEND_BOX);
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_EXTEND_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_EXTEND_BOX);
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_SKIP_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_EXTEND_BOX);
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_EXTEND_BOX);
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_SHIFT_EXTEND_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_EXTEND_BOX);
+		currentIsExtendBOX.put(SUBELEMENT_TYPE_POSSIBLE_SHIFT_EXTEND_BOX, SUBELEMENT_TYPE_POSSIBLE_SHIFT_EXTEND_BOX);
+		//////////////////////////////
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_BOX, SUBELEMENT_TYPE_SKIP_BOX);
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_LOST_BOX, SUBELEMENT_TYPE_SKIP_BAND);
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_EXTEND_BAND, SUBELEMENT_TYPE_SKIP_BAND);
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_SKIP_BAND, SUBELEMENT_TYPE_SKIP_BAND);
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_SHIFT_BOX, SUBELEMENT_TYPE_SKIP_BOX);
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_EXTEND_BOX, SUBELEMENT_TYPE_SKIP_BOX);
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_SKIP_BOX, SUBELEMENT_TYPE_SKIP_BOX);
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX, SUBELEMENT_TYPE_SKIP_BOX);
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_SHIFT_EXTEND_BOX, SUBELEMENT_TYPE_SKIP_BOX);
+		currentIsSkipBOX.put(SUBELEMENT_TYPE_POSSIBLE_SHIFT_EXTEND_BOX, SUBELEMENT_TYPE_SKIP_BOX);
+	}
+	/**
+	 * There is 10 types of SubElement, but only 4 types of them need to deal. And this 4 types of
+	 * SubElement are divided into 2 category.
+	 */
+	final static Map<String, Integer> currentNeedToDeal = new HashMap<String, Integer>();
+	static{
+		currentNeedToDeal.put(SUBELEMENT_TYPE_BOX, 1);
+		currentNeedToDeal.put(SUBELEMENT_TYPE_EXTEND_BOX, 2);
+		currentNeedToDeal.put(SUBELEMENT_TYPE_SHIFT_BOX, 3);
+		currentNeedToDeal.put(SUBELEMENT_TYPE_SHIFT_EXTEND_BOX, 4);
+	}
+	////////////////////////////////end of static field
+	
+	private MultiFromVariant[] variants;// All variation of this SubElement
 	private int variantsNum;// Variantion number of this SubElement
 	private String id = null;// Attribute
 	private String type = null;// Attribute
@@ -19,7 +81,7 @@ public class EctypalSubElement {
 	private String description = null;// Tag
 
 	EctypalSubElement() {
-		this.variants = new Variant[4];
+		this.variants = new MultiFromVariant[4];
 		this.variantsNum = 0;
 	}
 
@@ -35,7 +97,7 @@ public class EctypalSubElement {
 	}
 
 	EctypalSubElement(Element ele) {
-		this.variants = new Variant[4];
+		this.variants = new MultiFromVariant[4];
 		this.variantsNum = 0;
 		this.id = ele.getAttribute(XML_TAG_ID);
 		if ("".equals(this.id))	this.id = null;
@@ -96,36 +158,33 @@ public class EctypalSubElement {
 	}
 
 	/**
-	 * Add a variation to this SubElement.
+	 * Add a MultiFromVariant to this SubElement.
 	 * 
 	 * @param id	variation id
 	 * @param type	variation type
-	 * @param from	start base of this variation, 1-base.
-	 * @param to	end base of this variation, 1-base.
+	 * @param from	start base of this variation, 1-base. May contain many from.
+	 * @param to	end base of this variation, 1-base. May contain many to.
 	 * @param letter	letter of this variation. Null if this variation doesn't has
 	 *       			any letter.
 	 */
-	void addVariantion(String id, String type, int from, int to, String letter) {
+	void addMultiFromVariant(String id, String type, int[] from, int[] to, String letter) {
 		ensureCapacity();
-		variants[variantsNum] = new Variant(id, type, from, to);
-		variants[variantsNum++].setLetter(letter);
+		variants[variantsNum++] = new MultiFromVariant(id, type, from, to, letter);
 	}
-
-	/**
-	 * Add a variation to this SubElement.
-	 * 
-	 * @param variant
-	 */
-	void addVariantion(Variant variant) {
+	
+	void addMultiFromVariant(MultiFromVariant variant) {
 		ensureCapacity();
 		variants[variantsNum++] = variant;
+	}
+	
+	void addMultiFromVariant(Variant v){
+		addMultiFromVariant(v.getId(), v.getType(), new int[]{v.getFrom()}, new int[]{v.getTo()}, v.getLetter());
 	}
 
 	private void ensureCapacity() {
 		if (variantsNum == variants.length) {
-			Variant[] vs = new Variant[variants.length + variants.length];
+			MultiFromVariant[] vs = new MultiFromVariant[variants.length * 2];
 			System.arraycopy(variants, 0, vs, 0, variants.length);
-			variants = null;
 			variants = vs;
 		}
 	}
@@ -147,10 +206,11 @@ public class EctypalSubElement {
 	 * @param sepPosBelongFirst
 	 * 				Whether the <code>sepPos</code> is belonging the first SubElement.
 	 * 				True if the <code>sepPos</code> is belonging the first SubElement, false else.
+	 * @param direction The direction of the Element, true for "+", false else.
 	 * @return
 	 */
 	static EctypalSubElement[] divideInto2SubElements(EctypalSubElement subEle, int sepPos,
-			String firstType, String secondType, boolean sepPosBelongFirst) {
+			String firstType, String secondType, boolean sepPosBelongFirst, boolean direction) {
 		EctypalSubElement left = null;
 		EctypalSubElement right = null;
 		int reallySepPos = (sepPosBelongFirst ? sepPos : sepPos-1); //reallySepPos belongs the first SubElement 
@@ -164,25 +224,24 @@ public class EctypalSubElement {
 		left.description = subEle.description;
 		// Right SubElement
 		right = new EctypalSubElement();
-		left.id = subEle.id;
-		left.type = secondType;
-		left.from = reallySepPos + 1;
-		left.to = subEle.to;
-		left.direction = subEle.direction;
-		left.description = subEle.description;
+		right.id = subEle.id;
+		right.type = secondType;
+		right.from = reallySepPos + 1;
+		right.to = subEle.to;
+		right.direction = subEle.direction;
+		right.description = subEle.description;
 
-		for (Variant v : subEle.variants) {
-			if (v.getTo() <= reallySepPos) {
+		for (MultiFromVariant v : subEle.variants) {
+			if(v == null) break;
+			if (v.getFirstTo() <= reallySepPos) {
 				// Add the variation to the left SubElement
-				left.addVariantion(v);
-			} else if (v.getFrom() > reallySepPos) {
+				left.addMultiFromVariant(v);
+			} else if (v.getFirstFrom() > reallySepPos) {
 				// Add the variation to the right SubElement
-				right.addVariantion(v);
-			} else {
-				// Divide the variation into two variations and add the first variation to the 
-				// left SubElement, add the second variation to the right SubElement.
-				left.addVariantion(v.getId(), v.getType(), v.getFrom(), reallySepPos, v.getLetter());
-				right.addVariantion(v.getId(), v.getType(), reallySepPos + 1, v.getTo(), v.getLetter());
+				right.addMultiFromVariant(v);
+			} else {//Must be INS variant
+				if(direction) left.addMultiFromVariant(v);
+				else right.addMultiFromVariant(v);
 			}
 		}
 		return new EctypalSubElement[] { left, right };
@@ -200,20 +259,72 @@ public class EctypalSubElement {
 			XmlWriter.append_text_element(doc, subEle, XML_TAG_DESCRIPTION, description);
 		//Add all variations
 		if(variantsNum > 0){
-			Element variant = null;
-			Variant v = null;
 			for(int i=0; i<variantsNum; i++){
-				v = variants[i];
-				variant = doc.createElement(XML_TAG_VARIANT);
-				variant.setAttribute(XML_TAG_TYPE, v.getType());
-				XmlWriter.append_text_element(doc, variant, XML_TAG_FROM, String.valueOf(v.getFrom()));
-				XmlWriter.append_text_element(doc, variant, XML_TAG_TO, String.valueOf(v.getTo()));
-				if(v.getLetter() != null)
-					XmlWriter.append_text_element(doc, variant, XML_TAG_LETTER, String.valueOf(v.getLetter()));
-				subEle.appendChild(variant);
+				variants[i].write2xml(doc, subEle);
 			}
 		}
 
 		return subEle;
+	}
+	
+	public String toString(){
+		return this.type + ":" + this.from + "-" + this.to;
+	}
+	
+	/**
+	 * Judge that whether [from1, to1] overlaps with [from2, to2].
+	 * @return
+	 */
+ 	public static boolean overlap(int from1, int to1, int from2, int to2) {
+ 		return to1 >= from2 && from1 <= to2;
+	}
+
+	/**
+	 * Judge that whether [from1, to1] contained in [from2, to2].
+	 * @return
+	 */
+	public static boolean contained(int from1, int to1, int from2, int to2) {
+		return from1 >= from2 && to1 <= to2;
+	}
+	
+	/**
+	 * Whether the type is not "Line" and not "Band".
+	 * @param type
+	 * @return
+	 */
+	static boolean notLineNotBand(String type){
+		return !SUBELEMENT_TYPE_LINE.equals(type) && !SUBELEMENT_TYPE_BAND.equals(type);
+	}
+	
+	static boolean shouldAddBoxBases(String type, boolean hasEffect){
+		return (hasEffect && currentNeedToDeal.containsKey(type)) || (!hasEffect && notLineNotBand(type));
+	}
+	
+	/**
+	 * Get the previous Box of the <code>cur</code>. For <code>hasEffect=true</code>, the BOX is one of "Box", "Extend_Box", "Shift_Box", 
+	 * "Shift_Extend_Box"; for <code>hasEffect=false</code>, the BOX is one of the type which is not "Line" and "Band".
+	 * @return
+	 */
+	static Entry<EctypalSubElement> getPreviousBox(LinkedArrayList<EctypalSubElement> subEles, Entry<EctypalSubElement> cur, boolean hasEffect){
+		while(true){
+			cur = subEles.getPrevious(cur);
+			if(cur == null) return null;
+			if(shouldAddBoxBases(cur.getElement().getType(), hasEffect))
+				return cur;
+		}
+	}
+	
+	/**
+	 * Get the next Box of <code>cur</code>. For <code>hasEffect=true</code>, the BOX is one of "Box", "Extend_Box", "Shift_Box", 
+	 * "Shift_Extend_Box"; for <code>hasEffect=false</code>, the BOX is one of the type which is not "Line" and "Band".
+	 * @return
+	 */
+	static Entry<EctypalSubElement> getNextBox(LinkedArrayList<EctypalSubElement> subEles, Entry<EctypalSubElement> cur, boolean hasEffect){
+		while(true){
+			cur = subEles.getNext(cur);
+			if(cur == null) return null;
+			if(shouldAddBoxBases(cur.getElement().getType(), hasEffect))
+				return cur;
+		}
 	}
 }

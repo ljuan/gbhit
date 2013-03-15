@@ -1,5 +1,6 @@
 package FileReaders;
 
+import static FileReaders.Consts.DATA_ROOT;
 import FileReaders.gff.*;
 
 import java.io.File;
@@ -9,6 +10,9 @@ import java.util.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.commons.lang3.SerializationUtils;
+
+import edu.hit.mlg.individual.VariantAnalysis;
 
 public class Instance {
 	String Assembly;
@@ -23,9 +27,12 @@ public class Instance {
 	
 	String PvarID=null;
 	Annotations Pvar=null;
+	Element Ele_var=null;
 	Annotations Panno=null;
+	Element[] Ele_anno=null;
 	Annotations Pfanno=null;
-	Hashtable<String,Annotations> Pclns=null;
+	Element Ele_fanno=null;
+	Hashtable<String,Annotations> Pclns=new Hashtable<String,Annotations>();
 	
 	public Instance (){
 		initialize("hg19");
@@ -82,18 +89,16 @@ public class Instance {
 				Annotations external_temp=externals_enum.nextElement();
 				append_track(external_temp,doc,external_temp.get_Mode());
 			}	
-			if(Pvar!=null){
-				append_Ptrack(Pvar,doc,Pvar.get_Mode());
-				if(Pfanno!=null)
-					append_Ptrack(Pfanno,doc,Pfanno.get_Mode());
-				if(Panno!=null){
-					append_Ptrack(Panno,doc,Panno.get_Mode());
-
-					Enumeration<Annotations> pclns_enum=Pclns.elements();
-					for(int i=0;i<Externals.size();i++){
-						Annotations pclns_temp=pclns_enum.nextElement();
-						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode());
-					}	
+			if(Pvar!=null)
+				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
+			if(Pfanno!=null)
+				append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
+			if(Panno!=null){
+				append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
+				Enumeration<Annotations> pclns_enum=Pclns.elements();
+				for(int i=0;i<Externals.size();i++){
+					Annotations pclns_temp=pclns_enum.nextElement();
+					append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
 				}
 			}
 		}
@@ -146,9 +151,11 @@ public class Instance {
 					||(Annos.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
 							&&((VcfSample)(Annos.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifSelected(PvarID))){
 				this.PvarID=PvarID;
-				this.Pvar=Annos.get(track);
+				this.Pvar=SerializationUtils.clone(Annos.get(track));
 				Pvar.set_Mode(mode);
-				append_Ptrack(Pvar,doc,Pvar.get_Mode());
+				if (!PvarID.equals(track))
+					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
+				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
 			}
 		}
 		else if(Externals.containsKey(track)){
@@ -156,9 +163,11 @@ public class Instance {
 					||(Externals.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
 							&&((VcfSample)(Externals.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifSelected(PvarID))){
 				this.PvarID=PvarID;
-				this.Pvar=Externals.get(track);
+				this.Pvar=SerializationUtils.clone(Externals.get(track));
 				Pvar.set_Mode(mode);
-				append_Ptrack(Pvar,doc,Pvar.get_Mode());
+				if (!PvarID.equals(track))
+					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
+				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
 			}
 		}
 		return XmlWriter.xml2string(doc);
@@ -166,57 +175,60 @@ public class Instance {
 	public void remove_Pvar(){
 		Pvar=null;
 		PvarID=null;
+		Ele_var=null;
 	}
 	public String add_Panno(String track,String mode){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		if(Annos.containsKey(track)&&Annos.get(track).get_Type().equals(Consts.FORMAT_ANNO)){
-			Panno=Annos.get(track);
+			Panno=SerializationUtils.clone(Annos.get(track));
 			Panno.set_Mode(mode);
-			append_Ptrack(Panno,doc,Panno.get_Mode());
+			append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
 		}
 		else if(Externals.containsKey(track)&&Externals.get(track).get_Type().equals(Consts.FORMAT_ANNO)){
-			Panno=Externals.get(track);
+			Panno=SerializationUtils.clone(Externals.get(track));
 			Panno.set_Mode(mode);
-			append_Ptrack(Panno,doc,Panno.get_Mode());
+			append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
 		}
 		return XmlWriter.xml2string(doc);
 	}
 	public void remove_Panno(){
 		Panno=null;
+		Ele_anno=null;
 	}
 	public String add_Pfanno(String track,String mode){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		if(Annos.containsKey(track)&&Annos.get(track).get_Type().equals(Consts.FORMAT_GRF)){
-			Pfanno=Annos.get(track);
+			Pfanno=SerializationUtils.clone(Annos.get(track));
 			Pfanno.set_Mode(mode);
-			append_Ptrack(Pfanno,doc,Pfanno.get_Mode());
+			append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
 			if(Panno!=null)
-				append_Ptrack(Panno,doc,Panno.get_Mode());
+				append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
 		}
 		else if(Externals.containsKey(track)&&Externals.get(track).get_Type().equals(Consts.FORMAT_GRF)){
-			Pfanno=Externals.get(track);
+			Pfanno=SerializationUtils.clone(Externals.get(track));
 			Pfanno.set_Mode(mode);
-			append_Ptrack(Pfanno,doc,Pfanno.get_Mode());
+			append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
 			if(Panno!=null)
-				append_Ptrack(Panno,doc,Panno.get_Mode());
+				append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
 		}
 		return XmlWriter.xml2string(doc);
 	}
 	public void remove_Pfanno(){
 		Pfanno=null;
+		Ele_fanno=null;
 	}
 	public String add_Pclns(String[] tracks,String[] modes){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		for(int i=0;i<tracks.length;i++)
 			if(Annos.containsKey(tracks[i])&&Annos.get(tracks[i]).get_Type().equals(Consts.FORMAT_GDF)){
-				Pclns.put(tracks[i],Annos.get(tracks[i]));
+				Pclns.put(tracks[i],SerializationUtils.clone(Annos.get(tracks[i])));
 				Pclns.get(tracks[i]).set_Mode(modes[i]);
-				append_Ptrack(Pclns.get(tracks[i]),doc,Pclns.get(tracks[i]).get_Mode());
+				append_Ptrack(Pclns.get(tracks[i]),doc,Pclns.get(tracks[i]).get_Mode(),Consts.PTRACK_CLASS_CLN);
 			}
 			else if(Externals.containsKey(tracks[i])&&Externals.get(tracks[i]).get_Type().equals(Consts.FORMAT_GDF)){
-				Pclns.put(tracks[i],Externals.get(tracks[i]));
+				Pclns.put(tracks[i],SerializationUtils.clone(Externals.get(tracks[i])));
 				Pclns.get(tracks[i]).set_Mode(modes[i]);
-				append_Ptrack(Pclns.get(tracks[i]),doc,Pclns.get(tracks[i]).get_Mode());
+				append_Ptrack(Pclns.get(tracks[i]),doc,Pclns.get(tracks[i]).get_Mode(),Consts.PTRACK_CLASS_CLN);
 			}
 		return XmlWriter.xml2string(doc);
 	}
@@ -264,15 +276,15 @@ public class Instance {
 				}
 			}
 /*			else if(type_temp.equals(Consts.FORMAT_GRF)){
-				GFFReader gr;
+				GRFReader gr;
 				try {
-					gr = new GFFReader(path_temp);
-					ele_temp=gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"NONE");
+					gr = new GRFReader(path_temp);
+					ele_temp=gr.write_grf2elements(doc, track.get_ID(), Chr,(int)Coordinate[0],(int)Coordinate[1]);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			else if(type_temp.equals(Consts.FORMAT_GDF)){
+/*			else if(type_temp.equals(Consts.FORMAT_GDF)){
 				GFFReader gr;
 				try {
 					gr = new GFFReader(path_temp);
@@ -361,21 +373,53 @@ public class Instance {
 		else if(Externals.containsKey(track))
 			Externals.get(track).set_Mode(mode);
 	}
-	void append_Ptrack(Annotations track,Document doc,String mode){
+	void append_Ptrack(Annotations track,Document doc,String mode,int Class) {
 		String type_temp=track.get_Type();
-		if(track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_VCF)){
-			if(track.get_ID().equals(PvarID))
-				append_track(track,doc,mode);
-			else 
-				append_track(track,doc,mode);
+		if (Coordinate[1]-Coordinate[0]>1000000)
+			return;
+		if(Pvar!=null&&track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_VCF)&&Class==Consts.PTRACK_CLASS_VAR){
+			if(track.get_ID().equals(PvarID)){
+				VcfReader vr=new VcfReader(track,Chr);
+				Ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
+			}
+			else {
+				VcfReader vr=new VcfReader(track,Chr);
+				Ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
+			}
 		}
-		else if(track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_GVF))
-			append_track(track,doc,mode);
-		else if(track.get_ID().equals(Panno.get_ID())&&type_temp.equals(Consts.FORMAT_ANNO))
-			append_track(track,doc,mode);
-		else if(track.get_ID().equals(Pfanno.get_ID())&&type_temp.equals(Consts.FORMAT_GRF))
-			append_track(track,doc,mode);
-		else if(Pclns.containsKey(track.get_ID())&&type_temp.equals(Consts.FORMAT_GDF))
+		else if(Pvar!=null&&track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_GVF)&&Class==Consts.PTRACK_CLASS_VAR){
+			GVFReader gr;
+			try {
+				gr = new GVFReader(Pvar.get_Path(Chr));
+				Ele_var=gr.write_gvf2variants(doc, "_"+track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else if(Panno!=null&&track.get_ID().equals(Panno.get_ID())&&type_temp.equals(Consts.FORMAT_ANNO)&&Class==Consts.PTRACK_CLASS_ANNO){
+			try{
+				BasicAnnosReader bar=new BasicAnnosReader(Panno.get_Path(Chr));
+				Element ele_anno=bar.write_ba2elements(doc, "_"+track.get_ID(), Chr, Coordinate[0], Coordinate[1], bpp);
+				VariantAnalysis ee = new VariantAnalysis(doc, rr, ele_anno,Ele_fanno, Ele_var, Consts.DBSNP_DATA, Chr, (int)Coordinate[0], (int)Coordinate[1]);
+				Ele_anno=ee.deal();
+				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_anno[0]);
+				if(Ele_anno.length > 1)
+					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_anno[1]);
+				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_anno);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		else if(Pfanno!=null&&track.get_ID().equals(Pfanno.get_ID())&&type_temp.equals(Consts.FORMAT_GRF)&&Class==Consts.PTRACK_CLASS_FANNO){
+			GRFReader gr2;
+			try {
+				gr2 = new GRFReader(Pfanno.get_Path(Chr));
+				Ele_fanno=gr2.write_grf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else if(Pclns.containsKey(track.get_ID())&&type_temp.equals(Consts.FORMAT_GDF)&&Class==Consts.PTRACK_CLASS_CLN)
 			append_track(track,doc,mode);
 		else 
 			append_track(track,doc,mode);

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import edu.hit.mlg.Tools.StringSplit;
 
-import FileReaders.Consts;
+import static FileReaders.Consts.*;
 
 /**
  * @author Chengwu Yan
@@ -13,13 +13,13 @@ import FileReaders.Consts;
 class GVF extends GFF {
 	private static Map<String, String> variantType = new HashMap<String, String>();
 	static {
-		variantType.put("insertion", Consts.VARIANT_TYPE_INSERTION);
-		variantType.put("copy_number_variation", Consts.VARIANT_TYPE_CNV);
-		variantType.put("inversion", Consts.VARIANT_TYPE_INVERSION);
-		variantType.put("deletion", Consts.VARIANT_TYPE_DELETION);
-		variantType.put("substitution", Consts.VARIANT_TYPE_SNV);
-		variantType.put("SNV", Consts.VARIANT_TYPE_SNV);
-		variantType.put("translocation", Consts.VARIANT_TYPE_BLS);
+		variantType.put("insertion", VARIANT_TYPE_INSERTION);
+		variantType.put("copy_number_variation", VARIANT_TYPE_CNV);
+		variantType.put("inversion", VARIANT_TYPE_INVERSION);
+		variantType.put("deletion", VARIANT_TYPE_DELETION);
+		variantType.put("substitution", VARIANT_TYPE_SNV);
+		variantType.put("SNV", VARIANT_TYPE_SNV);
+		variantType.put("translocation", VARIANT_TYPE_BLS);
 	}
 
 	String id;
@@ -27,7 +27,8 @@ class GVF extends GFF {
 	String letter = "";
 	String[][] variants;
 	int variantNum = 0;
-	int homo = 0;
+	String homo = "";
+	String phased = null;
 
 	GVF(String[] str) {
 		super(str);
@@ -52,20 +53,17 @@ class GVF extends GFF {
 				continue;
 			} else if (s.startsWith("Variant_seq=")) {
 				// All variants
-				String[] strs = new StringSplit(',').split(
-						split.split(s).getResultByIndex(1)).getResult();
+				String[] strs = new StringSplit(',').split(split.split(s).getResultByIndex(1)).getResult();
 				char c;
 				variants = new String[strs.length][2];
 				if (type != null) {
 					// We can identify this type of variant
-					boolean isSNVOrINS = type.equals(Consts.VARIANT_TYPE_SNV)
-							|| type.equals(Consts.VARIANT_TYPE_INSERTION);
+					boolean isSNVOrINS = type.equals(VARIANT_TYPE_SNV) || type.equals(VARIANT_TYPE_INSERTION);
 					for (String variant : strs) {
 						c = variant.charAt(0);
 						if (c != '.' && c != '~' && c != '!' && c != '^') {
 							variants[variantNum][0] = type;
-							variants[variantNum++][1] = isSNVOrINS ? variant
-									: null;
+							variants[variantNum++][1] = isSNVOrINS ? variant : null;
 						}
 					}
 				} else {
@@ -76,22 +74,22 @@ class GVF extends GFF {
 						if (c != '.' && c != '~' && c != '!' && c != '^') {
 							if (c == '-') {
 								// DEL
-								variants[variantNum][0] = Consts.VARIANT_TYPE_DELETION;
+								variants[variantNum][0] = VARIANT_TYPE_DELETION;
 								variants[variantNum++][1] = null;
 								continue;
 							}
 							compResult = end - start + 1 - variant.length();
 							if (compResult == 0) {
 								// SNV
-								variants[variantNum][0] = Consts.VARIANT_TYPE_SNV;
+								variants[variantNum][0] = VARIANT_TYPE_SNV;
 								variants[variantNum++][1] = variant;
 							} else if (compResult < 0) {
 								// INS
-								variants[variantNum][0] = Consts.VARIANT_TYPE_INSERTION;
+								variants[variantNum][0] = VARIANT_TYPE_INSERTION;
 								variants[variantNum++][1] = variant;
 							} else {
 								// DEL
-								variants[variantNum][0] = Consts.VARIANT_TYPE_DELETION;
+								variants[variantNum][0] = VARIANT_TYPE_DELETION;
 								variants[variantNum++][1] = null;
 							}
 						}
@@ -103,15 +101,9 @@ class GVF extends GFF {
 				hasReadSeq = true;
 				continue;
 			} else if (s.startsWith("Genotype=")) {
-				StringSplit ss = new StringSplit(':').split(split.split(s)
-						.getResultByIndex(1));
-				if (ss.getResultNum() == 2) {
-					if (ss.getResultByIndex(0).equals(ss.getResultByIndex(1))) {
-						this.homo = 1;
-					} else {
-						this.homo = 2;
-					}
-				}
+				this.homo = split.split(s).getResultByIndex(1);
+			} else if (s.startsWith("phased=")) {
+				this.phased = split.split(s).getResultByIndex(1);
 			}
 		}
 	}

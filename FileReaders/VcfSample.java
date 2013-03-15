@@ -1,5 +1,6 @@
 package FileReaders;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ import org.w3c.dom.Element;
  * @author Chengwu Yan
  * 
  */
-class VcfSample {
+class VcfSample implements Serializable{
 	private Map<String, BooleanIndex> Samples;
 	private String[] SampleNames;
 	private int[] selectedIndexes;
@@ -120,7 +121,7 @@ class VcfSample {
 		return SampleNames == null ? 0 : SampleNames.length;
 	}
 
-	private class BooleanIndex {
+	private class BooleanIndex implements Serializable {
 		boolean selected;
 		int index;
 

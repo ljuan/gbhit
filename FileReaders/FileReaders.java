@@ -11,7 +11,7 @@ public class FileReaders {
 		System.out.println(System.currentTimeMillis());
 		System.out.println(i1.get_Annotations());
 		System.out.println(System.currentTimeMillis());
-		System.out.println(i1.update("chr1",33031597,33041570,1350));
+		System.out.println(i1.update("chr1",33021597,34021570,1350));
 		System.out.println(System.currentTimeMillis());
 		String[] externals={"RefSeq"};
 		String[] externals_links={"input/refGene.hg19.sorted.anno.gz"};
@@ -19,8 +19,17 @@ public class FileReaders {
 		String[] externals_modes={Consts.MODE_DENSE};
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
+		externals[0]="dbSNP135_CHB";externals_modes[0]=Consts.MODE_PACK;
+		System.out.println(i1.add_Tracks(externals,externals_modes));
+		String[] samples={"sample"};
+		String[] values={"NA18534:NA18536:NA18546"};
+		i1.set_Params(externals, samples, values);
 		System.out.println(System.currentTimeMillis());
-		externals[0]="RefSeq";
+		System.out.println(i1.add_Pvar("dbSNP135", Consts.MODE_PACK, "dbSNP135"));
+		externals[0]="Regulation";externals_links[0]="http://127.0.0.1/gbfiles/ensemblRegulation.hg19.grf.gz";externals_types[0]=Consts.FORMAT_GRF;externals_modes[0]=Consts.MODE_DENSE;
+		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
+		System.out.println(i1.add_Pfanno("Regulation", Consts.MODE_PACK));
+		System.out.println(i1.add_Panno("RefSeq", Consts.MODE_PACK));
 /*		i1.remove_Tracks(externals);
 /*		System.out.println(System.currentTimeMillis());
 		externals[0]="cytoband";externals_links[0]="input/cytoBand.hg19.txt";externals_types[0]=Consts.FORMAT_CYTO;externals_modes[0]=Consts.MODE_DENSE;
@@ -36,10 +45,6 @@ public class FileReaders {
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
 		i1.remove_Tracks(externals);
-*/		externals[0]="Regulation";externals_links[0]="http://127.0.0.1/gbfiles/ensemblRegulation.hg19.grf.gz";externals_types[0]=Consts.FORMAT_GRF;externals_modes[0]=Consts.MODE_DENSE;
-		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
-		System.out.println(i1.add_Tracks(externals,externals_modes));
-		System.out.println(System.currentTimeMillis());
 /*		externals[0]="dbsnp135";externals_links[0]="http://202.118.228.68/gbfiles/dbsnp135.hg19.vcf.bgz";externals_types[0]=Consts.FORMAT_VCF;externals_modes[0]=Consts.MODE_PACK;
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));

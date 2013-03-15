@@ -19,7 +19,7 @@ public class GRFReader {
 		this.path = path;
 	}
 
-	public Element write_grf2elements(Document doc,String track, String chr, int start, int end) throws IOException {
+	public Element write_grf2elements(Document doc, String track, String chr, int start, int end) throws IOException {
 		Element elements = doc.createElement(XML_TAG_ELEMENTS);
 		elements.setAttribute(XML_TAG_ID, track);
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(elements); // Elements

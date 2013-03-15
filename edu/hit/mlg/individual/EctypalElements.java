@@ -9,7 +9,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import edu.hit.mlg.individual.Individual.VariantMapToDBSNP;
+import edu.hit.mlg.individual.VariantAnalysis.ControlArea;
 import edu.hit.mlg.individual.vcf.Variant;
 import FileReaders.FastaReader;
 import static FileReaders.Consts.*;
@@ -23,24 +23,14 @@ import static FileReaders.Consts.*;
  */
 public class EctypalElements {
 	private Document doc;
-	private Element elements;
 	private List<ControlArea> ctrlAreas;
-	private Element variants;
-	private boolean isVCF;
-	private String dbsnpURI;
-	private String chr;
-	private int start;
-	private int end;
 	private String id = null; // Attribute
 	private String ifParam = null; // Attribute
 	private EctypalElement[] eles; // All Elements of this Elements
-	private HashSet<EctypalElement> needToDealEles; // All Elements need to deal
-													// of
-													// this Elements
+	private HashSet<EctypalElement> needToDealEles; // All Elements need to deal of this Elements
 
 	/**
-	 * Remember that each deal should construct a new
-	 * <code>EctypalElements</code> instance.
+	 * Remember that each deal should construct a new <code>EctypalElements</code> instance.
 	 * 
 	 * @param doc
 	 *            XML <code>Document</code> instance
@@ -50,33 +40,16 @@ public class EctypalElements {
 	 *            All <code>Element</code>s designated to be dealed
 	 * @param ctrlArea
 	 *            Control areas
-	 * @param variants
-	 *            All variantions designated to be dealed
-	 * @param isVCF
-	 *            Whether the <code>variants</code> come from VCF file
-	 * @param dbsnpURI
-	 *            DBSNP URI
 	 * @param chr
 	 *            chromosome name
-	 * @param start
-	 *            1-base
-	 * @param end
-	 *            1-base
+	 * @param hasEffect 
+	 * 			  Whether the upstream SubElement has an effect on the downstream SubElement.
 	 */
-	public EctypalElements(Document doc, FastaReader fr, Element elements,
-			Element ctrlArea, Element variants, boolean isVCF, String dbsnpURI,
-			String chr, int start, int end) {
+	public EctypalElements(Document doc, FastaReader fr, Element elements, Element ctrlArea, String chr, boolean hasEffect) {
 		this.doc = doc;
-		this.elements = elements;
 		this.ctrlAreas = Element2ControlAreas(ctrlArea);
-		this.variants = variants;
-		this.isVCF = isVCF;
-		this.dbsnpURI = dbsnpURI;
-		this.chr = chr;
-		this.start = start;
-		this.end = end;
 
-		this.id = elements.getAttribute(XML_TAG_ID);
+		this.id = elements.getAttribute(XML_TAG_ID) ;
 		this.ifParam = elements.getAttribute("ifParam");
 		if ("".equals(this.ifParam)) {
 			ifParam = null;
@@ -87,66 +60,33 @@ public class EctypalElements {
 		this.eles = new EctypalElement[nodeNum];
 		this.needToDealEles = new HashSet<EctypalElement>();
 		for (int i = 0; i < nodeNum; i++) {
-			eles[i] = new EctypalElement((Element) nodes.item(i), fr, chr);
+			eles[i] = new EctypalElement((Element) nodes.item(i), fr, chr, hasEffect);
 			needToDealEles.add(eles[i]);
 		}
 	}
 
 	/**
 	 * Start to deal.
-	 * 
+	 * @param mergeVariants Al variants need to deal
+	 * @return
 	 * @throws IOException
 	 */
-	public Element deal() throws IOException {
-		List<VariantMapToDBSNP> mergeVariants = new Individual(variants, isVCF)
-				.merge(dbsnpURI, chr, start, end);
-		// If mergeVariants==null, return untreated Elements
-		if (mergeVariants == null || mergeVariants.size() == 0)
-			return this.elements;
-		
-		/*for(VariantMapToDBSNP v : mergeVariants)
-			System.out.println(v.variant);
-
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		
-		for (EctypalElement ee : eles) {
-			ee.printVariantsInSubElement(mergeVariants);
-		}*/
+	public Element deal(List<VariantMapToDBSNP> mergeVariants) throws IOException {
+		List<ControlArea> cas = ctrlArea2Variants(mergeVariants);
+		if (cas != null && cas.size() > 0) {
+			for (EctypalElement ee : eles)
+				ee.dealCtrlAreas(cas);
+		}
 		
 		for (EctypalElement ee : eles) {
 			ee.preDeal(mergeVariants);
-			if (!ee.stillNeedToDeal()){
-			//	System.out.println(ee.getId() + "不需要再处理");
+			if (!ee.stillNeedToDeal())
 				needToDealEles.remove(ee);
-			}
-		}
-		if (needToDealEles.size() > 0) {
-			List<ControlArea> cas = ctrlArea2Variants(mergeVariants);
-			if (cas != null && cas.size() > 0) {
-				for (EctypalElement ee : needToDealEles) {
-					ee.dealCtrlAreas(cas);
-				}
-			}
-			//TODO 只需测试下列部分
-			for (EctypalElement ee : needToDealEles) {
-				ee.deal(mergeVariants);
-			}
 		}
 		
-		/*boolean b = false;
-		for (EctypalElement ee : eles) {
-			if(ee.canBeTest()){
-				System.out.println(this.id + "(" + this.start + "-" + this.end + ")可以用来测试！");
-				b = true;
-				break;
-			}
+		for (EctypalElement ee : needToDealEles) {
+			ee.deal(mergeVariants);
 		}
-		if(!b){
-			System.out.println(this.id + "(" + this.start + "-" + this.end + ")不可用来测试！");
-		}*/
 		
 		return write2XML();
 	}
@@ -210,7 +150,7 @@ public class EctypalElements {
 						break;
 					cur = ctrlAreas.get(index++);
 				}
-			} else if (EctypalElement.overlap(v.getFrom(), v.getTo(), cur.from, cur.to)) {
+			} else if (EctypalSubElement.overlap(v.getFrom(), v.getTo(), cur.from, cur.to)) {
 				ca2vs.add(cur);
 				if (index == size)
 					break;
@@ -224,7 +164,6 @@ public class EctypalElements {
 				}
 				if(v.getFrom() > cur.to)
 					break;
-				// Now v.getFrom()<curTo
 				i--;
 			}
 		}
@@ -232,15 +171,7 @@ public class EctypalElements {
 		return ca2vs;
 	}
 
-	public void print() {
-		System.out.println("id=" + id);
-		System.out.println("ifParam=" + ifParam);
-		for (int i = 0, nodeNum = eles.length; i < nodeNum; i++) {
-			eles[i].print();
-		}
-	}
-
-	private Element write2XML() {
+	public Element write2XML() {
 		Element elements = doc.createElement(XML_TAG_ELEMENTS);
 		if (id != null)
 			elements.setAttribute(XML_TAG_ID, id);
@@ -248,19 +179,9 @@ public class EctypalElements {
 			elements.setAttribute("ifParam", ifParam);
 		Element ele = null;
 		for (int i = 0, len = eles.length; i < len; i++) {
-			//ENST00000366973, ENST00000531963, ENST00000526997, ENST00000525569
-			//if(eles[i].getId().equals("ENST00000366973") || eles[i].getId().equals("ENST00000531963") ||
-				//	eles[i].getId().equals("ENST00000526997") || eles[i].getId().equals("ENST00000525569")){
 				ele = eles[i].write2XML(doc);
 				elements.appendChild(ele);
-			//}
 		}
 		return elements;
-	}
-
-	static class ControlArea {
-		String id;
-		int from;
-		int to;
 	}
 }
