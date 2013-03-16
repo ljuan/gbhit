@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import edu.hit.mlg.Tools.StringSplit;
+
 import static FileReaders.Consts.VARIANT_TYPE_SNV;
 import static FileReaders.Consts.VARIANT_TYPE_INSERTION;
 import static FileReaders.Consts.VARIANT_TYPE_DELETION;
@@ -120,10 +122,8 @@ public class Vcf {
 	 *            samplesFilter will leave. If the track is DBSnp,
 	 *            samplesFilter=null
 	 */
-	public Vcf(char[] vcfInCharArray, int lenOfCharArray, int samplenum,
-			int[] samplesFilter) {
-		String[] temp = resolveVCFLine(vcfInCharArray, lenOfCharArray,
-				samplenum, samplesFilter);
+	public Vcf(char[] vcfInCharArray, int lenOfCharArray, int samplenum, int[] samplesFilter) {
+		String[] temp = resolveVCFLine(vcfInCharArray, lenOfCharArray, samplenum, samplesFilter);
 		Chr = (temp[0].startsWith("chr") ? "" : "chr") + temp[0];
 		Pos = getIntValue(temp[1]);
 		ID = temp[2];
@@ -138,8 +138,10 @@ public class Vcf {
 		Filter = temp[6];
 		FilterSet = new HashSet<String>();
 
-		for (String s : splitVCFByChar(temp[6], ','))
-			FilterSet.add(s);
+		StringSplit split = new StringSplit(',');
+		split.split(temp[6]);
+		for(int index=0, len=split.getResultNum(); index<len; index++)
+			FilterSet.add(split.getResultByIndex(index));
 
 		Info = temp[7];
 		if (samplesFilter != null) {
@@ -225,79 +227,6 @@ public class Vcf {
 		return dest;
 	}
 
-	private String[] expandCapacity(String[] src, int len) {
-		String[] dest = new String[len + len];
-		System.arraycopy(src, 0, dest, 0, len);
-		return dest;
-	}
-
-	private String[] splitVCFByChar(String vcf, int length, char c) {
-		String[] strs = new String[length];
-		char[] cs = vcf.toCharArray();
-		int len = cs.length;
-		int n = 0;
-
-		char[] tempCs = new char[300];
-		int count = 0;
-		int capacity = 300;
-
-		for (int i = 0; i < len; i++) {
-			if (c == cs[i]) {
-				strs[n++] = new String(tempCs, 0, count);
-				count = 0;
-				continue;
-			}
-			if (count == capacity) {
-				tempCs = expandCapacity(tempCs, capacity);
-				capacity += capacity;
-			}
-			tempCs[count++] = cs[i];
-		}
-		strs[n] = new String(tempCs, 0, count);
-
-		return strs;
-	}
-
-	private String[] splitVCFByChar(String vcf, char c) {
-		char[] cs = vcf.toCharArray();
-		int len = cs.length;
-
-		String[] strs = new String[100];
-		int strCount = 0;
-		int strLen = 100;
-
-		char[] tempCs = new char[100];
-		int count = 0;
-		int capacity = 100;
-
-		for (int i = 0; i < len; i++) {
-			if (c == cs[i]) {
-				if (strCount == strLen) {
-					strs = expandCapacity(strs, strLen);
-					strLen += strLen;
-				}
-				strs[strCount++] = new String(tempCs, 0, count);
-				count = 0;
-				continue;
-			}
-			if (count == capacity) {
-				tempCs = expandCapacity(tempCs, capacity);
-				capacity += capacity;
-			}
-			tempCs[count++] = cs[i];
-		}
-		if (strCount == strLen) {
-			strs = expandCapacity(strs, strLen);
-			strLen += strLen;
-		}
-		strs[strCount++] = new String(tempCs, 0, count);
-
-		String[] dest = new String[strCount];
-		System.arraycopy(strs, 0, dest, 0, strCount);
-
-		return dest;
-	}
-
 	// ///////////////////////////////////////////////////////////resolve INFO
 	/**
 	 * Resolve the Info. Each key-value is seperate by semicolon.<br />
@@ -308,15 +237,16 @@ public class Vcf {
 	public void resolveInfo(boolean samplesNumEQ0) {
 		if ('.' == Info.charAt(0))
 			return;
-		String[] many = splitVCFByChar(Info, ';');
+		String[] many = new StringSplit(';').split(Info).getResult();
 		Integer index = null;
 		String[] keyValue = null;
 		char firstChar;
+		StringSplit split = new StringSplit('=');
 		if (!samplesNumEQ0) {
 			// Personal Genemic VCF
 			pgInfo = new PGInfo();
 			for (String one : many) {
-				keyValue = splitVCFByChar(one, 2, '=');
+				keyValue = split.split(one).getResult();
 				if ((index = PGInfos_M.get(keyValue[0])) != null)
 					pgInfo.pgInfos[index] = true;
 
@@ -335,7 +265,7 @@ public class Vcf {
 			// DBSnp
 			dbSnpInfo = new DBSnpInfo();
 			for (String one : many) {
-				keyValue = splitVCFByChar(one, 2, '=');
+				keyValue = split.split(one).getResult();
 				if ((index = dbSnpInfos_M.get(keyValue[0])) != null) {
 					dbSnpInfo.dbSnpInfos[index] = true;
 
@@ -491,7 +421,7 @@ public class Vcf {
 			many = new String[1];
 			many[0] = Alt;
 		} else {
-			many = splitVCFByChar(Alt, ',');
+			many = new StringSplit(',').split(Alt).getResult();
 		}
 
 		variants = new Variant[many.length];
@@ -727,49 +657,15 @@ public class Vcf {
 		return vs;
 	}
 
-	public class DBSnpInfo {
-		/**
-		 * Every element map to dbSnpInfos_M. True represent INFO contains the
-		 * key, false else.
-		 */
-		boolean[] dbSnpInfos = new boolean[17];
-		/**
-		 * Only when the track is Database in VCF and the INFO contains
-		 * "GENEINFO", GENEINFO is effective.
-		 */
-		private String GENEINFO = null;
-		/**
-		 * Only when the track is Database VCF and the INFO contains "SCS", SCS
-		 * is effective.
-		 */
-		private String SCS = null;
-	}
-
-	private class PGInfo {
-		/**
-		 * Every element map to PGInfos_M. True represent INFO contains the key,
-		 * false else.
-		 */
-		boolean[] pgInfos = new boolean[3];
-		/**
-		 * The variant end base
-		 */
-		int end = -1;
-		/**
-		 * Number of the variant bases
-		 */
-		int svlen = -1;
-	}
-
 	public String getDetail() {
 		StringBuilder description = new StringBuilder();
 		description.append("QUAL:").append(this.Qual).append(";FILTER:")
 				.append(this.Filter).append(";INFO:").append(this.Info);
-/*		if (samples != null) {
+		if (samples != null) {
 			description.append(";FORMAT:").append(samples.getFormat())
 					.append(";SAMPLES:").append(samples.toString());
 		}
-*/
+
 		return description.toString();
 	}
 }

@@ -647,12 +647,13 @@ public class EctypalElement {
 		
 		Extract3Bases result = extractFromFasta(cur, v.getFrom(), extractIndex[direction?0:1][0][remain][0], extractIndex[direction?0:1][0][remain][1]);   
 		if (result == null) return cur;
+		char oldTranscription = standardGeneticCode.get(result.sequence);
 		dealedVariations.addLast(new DealedVariation(v));
 		result.sequence = replaceChar(result.sequence, v.getLetter().charAt(0), remain==0 ? 2 : (remain==1 ? 0 : 1), direction);
 		// Now we have get the sequence from the fasta file.
 		char transcription = standardGeneticCode.get(result.sequence);
 		//Record this variation in SubElement
-		recordVariant(result, v, transcription + "", cur.getElement());
+		recordVariant(result, v, oldTranscription + ":" + transcription, cur.getElement());
 		
 		if(v.getFrom() >= initiatorSmall && v.getTo() <= initiatorLarge){//The variant appeared in the initiator and must change the initiator
 			String changeType = cur.getElement().getType().equals(SUBELEMENT_TYPE_BOX) ? SUBELEMENT_TYPE_LOST_BOX : SUBELEMENT_TYPE_EXTEND_BAND;

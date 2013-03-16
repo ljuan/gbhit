@@ -1,9 +1,11 @@
 package edu.hit.mlg.individual.vcf;
 
+import static FileReaders.Consts.*;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-import FileReaders.Consts;
 import FileReaders.XmlWriter;
 
 /**
@@ -13,6 +15,15 @@ import FileReaders.XmlWriter;
  * 
  */
 public class Variant implements Comparable<Variant> {
+	public static final String LARGE_VARIANTION = "LargeVariation";
+	public static final int hash_SNV = VARIANT_TYPE_SNV.hashCode();
+	public static final int hash_INS = VARIANT_TYPE_INSERTION.hashCode();
+	public static final int hash_DEL = VARIANT_TYPE_DELETION.hashCode();
+	public static final int hash_INV = VARIANT_TYPE_INVERSION.hashCode();
+	public static final int hash_CNV = VARIANT_TYPE_CNV.hashCode();
+	public static final int hash_DUP = VARIANT_TYPE_DUPLICATION.hashCode();
+	public static final int hash_BLS = VARIANT_TYPE_BLS.hashCode();
+
 	private String id;// Attribute
 	private String type;// Attribute
 	private int from;// Tag
@@ -21,10 +32,10 @@ public class Variant implements Comparable<Variant> {
 	private String toChr;// Tag
 	private String direction;// Tag
 	private String description;// Tag
-	private int homo;// //Attribute
+	private String homo;// //Attribute
 
 	public Variant() {
-		this.homo = 0;
+		this.homo = "";
 	}
 
 	public Variant(String id, String type, int from, int to) {
@@ -32,7 +43,7 @@ public class Variant implements Comparable<Variant> {
 		this.type = type;
 		this.from = from;
 		this.to = to;
-		homo = 0;
+		homo = "";
 	}
 
 	public String toString() {
@@ -129,15 +140,12 @@ public class Variant implements Comparable<Variant> {
 		return id;
 	}
 
-	/**
-	 * <pre>
-	 * If <code>homo</code>=0: Don't need to set attribute of homo.
-	 * If <code>homo</code>=1: Set attribute of homo=true.
-	 * If <code>homo</code>=2: Set attribute of homo=false.
-	 * @param homo
-	 */
-	public void setHomo(int homo) {
+	public void setHomo(String homo) {
 		this.homo = homo;
+	}
+	
+	public String getHomo(){
+		return homo;
 	}
 
 	/**
@@ -159,29 +167,66 @@ public class Variant implements Comparable<Variant> {
 	 *            Whether to output LETTER
 	 */
 	public void write2xml(Document doc, Element parent, boolean outputLetter) {
-		Element v = doc.createElement(Consts.XML_TAG_VARIANT);
+		Element v = doc.createElement(XML_TAG_VARIANT);
 		parent.appendChild(v);
-		v.setAttribute(Consts.XML_TAG_ID, id);
-		v.setAttribute(Consts.XML_TAG_TYPE, type);
-		if (homo != 0)
-			v.setAttribute(Consts.XML_TAG_HOMO, homo == 1 ? Consts.TEXT_TRUE : Consts.TEXT_FALSE);
-		XmlWriter.append_text_element(doc, v, Consts.XML_TAG_FROM, from + "");
-		XmlWriter.append_text_element(doc, v, Consts.XML_TAG_TO, to + "");
+		v.setAttribute(XML_TAG_ID, id);
+		v.setAttribute(XML_TAG_TYPE, type);
+		if (!"".equals(homo))
+			v.setAttribute(XML_TAG_HOMO, homo);
+		XmlWriter.append_text_element(doc, v, XML_TAG_FROM, from + "");
+		XmlWriter.append_text_element(doc, v, XML_TAG_TO, to + "");
 		if (letter != null && outputLetter)
-			XmlWriter
-					.append_text_element(doc, v, Consts.XML_TAG_LETTER, letter);
+			XmlWriter.append_text_element(doc, v, XML_TAG_LETTER, letter);
 		if (toChr != null)
-			XmlWriter.append_text_element(doc, v, Consts.XML_TAG_TOCHR, toChr);
+			XmlWriter.append_text_element(doc, v, XML_TAG_TOCHR, toChr);
 		if (direction != null)
-			XmlWriter.append_text_element(doc, v, Consts.XML_TAG_DIRECTION,
-					direction);
+			XmlWriter.append_text_element(doc, v, XML_TAG_DIRECTION, direction);
 		if (description != null)
-			XmlWriter.append_text_element(doc, v, Consts.XML_TAG_DESCRIPTION,
-					description);
+			XmlWriter.append_text_element(doc, v, XML_TAG_DESCRIPTION, description);
+	}
+	
+	public static Variant convertElement2Variant(Element ele){
+		Variant v = new Variant();
+		v.setId(ele.getAttribute(XML_TAG_ID));
+		v.setType(ele.getAttribute(XML_TAG_TYPE));
+		String homo = ele.getAttribute(XML_TAG_HOMO);
+		v.setHomo(homo);
+		
+		NodeList children = ele.getChildNodes();
+		v.setFrom(Integer.parseInt(children.item(0).getTextContent()));
+		v.setTo(Integer.parseInt(children.item(1).getTextContent()));
+		for(int index = 2, len = children.getLength(); index < len; index++){
+			Element e = (Element) children.item(index);
+			if (e.getTagName().equals(XML_TAG_LETTER))
+				v.setLetter(e.getTextContent());
+			else if (e.getTagName().equals(XML_TAG_TOCHR))
+				v.setToChr(e.getTextContent());
+			else if (e.getTagName().equals(XML_TAG_DIRECTION))
+				v.setDirection(e.getTextContent());
+			else if (e.getTagName().equals(XML_TAG_DESCRIPTION))
+				v.setDescription(e.getTextContent());
+		}
+		
+		return v;
 	}
 
 	@Override
 	public int compareTo(Variant o) {
 		return (this.from != o.from) ? (this.from - o.from) : (this.to - o.to);
+	}
+	
+	public static Variant copy(Variant obj){
+		if(obj == null) return null;
+		Variant newObj = new Variant();
+		newObj.id = obj.id;
+		newObj.type = obj.type;
+		newObj.from = obj.from;
+		newObj.to = obj.to;
+		newObj.letter = obj.letter;
+		newObj.toChr = obj.toChr;
+		newObj.direction = obj.direction;
+		newObj.description = obj.description;
+		newObj.homo = obj.homo;
+		return newObj;
 	}
 }

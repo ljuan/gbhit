@@ -119,6 +119,10 @@ public class Genes{
 				else{
 					Element gene=doc.createElement(Consts.XML_TAG_GENE);
 					gene.setAttribute(Consts.XML_TAG_ID, Symbols_sorted[i]);
+					int index=SymbolMap.get(Symbols_sorted[i]);
+					XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_CHROMOSOME, ChrList[Chrs[index]]);
+					XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_FROM, Integer.toString(Starts[index]+1));
+					XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_TO, Integer.toString(Ends[index]));
 					genes.appendChild(gene);
 				}
 			}

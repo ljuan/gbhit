@@ -9,31 +9,22 @@ package edu.hit.mlg.individual.vcf;
 public class VCFRecordSamples {
 	private String format;
 	private int[][] sampleVariants;
-	/**
-	 * <pre>
-	 * If <code>homo</code>=0: Don't need to set attribute of homo.<br>
-	 * If <code>homo</code>=1: Set attribute of homo=true.<br>
-	 * If <code>homo</code>=2: Set attribute of homo=false.
-	 * <br>
-	 */
-	private int[] homos;
+	private String[] homos;
 	private String[] samples;
 	private boolean containGT;
 
 	/**
 	 * 
-	 * @param samples
-	 *            VCF line split by '\t'
+	 * @param samples 	VCF line split by '\t'
 	 */
 	public VCFRecordSamples(String[] samples) {
 		int len = samples.length - 9;
 		this.format = samples[8];
-		containGT = format.length() > 2 && format.charAt(0) == 'G'
-				&& format.charAt(1) == 'T' && format.charAt(2) == ':';
+		containGT = format.startsWith("GT:");
 		this.sampleVariants = new int[len][];
-		this.homos = new int[len];
+		this.homos = new String[len];
 		for (int i = 0; i < len; i++) {
-			this.homos[i] = 0;
+			this.homos[i] = "";
 		}
 		this.samples = new String[len];
 		for (int index = 0; index < len; index++) {
@@ -42,8 +33,7 @@ public class VCFRecordSamples {
 		if (containGT) {
 			char[] cs = new char[100];
 			for (int index = 0; index < len; index++) {
-				this.sampleVariants[index] = getIntValues(
-						getGT(samples[index + 9], cs), index);
+				this.sampleVariants[index] = getIntValues(getGT(samples[index + 9], cs, index), index);
 			}
 		}
 	}
@@ -53,9 +43,10 @@ public class VCFRecordSamples {
 	 * 
 	 * @param sample
 	 * @param cs
+	 * @param index
 	 * @return
 	 */
-	private char[] getGT(String sample, char[] cs) {
+	private char[] getGT(String sample, char[] cs, int index) {
 		int count = 0;
 		for (int i = 0; i < sample.length(); i++) {
 			if (sample.charAt(i) == ':')
@@ -65,12 +56,13 @@ public class VCFRecordSamples {
 
 		char[] dest = new char[count];
 		System.arraycopy(cs, 0, dest, 0, count);
+		this.homos[index] = new String(dest);
 
 		return dest;
 	}
 
 	/**
-	 * Retrieve number from GT. The numbers may separate by '|' or '/'. If
+	 * Retrieve number from GT. The numbers may separate by '|' or '/'.
 	 * 
 	 * <pre>
 	 * They are five examples:
@@ -86,7 +78,6 @@ public class VCFRecordSamples {
 	private int[] getIntValues(char[] GT, int index) {
 		int[] intValues = new int[10];
 		int[] position = new int[11];
-		int numberNum = 0; // Number of numbers
 		int curNum = -1;
 		int count = 0;
 		int num = 0;
@@ -95,7 +86,6 @@ public class VCFRecordSamples {
 			if (c >= '0' && c <= '9') {
 				num = num * 10 + (int) c - 48;
 			} else {
-				numberNum++;
 				if (num != curNum) {
 					curNum = num;
 				} else {
@@ -108,7 +98,6 @@ public class VCFRecordSamples {
 				num = 0;
 			}
 		}
-		numberNum++;
 		if (num != curNum) {
 			curNum = num;
 		} else {
@@ -116,15 +105,6 @@ public class VCFRecordSamples {
 		}
 		if (num > 0 && position[num] == 0)
 			intValues[count++] = num;
-		if (numberNum == 2) {
-			if (curNum == -1) {
-				// The two numbers are equal.
-				this.homos[index] = 1;
-			} else {
-				// The two numbers are not equal.
-				this.homos[index] = 2;
-			}
-		}
 		// In most cases
 		if (count == 0)
 			return null;
@@ -147,7 +127,7 @@ public class VCFRecordSamples {
 		return sampleVariants[index];
 	}
 
-	public int getHome(int index) {
+	public String getHome(int index) {
 		return homos[index];
 	}
 

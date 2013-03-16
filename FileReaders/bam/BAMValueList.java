@@ -83,17 +83,16 @@ public class BAMValueList {
 	 * For example, array={1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.7, 9.9, 10.0},
 	 * return "1;2;3;4;5;6;7;8;9;10".
 	 * @param array
-	 * @param sep
 	 * @return
 	 */
-	public static String doubleArray2IntString(double[] array, char sep) {
+	public static String doubleArray2IntString(double[] array) {
 		if (array == null)
 			return null;
 		StringBuilder builder = new StringBuilder();
 		int len = array.length;
 		for (int i = 0; i < len - 1; i++) {
 			builder.append((int) array[i]);
-			builder.append(sep);
+			builder.append(';');
 		}
 		if (len > 0)
 			builder.append((int) array[len - 1]);
@@ -107,20 +106,39 @@ public class BAMValueList {
 	 * For example, array={1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 	 * return "1;2;3;4;5;6;7;8;9;10".
 	 * @param array
-	 * @param sep
 	 * @return
 	 */
-	public static String intArray2IntString(int[] array, char sep) {
-		if (array == null)
+	public static String intArray2IntString(int[] array) {
+		return intArray2IntString(array, 0, array.length - 1);
+	}
+	
+	public static String intArray2IntString(int[] array, char c) {
+		return intArray2IntString(array, 0, array.length - 1, c);
+	}
+	
+	/**
+	 * Link every element of integer array of the certain region with ";"
+	 * 
+	 * <pre>
+	 * For example, array={1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, from=1, to=8
+	 * return "2;3;4;5;6;7;8;9".
+	 * @param array
+	 * @param from from index, inclusive.
+	 * @param to to index, inclusive.
+	 * @return
+	 */
+	public static String intArray2IntString(int[] array, int from, int to){
+		return intArray2IntString(array, from, to, ';');
+	}
+	
+	public static String intArray2IntString(int[] array, int from, int to, char c){
+		if(array == null || from < 0 || from >= array.length || to < 0 || to >= array.length || from > to)
 			return null;
 		StringBuilder builder = new StringBuilder();
-		int len = array.length;
-		for (int i = 0; i < len - 1; i++) {
+		for (int i = from; i <= to; i++) {
 			builder.append(array[i]);
-			builder.append(sep);
+			builder.append(c);
 		}
-		if (len > 0)
-			builder.append(array[len - 1]);
-		return builder.toString();
+		return builder.toString().substring(0, builder.length() - 1);
 	}
 }

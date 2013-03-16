@@ -12,6 +12,7 @@ import edu.hit.mlg.individual.vcf.Variant;
 import edu.hit.mlg.individual.vcf.Variants;
 import edu.hit.mlg.individual.vcf.Vcf;
 
+import static FileReaders.Consts.*;
 
 /*
  * This is for reading a Consts.VCF format file.
@@ -34,11 +35,16 @@ import edu.hit.mlg.individual.vcf.Vcf;
 public class VcfReader {
 	private TabixReaderForVCF vcf_tb;
 	private Annotations track = null;
+	/**
+	 * limit of bpp
+	 */
+	private double bppLimit;
 
 	public VcfReader(Annotations track, String Chr) {
+		this.bppLimit = 0.5;
 		try {
 			vcf_tb = new TabixReaderForVCF(track.get_Path(Chr));
-			if (track.get_Parameter(Consts.VCF_CHROM_PREFIX) == null) {
+			if (track.get_Parameter(VCF_CHROM_PREFIX) == null) {
 				Map<String, Boolean> filter_header = new HashMap<String, Boolean>();
 				Map<String, String[]> info_header = new HashMap<String, String[]>();
 				Map<String, String[]> format_header = new HashMap<String, String[]>();
@@ -51,23 +57,18 @@ public class VcfReader {
 					if (str.equalsIgnoreCase("FILTER")) {
 						int left = line.indexOf('<');
 						int right = line.lastIndexOf('>');
-						String[] line_temp = line.substring(left + 1, right)
-								.split("ID=|,Description=");
+						String[] line_temp = line.substring(left + 1, right).split("ID=|,Description=");
 						filter_header.put(line_temp[1], false);
 					} else if (line.substring(2, 6).equalsIgnoreCase("INFO")) {
 						int left = line.indexOf('<');
 						int right = line.lastIndexOf('>');
-						String[] line_temp = line.substring(left + 1, right)
-								.split("ID=|,Number=|,Type=|,Description=");
-						info_header.put(line_temp[1],
-								Arrays.copyOfRange(line_temp, 2, 5));
+						String[] line_temp = line.substring(left + 1, right).split("ID=|,Number=|,Type=|,Description=");
+						info_header.put(line_temp[1], Arrays.copyOfRange(line_temp, 2, 5));
 					} else if (str.equalsIgnoreCase("FORMAT")) {
 						int left = line.indexOf('<');
 						int right = line.lastIndexOf('>');
-						String[] line_temp = line.substring(left + 1, right)
-								.split("ID=|,Number=|,Type=|,Description=");
-						format_header.put(line_temp[1],
-								Arrays.copyOfRange(line_temp, 2, 5));
+						String[] line_temp = line.substring(left + 1, right).split("ID=|,Number=|,Type=|,Description=");
+						format_header.put(line_temp[1], Arrays.copyOfRange(line_temp, 2, 5));
 					} else if (line.startsWith("#CHROM")) {
 						String[] line_temp = line.split("\t");
 						if (line_temp.length > 9) {
@@ -79,21 +80,15 @@ public class VcfReader {
 					}
 				}
 				if (samples != null)
-					track.initialize_Parameter(Consts.VCF_HEADER_SAMPLE,
-							new VcfSample(samples), Consts.PARAMETER_TYPE_VCFSAMPLE);
+					track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(samples), PARAMETER_TYPE_VCFSAMPLE);
 				if (!filter_header.isEmpty())
-					track.initialize_Parameter(Consts.VCF_HEADER_FILTER,
-							filter_header, Consts.PARAMETER_TYPE_CHECKBOX);
+					track.initialize_Parameter(VCF_HEADER_FILTER, filter_header, PARAMETER_TYPE_CHECKBOX);
 				if (!format_header.isEmpty())
-					track.initialize_Parameter(Consts.VCF_HEADER_FORMAT,
-							format_header, Consts.PARAMETER_TYPE_INVISABLE);
+					track.initialize_Parameter(VCF_HEADER_FORMAT, format_header, PARAMETER_TYPE_INVISABLE);
 				if (!info_header.isEmpty())
-					track.initialize_Parameter(Consts.VCF_HEADER_INFO, info_header,
-							Consts.PARAMETER_TYPE_INVISABLE);
-				track.initialize_Parameter(Consts.VCF_CHROM_PREFIX,
-						vcf_tb.hasChromPrefix(), Consts.PARAMETER_TYPE_INVISABLE);
-				track.initialize_Parameter(Consts.VCF_QUAL_LIMIT, "-1",
-						Consts.PARAMETER_TYPE_STRING);
+					track.initialize_Parameter(VCF_HEADER_INFO, info_header, PARAMETER_TYPE_INVISABLE);
+				track.initialize_Parameter(VCF_CHROM_PREFIX, vcf_tb.hasChromPrefix(), PARAMETER_TYPE_INVISABLE);
+				track.initialize_Parameter(VCF_QUAL_LIMIT, "-1", PARAMETER_TYPE_STRING);
 			}
 			this.track = track;
 		} catch (IOException e) {
@@ -101,9 +96,18 @@ public class VcfReader {
 		}
 	}
 
+	/**
+	 * Change the limit of bpp
+	 * 
+	 * @param bppLimit
+	 *            limit of bpp
+	 */
+	public void changeBppLimit(double bppLimit) {
+		this.bppLimit = bppLimit;
+	}
+
 	public void printSamples() {
-		VcfSample vcfSample = (VcfSample) this.track
-				.get_Parameter(Consts.VCF_HEADER_SAMPLE);
+		VcfSample vcfSample = (VcfSample) this.track.get_Parameter(VCF_HEADER_SAMPLE);
 		if (vcfSample == null) {
 			System.out.println("The track is dbsnp!");
 			return;
@@ -112,29 +116,29 @@ public class VcfReader {
 		for (String sample : vcfSample.getSampleNames())
 			System.out.println(sample);
 	}
-	public Element get_detail(Document doc, String track, String id, String chr, long start, long end){
-		Variants[] variants=new Variants[1];
-		variants[0]=new Variants(track, null, doc, Consts.MODE_DETAIL, 0.1, -1, null);
+
+	public Element get_detail(Document doc, String track, String id,
+			String chr, long start, long end) {
+		Variants[] variants = new Variants[1];
+		variants[0] = new Variants(track, null, doc, MODE_DETAIL, 0.1, bppLimit, -1, null);
 		Vcf vcf = null;
 		try {
-			String chrom = (Boolean) this.track.get_Parameter(Consts.VCF_CHROM_PREFIX) ? chr
-					: chr.substring(3);
+			String chrom = (Boolean) this.track .get_Parameter(VCF_CHROM_PREFIX) ? chr : chr.substring(3);
 			if ("M".equalsIgnoreCase(chrom)) {
 				chrom = "MT";
 			}
-			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start
-					+ "-" + end);
+			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start + "-" + end);
 			if (Query != null) {
-				ArrayList<Variant> vs_list=new ArrayList<Variant>();
+				ArrayList<Variant> vs_list = new ArrayList<Variant>();
 				Variant[] vs;
 				while (Query.next() != null) {
-					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar,	0, null);
-					Variant[] vs_temp=vcf.getVariants();
-					for(int vs_i=0;vs_i<vs_temp.length;vs_i++)
-						if(vcf.getID().equals(id)&&vs_temp[vs_i].getFrom()==start&&vs_temp[vs_i].getTo()==end)
+					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, 0, null);
+					Variant[] vs_temp = vcf.getVariants();
+					for (int vs_i = 0; vs_i < vs_temp.length; vs_i++)
+						if (vcf.getID().equals(id) && vs_temp[vs_i].getFrom() == start && vs_temp[vs_i].getTo() == end)
 							vs_list.add(vs_temp[vs_i]);
-					if(!vs_list.isEmpty()){
-						vs=new Variant[vs_list.size()];
+					if (!vs_list.isEmpty()) {
+						vs = new Variant[vs_list.size()];
 						vs_list.toArray(vs);
 						variants[0].addVariant(vcf, vs);
 						break;
@@ -149,10 +153,11 @@ public class VcfReader {
 		variants = null;
 		return e1;
 	}
+
 	public Element write_vcf2variants(Document doc, String track, String mode,
 			double bpp/* bases per pixel */, String chr, long start, long end) {
 		float qualLimit = Float.parseFloat((String) (this.track
-				.get_Parameter(Consts.VCF_QUAL_LIMIT)));
+				.get_Parameter(VCF_QUAL_LIMIT)));
 		String[] filterLimit = getFilterLimit();
 
 		int samplesNum = 0;
@@ -160,8 +165,9 @@ public class VcfReader {
 		VcfSample vcfSample = null;
 		Variants[] variants;
 
-		if (this.track.has_Parameter(Consts.VCF_HEADER_SAMPLE)) {
-			vcfSample = (VcfSample) this.track.get_Parameter(Consts.VCF_HEADER_SAMPLE);
+		if (this.track.has_Parameter(VCF_HEADER_SAMPLE)) {
+			vcfSample = (VcfSample) this.track
+					.get_Parameter(VCF_HEADER_SAMPLE);
 			// vcfSample.setSamples("MCF7");
 			samplesNum = vcfSample.getSamplesNum();
 			selectedIndexes = vcfSample.getSelectedIndexes();
@@ -169,22 +175,20 @@ public class VcfReader {
 		if (samplesNum == 0 || selectedIndexes == null) {
 			// DBSnp or Personal genemic VCF without choose any SAMPLEs
 			variants = new Variants[1];
-			variants[0] = new Variants(track, null, doc, mode, bpp, -1, null);
+			variants[0] = new Variants(track, null, doc, mode, bpp, bppLimit, -1, null);
 		} else {
 			// Personal Genemic VCF
 			variants = new Variants[selectedIndexes.length];
 			String[] selectedNames = vcfSample.getSelectedNames();
 			int selectedLen = selectedIndexes.length;
 			for (int i = 0; i < selectedLen; i++) {
-				variants[i] = new Variants(track, selectedNames[i], doc, mode,
-						bpp, qualLimit, filterLimit);
+				variants[i] = new Variants(track, selectedNames[i], doc, mode, bpp, bppLimit, qualLimit, filterLimit);
 			}
 		}
 
 		Vcf vcf = null;
 		try {
-			String chrom = (Boolean) this.track.get_Parameter(Consts.VCF_CHROM_PREFIX) ? chr
-					: chr.substring(3);
+			String chrom = (Boolean) this.track.get_Parameter(VCF_CHROM_PREFIX) ? chr : chr.substring(3);
 			if ("M".equalsIgnoreCase(chrom)) {
 				chrom = "MT";
 			}
@@ -195,14 +199,12 @@ public class VcfReader {
 				Variant[] vs;
 				boolean siNotNull = selectedIndexes != null;
 				while (Query.next() != null) {
-					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar,
-							samplesNum, selectedIndexes);
+					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, samplesNum, selectedIndexes);
 					if (vcf.altIsDot())
 						continue;
 					if (!vcf.isDBSnp() && siNotNull) {
 						// Personal Genemic VCF
-						if (vcf.shouldBeFilteredByQualLimit(qualLimit)
-								|| vcf.shouldBeFilteredByFilterLimit(filterLimit))
+						if (vcf.shouldBeFilteredByQualLimit(qualLimit) || vcf.shouldBeFilteredByFilterLimit(filterLimit))
 							continue;
 						for (int i = 0; i < len; i++) {
 							vs = vcf.getVariants(i);
@@ -230,7 +232,7 @@ public class VcfReader {
 	}
 
 	private String[] getFilterLimit() {
-		Object o = this.track.get_Parameter(Consts.VCF_HEADER_FILTER);
+		Object o = this.track.get_Parameter(VCF_HEADER_FILTER);
 		if (o == null)
 			return null;
 		String[] filterLimit = new String[20];

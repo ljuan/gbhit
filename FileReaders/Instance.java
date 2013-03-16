@@ -89,16 +89,17 @@ public class Instance {
 				Annotations external_temp=externals_enum.nextElement();
 				append_track(external_temp,doc,external_temp.get_Mode());
 			}	
-			if(Pvar!=null)
+			if(Pvar!=null){
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
-			if(Pfanno!=null)
-				append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
-			if(Panno!=null){
-				append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
-				Enumeration<Annotations> pclns_enum=Pclns.elements();
-				for(int i=0;i<Externals.size();i++){
-					Annotations pclns_temp=pclns_enum.nextElement();
-					append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
+				if(Pfanno!=null)
+					append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
+				if(Panno!=null){
+					append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
+					Enumeration<Annotations> pclns_enum=Pclns.elements();
+					for(int i=0;i<Pclns.size();i++){
+						Annotations pclns_temp=pclns_enum.nextElement();
+						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
+					}
 				}
 			}
 		}
@@ -156,6 +157,14 @@ public class Instance {
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
+				if(Panno!=null){
+					append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
+					Enumeration<Annotations> pclns_enum=Pclns.elements();
+					for(int i=0;i<Pclns.size();i++){
+						Annotations pclns_temp=pclns_enum.nextElement();
+						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
+					}
+				}
 			}
 		}
 		else if(Externals.containsKey(track)){
@@ -168,6 +177,14 @@ public class Instance {
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
+				if(Panno!=null){
+					append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
+					Enumeration<Annotations> pclns_enum=Pclns.elements();
+					for(int i=0;i<Pclns.size();i++){
+						Annotations pclns_temp=pclns_enum.nextElement();
+						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
+					}
+				}
 			}
 		}
 		return XmlWriter.xml2string(doc);
@@ -183,11 +200,21 @@ public class Instance {
 			Panno=SerializationUtils.clone(Annos.get(track));
 			Panno.set_Mode(mode);
 			append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
+			Enumeration<Annotations> pclns_enum=Pclns.elements();
+			for(int i=0;i<Pclns.size();i++){
+				Annotations pclns_temp=pclns_enum.nextElement();
+				append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
+			}
 		}
 		else if(Externals.containsKey(track)&&Externals.get(track).get_Type().equals(Consts.FORMAT_ANNO)){
 			Panno=SerializationUtils.clone(Externals.get(track));
 			Panno.set_Mode(mode);
 			append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
+			Enumeration<Annotations> pclns_enum=Pclns.elements();
+			for(int i=0;i<Pclns.size();i++){
+				Annotations pclns_temp=pclns_enum.nextElement();
+				append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
+			}
 		}
 		return XmlWriter.xml2string(doc);
 	}
@@ -201,21 +228,43 @@ public class Instance {
 			Pfanno=SerializationUtils.clone(Annos.get(track));
 			Pfanno.set_Mode(mode);
 			append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
-			if(Panno!=null)
-				append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
+			if(Panno!=null&&Pvar!=null){
+				append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
+				Enumeration<Annotations> pclns_enum=Pclns.elements();
+				for(int i=0;i<Pclns.size();i++){
+					Annotations pclns_temp=pclns_enum.nextElement();
+					append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
+				}
+			}
 		}
 		else if(Externals.containsKey(track)&&Externals.get(track).get_Type().equals(Consts.FORMAT_GRF)){
 			Pfanno=SerializationUtils.clone(Externals.get(track));
 			Pfanno.set_Mode(mode);
 			append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
-			if(Panno!=null)
-				append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
+			if(Panno!=null&&Pvar!=null){
+				append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
+				Enumeration<Annotations> pclns_enum=Pclns.elements();
+				for(int i=0;i<Pclns.size();i++){
+					Annotations pclns_temp=pclns_enum.nextElement();
+					append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
+				}
+			}
 		}
 		return XmlWriter.xml2string(doc);
 	}
-	public void remove_Pfanno(){
+	public String remove_Pfanno(){
 		Pfanno=null;
 		Ele_fanno=null;
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		if(Panno!=null&&Pvar!=null){
+			append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
+			Enumeration<Annotations> pclns_enum=Pclns.elements();
+			for(int i=0;i<Pclns.size();i++){
+				Annotations pclns_temp=pclns_enum.nextElement();
+				append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
+			}
+		}
+		return XmlWriter.xml2string(doc);
 	}
 	public String add_Pclns(String[] tracks,String[] modes){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
@@ -380,10 +429,12 @@ public class Instance {
 		if(Pvar!=null&&track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_VCF)&&Class==Consts.PTRACK_CLASS_VAR){
 			if(track.get_ID().equals(PvarID)){
 				VcfReader vr=new VcfReader(track,Chr);
+				vr.changeBppLimit(Consts.LIMIT_BPP);
 				Ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			}
 			else {
 				VcfReader vr=new VcfReader(track,Chr);
+				vr.changeBppLimit(Consts.LIMIT_BPP);
 				Ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			}
 		}

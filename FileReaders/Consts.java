@@ -12,6 +12,7 @@ public interface Consts{
 	public static final int LIMIT_SEQ=900;
 	public static final int LIMIT_ELE=-1;
 	public static final int LIMIT_VAR=1000000;
+	public static final double LIMIT_BPP=1.5;
 	
 	public static final String VCF_HEADER_FILTER="filters";
 	public static final String VCF_HEADER_INFO="info";

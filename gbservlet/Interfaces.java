@@ -57,7 +57,8 @@ public class Interfaces extends HttpServlet{
 			res.getWriter().print(a);
 		}
 		else if (action.equals("removePfanno")){
-			ins.remove_Pfanno();
+			String a=ins.remove_Pfanno();
+			res.getWriter().print(a);
 		}
 		else if (action.equals("modiPclns")||action.equals("addPclns")){
 			String a=ins.add_Pclns(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
