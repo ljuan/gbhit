@@ -31,7 +31,7 @@ public class FileReaders {
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());
-		externals[0]="BamTest";externals_links[0]="http://202.118.228.68/gbfiles/MCF7_DNAseq.hg19.sorted.bam";externals_types[0]="BAM";externals_modes[0]=Consts.MODE_FULL;
+*/		externals[0]="BamTest";externals_links[0]="http://202.118.228.68/gbfiles/MCF7_DNAseq.hg19.sorted.bam";externals_types[0]="BAM";externals_modes[0]=Consts.MODE_FULL;
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
 		System.out.println(System.currentTimeMillis());

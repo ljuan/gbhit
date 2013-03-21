@@ -3,7 +3,8 @@ package edu.hit.mlg.individual.vcf;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import static FileReaders.Consts.*;
+import FileReaders.Consts;
+
 
 /**
  * An instance of Variants represent DBSnp or an individual of SAMPLEs.
@@ -54,13 +55,16 @@ public class Variants {
 			double bpp, double bppLimit, float qualLimit, String[] filterLimit) {
 		this.doc = doc;
 		this.bpp = bpp;
-		this.isModeDENSE = mode.equals(MODE_DENSE);
+		this.isModeDENSE = mode.equals(Consts.MODE_DENSE);
 		this.outputLetter = !isModeDENSE || bpp < bppLimit;
-		ele = doc.createElement(XML_TAG_VARIANTS);
-		ele.setAttribute(XML_TAG_ID, id);
-		if (subId != null)
-			ele.setAttribute(XML_TAG_SUBID, subId);
-		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele);
+		ele = doc.createElement(Consts.XML_TAG_VARIANTS);
+		if (subId != null){
+	      ele.setAttribute(Consts.XML_TAG_ID, subId);
+	      ele.setAttribute(Consts.XML_TAG_SUPERID, id);
+	    }
+	    else
+	      ele.setAttribute(Consts.XML_TAG_ID, id); 
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(ele);
 	}
 
 	/**

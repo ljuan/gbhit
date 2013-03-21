@@ -10,9 +10,10 @@ import FileReaders.bam.VariantResolver;
 import edu.hit.mlg.individual.vcf.Variant;
 import net.sf.samtools.*;
 import net.sf.samtools.SAMRecord.SAMTagAndValue;
-import net.sf.samtools.util.SeekableBufferedStream;
-import net.sf.samtools.util.SeekableHTTPStream;
+import net.sf.samtools.seekablestream.SeekableBufferedStream;
+import net.sf.samtools.seekablestream.SeekableHTTPStream;
 import static FileReaders.XmlWriter.append_text_element;
+import static FileReaders.Consts.*;
 
 /**
  * <pre>
@@ -28,6 +29,7 @@ import static FileReaders.XmlWriter.append_text_element;
  */
 public class BAMReader {
 
+	private static final int SMALL_REGION_NUMBER_LIMIT = 20000;
 	/**
 	 * BAM file path or url.
 	 */
@@ -89,9 +91,8 @@ public class BAMReader {
 	 * @throws MalformedURLException
 	 * @throws URISyntaxException
 	 */
-	public BAMReader(String filePath, String indexFilePath,
-			boolean fromRemoteServer) throws MalformedURLException,
-			URISyntaxException {
+	public BAMReader(String filePath, String indexFilePath, boolean fromRemoteServer) 
+			throws MalformedURLException, URISyntaxException {
 		this.filePath = filePath;
 		this.indexFilePath = indexFilePath;
 		this.fromRemoteServer = fromRemoteServer;
@@ -106,17 +107,14 @@ public class BAMReader {
 	 * @throws URISyntaxException
 	 * @throws FileNotFoundException
 	 */
-	public BAMReader(String filePath) throws MalformedURLException,
-			URISyntaxException, FileNotFoundException {
+	public BAMReader(String filePath) throws MalformedURLException, URISyntaxException, FileNotFoundException {
 		this.filePath = filePath;
-		if (filePath.startsWith("http://") || filePath.startsWith("ftp://")
-				|| filePath.startsWith("https://")) {
+		if (filePath.startsWith("http://") || filePath.startsWith("ftp://") || filePath.startsWith("https://")) {
 			this.fromRemoteServer = true;
 
 			if (isRemoteFileExists(filePath + ".bai"))
 				this.indexFilePath = filePath + ".bai";
-			else if (BAMReader.isRemoteFileExists(filePath.replace(".bam",
-					".bai")))
+			else if (BAMReader.isRemoteFileExists(filePath.replace(".bam", ".bai")))
 				this.indexFilePath = filePath.replace(".bam", ".bai");
 			else
 				throw new FileNotFoundException();
@@ -138,8 +136,7 @@ public class BAMReader {
 		URL serverUrl;
 		try {
 			serverUrl = new URL(url);
-			HttpURLConnection urlcon = (HttpURLConnection) serverUrl
-					.openConnection();
+			HttpURLConnection urlcon = (HttpURLConnection) serverUrl.openConnection();
 
 			String message = urlcon.getHeaderField(0);
 			if (message != null && message.startsWith("HTTP/1.1 200 OK")) {
@@ -176,9 +173,8 @@ public class BAMReader {
 	 * 3:NotDetailBig
 	 * @throws IOException
 	 */
-	public Element get_detail(Document doc, String track, String id,
-			String chr, int start, int end) throws SAMFormatException,
-			IOException {
+	public Element get_detail(Document doc, String track, String id, String chr, int start, int end) 
+			throws SAMFormatException, IOException {
 		Element ele = null;
 		List<SAMRecord> list = readSmallRegion(chr, start, end);
 		ele = writeDetail(doc, list, track, id, start, end);
@@ -186,8 +182,7 @@ public class BAMReader {
 
 	}
 
-	public Element readBAM(Document doc, String chr, int start, int end,
-			int windowSize, int step, String mode, String track)
+	public Element readBAM(Document doc, String chr, int start, int end, int windowSize, int step, String mode, String track)
 			throws SAMFormatException, IOException {
 		Element ele = null;
 		double bpp = 0;
@@ -221,43 +216,31 @@ public class BAMReader {
 		return ele;
 	}
 
-	private Element writeDetail(Document doc, List<SAMRecord> list,
-			String track, String id, int start, int end) {
-		Element reads = doc.createElement(Consts.XML_TAG_READS);
+	private Element writeDetail(Document doc, List<SAMRecord> list, String track, String id, int start, int end) {
+		Element reads = doc.createElement(XML_TAG_READS);
 		SAMRecord rec = null;
 		Element read = null;
-		reads.setAttribute(Consts.XML_TAG_ID, track);
-		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(reads);
+		reads.setAttribute(XML_TAG_ID, track);
+		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
 
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
 			rec = itor.next();
-			if (id.equals(rec.getReadName())
-					&& start == rec.getAlignmentStart()
-					&& end == rec.getAlignmentEnd()) {
-				read = doc.createElement(Consts.XML_TAG_READ);
-				read.setAttribute(Consts.XML_TAG_ID, rec.getReadName());
+			if (id.equals(rec.getReadName()) && start == rec.getAlignmentStart() && end == rec.getAlignmentEnd()) {
+				read = doc.createElement(XML_TAG_READ);
+				read.setAttribute(XML_TAG_ID, rec.getReadName());
 
 				int[][] startEnds = getStartEndByCigar(rec);
-				append_text_element(doc, read, Consts.XML_TAG_FROM,
-						BAMValueList.intArray2IntString(startEnds[0], ','));
-				append_text_element(doc, read, Consts.XML_TAG_TO,
-						BAMValueList.intArray2IntString(startEnds[1], ','));
-				append_text_element(doc, read, Consts.XML_TAG_DIRECTION,
-						((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
-				append_text_element(doc, read, "Mapq", rec.getMappingQuality()
-						+ "");
+				append_text_element(doc, read, XML_TAG_FROM, BAMValueList.intArray2IntString(startEnds[0], ','));
+				append_text_element(doc, read, XML_TAG_TO, BAMValueList.intArray2IntString(startEnds[1], ','));
+				append_text_element(doc, read, XML_TAG_DIRECTION, ((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
+				append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
 				append_text_element(doc, read, "Cigar", rec.getCigarString());
-				append_text_element(doc, read, "Rnext",
-						rec.getMateReferenceName());
-				append_text_element(doc, read, "Pnext",
-						rec.getMateAlignmentStart() + "");
-				append_text_element(doc, read, "Tlen",
-						rec.getInferredInsertSize() + "");
-				XmlWriter.append_text_element(doc, read, "Seq",
-						rec.getReadString());
-				append_text_element(doc, read, "Qual",
-						rec.getBaseQualityString());
+				append_text_element(doc, read, "Rnext", rec.getMateReferenceName());
+				append_text_element(doc, read, "Pnext", rec.getMateAlignmentStart() + "");
+				append_text_element(doc, read, "Tlen", rec.getInferredInsertSize() + "");
+				XmlWriter.append_text_element(doc, read, "Seq", rec.getReadString());
+				append_text_element(doc, read, "Qual", rec.getBaseQualityString());
 
 				StringBuilder remain = new StringBuilder();
 				List<SAMTagAndValue> l = rec.getAttributes();
@@ -267,8 +250,7 @@ public class BAMReader {
 						remain.append(";");
 				}
 
-				append_text_element(doc, read, Consts.XML_TAG_DESCRIPTION,
-						remain.toString());
+				append_text_element(doc, read, XML_TAG_DESCRIPTION, remain.toString());
 
 				reads.appendChild(read);
 				break;
@@ -287,27 +269,23 @@ public class BAMReader {
 	 * @param lt0point5
 	 *            True if bpp less than 0.5, false else
 	 */
-	private Element writeNotDetail(Document doc, List<SAMRecord> list,
-			String track, String mode, boolean lt0point5) {
-		Element reads = doc.createElement(Consts.XML_TAG_READS);
+	private Element writeNotDetail(Document doc, List<SAMRecord> list, String track, String mode, boolean lt0point5) {
+		Element reads = doc.createElement(XML_TAG_READS);
 		SAMRecord rec = null;
 		Element read = null;
-		reads.setAttribute(Consts.XML_TAG_ID, track);
+		reads.setAttribute(XML_TAG_ID, track);
 
 		Iterator<SAMRecord> itor = list.iterator();
 		while (itor.hasNext()) {
 			rec = itor.next();
-			read = doc.createElement(Consts.XML_TAG_READ);
+			read = doc.createElement(XML_TAG_READ);
 
-			if (!mode.equalsIgnoreCase(Consts.MODE_DENSE))
-				read.setAttribute(Consts.XML_TAG_ID, rec.getReadName());
+			if (!mode.equalsIgnoreCase(MODE_DENSE))
+				read.setAttribute(XML_TAG_ID, rec.getReadName());
 			int[][] startEnds = getStartEndByCigar(rec);
-			append_text_element(doc, read, Consts.XML_TAG_FROM,
-					BAMValueList.intArray2IntString(startEnds[0], ','));
-			append_text_element(doc, read, Consts.XML_TAG_TO,
-					BAMValueList.intArray2IntString(startEnds[1], ','));
-			append_text_element(doc, read, Consts.XML_TAG_DIRECTION,
-					((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
+			append_text_element(doc, read, XML_TAG_FROM, BAMValueList.intArray2IntString(startEnds[0], ','));
+			append_text_element(doc, read, XML_TAG_TO, BAMValueList.intArray2IntString(startEnds[1], ','));
+			append_text_element(doc, read, XML_TAG_DIRECTION, ((rec.getFlags() & 0x10) == 0x10) ? "+" : "-");
 			append_text_element(doc, read, "Mapq", rec.getMappingQuality() + "");
 
 			if (lt0point5) {
@@ -318,7 +296,7 @@ public class BAMReader {
 			}
 			reads.appendChild(read);
 		}
-		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(reads);
+		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(reads);
 		return reads;
 	}
 
@@ -362,18 +340,17 @@ public class BAMReader {
 		return dest;
 	}
 
-	private Element writeBigRegion(Document doc, int start, int end, int step,
-			String list, String track) {
-		Element values = doc.createElement(Consts.XML_TAG_VALUES);
-		values.setAttribute(Consts.XML_TAG_ID, track);
-		values.setAttribute(Consts.XML_TAG_TYPE, "REN");
+	private Element writeBigRegion(Document doc, int start, int end, int step, String list, String track) {
+		Element values = doc.createElement(XML_TAG_VALUES);
+		values.setAttribute(XML_TAG_ID, track);
+		values.setAttribute(XML_TAG_TYPE, "REN");
 
-		append_text_element(doc, values, Consts.XML_TAG_FROM, start + "");
-		append_text_element(doc, values, Consts.XML_TAG_TO, end + "");
-		append_text_element(doc, values, Consts.XML_TAG_STEP, step + "");
-		append_text_element(doc, values, Consts.XML_TAG_VALUE_LIST, list);
+		append_text_element(doc, values, XML_TAG_FROM, start + "");
+		append_text_element(doc, values, XML_TAG_TO, end + "");
+		append_text_element(doc, values, XML_TAG_STEP, step + "");
+		append_text_element(doc, values, XML_TAG_VALUE_LIST, list);
 
-		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(values);
+		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(values);
 		return values;
 	}
 
@@ -394,34 +371,44 @@ public class BAMReader {
 	 * @throws FileNotFoundException
 	 */
 	private List<SAMRecord> readSmallRegion(String chr, int start, int end)
-			throws MalformedURLException, FileNotFoundException,
-			SAMFormatException {
+			throws MalformedURLException, FileNotFoundException, SAMFormatException {
 		SAMRecordIterator itor = getIterator(chr, start, end);
-
 		if (itor == null) {
 			close();
 			return new LinkedList<SAMRecord>();
 		}
-
 		List<SAMRecord> list = new LinkedList<SAMRecord>();
-
 		int num = 0;
-		SAMRecord rec = null;
-		while (itor.hasNext()) {
-			rec = itor.next();
-			if ("*".equals(rec.getCigarString()))
-				continue;
-			num++;
-			if (num > 20000) {
-				list = null;
-				break;
-			}
-			list.add(rec);
-		}
+		list = iterateSmallRegionRecursion(list, itor, num);
 
 		close();
 
 		return list;
+	}
+
+	/*
+	 * Sometimes, the iterate of the iterator may cause SAMFormatException and it will return without iterate the
+	 * rest SAMRecord, Of course we don't want to see that result. So we can use recursion to read the rest SAMRecord
+	 * when SAMFormatException caused.
+	 */
+	private List<SAMRecord> iterateSmallRegionRecursion(List<SAMRecord> list, SAMRecordIterator itor, int num) {
+		SAMRecord rec = null;
+		try {
+			while (itor.hasNext()) {
+				rec = itor.next();
+				if ("*".equals(rec.getCigarString()))
+					continue;
+				num++;
+				if (num > SMALL_REGION_NUMBER_LIMIT) {
+					list = null;
+					break;
+				}
+				list.add(rec);
+			}
+			return list;
+		} catch (SAMFormatException e) {
+			return iterateSmallRegionRecursion(list, itor, num);
+		}
 	}
 
 	/**
@@ -440,26 +427,44 @@ public class BAMReader {
 	 * @throws MalformedURLException
 	 * @throws FileNotFoundException
 	 */
-	private String readMiddleRegion(String chr, int start, int end,
-			int windowSize, int step) throws MalformedURLException,
-			FileNotFoundException {
+	private String readMiddleRegion(String chr, int start, int end, int windowSize, int step) 
+			throws MalformedURLException, FileNotFoundException {
 		SAMRecordIterator itor = getIterator(chr, start, end);
-		BAMValueList list = new BAMValueList(start, end, windowSize, step);
-		SAMRecord read = null;
-		while (itor.hasNext()) {
-			read = itor.next();
-			if ("*".equals(read.getCigarString()))
-				continue;
-			int[][] startEnds = getStartEndByCigar(read);
-			for (int i = 0; i < startEnds[0].length; i++) {
-				list.update(startEnds[0][i] - start, startEnds[1][i] - start);
-			}
+		if (itor == null) {
+			close();
+			return "";
 		}
+
+		BAMValueList valueList = new BAMValueList(start, end, windowSize, step);
+		iterateMiddleRegionRecursion(valueList, itor, start);
+
 		close();
 
-		return BAMValueList.doubleArray2IntString(list.getResults());
+		return BAMValueList.doubleArray2IntString(valueList.getResults());
 	}
-
+	
+	/*
+	 * Sometimes, the iterate of the iterator may cause SAMFormatException and it will return without iterate the
+	 * rest SAMRecord, Of course we don't want to see that result. So we can use recursion to read the rest SAMRecord
+	 * when SAMFormatException caused.
+	 */
+	private void iterateMiddleRegionRecursion(BAMValueList valueList, SAMRecordIterator itor, int start) {
+		SAMRecord rec = null;
+		try {
+			while (itor.hasNext()) {
+				rec = itor.next();
+				if ("*".equals(rec.getCigarString()))
+					continue;
+				int[][] startEnds = getStartEndByCigar(rec);
+				for (int i = 0; i < startEnds[0].length; i++) {
+					valueList.update(startEnds[0][i] - start, startEnds[1][i] - start);
+				}
+			}
+		} catch (SAMFormatException e) {
+			iterateMiddleRegionRecursion(valueList, itor, start);
+		}
+	}
+	
 	/**
 	 * @param chr
 	 *            name of chromosome
@@ -473,9 +478,8 @@ public class BAMReader {
 	 * 
 	 * @return
 	 */
-	private String readBigRegion(String chr, int start, int end,
-			int windowSize, int step) throws IOException {
-		open(false);
+	private String readBigRegion(String chr, int start, int end, int windowSize, int step) throws IOException {
+		open(true);
 		/*
 		 * index of the given chromosome in BAM file order
 		 */
@@ -560,9 +564,8 @@ public class BAMReader {
 
 		close();
 
-		return BAMValueList.doubleArray2IntString(getSpan(start % SIXTEENK, 
-				(end - start + 1) / (windowSize / ((double) step)), windowSize / step,
-						regions));
+		return BAMValueList.doubleArray2IntString(getSpan(start % SIXTEENK,
+				(end - start + 1) / (windowSize / ((double) step)), windowSize / step, regions));
 	}
 
 	/**
@@ -611,8 +614,7 @@ public class BAMReader {
 		return result;
 	}
 
-	private void location(int refIndex, InputStream is, int start)
-			throws IOException {
+	private void location(int refIndex, InputStream is, int start) throws IOException {
 		is.skip(8);
 
 		int nBins;
@@ -640,8 +642,7 @@ public class BAMReader {
 	}
 
 	private void readReference(int refIndex) {
-		AbstractBAMFileIndex index = (AbstractBAMFileIndex) samReader
-				.getIndex();
+		AbstractBAMFileIndex index = (AbstractBAMFileIndex) samReader.getIndex();
 		sequenceNum = index.getNumberOfReferences();
 		chrLinearBinNum = new int[sequenceNum];
 		chrLastLinearSpan = new long[sequenceNum];
@@ -683,34 +684,27 @@ public class BAMReader {
 			}
 		}
 
-		chrFileSize[sequenceNum] = samReader.getIndex()
-				.getStartOfLastLinearBin();
+		chrFileSize[sequenceNum] = samReader.getIndex().getStartOfLastLinearBin();
 	}
 
 	private SAMRecordIterator getIterator(String chr, int start, int end)
 			throws MalformedURLException, FileNotFoundException {
+		SAMRecordIterator samRecItor = null;
 		try {
 			open(false);
-
-			SAMRecordIterator samRecItor = samReader.queryOverlapping(chr,
-					start, end);
-
-			return samRecItor;
+			return samReader.queryOverlapping(chr, start, end);
 		} catch (SAMException e) {
-			return null;
+			e.printStackTrace();
+			return samRecItor;
 		}
 	}
 
-	private void open(boolean b) throws MalformedURLException,
-			FileNotFoundException {
+	private void open(boolean b) throws MalformedURLException, FileNotFoundException {
 		if (fromRemoteServer)
-			samReader = new SAMFileReader(new SeekableBufferedStream(
-					new SeekableHTTPStream(new URL(filePath))),
-					new SeekableBufferedStream(new SeekableHTTPStream(new URL(
-							indexFilePath))), b);
+			samReader = new SAMFileReader(new SeekableBufferedStream(new SeekableHTTPStream(new URL(filePath))),
+										  new SeekableBufferedStream(new SeekableHTTPStream(new URL(indexFilePath))), b);
 		else
-			samReader = new SAMFileReader(new File(filePath), new File(
-					indexFilePath), b);
+			samReader = new SAMFileReader(new File(filePath), new File(indexFilePath), b);
 	}
 
 	private void close() {
@@ -720,11 +714,9 @@ public class BAMReader {
 		}
 	}
 
-	private InputStream getInputStream(String path)
-			throws MalformedURLException, FileNotFoundException {
+	private InputStream getInputStream(String path) throws MalformedURLException, FileNotFoundException {
 		if (fromRemoteServer)
-			return new SeekableBufferedStream(new SeekableHTTPStream(new URL(
-					path)));
+			return new SeekableBufferedStream(new SeekableHTTPStream(new URL(path)));
 		else
 			return new FileInputStream(new File(path));
 	}
