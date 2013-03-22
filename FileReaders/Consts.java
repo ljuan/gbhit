@@ -23,6 +23,9 @@ public interface Consts{
 	
 	public static final String CYTOBAND_PREVIOUS_CHR="pChr";
 	
+	public static final String GDF_SNPID="SNPid";
+	public static final String GDF_GENEID="GeneSymbol";
+	
 	public static final int PTRACK_CLASS_VAR=0;
 	public static final int PTRACK_CLASS_FANNO=1;
 	public static final int PTRACK_CLASS_ANNO=2;
@@ -90,6 +93,9 @@ public interface Consts{
 	public static final String XML_TAG_LETTER="Letter";
 	public static final String XML_TAG_DESCRIPTION="Description";
 	public static final String XML_TAG_HOMO="homo";
+	public static final String XML_TAG_SOURCE="Source";
+	public static final String XML_TAG_SCORE="Score";
+	public static final String XML_TAG_FRAME="Frame";
 	
 	public static final String XML_TAG_CYTOBANDS="Cytobands";
 	public static final String XML_TAG_CYTOBAND="Cytoband";

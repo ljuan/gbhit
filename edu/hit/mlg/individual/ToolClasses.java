@@ -1,6 +1,10 @@
 package edu.hit.mlg.individual;
 
 import static edu.hit.mlg.individual.EctypalSubElement.*;
+
+import java.io.IOException;
+
+import FileReaders.FastaReader;
 import edu.hit.mlg.Tools.LinkedArrayList;
 import edu.hit.mlg.Tools.LinkedArrayList.Entry;
 import edu.hit.mlg.individual.vcf.Variant;
@@ -150,7 +154,7 @@ class DealedVariation{
 		 * @return
 		 */
 		int countDistanceToTheEdge(boolean direction){
-			return direction ? (realFrom - firstSubEle.getElement().getFrom() + 1) : (     lastSubEle.getElement().getTo() - realTo + 1);
+			return direction ? (realFrom - firstSubEle.getElement().getFrom() + 1) : (lastSubEle.getElement().getTo() - realTo + 1);
 		}
 		
 		/**
@@ -197,6 +201,32 @@ class DealedVariation{
 				this.realTo = toPos;
 			}
 			return 0;
+		}
+		
+		/**
+		 * Get the sequence of the bases in the "Box" the deletion deleted.
+		 * @param fr FastaReader instance
+		 * @param chr chromosome name
+		 * @return
+		 */
+		String delBases(FastaReader fr, String chr){
+			try {
+				StringBuilder bases = new StringBuilder();
+				Entry<EctypalSubElement> cur = firstSubEle;
+				int fromPos = realFrom;
+				int lastPos = lastSubEle.getElement().getTo();
+				do{
+					if(shouldAddBoxBases(cur.getElement().getType(), hasEffect)){
+						bases.append(fr.extract_seq(chr, fromPos, realTo < cur.getElement().getTo() ? realTo : cur.getElement().getTo()));
+					}
+					cur = subEles.getNext(cur);
+					if(cur == null) break;
+					fromPos = cur.getElement().getFrom();
+				}while(cur.getElement().getTo() <= lastPos);
+				return bases.toString();
+			} catch (IOException e) {
+				return null;
+			}
 		}
 		
 		/**

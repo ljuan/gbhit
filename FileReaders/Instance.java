@@ -324,25 +324,15 @@ public class Instance {
 					e.printStackTrace();
 				}
 			}
-/*			else if(type_temp.equals(Consts.FORMAT_GRF)){
-				GRFReader gr;
-				try {
-					gr = new GRFReader(path_temp);
-					ele_temp=gr.write_grf2elements(doc, track.get_ID(), Chr,(int)Coordinate[0],(int)Coordinate[1]);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			else if(type_temp.equals(Consts.FORMAT_GRF)){
+				GRFReader gr = new GRFReader(path_temp);
+				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,(int)Coordinate[0],(int)Coordinate[1]);
 			}
-/*			else if(type_temp.equals(Consts.FORMAT_GDF)){
-				GFFReader gr;
-				try {
-					gr = new GFFReader(path_temp);
-					ele_temp=gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"gene_id");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			else if(type_temp.equals(Consts.FORMAT_GDF)){
+				GDFReader gr = new GDFReader(path_temp);
+				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,(int)Coordinate[0],(int)Coordinate[1]);
 			}
-*/			else if(type_temp.equals(Consts.FORMAT_GVF)){
+			else if(type_temp.equals(Consts.FORMAT_GVF)){
 				GVFReader gr;
 				try {
 					gr = new GVFReader(path_temp);
@@ -470,8 +460,15 @@ public class Instance {
 				e.printStackTrace();
 			}
 		}
-		else if(Pclns.containsKey(track.get_ID())&&type_temp.equals(Consts.FORMAT_GDF)&&Class==Consts.PTRACK_CLASS_CLN)
-			append_track(track,doc,mode);
+		else if(Pclns.containsKey(track.get_ID())&&type_temp.equals(Consts.FORMAT_GDF)&&Class==Consts.PTRACK_CLASS_CLN){
+			GDFReader gr3;
+			try {
+				gr3 = new GDFReader(Pfanno.get_Path(Chr));
+				Ele_fanno=gr3.write_gdf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		else 
 			append_track(track,doc,mode);
 	}
@@ -544,11 +541,11 @@ public class Instance {
 				}
 			}
 			else if(type_temp.equals(Consts.FORMAT_GDF)){
-				GFFReader gr;
-				try {
-					gr = new GFFReader(path_temp);
-					ele_temp=gr.write_gff2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1],"gene_id");
-				} catch (IOException e) {
+				GDFReader gr;
+				try{
+					gr= new GDFReader(path_temp);
+					ele_temp=gr.write_gdf2elements(doc, track.get_ID(), Chr,(int) Coordinate[0], (int) Coordinate[1]);
+				}catch(IOException e){
 					e.printStackTrace();
 				}
 			}
