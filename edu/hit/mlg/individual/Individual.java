@@ -24,38 +24,53 @@ public class Individual {
 	private HashMap<Integer, Variant[]> int2Variants = new HashMap<Integer, Variant[]>();
 	private HashMap<Variant, VariantMapToDBSNP> result = null;
 	private int variantNumLimit = 1000;
+	private boolean isDetail;
+	private String id;
+	private String ifParam;
+	
+	/**
+	 * 
+	 * @param variants
+	 *            The variants may come from VCF file or GVF file.
+	 * @param isDetail whether the <code>variants</code> read by get_detail           
+	 */
+	public Individual(Element variants, boolean isDetail) {
+		this.id = variants.getAttribute(XML_TAG_ID);
+		this.ifParam = variants.getAttribute(XML_TAG_IFP);
+		this.isDetail = isDetail;
+		NodeList nodeList = variants.getChildNodes();
+		int nodeNum = nodeList.getLength();
+		
+		result = new HashMap<Variant, VariantMapToDBSNP>(nodeNum > 0 ? nodeNum : 16);
+		Variant v = null;
+		Variant[] vs = null;
+		int from = 0;
+		for (int i = 0, num = nodeList.getLength(); i < num; i++) {
+			v = Variant.convertElement2Variant((Element) nodeList.item(i));
+			result.put(v, new VariantMapToDBSNP(v, null, null));
+			from = v.getFrom();
+			vs = int2Variants.get(from);
+			if (vs == null) {
+				int2Variants.put(from, new Variant[] { v });
+			} else {
+				int vsLen = vs.length;
+				Variant[] newVs = new Variant[vsLen + 1];
 
+				System.arraycopy(vs, 0, newVs, 0, vsLen);
+				newVs[vsLen] = v;
+				vs = null;
+				int2Variants.put(from, newVs);
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @param variants
 	 *            The variants may come from VCF file or GVF file.
 	 */
 	public Individual(Element variants) {
-		NodeList nodeList = variants.getChildNodes();
-		int nodeNum = nodeList.getLength();
-		if (nodeNum > 0 && nodeNum <= variantNumLimit) {
-			result = new HashMap<Variant, VariantMapToDBSNP>(nodeNum);
-			Variant v = null;
-			Variant[] vs = null;
-			int from = 0;
-			for (int i = 0, num = nodeList.getLength(); i < num; i++) {
-				v = Variant.convertElement2Variant((Element) nodeList.item(i));
-				result.put(v, new VariantMapToDBSNP(v, null, null));
-				from = v.getFrom();
-				vs = int2Variants.get(from);
-				if (vs == null) {
-					int2Variants.put(from, new Variant[] { v });
-				} else {
-					int vsLen = vs.length;
-					Variant[] newVs = new Variant[vsLen + 1];
-
-					System.arraycopy(vs, 0, newVs, 0, vsLen);
-					newVs[vsLen] = v;
-					vs = null;
-					int2Variants.put(from, newVs);
-				}
-			}
-		}
+		this(variants, false);
 	}
 
 	/**
@@ -73,40 +88,38 @@ public class Individual {
 	 *         Exception throwed when reading from file.
 	 */
 	List<VariantMapToDBSNP> merge(String dbsnpURI, String chr, long start, long end) {
-		if (result == null)
-			return null;
-
-		try {
-			TabixReaderForVCF tabix = new TabixReaderForVCF(dbsnpURI);
-			String chrom = tabix.hasChromPrefix() ? chr : chr.substring(3);
-			if ("M".equalsIgnoreCase(chrom)) {
-				chrom = "MT";
-			}
-			TabixReaderForVCF.Iterator Query = tabix.query(chrom + ":" + start
-					+ "-" + end);
-			Vcf vcf = null;
-			Variant variant = null;
-			Variant[] variants = null;
-			if (Query != null) {
-				while (Query.next() != null) {
-					vcf = new Vcf(tabix.lineInChars, tabix.numOfChar, 0, null);
-					variants = vcf.getVariants();
-					if(variants == null){
-						continue;
-					}
-					for (Variant v : variants) {
-						if ((variant = variantInMap(v)) != null) {
-							result.get(variant).dbsnp = vcf.getDBSnpInfo();
-							result.get(variant).dbsnpId = vcf.getID();
+		if(isDetail || (result.size() > 0 && result.size() <= variantNumLimit)){
+			try {
+				TabixReaderForVCF tabix = new TabixReaderForVCF(dbsnpURI);
+				String chrom = tabix.hasChromPrefix() ? chr : chr.substring(3);
+				if ("M".equalsIgnoreCase(chrom)) {
+					chrom = "MT";
+				}
+				TabixReaderForVCF.Iterator Query = tabix.query(chrom + ":" + start + "-" + end);
+				Vcf vcf = null;
+				Variant variant = null;
+				Variant[] variants = null;
+				if (Query != null) {
+					while (Query.next() != null) {
+						vcf = new Vcf(tabix.lineInChars, tabix.numOfChar, 0, null);
+						variants = vcf.getVariants();
+						if(variants == null){
+							continue;
+						}
+						for (Variant v : variants) {
+							if ((variant = variantInMap(v)) != null) {
+								result.get(variant).dbsnp = vcf.getDBSnpInfo();
+								result.get(variant).dbsnpId = vcf.getID();
+							}
 						}
 					}
 				}
+			} catch (IOException e) {
+				List<VariantMapToDBSNP> list = new ArrayList<VariantMapToDBSNP>(result.values());
+				Collections.sort(list);
+				return list;
 			}
-
-		} catch (IOException e) {
-			return null;
 		}
-
 		List<VariantMapToDBSNP> list = new ArrayList<VariantMapToDBSNP>(result.values());
 		Collections.sort(list);
 		return list;
@@ -129,11 +142,14 @@ public class Individual {
 	 */
 	public Element mergeWithDBSNP(String dbsnpURI, String chr, long start, long end, Document doc) {
 		List<VariantMapToDBSNP> mergeResult = merge(dbsnpURI, chr, start, end);
-		if(mergeResult == null)
-			return null;
 		Element variants = doc.createElement(XML_TAG_VARIANTS);
+		if(this.id != null && !this.id.isEmpty())
+			variants.setAttribute(XML_TAG_ID, this.id);
+		if(this.ifParam != null && !this.ifParam.isEmpty())
+			variants.setAttribute(XML_TAG_IFP, this.ifParam);
 		for(VariantMapToDBSNP mr : mergeResult)
-			mr.write2xml(doc, variants);
+			mr.write2xml(doc, variants, isDetail);
+
 		return variants;
 	}
 
