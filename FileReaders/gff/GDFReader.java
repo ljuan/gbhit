@@ -34,32 +34,49 @@ public class GDFReader {
 			StringSplit split = new StringSplit('\t');
 			StringSplit DNameSplit = new StringSplit(';');
 			StringSplit equalSignSplit = new StringSplit('=');
+			String eight = null;
+			String DName = null;
 			Element element = null;
 			if (Query != null) 
 				while ((line = Query.next()) != null) {
 					split.split(line);
-					String DName = DNameSplit.split(split.getResultByIndex(8)).getResultByIndex(0);
+					eight = split.getResultByIndex(8);
+					DNameSplit.split(eight);
+					DName = equalSignSplit.split(DNameSplit.getResultByIndex(0)).getResultByIndex(1);
 					if(DName.equals(id)){
 						element = doc.createElement(XML_TAG_ELEMENT);
-						element.setAttribute(XML_TAG_ID, equalSignSplit.split(DName).getResultByIndex(1));
-						XmlWriter.append_text_element(doc, element,
-								XML_TAG_CHROMOSOME, split.getResultByIndex(0));
-						XmlWriter.append_text_element(doc, element,
-								XML_TAG_SOURCE, split.getResultByIndex(1));
-						XmlWriter.append_text_element(doc, element,
-								XML_TAG_TYPE, split.getResultByIndex(2));
-						XmlWriter.append_text_element(doc, element,
-								XML_TAG_FROM, split.getResultByIndex(3));
-						XmlWriter.append_text_element(doc, element, XML_TAG_TO,
-								split.getResultByIndex(4));
-						XmlWriter.append_text_element(doc, element, XML_TAG_SCORE,
-								split.getResultByIndex(5));
-						XmlWriter.append_text_element(doc, element, XML_TAG_DIRECTION,
-								split.getResultByIndex(6));
-						XmlWriter.append_text_element(doc, element, XML_TAG_FRAME,
-								split.getResultByIndex(7));
-						XmlWriter.append_text_element(doc, element, XML_TAG_DESCRIPTION,
-								split.getResultByIndex(8));
+						element.setAttribute(XML_TAG_ID, DName);
+						element.setAttribute(XML_TAG_TYPE, split.getResultByIndex(2));
+						for(int i=0;i<DNameSplit.getResultNum();i++){
+							equalSignSplit.split(DNameSplit.getResultByIndex(i));
+							if (equalSignSplit.getResultByIndex(0).equals(GDF_GENEID))
+								element.setAttribute(XML_TAG_SYMBOL, equalSignSplit.getResultByIndex(1));
+							else if (equalSignSplit.getResultByIndex(0).equals(GDF_SNPID))
+								element.setAttribute(XML_TAG_VARIANT, equalSignSplit.getResultByIndex(1));
+						}
+						StringBuilder builder = new StringBuilder();
+						builder.append(XML_TAG_CHROMOSOME);
+						builder.append("=");
+						builder.append(split.getResultByIndex(0));
+						builder.append(";");
+						builder.append(XML_TAG_SOURCE);
+						builder.append("=");
+						builder.append(split.getResultByIndex(1));
+						builder.append(";");
+						builder.append(XML_TAG_SCORE);
+						builder.append("=");
+						builder.append(split.getResultByIndex(5));
+						builder.append(";");
+						builder.append(XML_TAG_DIRECTION);
+						builder.append("=");
+						builder.append(split.getResultByIndex(6));
+						builder.append(";");
+						builder.append(XML_TAG_FRAME);
+						builder.append("=");
+						builder.append(split.getResultByIndex(7));
+						builder.append(";");
+						builder.append(split.getResultByIndex(8));
+						XmlWriter.append_text_element(doc, element, XML_TAG_DESCRIPTION, builder.toString());
 						elements.appendChild(element);
 					}
 				}
@@ -89,12 +106,9 @@ public class GDFReader {
 				element = doc.createElement(XML_TAG_ELEMENT);
 				String DName = DNameSplit.split(split.getResultByIndex(8)).getResultByIndex(0);
 				element.setAttribute(XML_TAG_ID, equalSignSplit.split(DName).getResultByIndex(1));
-				XmlWriter.append_text_element(doc, element,
-						XML_TAG_FROM, split.getResultByIndex(3));
-				XmlWriter.append_text_element(doc, element, XML_TAG_TO,
-						split.getResultByIndex(4));
-				XmlWriter.append_text_element(doc, element,
-						XML_TAG_TYPE, split.getResultByIndex(2));
+				element.setAttribute(XML_TAG_TYPE, split.getResultByIndex(2));
+				XmlWriter.append_text_element(doc, element, XML_TAG_FROM, split.getResultByIndex(3));
+				XmlWriter.append_text_element(doc, element, XML_TAG_TO, split.getResultByIndex(4));
 				String[] attributes=DNameSplit.split(split.getResultByIndex(8)).getResult();
 				for(int i=0;i<attributes.length;i++){
 					String[] attribute=equalSignSplit.split(attributes[i]).getResult();

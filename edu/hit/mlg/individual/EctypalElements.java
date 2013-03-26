@@ -50,11 +50,7 @@ public class EctypalElements {
 		this.ctrlAreas = Element2ControlAreas(ctrlArea);
 
 		this.id = elements.getAttribute(XML_TAG_ID) ;
-		this.ifParam = elements.getAttribute("ifParam");
-		if ("".equals(this.ifParam)) {
-			ifParam = null;
-		}
-
+		this.ifParam = elements.getAttribute(XML_TAG_IFP);
 		NodeList nodes = elements.getChildNodes();
 		int nodeNum = nodes.getLength();
 		this.eles = new EctypalElement[nodeNum];
@@ -67,25 +63,25 @@ public class EctypalElements {
 
 	/**
 	 * Start to deal.
-	 * @param mergeVariants Al variants need to deal
+	 * @param variants Al variants need to deal
 	 * @return
 	 * @throws IOException
 	 */
-	public Element deal(List<VariantMapToDBSNP> mergeVariants) throws IOException {
-		List<ControlArea> cas = ctrlArea2Variants(mergeVariants);
+	public Element deal(List<Variant> variants) throws IOException {
+		List<ControlArea> cas = ctrlArea2Variants(variants);
 		if (cas != null && cas.size() > 0) {
 			for (EctypalElement ee : eles)
 				ee.dealCtrlAreas(cas);
 		}
 		
 		for (EctypalElement ee : eles) {
-			ee.preDeal(mergeVariants);
+			ee.preDeal(variants);
 			if (!ee.stillNeedToDeal())
 				needToDealEles.remove(ee);
 		}
 		
 		for (EctypalElement ee : needToDealEles) {
-			ee.deal(mergeVariants);
+			ee.deal(variants);
 		}
 		
 		return write2XML();
@@ -126,10 +122,10 @@ public class EctypalElements {
 	/**
 	 * Return control areas where some variantions effect at them.
 	 * 
-	 * @param mergeVariants
+	 * @param variants
 	 * @return
 	 */
-	private List<ControlArea> ctrlArea2Variants(List<VariantMapToDBSNP> mergeVariants) {
+	private List<ControlArea> ctrlArea2Variants(List<Variant> variants) {
 		if (ctrlAreas == null || ctrlAreas.size() == 0)
 			return null;
 		List<ControlArea> ca2vs = new ArrayList<ControlArea>();
@@ -137,8 +133,8 @@ public class EctypalElements {
 		int index = 0;
 		ControlArea cur = ctrlAreas.get(index++);
 		Variant v = null;
-		for (int i = 0, num = mergeVariants.size(); i < num; i++) {
-			v = mergeVariants.get(i).variant;
+		for (int i = 0, num = variants.size(); i < num; i++) {
+			v = variants.get(i);
 			if (v.getTo() < cur.from) {
 				continue;
 			}
@@ -175,8 +171,8 @@ public class EctypalElements {
 		Element elements = doc.createElement(XML_TAG_ELEMENTS);
 		if (id != null)
 			elements.setAttribute(XML_TAG_ID, id);
-		if (ifParam != null)
-			elements.setAttribute("ifParam", ifParam);
+		if (ifParam != null && !ifParam.isEmpty())
+			elements.setAttribute(XML_TAG_IFP, ifParam);
 		Element ele = null;
 		for (int i = 0, len = eles.length; i < len; i++) {
 				ele = eles[i].write2XML(doc);

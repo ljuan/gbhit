@@ -33,6 +33,7 @@ public class Variant implements Comparable<Variant> {
 	private String direction;// Tag
 	private String description;// Tag
 	private String homo;// //Attribute
+	private String dbsnpInfo;// Tag
 
 	public Variant() {
 		this.homo = "";
@@ -148,6 +149,14 @@ public class Variant implements Comparable<Variant> {
 		return homo;
 	}
 
+	public void setDbsnpInfo(String dbsnpInfo){
+		this.dbsnpInfo = dbsnpInfo;
+	}
+	
+	public String getDbsnpInfo(){
+		return this.dbsnpInfo;
+	}
+	
 	/**
 	 * Write to xml in an Variants element of BAMRecords.
 	 * 
@@ -157,7 +166,7 @@ public class Variant implements Comparable<Variant> {
 	public void write2xml(Document doc, Element parent) {
 		this.write2xml(doc, parent, true);
 	}
-
+	
 	/**
 	 * Write to xml in an Variants element of VCFRecords.
 	 * 
@@ -183,6 +192,8 @@ public class Variant implements Comparable<Variant> {
 			XmlWriter.append_text_element(doc, v, XML_TAG_DIRECTION, direction);
 		if (description != null)
 			XmlWriter.append_text_element(doc, v, XML_TAG_DESCRIPTION, description);
+		if(dbsnpInfo != null)
+			XmlWriter.append_text_element(doc, v, XML_TAG_DBSNP, dbsnpInfo);
 	}
 	
 	public static Variant convertElement2Variant(Element ele){
@@ -205,6 +216,8 @@ public class Variant implements Comparable<Variant> {
 				v.setDirection(e.getTextContent());
 			else if (e.getTagName().equals(XML_TAG_DESCRIPTION))
 				v.setDescription(e.getTextContent());
+			else if (e.getTagName().equals(XML_TAG_DBSNP))
+				v.setDbsnpInfo(e.getTextContent());
 		}
 		
 		return v;

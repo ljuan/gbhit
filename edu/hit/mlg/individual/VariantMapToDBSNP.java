@@ -24,16 +24,22 @@ public class VariantMapToDBSNP implements Comparable<VariantMapToDBSNP> {
 	}
 	
 	Element write2xml(Document doc, Element parent){
+		return this.write2xml(doc, parent, false);
+	}
+	
+	/**
+	 * Write this object to XML Node.
+	 * @param doc
+	 * @param parent This object's parent node.
+	 * @param isDetail whether this object comes from get_detail();
+	 * @return
+	 */
+	Element write2xml(Document doc, Element parent, boolean isDetail){
 		Element ele = doc.createElement(XML_TAG_VARIANT);
 		if(dbsnp != null){
 			variant.setId(dbsnpId);
-			String info = dbsnp.toString();
-			String letter = variant.getLetter();
-			if(letter == null){
-				variant.setLetter(info);
-			}else{
-				variant.setLetter((info != null ? info : "").concat(";").concat(letter));
-			}
+			if(isDetail)
+				variant.setDbsnpInfo(dbsnp.toString());
 		}
 		variant.write2xml(doc, parent);
 		
@@ -41,24 +47,23 @@ public class VariantMapToDBSNP implements Comparable<VariantMapToDBSNP> {
 	}
 	
 	/**
-	 * Divide all VariantMapToDBSNP into two groups only when all VariantMapToDBSNP.variant.getHomo() is
-	 * like: number1|number2. Or return <code>mergeVariants</code>.<br />
-	 * if VariantMapToDBSNP.variant.getHomo() is like: number1|number2, then the first group will contain this
-	 * VariantMapToDBSNP Object if number!=0, and the second group will also contain this VariantMapToDBSNP 
-	 * Object if number2!=0. 
+	 * Divide all Variants into two groups only when all Variants.getHomo() is like: number1|number2. 
+	 * Or return <code>variants</code>.<br />
+	 * if Variant.getHomo() is like: number1|number2, then the first group will contain this Variant 
+	 * Object if number!=0, and the second group will also contain this Variant Object if number2!=0. 
 	 * 
-	 * @param mergeVariants
+	 * @param variants
 	 * @return
 	 */
-	static Object[] divide(List<VariantMapToDBSNP> mergeVariants){
-		ArrayList<VariantMapToDBSNP> result1 = new ArrayList<VariantMapToDBSNP>();
-		ArrayList<VariantMapToDBSNP> result2 = new ArrayList<VariantMapToDBSNP>();
+	static Object[] divide(List<Variant> variants){
+		ArrayList<Variant> result1 = new ArrayList<Variant>();
+		ArrayList<Variant> result2 = new ArrayList<Variant>();
 		String homo;
 		boolean divide = true;
 		StringSplit split = new StringSplit('|');
 		
-		for(VariantMapToDBSNP mergeVariant : mergeVariants){
-			homo = mergeVariant.variant.getHomo();
+		for(Variant variant : variants){
+			homo = variant.getHomo();
 			if("".equals(homo)){
 				divide = false;
 				break;
@@ -69,14 +74,14 @@ public class VariantMapToDBSNP implements Comparable<VariantMapToDBSNP> {
 				break;
 			}
 			if('0' != split.getResultByIndex(0).charAt(0)){
-				result1.add(mergeVariant);
+				result1.add(Variant.copy(variant));
 			}
 			if('0' != split.getResultByIndex(1).charAt(0)){
-				result2.add(copy(mergeVariant));
+				result2.add(Variant.copy(variant));
 			}
 		}
 		
-		return divide ? new Object[]{ result1, result2 } : new Object[]{ mergeVariants };
+		return divide ? new Object[]{ result1, result2 } : new Object[]{ variants };
 	}
 
 	@Override

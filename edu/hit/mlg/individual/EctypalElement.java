@@ -39,6 +39,8 @@ public class EctypalElement {
 	private static final float BOX_LIMIT = 1 / 10.0f;
 	private Set<String> status = null;
 	private String id = null;// Attribute
+	private String variant = null;// Attribute
+	private String symbol = null;// Attribute
 	private String type = null;// Attribute
 	private int from;// Tag
 	private int to;// Tag
@@ -123,13 +125,16 @@ public class EctypalElement {
 		this.fr = fr;
 		this.chr = chr;
 		this.hasEffect = hasEffect;
-		this.chrLen = (int) fr.getChromosomeLength(chr);
+		if(fr != null)
+			this.chrLen = (int) fr.getChromosomeLength(chr);
 		this.id = ele.getAttribute(XML_TAG_ID);
-		if ("".equals(this.id))
-			this.id = null;
+		if ("".equals(this.id)) this.id = null;
 		this.type = ele.getAttribute(XML_TAG_TYPE);
-		if ("".equals(this.type))
-			this.type = null;
+		if ("".equals(this.type)) this.type = null;
+		this.symbol = ele.getAttribute(XML_TAG_SYMBOL);
+		if ("".equals(this.symbol))	this.symbol = null;
+		this.variant = ele.getAttribute(XML_TAG_VARIANT);
+		if ("".equals(this.variant)) this.variant = null;
 		this.direction = ele.getElementsByTagName(XML_TAG_DIRECTION).item(0).getTextContent().equals("+");
 		NodeList nodes = ele.getChildNodes();// All Children
 		// The first child must be "From"
@@ -216,10 +221,10 @@ public class EctypalElement {
 	 * Deal structural variations and variations at ctrlAreas effect the Element
 	 * and variations at ASS and ASS.
 	 * 
-	 * @param mergeVariants	All the variations need to be dealed.
+	 * @param variants	All the variants need to be dealed.
 	 * @throws IOException
 	 */
-	public void preDeal(List<VariantMapToDBSNP> mergeVariants) throws IOException {
+	public void preDeal(List<Variant> variants) throws IOException {
 		if(subEles == null || subEles.size() == 0){
 			return ;
 		}
@@ -228,8 +233,8 @@ public class EctypalElement {
 		if (direction) {
 			// Deal from the first variation
 			Entry<EctypalSubElement> next = subEles.getFirst();
-			for (int i = 0, num = mergeVariants.size(); i < num; i++) {
-				v = mergeVariants.get(i).variant;
+			for (int i = 0, num = variants.size(); i < num; i++) {
+				v = variants.get(i);
 				if(v.getTo() < next.getElement().getFrom())
 					continue;
 				next = dealAVariationPreDeal(v, tempAssDss,	next);
@@ -238,8 +243,8 @@ public class EctypalElement {
 		} else {
 			// Deal from the last variation
 			Entry<EctypalSubElement> pre = subEles.getLast();
-			for (int i = mergeVariants.size() - 1; i >= 0; i--) {
-				v = mergeVariants.get(i).variant;
+			for (int i = variants.size() - 1; i >= 0; i--) {
+				v = variants.get(i);
 				if(v.getFrom() > pre.getElement().getTo())
 					continue;
 				pre = dealAVariationPreDeal(v, tempAssDss, pre);
@@ -443,6 +448,9 @@ public class EctypalElement {
 	private void recordTempAssDss(Variant v, Map<Entry<EctypalSubElement>, String> tempAssDss, Entry<EctypalSubElement> cur, boolean isFS) {
 		Entry<EctypalSubElement> e = (isFS ? subEles.getPrevious(cur) : subEles.getNext(cur));
 		if (e != null) {
+			//we should add variant into the Box the variant affect.
+			e.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{ v.getFrom() }, new int[]{ v.getTo() }, 
+					isFS == direction ? "(" : ")");
 			if(hasEffect){
 				//For hasEffect==true, we should change the type of the Box the variant affect.
 				int small = (direction ? initiatorSmall : terminatorSmall);
@@ -453,10 +461,6 @@ public class EctypalElement {
 				String isUp = isBox ? SUBELEMENT_TYPE_EXTEND_BOX : SUBELEMENT_TYPE_EXTEND_BAND;
 				String isDown = isBox ? SUBELEMENT_TYPE_SKIP_BOX : SUBELEMENT_TYPE_SKIP_BAND;
 				tempAssDss.put(e, isFS ? (direction ? isUp : isDown) : (direction ? isDown : isUp));	
-			}else{
-				//For hasEffect==false, we should add variant into the Box the variant affect.
-				e.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{ v.getFrom() }, new int[]{ v.getTo() }, 
-						isFS == direction ? "(" : ")");
 			}
 		}
 	}
@@ -539,7 +543,7 @@ public class EctypalElement {
 	//////////////////////////////////////////////////////////End of predeal
 	
 	//////////////////////////////////////////////////////////Deal
-	public void deal(List<VariantMapToDBSNP> mergeVariants) throws IOException{
+	public void deal(List<Variant> variants) throws IOException{
 		if(initBoxLen == 0) return;
 		Variant v = null;
 		int typeHash = 0;
@@ -548,9 +552,9 @@ public class EctypalElement {
 		if (direction) {
 			// direction=true, deal from the first variation
 			Entry<EctypalSubElement> next = subEles.getFirst();
-			for (int i = 0, num = mergeVariants.size(); i < num; i++) {
+			for (int i = 0, num = variants.size(); i < num; i++) {
 				if(next == null) break;
-				v = mergeVariants.get(i).variant;
+				v = variants.get(i);
 				if(v.getTo() < next.getElement().getFrom()) 
 					continue;
 				if(v.getFrom() > next.getElement().getTo()){
@@ -598,9 +602,9 @@ public class EctypalElement {
 		}/////////////////////////////////////////////////////////////End of direction=true
 		// direction=false, deal from the last variation
 		Entry<EctypalSubElement> pre = subEles.getLast();
-		for (int i = mergeVariants.size() - 1; i >= 0; i--) {
+		for (int i = variants.size() - 1; i >= 0; i--) {
 			if(pre == null) break;
-			v = mergeVariants.get(i).variant;
+			v = variants.get(i);
 			if(v.getFrom() > pre.getElement().getTo())
 				continue;
 			if(v.getTo() < pre.getElement().getFrom()){
@@ -1167,6 +1171,10 @@ public class EctypalElement {
 			element.setAttribute(XML_TAG_ID, id);
 		if(type != null)
 			element.setAttribute(XML_TAG_TYPE, type);
+		if (symbol != null)	
+			element.setAttribute(XML_TAG_SYMBOL, symbol);
+		if (variant != null)	
+			element.setAttribute(XML_TAG_VARIANT, variant);
 		XmlWriter.append_text_element(doc, element, XML_TAG_FROM, String.valueOf(from));
 		XmlWriter.append_text_element(doc, element, XML_TAG_TO, String.valueOf(to));
 		XmlWriter.append_text_element(doc, element, XML_TAG_DIRECTION, direction?"+":"-");

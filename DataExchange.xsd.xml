@@ -89,6 +89,7 @@
 										<xs:element name="ToChr" type="xs:string" minOccurs="0"/>
 										<xs:element name="Direction" type="xs:string" minOccurs="0"/>
 										<xs:element name="Description" type="xs:string" minOccurs="0"/>
+										<xs:element name="Dbsnp" type="xs:string" minOccurs="0"/>
 									</xs:sequence>
 									<xs:attribute name="id" type="xs:string"/>
 									<xs:attribute name="Type" type="VariantType"/>
@@ -239,8 +240,8 @@
 			<xs:enumeration value="sBox"/>
 			<xs:enumeration value="psBox"/>
 			<xs:enumeration value="eBand"/>
-			<xs:enumeration value="seBand"/>
-			<xs:enumeration value="pseBand"/>
+			<xs:enumeration value="seBox"/>
+			<xs:enumeration value="pseBox"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="ValueType">

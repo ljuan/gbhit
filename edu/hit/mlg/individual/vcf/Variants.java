@@ -3,8 +3,7 @@ package edu.hit.mlg.individual.vcf;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import FileReaders.Consts;
-
+import static FileReaders.Consts.*;
 
 /**
  * An instance of Variants represent DBSnp or an individual of SAMPLEs.
@@ -31,6 +30,10 @@ public class Variants {
 	 * Whether mode equals "DENSE"
 	 */
 	private boolean isModeDENSE = false;
+	 /**
+	  * Whether mode equals "DETAIL"
+	  */
+	 private boolean isModeDETAIL = false;
 
 	private int lastpos = 0;
 
@@ -55,16 +58,18 @@ public class Variants {
 			double bpp, double bppLimit, float qualLimit, String[] filterLimit) {
 		this.doc = doc;
 		this.bpp = bpp;
-		this.isModeDENSE = mode.equals(Consts.MODE_DENSE);
+		this.isModeDENSE = mode.equals(MODE_DENSE);
+		this.isModeDETAIL = mode.equals(MODE_DETAIL);
 		this.outputLetter = !isModeDENSE || bpp < bppLimit;
-		ele = doc.createElement(Consts.XML_TAG_VARIANTS);
+		ele = doc.createElement(XML_TAG_VARIANTS);
+		ele.setAttribute(XML_TAG_ID, id);
 		if (subId != null){
-	      ele.setAttribute(Consts.XML_TAG_ID, subId);
-	      ele.setAttribute(Consts.XML_TAG_SUPERID, id);
-	    }
-	    else
-	      ele.setAttribute(Consts.XML_TAG_ID, id); 
-		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(ele);
+			ele.setAttribute(XML_TAG_ID, subId);
+			ele.setAttribute(XML_TAG_SUPERID, id);
+		}
+		else
+			ele.setAttribute(XML_TAG_ID, id); 
+		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele);
 	}
 
 	/**
@@ -78,6 +83,9 @@ public class Variants {
 		for (Variant v : vs) {
 			if (isModeDENSE && v.getTo() - lastpos < bpp)
 				continue;
+			if (isModeDETAIL) {
+				v.setDescription(vcf.getDetail());
+			}
 			v.write2xml(doc, ele, outputLetter);
 			lastpos = v.getTo();
 		}

@@ -93,9 +93,10 @@ public interface Consts{
 	public static final String XML_TAG_LETTER="Letter";
 	public static final String XML_TAG_DESCRIPTION="Description";
 	public static final String XML_TAG_HOMO="homo";
+	public static final String XML_TAG_DBSNP="Dbsnp";
 	public static final String XML_TAG_SOURCE="Source";
-	public static final String XML_TAG_SCORE="Score";
 	public static final String XML_TAG_FRAME="Frame";
+	public static final String XML_TAG_SCORE="Score";
 	
 	public static final String XML_TAG_CYTOBANDS="Cytobands";
 	public static final String XML_TAG_CYTOBAND="Cytoband";

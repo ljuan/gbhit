@@ -12,6 +12,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.commons.lang3.SerializationUtils;
 
+import edu.hit.mlg.individual.GdfElementSelector;
+import edu.hit.mlg.individual.Individual;
 import edu.hit.mlg.individual.VariantAnalysis;
 
 public class Instance {
@@ -176,6 +178,8 @@ public class Instance {
 				Pvar.set_Mode(mode);
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
+				else
+					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, "");
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
 				if(Panno!=null){
 					append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
@@ -289,10 +293,16 @@ public class Instance {
 	public String get_Detail(String trackname, String id,int start,int end){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		Annotations track=null;
+		boolean personal=false;
+		if(trackname.startsWith("_")){
+			trackname=trackname.substring(1);
+			personal=true;
+		}
 		if(Annos.containsKey(trackname))
 			track=Annos.get(trackname);
 		else if(Externals.containsKey(trackname))
 			track=Externals.get(trackname);
+		
 		if(track!=null){
 			Element ele_temp=null;
 			String type_temp=track.get_Type();
@@ -304,6 +314,19 @@ public class Instance {
 			else if(type_temp.equals(Consts.FORMAT_ANNO)){
 				BasicAnnosReader bar=new BasicAnnosReader(path_temp);
 				ele_temp=bar.get_detail(doc, track.get_ID(), id, Chr, (long)start, (long)end);
+				if(personal){
+					VariantAnalysis ee = new VariantAnalysis(doc, rr, ele_temp, Ele_fanno, Ele_var, Chr);
+					Element[] ele_anno_temp=null;
+					try{
+						ele_anno_temp=ee.deal();
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_anno_temp[0]);
+					if(ele_anno_temp.length > 1)
+						doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_anno_temp[1]);
+					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
+				}
 			}
 			else if(type_temp.equals(Consts.FORMAT_BED)){
 				BedReader br=new BedReader(path_temp);
@@ -331,12 +354,23 @@ public class Instance {
 			else if(type_temp.equals(Consts.FORMAT_GDF)){
 				GDFReader gr = new GDFReader(path_temp);
 				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,(int)Coordinate[0],(int)Coordinate[1]);
+				if(personal){
+					GdfElementSelector ges=new GdfElementSelector(doc,Ele_anno[0],Ele_var);
+					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ges.select(ele_temp));
+					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
+				}
 			}
 			else if(type_temp.equals(Consts.FORMAT_GVF)){
 				GVFReader gr;
 				try {
 					gr = new GVFReader(path_temp);
 					ele_temp=gr.get_detail(doc, track.get_ID(), id, Chr, start, end);
+					if(personal){
+						Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(Consts.DBSNP_DATA, Chr, Coordinate[0], Coordinate[1], doc);
+						doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
+						doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
+					}
+					
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -344,6 +378,11 @@ public class Instance {
 			else if (type_temp.equals(Consts.FORMAT_VCF)){
 				VcfReader vr=new VcfReader(track,Chr);
 				ele_temp=vr.get_detail(doc, track.get_ID(), id, Chr, start, end);
+				if(personal){
+					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(Consts.DBSNP_DATA, Chr, Coordinate[0], Coordinate[1], doc);
+					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
+					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
+				}
 			}
 			else if (type_temp.equals(Consts.FORMAT_BAM)){
 				try {
@@ -417,22 +456,25 @@ public class Instance {
 		if (Coordinate[1]-Coordinate[0]>1000000)
 			return;
 		if(Pvar!=null&&track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_VCF)&&Class==Consts.PTRACK_CLASS_VAR){
-			if(track.get_ID().equals(PvarID)){
 				VcfReader vr=new VcfReader(track,Chr);
 				vr.changeBppLimit(Consts.LIMIT_BPP);
-				Ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
-			}
-			else {
-				VcfReader vr=new VcfReader(track,Chr);
-				vr.changeBppLimit(Consts.LIMIT_BPP);
-				Ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
-			}
+				Element ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
+				add_att_ifParam(track,ele_var);
+				if(PvarID!=null&&!track.get_ID().equals(PvarID))
+					ele_var.setAttribute(Consts.XML_TAG_ID, "_"+PvarID);
+				Ele_var = new Individual(ele_var).mergeWithDBSNP(Consts.DBSNP_DATA, Chr, Coordinate[0], Coordinate[1], doc);
+				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
+				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_var);
 		}
 		else if(Pvar!=null&&track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_GVF)&&Class==Consts.PTRACK_CLASS_VAR){
 			GVFReader gr;
 			try {
 				gr = new GVFReader(Pvar.get_Path(Chr));
-				Ele_var=gr.write_gvf2variants(doc, "_"+track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
+				Element ele_var=gr.write_gvf2variants(doc, "_"+track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
+				add_att_ifParam(track,ele_var);
+				Ele_var = new Individual(ele_var).mergeWithDBSNP(Consts.DBSNP_DATA, Chr, Coordinate[0], Coordinate[1], doc);
+				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
+				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_var);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -441,11 +483,13 @@ public class Instance {
 			try{
 				BasicAnnosReader bar=new BasicAnnosReader(Panno.get_Path(Chr));
 				Element ele_anno=bar.write_ba2elements(doc, "_"+track.get_ID(), Chr, Coordinate[0], Coordinate[1], bpp);
-				VariantAnalysis ee = new VariantAnalysis(doc, rr, ele_anno,Ele_fanno, Ele_var, Consts.DBSNP_DATA, Chr, (int)Coordinate[0], (int)Coordinate[1]);
+				add_att_ifParam(track,ele_anno);
+				VariantAnalysis ee = new VariantAnalysis(doc, rr, ele_anno, Ele_fanno, Ele_var, Chr);
 				Ele_anno=ee.deal();
 				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_anno[0]);
-				if(Ele_anno.length > 1)
+				if(Ele_anno.length > 1){
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_anno[1]);
+				}
 				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_anno);
 			}catch(Exception e){
 				e.printStackTrace();
@@ -464,7 +508,11 @@ public class Instance {
 			GDFReader gr3;
 			try {
 				gr3 = new GDFReader(Pfanno.get_Path(Chr));
-				Ele_fanno=gr3.write_gdf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
+				Element ele_cln=gr3.write_gdf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
+				add_att_ifParam(track,ele_cln);
+				GdfElementSelector ges=new GdfElementSelector(doc,Ele_anno[0],Ele_var);
+				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ges.select(ele_cln));
+				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_cln);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -614,13 +662,16 @@ public class Instance {
 					&&!ele_temp.getTagName().equals(Consts.XML_TAG_PARAMETERS)
 					&&!type_temp.equals(Consts.FORMAT_CYTO)
 					&&!type_temp.equals(Consts.FORMAT_REF))
-				if(track.has_visable_Parameter())
-					ele_temp.setAttribute(Consts.XML_TAG_IFP, Consts.TEXT_TRUE);
-				else 
-					ele_temp.setAttribute(Consts.XML_TAG_IFP, Consts.TEXT_FALSE);
+				add_att_ifParam(track,ele_temp);
 		}
 	}
 
+	void add_att_ifParam(Annotations track, Element ele_temp){
+		if(track.has_visable_Parameter())
+			ele_temp.setAttribute(Consts.XML_TAG_IFP, Consts.TEXT_TRUE);
+		else 
+			ele_temp.setAttribute(Consts.XML_TAG_IFP, Consts.TEXT_FALSE);
+	}
 	int check_chromosome(String chr){
 		if(rr.seq_name.containsKey(chr))
 			return rr.seq_name.get(chr);
