@@ -4,6 +4,7 @@ public interface Consts{
 	public static final String CONFIGURE="/home/ljuan/gbdata/config.xml";
 	public static final String GENE_DATA="/home/ljuan/gbdata/hg19/hgnc.hg19.sorted.txt";
 	public static final String DBSNP_DATA="/home/ljuan/gbdata/hg19/dbsnp135.hg19.vcf.bgz";
+	public static final String FASTA_DATA="/home/ljuan/gbdata/hg19/hg19.fa";
 	
 	public static final String DEFAULT_ENCODE="ISO-8859-1";
 	public static final String META_ROOT="MetaDataExchange";
@@ -23,7 +24,8 @@ public interface Consts{
 	
 	public static final String CYTOBAND_PREVIOUS_CHR="pChr";
 	
-	public static final String GDF_SNPID="SNPid";
+	public static final String GDF_SNPID="SNPID";
+	public static final String GDF_MUTID="MUTID";
 	public static final String GDF_GENEID="GeneSymbol";
 	
 	public static final int PTRACK_CLASS_VAR=0;
@@ -150,7 +152,7 @@ public interface Consts{
 	
 	public static final String SUBELEMENT_TYPE_LINE="Line";
 	public static final String SUBELEMENT_TYPE_SKIP_BAND="sBand";
-	public static final String SUBELEMENT_TYPE_SKIP_BOX="sBox";
+	public static final String SUBELEMENT_TYPE_SKIP_BOX="skBox";
 	
 	public static final String SUBELEMENT_TYPE_BAND="Band";
 	public static final String SUBELEMENT_TYPE_EXTEND_BAND="eBand";
@@ -158,7 +160,7 @@ public interface Consts{
 	
 	public static final String SUBELEMENT_TYPE_BOX="Box";
 	public static final String SUBELEMENT_TYPE_EXTEND_BOX="eBox";
-	public static final String SUBELEMENT_TYPE_SHIFT_BOX="sBox";
+	public static final String SUBELEMENT_TYPE_SHIFT_BOX="shBox";
 	public static final String SUBELEMENT_TYPE_SHIFT_EXTEND_BOX="seBox";
 	
 	public static final String SUBELEMENT_TYPE_POSSIBLE_SHIFT_BOX="psBox";

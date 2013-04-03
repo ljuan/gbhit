@@ -41,6 +41,7 @@ public class FileReaders {
 		System.out.println(i1.get_Detail("RefSeq", "NM_020706", 33043313, 33104431));
 		System.out.println(i1.get_Detail("_1000g", "rs187787213", 33043633, 33043633));
 		System.out.println(i1.get_Detail("_Regulation", "CTCF", 33043113, 33104431));
+		System.out.println(i1.get_Annotations());
 /*		i1.remove_Tracks(externals);
 /*		System.out.println(System.currentTimeMillis());
 		externals[0]="cytoband";externals_links[0]="input/cytoBand.hg19.txt";externals_types[0]=Consts.FORMAT_CYTO;externals_modes[0]=Consts.MODE_DENSE;

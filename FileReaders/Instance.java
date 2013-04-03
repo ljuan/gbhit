@@ -159,6 +159,8 @@ public class Instance {
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
+				if(Pfanno!=null)
+					append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
 				if(Panno!=null){
 					append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
 					Enumeration<Annotations> pclns_enum=Pclns.elements();
@@ -181,6 +183,8 @@ public class Instance {
 				else
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, "");
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
+				if(Pfanno!=null)
+					append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
 				if(Panno!=null){
 					append_Ptrack(Panno,doc,Panno.get_Mode(),Consts.PTRACK_CLASS_ANNO);
 					Enumeration<Annotations> pclns_enum=Pclns.elements();
@@ -355,7 +359,7 @@ public class Instance {
 				GDFReader gr = new GDFReader(path_temp);
 				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,(int)Coordinate[0],(int)Coordinate[1]);
 				if(personal){
-					GdfElementSelector ges=new GdfElementSelector(doc,Ele_anno[0],Ele_var);
+					GdfElementSelector ges=new GdfElementSelector(doc,Ele_anno,Ele_var);
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ges.select(ele_temp));
 					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
 				}
@@ -418,11 +422,23 @@ public class Instance {
 		return XmlWriter.xml2string(doc);
 	}
 	public String get_Annotations(){
-		String[] anno_names=new String[Annos.size()];
+		String[] anno_names=new String[Annos.size()+3+Pclns.size()];
+		int i=0;
 		Enumeration<Annotations> annos_enum=Annos.elements();
-		for(int i=0;i<Annos.size();i++){
+		for(i=0;i<Annos.size();i++){
 			Annotations temp=annos_enum.nextElement();
 			anno_names[i]=temp.get_Group()+":"+temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
+		}
+		if(Pvar!=null)
+			anno_names[i++]="Pvar:_"+Pvar.get_ID()+":"+Pvar.get_Mode()+":"+Pvar.get_Type();
+		if(Pfanno!=null)
+			anno_names[i++]="Pfanno:_"+Pfanno.get_ID()+":"+Pfanno.get_Mode()+":"+Pfanno.get_Type();
+		if(Panno!=null)
+			anno_names[i++]="Panno:_"+Panno.get_ID()+":"+Panno.get_Mode()+":"+Panno.get_Type();
+		Enumeration<Annotations> pclns_enum=Pclns.elements();
+		for(;i<Pclns.size();i++){
+			Annotations temp=pclns_enum.nextElement();
+			anno_names[i]="Pclns:_"+temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
 		}
 		Document doc=XmlWriter.init(Consts.META_ROOT);
 		Config.write_metalist(doc,anno_names, "AnnotationList");
@@ -510,7 +526,7 @@ public class Instance {
 				gr3 = new GDFReader(Pfanno.get_Path(Chr));
 				Element ele_cln=gr3.write_gdf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
 				add_att_ifParam(track,ele_cln);
-				GdfElementSelector ges=new GdfElementSelector(doc,Ele_anno[0],Ele_var);
+				GdfElementSelector ges=new GdfElementSelector(doc,Ele_anno,Ele_var);
 				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ges.select(ele_cln));
 				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_cln);
 			} catch (IOException e) {

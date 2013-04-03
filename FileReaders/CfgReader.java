@@ -26,6 +26,7 @@ class CfgReader{
 	String[] getAssemblies(){
 		return Assemblies;
 	}
+
 	Annotations[] getAnnotations(String assemblyid){
 		
 		NodeList assemlist = doc.getElementsByTagName(Consts.XML_TAG_ASSEMBLY);
@@ -67,9 +68,11 @@ class CfgReader{
 	Element write_metalist(Document doc,String[] metalist,String metatype){
 		StringBuffer temp=new StringBuffer();
 		for(int i=0;i<metalist.length;i++){
-			temp.append(metalist[i]);
-			if(i<metalist.length-1)
+			if(metalist[i]==null)
+				continue;
+			if(i>0)
 				temp.append(",");
+			temp.append(metalist[i]);
 		}
 		return XmlWriter.append_text_element(doc,doc.getElementsByTagName(Consts.META_ROOT).item(0),metatype,temp.toString());
 	}

@@ -54,6 +54,10 @@ public class GDFReader {
 							else if (equalSignSplit.getResultByIndex(0).equals(GDF_SNPID))
 								element.setAttribute(XML_TAG_VARIANT, equalSignSplit.getResultByIndex(1));
 						}
+						
+						XmlWriter.append_text_element(doc, element, XML_TAG_FROM, split.getResultByIndex(3));
+						XmlWriter.append_text_element(doc, element, XML_TAG_TO, split.getResultByIndex(4));
+						
 						StringBuilder builder = new StringBuilder();
 						builder.append(XML_TAG_CHROMOSOME);
 						builder.append("=");
