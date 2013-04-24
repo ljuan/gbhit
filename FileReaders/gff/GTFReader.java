@@ -66,10 +66,16 @@ public class GTFReader {
 					gtfs.add(new GTF(ss.split(line).getResult()));
 				}
 			}
-			tb.TabixReaderClose();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		} finally{
+			if(tb != null){
+				try {
+					tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
 		}
 
 		String transcript_id = null;

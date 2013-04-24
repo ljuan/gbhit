@@ -88,6 +88,13 @@ public class GFFReader {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		} finally{
+			if(tb != null){
+				try {
+					tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
 		}
 
 		return elements;

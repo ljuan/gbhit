@@ -27,6 +27,10 @@ public class Interfaces extends HttpServlet{
 			String a=ins.get_Annotations();
 			res.getWriter().print(a);
 		}
+		else if (action.equals("getChromosomes")){
+			String a=ins.get_Chromosomes();
+			res.getWriter().print(a);
+		}
 		else if (action.equals("setAssembly")){
 			ins=new Instance(req.getParameter("assembly"));
 			session.setAttribute("Instance", ins);

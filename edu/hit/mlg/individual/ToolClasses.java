@@ -209,7 +209,7 @@ class DealedVariation{
 		 * @param chr chromosome name
 		 * @return
 		 */
-		String delBases(FastaReader fr, String chr){
+		String delBases(FastaReader fr,String chr){
 			try {
 				StringBuilder bases = new StringBuilder();
 				Entry<EctypalSubElement> cur = firstSubEle;

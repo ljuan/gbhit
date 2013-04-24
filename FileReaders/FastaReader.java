@@ -27,7 +27,7 @@ public class FastaReader {
 	long[][] fasta_index;
 	RandomAccessFile raf = null;
 
-	public FastaReader(String fasta) throws IOException {
+	public FastaReader(String fasta) throws IOException{
 		String temp = "";
 		File idx_file = new File(fasta + ".fai");
 		ByteBufferChannel bbc = new ByteBufferChannel(idx_file, 0,
@@ -43,8 +43,11 @@ public class FastaReader {
 			for (int j = 0; j < 4; j++)
 				fasta_index[i][j] = Long.parseLong(line_temp[j + 1]);
 		}
-
-		raf = new RandomAccessFile(new File(fasta), "r");
+		try{
+			raf = new RandomAccessFile(new File(fasta), "r");
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 
 	/**

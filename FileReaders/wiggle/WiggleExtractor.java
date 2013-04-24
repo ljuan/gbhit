@@ -86,8 +86,7 @@ public class WiggleExtractor {
 			try {
 				new BigWigReader(this.filePath).getBigWig(this.chrom,
 						this.start, this.end, false, this.wiggles,
-						this.wiggles.getWindowSize(), this.wiggles.getStep())
-						.close();
+						this.wiggles.getWindowSize(), this.wiggles.getStep());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

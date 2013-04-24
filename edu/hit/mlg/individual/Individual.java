@@ -27,7 +27,7 @@ public class Individual {
 	private boolean isDetail;
 	private String id;
 	private String ifParam;
-	
+
 	/**
 	 * 
 	 * @param variants
@@ -40,7 +40,7 @@ public class Individual {
 		this.isDetail = isDetail;
 		NodeList nodeList = variants.getChildNodes();
 		int nodeNum = nodeList.getLength();
-		
+
 		result = new HashMap<Variant, VariantMapToDBSNP>(nodeNum > 0 ? nodeNum : 16);
 		Variant v = null;
 		Variant[] vs = null;
@@ -63,7 +63,7 @@ public class Individual {
 			}
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param variants
@@ -89,8 +89,9 @@ public class Individual {
 	 */
 	List<VariantMapToDBSNP> merge(String dbsnpURI, String chr, long start, long end) {
 		if(isDetail || (result.size() > 0 && result.size() <= variantNumLimit)){
+			TabixReaderForVCF tabix = null;
 			try {
-				TabixReaderForVCF tabix = new TabixReaderForVCF(dbsnpURI);
+				tabix = new TabixReaderForVCF(dbsnpURI);
 				String chrom = tabix.hasChromPrefix() ? chr : chr.substring(3);
 				if ("M".equalsIgnoreCase(chrom)) {
 					chrom = "MT";
@@ -118,13 +119,20 @@ public class Individual {
 				List<VariantMapToDBSNP> list = new ArrayList<VariantMapToDBSNP>(result.values());
 				Collections.sort(list);
 				return list;
+			} finally{
+				if(tabix != null){
+					try {
+						tabix.TabixReaderClose();
+					} catch (IOException e) {
+					}
+				}
 			}
 		}
 		List<VariantMapToDBSNP> list = new ArrayList<VariantMapToDBSNP>(result.values());
 		Collections.sort(list);
 		return list;
 	}
-	
+
 	/**
 	 * Merge variations come from VCF file or GVF file with variations come from DBSNP file.
 	 * @param dbsnpURI

@@ -56,7 +56,7 @@ public class GdfElementSelector {
 				if(variantIDs.contains(ele.getAttribute(XML_TAG_ID))){
 					//The element contains attribute:Variant and
 					//the value is one of the id of variants.
-					eles.appendChild(new EctypalElement(ele, null, null, true).write2XML(doc));
+					eles.appendChild(new EctypalElement(ele,null, null, true).write2XML(doc));
 				}
 				continue;
 			}
@@ -67,7 +67,7 @@ public class GdfElementSelector {
 					//The element doesn't contain attribute:Variant
 					//but contains attribute:Symbol and the value is one of
 					//the id of elements which has beed affected by some variants
-					eles.appendChild(new EctypalElement(ele, null, null, true).write2XML(doc));
+					eles.appendChild(new EctypalElement(ele,null, null, true).write2XML(doc));
 				}
 			}
 		}

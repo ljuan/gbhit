@@ -5,6 +5,7 @@
 			<xs:sequence>
 				<xs:element name="AssemblyList" type="xs:string" minOccurs="0"/>
 				<xs:element name="AnnotationList" type="xs:string" minOccurs="0"/>
+				<xs:element name="ChromosomeList" type="xs:string" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

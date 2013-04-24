@@ -26,10 +26,11 @@ class BedReaderTabix{
 		Elements.setAttribute(Consts.XML_TAG_ID, track);
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Elements);
 		// node
+		TabixReader bed_tb = null;
 		try {
 			Element Ele = null;
 			String line;
-			TabixReader bed_tb = new TabixReader(bedPath);
+			bed_tb = new TabixReader(bedPath);
 			TabixReader.Iterator Query = bed_tb.query(chr + ":" + regionstart
 					+ "-" + regionend);
 			StringSplit split = new StringSplit('\t');
@@ -64,9 +65,15 @@ class BedReaderTabix{
 					break;
 				}
 			}
-			bed_tb.TabixReaderClose();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally{
+			if(bed_tb != null){
+				try {
+					bed_tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
 		}
 
 		return Elements;
@@ -76,10 +83,11 @@ class BedReaderTabix{
 		Element Elements = doc.createElement(Consts.XML_TAG_ELEMENTS);
 		Elements.setAttribute(Consts.XML_TAG_ID, track);
 		// node
+		TabixReader bed_tb = null;
 		try {
 			Element Ele = null;
 			String line;
-			TabixReader bed_tb = new TabixReader(bedPath);
+			bed_tb = new TabixReader(bedPath);
 			TabixReader.Iterator Query = bed_tb.query(chr + ":" + regionstart
 					+ "-" + regionend);
 			StringSplit split = new StringSplit('\t');
@@ -90,9 +98,15 @@ class BedReaderTabix{
 						split.getResult(), split.getResultNum()));
 				Elements.appendChild(Ele);
 			}
-			bed_tb.TabixReaderClose();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally{
+			if(bed_tb != null){
+				try {
+					bed_tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
 		}
 
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Elements);

@@ -57,10 +57,16 @@ public class GVFReader {
 					}
 				}
 			}
-			tb.TabixReaderClose();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		} finally{
+			if(tb != null){
+				try {
+					tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
 		}
 		if (gvf == null) {
 			return variants;
@@ -121,10 +127,16 @@ public class GVFReader {
 					}
 				}
 			}
-			tb.TabixReaderClose();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		} finally{
+			if(tb != null){
+				try {
+					tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
 		}
 
 		String[][] vs;

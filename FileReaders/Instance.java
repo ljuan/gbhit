@@ -10,6 +10,7 @@ import java.util.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.apache.commons.lang3.SerializationUtils;
 
 import edu.hit.mlg.individual.GdfElementSelector;
@@ -23,7 +24,8 @@ public class Instance {
 	Hashtable<String, Annotations> Annos;
 	Hashtable<String, Annotations> Externals;
 	FastaReader rr;
-	CfgReader Config;
+	Annotations Ref;
+	Annotations Cyto;
 	double bpp;
 	int window_width;
 	
@@ -43,21 +45,18 @@ public class Instance {
 		initialize(Assembly);
 	}
 	void initialize(String Assembly){
-		Config=new CfgReader(new File(Consts.CONFIGURE));
 		this.Assembly=Assembly;
-		Annotations[] Annos=Config.getAnnotations(Assembly);
-		this.Annos=new Hashtable<String, Annotations>(Annos.length,1);
-		for(int i=0;i<Annos.length;i++){
-			if(Annos[i].get_Type().equals(Consts.FORMAT_REF)){
-				try{
-					rr=new FastaReader(Annos[i].get_Path());
-				} catch(IOException e){
-					e.printStackTrace();
-				}
-				
-			}
-			this.Annos.put(Annos[i].get_ID(), Annos[i]);
+		this.Ref=CfgReader.getBasicRef(Assembly);
+		this.Cyto=CfgReader.getBasicCyto(Assembly);
+		try{
+			rr=new FastaReader(Ref.get_Path());
+		} catch(IOException e){
+			e.printStackTrace();
 		}
+		Annotations[] Annos=CfgReader.getAnnotations(Assembly);
+		this.Annos=new Hashtable<String, Annotations>(Annos.length,1);
+		for(int i=0;i<Annos.length;i++)
+			this.Annos.put(Annos[i].get_ID(), Annos[i]);
 		Externals=new Hashtable<String, Annotations>();
 		bpp=1;
 	}
@@ -68,19 +67,17 @@ public class Instance {
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		int chrid=check_chromosome(chr);
 		if(chrid>=0){
-			if(Chr!=null && Chr.equals(chr) && Coordinate[0]==start && Coordinate[1]==end)
-				if(Annos.get("cytoBand").has_Parameter(Consts.CYTOBAND_PREVIOUS_CHR))
-					Annos.get("cytoBand").set_Parameter(Consts.CYTOBAND_PREVIOUS_CHR, "chr0");
 			Chr=chr;
 			Coordinate=check_coordinate(chrid,start,end);
-			this.window_width=window_width;
-			bpp=(double)(Coordinate[1]-Coordinate[0])/(double)window_width;
+			this.window_width=(int) (window_width*(Coordinate[1]-Coordinate[0])/(Math.abs(end-start)));
+			bpp=(double)(Coordinate[1]-Coordinate[0])/(double)this.window_width;
 			
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(Consts.DATA_ROOT).item(0), Consts.XML_TAG_CHROMOSOME, Chr);
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(Consts.DATA_ROOT).item(0), Consts.XML_TAG_START, String.valueOf(Coordinate[0]));
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(Consts.DATA_ROOT).item(0), Consts.XML_TAG_END, String.valueOf(Coordinate[1]));
 			XmlWriter.append_text_element(doc, doc.getElementsByTagName(Consts.DATA_ROOT).item(0), Consts.XML_TAG_LENGTH, String.valueOf(rr.fasta_index[chrid][0]));
-
+			append_track(Ref,doc,Ref.get_Mode());
+			append_track(Cyto,doc,Cyto.get_Mode());
 			Enumeration<Annotations> annos_enum=Annos.elements();
 			for(int i=0;i<Annos.size();i++){
 				Annotations anno_temp=annos_enum.nextElement();
@@ -370,7 +367,7 @@ public class Instance {
 					gr = new GVFReader(path_temp);
 					ele_temp=gr.get_detail(doc, track.get_ID(), id, Chr, start, end);
 					if(personal){
-						Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(Consts.DBSNP_DATA, Chr, Coordinate[0], Coordinate[1], doc);
+						Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
 						doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
 						doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
 					}
@@ -383,7 +380,7 @@ public class Instance {
 				VcfReader vr=new VcfReader(track,Chr);
 				ele_temp=vr.get_detail(doc, track.get_ID(), id, Chr, start, end);
 				if(personal){
-					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(Consts.DBSNP_DATA, Chr, Coordinate[0], Coordinate[1], doc);
+					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
 					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
 				}
@@ -418,7 +415,19 @@ public class Instance {
 	}
 	public String get_Assemblies(){
 		Document doc=XmlWriter.init(Consts.META_ROOT);
-		Config.write_metalist(doc,Config.getAssemblies(),"AssemblyList");
+		CfgReader.write_metalist(doc,CfgReader.getAssemblies(),"AssemblyList");
+		return XmlWriter.xml2string(doc);
+	}
+	public String get_Chromosomes(){
+		String[] chrom_names=new String[rr.seq_name.size()];
+		rr.seq_name.keySet().toArray(chrom_names);
+		String[] chrom_lengths=new String[rr.seq_name.size()];
+		for(int i=0;i<rr.seq_name.size();i++){
+			int idx=check_chromosome(chrom_names[i]);
+			chrom_lengths[idx]=chrom_names[i]+":"+rr.fasta_index[idx][0];
+		}
+		Document doc=XmlWriter.init(Consts.META_ROOT);
+		CfgReader.write_metalist(doc,chrom_lengths, "ChromosomeList");
 		return XmlWriter.xml2string(doc);
 	}
 	public String get_Annotations(){
@@ -430,18 +439,18 @@ public class Instance {
 			anno_names[i]=temp.get_Group()+":"+temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
 		}
 		if(Pvar!=null)
-			anno_names[i++]="Pvar:_"+Pvar.get_ID()+":"+Pvar.get_Mode()+":"+Pvar.get_Type();
+			anno_names[i++]="Pvar:_"+this.PvarID+":"+Pvar.get_Mode()+":"+Pvar.get_Type();
 		if(Pfanno!=null)
 			anno_names[i++]="Pfanno:_"+Pfanno.get_ID()+":"+Pfanno.get_Mode()+":"+Pfanno.get_Type();
 		if(Panno!=null)
 			anno_names[i++]="Panno:_"+Panno.get_ID()+":"+Panno.get_Mode()+":"+Panno.get_Type();
 		Enumeration<Annotations> pclns_enum=Pclns.elements();
-		for(;i<Pclns.size();i++){
+		for(int j=0;j<Pclns.size();j++){
 			Annotations temp=pclns_enum.nextElement();
-			anno_names[i]="Pclns:_"+temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
+			anno_names[i+j]="Pclns:_"+temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
 		}
 		Document doc=XmlWriter.init(Consts.META_ROOT);
-		Config.write_metalist(doc,anno_names, "AnnotationList");
+		CfgReader.write_metalist(doc,anno_names, "AnnotationList");
 		return XmlWriter.xml2string(doc);
 	}
 	public String get_Parameters(String[] tracks){
@@ -475,10 +484,12 @@ public class Instance {
 				VcfReader vr=new VcfReader(track,Chr);
 				vr.changeBppLimit(Consts.LIMIT_BPP);
 				Element ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
+			//	Element ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),Consts.MODE_PACK,bpp,Chr,Coordinate[0],Coordinate[1]);
+				//Cancel Dense-mode-bandwidth saving. transfer all variants to client.
 				add_att_ifParam(track,ele_var);
 				if(PvarID!=null&&!track.get_ID().equals(PvarID))
 					ele_var.setAttribute(Consts.XML_TAG_ID, "_"+PvarID);
-				Ele_var = new Individual(ele_var).mergeWithDBSNP(Consts.DBSNP_DATA, Chr, Coordinate[0], Coordinate[1], doc);
+				Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
 				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
 				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_var);
 		}
@@ -488,7 +499,7 @@ public class Instance {
 				gr = new GVFReader(Pvar.get_Path(Chr));
 				Element ele_var=gr.write_gvf2variants(doc, "_"+track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 				add_att_ifParam(track,ele_var);
-				Ele_var = new Individual(ele_var).mergeWithDBSNP(Consts.DBSNP_DATA, Chr, Coordinate[0], Coordinate[1], doc);
+				Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
 				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
 				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_var);
 			} catch (IOException e) {
@@ -643,6 +654,7 @@ public class Instance {
 			else if (type_temp.equals(Consts.FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<10000000){
 				VcfReader vr=new VcfReader(track,Chr);
 				ele_temp=vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
+			//	ele_temp=vr.write_vcf2variants(doc,track.get_ID(),Consts.MODE_PACK,bpp,Chr,Coordinate[0],Coordinate[1]);
 			}
 			else if (type_temp.equals(Consts.FORMAT_BAM)){
 				try {
@@ -677,8 +689,22 @@ public class Instance {
 			if(ele_temp!=null
 					&&!ele_temp.getTagName().equals(Consts.XML_TAG_PARAMETERS)
 					&&!type_temp.equals(Consts.FORMAT_CYTO)
-					&&!type_temp.equals(Consts.FORMAT_REF))
-				add_att_ifParam(track,ele_temp);
+					&&!type_temp.equals(Consts.FORMAT_REF)){
+				if(!type_temp.equals(Consts.FORMAT_VCF)||!ele_temp.hasAttribute(Consts.XML_TAG_SUPERID))
+					add_att_ifParam(track,ele_temp);
+				else{
+					Element DataEx=(Element) ele_temp.getParentNode();
+					NodeList nl=DataEx.getChildNodes();
+					for(int i=0;i<nl.getLength();i++){
+						Element item_temp=(Element)(nl.item(i));
+						if(item_temp.hasAttribute(Consts.XML_TAG_SUPERID)&&
+								item_temp.getAttribute(Consts.XML_TAG_SUPERID).equals(
+										ele_temp.getAttribute(Consts.XML_TAG_SUPERID)))
+							add_att_ifParam(track,item_temp);
+					}
+				}
+				
+			}
 		}
 	}
 

@@ -2,9 +2,10 @@ package FileReaders;
 
 public interface Consts{
 	public static final String CONFIGURE="/home/ljuan/gbdata/config.xml";
-	public static final String GENE_DATA="/home/ljuan/gbdata/hg19/hgnc.hg19.sorted.txt";
-	public static final String DBSNP_DATA="/home/ljuan/gbdata/hg19/dbsnp135.hg19.vcf.bgz";
-	public static final String FASTA_DATA="/home/ljuan/gbdata/hg19/hg19.fa";
+//	public static final String GENE_DATA="/home/ljuan/gbdata/hg19/hgnc.hg19.sorted.txt";
+//	public static final String DBSNP_DATA="/home/ljuan/gbdata/hg19/dbsnp135.hg19.vcf.bgz";
+//	public static final String REFERNCE_DATA="/home/ljuan/gbdata/hg19/hg19.fa";
+//	public static final String CYTO_DATA="/home/ljuan/gbdata/hg19/hg19.fa";
 	
 	public static final String DEFAULT_ENCODE="ISO-8859-1";
 	public static final String META_ROOT="MetaDataExchange";
@@ -21,8 +22,6 @@ public interface Consts{
 	public static final String VCF_HEADER_SAMPLE="sample";
 	public static final String VCF_QUAL_LIMIT="qualimit";
 	public static final String VCF_CHROM_PREFIX="chromprefix";
-	
-	public static final String CYTOBAND_PREVIOUS_CHR="pChr";
 	
 	public static final String GDF_SNPID="SNPID";
 	public static final String GDF_MUTID="MUTID";
@@ -42,7 +41,6 @@ public interface Consts{
 	public static final String FORMAT_BIGWIG="BW";
 	public static final String FORMAT_BEDGZ="BEDGZ";
 	public static final String FORMAT_FASTA="FASTA";
-	public static final String FORMAT_REF="REF";
 	public static final String FORMAT_BAM="BAM";
 	public static final String FORMAT_GFF="GFF";
 	public static final String FORMAT_GTF="GTF";
@@ -50,6 +48,9 @@ public interface Consts{
 	public static final String FORMAT_GDF="GDF";
 	public static final String FORMAT_GRF="GRF";
 	public static final String FORMAT_CYTO="CYTO";
+	public static final String FORMAT_REF="REF";
+	public static final String FORMAT_SNP="SNP";
+	public static final String FORMAT_HGNC="HGNC";
 	public static final String FORMAT_ANNO="ANNO";
 	public static final String FORMAT_FUNCTIONANNO="FANNO";
 	
@@ -64,6 +65,7 @@ public interface Consts{
 	public static final String GROUP_CLASS_PG="pGenome";
 	public static final String GROUP_CLASS_RNA="RNA";
 	public static final String GROUP_CLASS_DATA="data";
+	public static final String GROUP_CLASS_BASIC="Basic";
 	
 	public static final String XML_TAG_ASSEMBLY="Assembly";
 	public static final String XML_TAG_ANNOTATION="Anno";

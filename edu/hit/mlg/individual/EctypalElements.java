@@ -25,6 +25,7 @@ public class EctypalElements {
 	private Document doc;
 	private List<ControlArea> ctrlAreas;
 	private String id = null; // Attribute
+	private FastaReader fr = null; // Attribute
 	private String ifParam = null; // Attribute
 	private EctypalElement[] eles; // All Elements of this Elements
 	private HashSet<EctypalElement> needToDealEles; // All Elements need to deal of this Elements
@@ -48,7 +49,7 @@ public class EctypalElements {
 	public EctypalElements(Document doc, FastaReader fr, Element elements, Element ctrlArea, String chr, boolean hasEffect) {
 		this.doc = doc;
 		this.ctrlAreas = Element2ControlAreas(ctrlArea);
-
+		this.fr=fr;
 		this.id = elements.getAttribute(XML_TAG_ID) ;
 		this.ifParam = elements.getAttribute(XML_TAG_IFP);
 		NodeList nodes = elements.getChildNodes();
@@ -56,7 +57,7 @@ public class EctypalElements {
 		this.eles = new EctypalElement[nodeNum];
 		this.needToDealEles = new HashSet<EctypalElement>();
 		for (int i = 0; i < nodeNum; i++) {
-			eles[i] = new EctypalElement((Element) nodes.item(i), fr, chr, hasEffect);
+			eles[i] = new EctypalElement((Element) nodes.item(i), fr,chr, hasEffect);
 			needToDealEles.add(eles[i]);
 		}
 	}

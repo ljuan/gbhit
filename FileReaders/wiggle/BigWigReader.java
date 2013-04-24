@@ -27,8 +27,6 @@ public class BigWigReader {
 	// get the big header
 	private BBFileHeader bbFileHdr;
 
-	private SeekableStream ss = null;
-
 	private List<BBZoomLevelHeader> zoomLevelHeaders;
 
 	/**
@@ -45,16 +43,17 @@ public class BigWigReader {
 	 */
 	public BigWigReader(String uri) throws IOException {
 		// open big file
-		if (uri.startsWith("http://") || uri.startsWith("ftp://")
+		reader=new BBFileReader(uri);
+		/*if (uri.startsWith("http://") || uri.startsWith("ftp://")
 				|| uri.startsWith("https://")) {
 			if (!BAMReader.isRemoteFileExists(uri))
 				throw new FileNotFoundException("can't find file for:" + uri);
-			ss = new CustomSeekableBufferedStream(new CustomSeekableHTTPStream(
+			SeekableStream ss = new CustomSeekableBufferedStream(new CustomSeekableHTTPStream(
 					new URL(uri)));
 			reader = new BBFileReader(uri, ss);
 		} else {
 			reader = new BBFileReader(uri);
-		}
+		}*/
 
 		zoomLevelHeaders = reader.getZoomLevels().getZoomLevelHeaders();
 	}
@@ -118,6 +117,8 @@ public class BigWigReader {
 			}
 		}
 
+		//close();
+		
 		return this;
 	}
 
@@ -145,12 +146,12 @@ public class BigWigReader {
 		return zoomLevelHeaders.size();
 	}
 
-	public void close() {
+	/*private void close() {
 		try {
-			if (ss != null)
-				this.ss.close();
+			if (reader != null)
+				this.reader.getBBFis().close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 }

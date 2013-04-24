@@ -49,6 +49,7 @@ public class BAMReader {
 	private SAMFileReader samReader = null;
 
 	private static final int SIXTEENK = 16 * 1024;
+	private static final String CHROMOSOME_NAME_PREFIX = "chr";
 
 	/**
 	 * position of each chromosome's first read's first base in the BAM file.
@@ -75,6 +76,11 @@ public class BAMReader {
 	 * number of chromosome in the BAM file
 	 */
 	private int sequenceNum = 0;
+	
+	/**
+	 * whether chromosomes of all of this SAM file start with "chr" or "CHR"
+	 */
+	private boolean hasChromosomePrefix = true;
 
 	public BAMReader() {
 	}
@@ -442,7 +448,7 @@ public class BAMReader {
 
 		return BAMValueList.doubleArray2IntString(valueList.getResults());
 	}
-	
+
 	/*
 	 * Sometimes, the iterate of the iterator may cause SAMFormatException and it will return without iterate the
 	 * rest SAMRecord, Of course we don't want to see that result. So we can use recursion to read the rest SAMRecord
@@ -464,7 +470,7 @@ public class BAMReader {
 			iterateMiddleRegionRecursion(valueList, itor, start);
 		}
 	}
-	
+
 	/**
 	 * @param chr
 	 *            name of chromosome
@@ -692,7 +698,7 @@ public class BAMReader {
 		SAMRecordIterator samRecItor = null;
 		try {
 			open(false);
-			return samReader.queryOverlapping(chr, start, end);
+			return samReader.queryOverlapping(hasChromosomePrefix ? chr : chr.substring(3), start, end);
 		} catch (SAMException e) {
 			e.printStackTrace();
 			return samRecItor;
@@ -705,6 +711,15 @@ public class BAMReader {
 										  new SeekableBufferedStream(new SeekableHTTPStream(new URL(indexFilePath))), b);
 		else
 			samReader = new SAMFileReader(new File(filePath), new File(indexFilePath), b);
+		
+		String sequenceName = null;
+		//Judge whether chromosomes of all of this SAM file start with "chr" or "CHR"
+		for (SAMSequenceRecord sequenceRecord : samReader.getFileHeader().getSequenceDictionary().getSequences()) {
+			sequenceName = sequenceRecord.getSequenceName();
+			hasChromosomePrefix = sequenceName != null 
+									&& sequenceName.length() > 3 
+									&& sequenceName.substring(0, 3).equalsIgnoreCase(CHROMOSOME_NAME_PREFIX);
+		}
 	}
 
 	private void close() {

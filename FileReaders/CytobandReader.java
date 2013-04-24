@@ -17,27 +17,18 @@ class CytobandReader {
 	}
 
 	Element write_cytobands(Document doc, String chr, Annotations track){
-		if (!track.has_Parameter(Consts.CYTOBAND_PREVIOUS_CHR)||!track.get_Parameter(Consts.CYTOBAND_PREVIOUS_CHR).equals(chr)){
-			Element Cytobands = doc.createElement(Consts.XML_TAG_CYTOBANDS);
-			for (int i = 0; i < cytobands.length; i++) 
-				if(cytobands[i].startsWith(chr+"\t")){
-					String[] cytoband_temp=cytobands[i].split("\t");
-					Element Cytoband = doc.createElement(Consts.XML_TAG_CYTOBAND);
-					Cytoband.setAttribute(Consts.XML_TAG_ID, cytoband_temp[3]);
-					Cytoband.setAttribute(Consts.XML_TAG_GIESTAIN, cytoband_temp[4]);
-					XmlWriter.append_text_element(doc, Cytoband, Consts.XML_TAG_FROM, String.valueOf(Long.parseLong(cytoband_temp[1])+1));
-					XmlWriter.append_text_element(doc, Cytoband, Consts.XML_TAG_TO, String.valueOf(Long.parseLong(cytoband_temp[2])));
-					Cytobands.appendChild(Cytoband);
-				}
-			doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Cytobands);
-			if(!track.has_Parameter(Consts.CYTOBAND_PREVIOUS_CHR))
-				track.initialize_Parameter(Consts.CYTOBAND_PREVIOUS_CHR, chr, Consts.PARAMETER_TYPE_INVISABLE);
-			else
-				track.set_Parameter(Consts.CYTOBAND_PREVIOUS_CHR, chr);
-			return Cytobands;
-		}
-		else
-			return null;
-		
+		Element Cytobands = doc.createElement(Consts.XML_TAG_CYTOBANDS);
+		for (int i = 0; i < cytobands.length; i++) 
+			if(cytobands[i].startsWith(chr+"\t")){
+				String[] cytoband_temp=cytobands[i].split("\t");
+				Element Cytoband = doc.createElement(Consts.XML_TAG_CYTOBAND);
+				Cytoband.setAttribute(Consts.XML_TAG_ID, cytoband_temp[3]);
+				Cytoband.setAttribute(Consts.XML_TAG_GIESTAIN, cytoband_temp[4]);
+				XmlWriter.append_text_element(doc, Cytoband, Consts.XML_TAG_FROM, String.valueOf(Long.parseLong(cytoband_temp[1])+1));
+				XmlWriter.append_text_element(doc, Cytoband, Consts.XML_TAG_TO, String.valueOf(Long.parseLong(cytoband_temp[2])));
+				Cytobands.appendChild(Cytoband);
+			}
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Cytobands);
+		return Cytobands;
 	}
 }

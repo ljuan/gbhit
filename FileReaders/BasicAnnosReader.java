@@ -102,9 +102,10 @@ class BasicAnnosReader{
 			for (int j = 0; j < ba.exonCount; j++) {
 				long substart = ba.exonStarts[j] + ba.txStart;
 				long subend = ba.exonStarts[j] + ba.txStart + ba.exonSizes[j];
-				if (substart < regionend && subend >= regionstart) 
+				//if (substart < regionend && subend >= regionstart) 
 					deal_thick(doc, Ele, substart, subend, ba.cdsStart, ba.cdsEnd);
-				if (j < ba.exonCount - 1 && subend < regionend && (ba.exonStarts[j + 1] + ba.txStart) >= regionstart) 
+				//Do not skip exons that not shows in current region any more.
+				if (j < ba.exonCount - 1 )//&& subend < regionend && (ba.exonStarts[j + 1] + ba.txStart) >= regionstart) 
 					append_subele(doc, Ele,	Long.toString(subend + 1, 10), Long.toString(ba.exonStarts[j + 1]	+ ba.txStart, 10), Consts.SUBELEMENT_TYPE_LINE);
 			}
 		} 

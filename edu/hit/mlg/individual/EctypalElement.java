@@ -39,6 +39,7 @@ public class EctypalElement {
 	private static final float BOX_LIMIT = 1 / 10.0f;
 	private Set<String> status = null;
 	private String id = null;// Attribute
+	private FastaReader fr = null;// Attribute
 	private String variant = null;// Attribute
 	private String symbol = null;// Attribute
 	private String type = null;// Attribute
@@ -51,7 +52,6 @@ public class EctypalElement {
 	private String description = null;// Tag
 	private String color = null;// Tag
 	private LinkedArrayList<EctypalSubElement> subEles = null;
-	private FastaReader fr;
 	/**
 	 * Whether this Element still need to do in the current stage.
 	 */
@@ -122,11 +122,11 @@ public class EctypalElement {
 	EctypalElement(Element ele, FastaReader fr, String chr, boolean hasEffect) {
 		subEles = new LinkedArrayList<EctypalSubElement>();
 		status = new HashSet<String>();
-		this.fr = fr;
 		this.chr = chr;
 		this.hasEffect = hasEffect;
-		if(fr != null)
-			this.chrLen = (int) fr.getChromosomeLength(chr);
+		if(fr!=null)
+			this.fr=fr;
+		this.chrLen = (int) fr.getChromosomeLength(chr);
 		this.id = ele.getAttribute(XML_TAG_ID);
 		if ("".equals(this.id)) this.id = null;
 		this.type = ele.getAttribute(XML_TAG_TYPE);
@@ -851,7 +851,7 @@ public class EctypalElement {
 
 		//record the variant
 		if(dms.boxBases % 3 == 0){
-			String delBases = direction ? dms.delBases(fr, chr) : InverseAndComplement(dms.delBases(fr, chr));
+			String delBases = direction ? dms.delBases(fr,chr) : InverseAndComplement(dms.delBases(fr,chr));
 			if(remain != 1)
 				delBases = e3b.sequence.substring(0, (remain + 2) % 3).concat(delBases).concat(e3b.sequence.substring((remain + 2) % 3));
 			String pre = bases2gene(delBases);

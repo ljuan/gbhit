@@ -148,6 +148,13 @@ public class VcfReader {
 			vcf_tb.TabixReaderClose();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally{
+			if(vcf_tb != null){
+				try {
+					vcf_tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
 		}
 		Element e1 = variants[0].getVariantsElement();
 		variants = null;
@@ -222,9 +229,15 @@ public class VcfReader {
 					}
 				}
 			}
-			vcf_tb.TabixReaderClose();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally{
+			if(vcf_tb != null){
+				try {
+					vcf_tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
 		}
 		Element e1 = variants[0].getVariantsElement();
 		variants = null;
