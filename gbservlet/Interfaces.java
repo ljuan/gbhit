@@ -31,6 +31,10 @@ public class Interfaces extends HttpServlet{
 			String a=ins.get_Chromosomes();
 			res.getWriter().print(a);
 		}
+		else if (action.equals("getCytobands")){
+			String a=ins.get_Cyto(req.getParameter("chr"));
+			res.getWriter().print(a);
+		}
 		else if (action.equals("setAssembly")){
 			ins=new Instance(req.getParameter("assembly"));
 			session.setAttribute("Instance", ins);
@@ -110,6 +114,14 @@ public class Interfaces extends HttpServlet{
 			long end=Long.parseLong(req.getParameter("end"));
 			int window_width=Integer.parseInt(req.getParameter("width"));
 			String a=ins.update(chr, start, end, window_width);
+			res.getWriter().print(a);
+		}
+		else if (action.equals("refresh")){
+			String chr=req.getParameter("chr");
+			long start=Long.parseLong(req.getParameter("start"));
+			long end=Long.parseLong(req.getParameter("end"));
+			int window_width=Integer.parseInt(req.getParameter("width"));
+			String a=ins.refresh(chr, start, end, window_width);
 			res.getWriter().print(a);
 		}
 	}

@@ -71,27 +71,21 @@ public class VariantAnalysis {
 		Element first = null;
 		Element second = null;
 
-		try{
-			if(divide.length == 1){
-				List<Variant> firstList = (List<Variant>)divide[0];
-				EctypalElements ee = new EctypalElements(doc, fr, elements, ctrlAreas, chr, false);
-				first = firstList.size() > 0 ? ee.deal(firstList) : ee.write2XML();
-	
-				return new Element[]{ first };
-			}else{
-				List<Variant> firstList = (List<Variant>)divide[0];
-				EctypalElements ee1 = new EctypalElements(doc, fr, elements, ctrlAreas, chr, true);
-				first = firstList.size() > 0 ? ee1.deal(firstList) : ee1.write2XML();
-				List<Variant> secondList = (List<Variant>)divide[1];
-				EctypalElements ee2 = new EctypalElements(doc, fr, elements, ctrlAreas, chr, true);
-				second = secondList.size() > 0 ? ee2.deal(secondList) : ee2.write2XML();
-	
-				return new Element[]{ first, second };
-			}
-		}finally{
-			if(fr != null){
-				fr.close();
-			}
+		if(divide.length == 1){
+			List<Variant> firstList = (List<Variant>)divide[0];
+			EctypalElements ee = new EctypalElements(doc, fr, elements, ctrlAreas, chr, false);
+			first = firstList.size() > 0 ? ee.deal(firstList) : ee.write2XML();
+
+			return new Element[]{ first };
+		}else{
+			List<Variant> firstList = (List<Variant>)divide[0];
+			EctypalElements ee1 = new EctypalElements(doc, fr, elements, ctrlAreas, chr, true);
+			first = firstList.size() > 0 ? ee1.deal(firstList) : ee1.write2XML();
+			List<Variant> secondList = (List<Variant>)divide[1];
+			EctypalElements ee2 = new EctypalElements(doc, fr, elements, ctrlAreas, chr, true);
+			second = secondList.size() > 0 ? ee2.deal(secondList) : ee2.write2XML();
+
+			return new Element[]{ first, second };
 		}
 		
 	}

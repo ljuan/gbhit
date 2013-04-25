@@ -11,7 +11,7 @@ public class FileReaders {
 		System.out.println(System.currentTimeMillis());
 		System.out.println(i1.get_Annotations());
 		System.out.println(System.currentTimeMillis());
-		System.out.println(i1.update("chr21",33043478,33044749,1350));
+		System.out.println(i1.update("chr21",33044478,33044749,1350));
 		System.out.println(System.currentTimeMillis());
 		String[] externals={"1000g"};
 		String[] externals_links={"Chr21:http://202.118.228.68/gbfiles/ALL.chr21.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz;"};
@@ -42,6 +42,7 @@ public class FileReaders {
 		System.out.println(i1.get_Detail("_1000g", "rs187787213", 33043633, 33043633));
 		System.out.println(i1.get_Detail("_Regulation", "CTCF", 33043113, 33104431));
 		System.out.println(i1.get_Annotations());
+		System.out.println(i1.get_Chromosomes());
 /*		i1.remove_Tracks(externals);
 /*		System.out.println(System.currentTimeMillis());
 		externals[0]="cytoband";externals_links[0]="input/cytoBand.hg19.txt";externals_types[0]=Consts.FORMAT_CYTO;externals_modes[0]=Consts.MODE_DENSE;
@@ -51,6 +52,8 @@ public class FileReaders {
 */		externals[0]="BamTest";externals_links[0]="http://202.118.228.68/gbfiles/MCF7_DNAseq.hg19.sorted.bam";externals_types[0]="BAM";externals_modes[0]=Consts.MODE_FULL;
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);
 		System.out.println(i1.add_Tracks(externals,externals_modes));
+		System.out.println(i1.refresh("chr1",1,100,1350));
+		System.out.println(i1.get_Cyto("chr1"));
 		System.out.println(System.currentTimeMillis());
 /*		externals[0]="GffTest";externals_links[0]="http://127.0.0.1/gbfiles/refGene.hg19.sorted.gtf.gz";externals_types[0]=Consts.FORMAT_GFF;externals_modes[0]=Consts.MODE_DENSE;
 		i1.add_Externals(externals,externals_links,externals_types,externals_modes);

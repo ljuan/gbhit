@@ -60,8 +60,25 @@ public class Instance {
 		Externals=new Hashtable<String, Annotations>();
 		bpp=1;
 	}
-	public void refresh(String chr,long start,long end){
-		
+	public String refresh(String chr,long start,long end,int window_width){
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		int chrid=check_chromosome(chr);
+		if(chrid>=0){
+			Chr=chr;
+			Coordinate=check_coordinate(chrid,start,end);
+			this.window_width=(int) (window_width*(Coordinate[1]-Coordinate[0])/(Math.abs(end-start)));
+			bpp=(double)(Coordinate[1]-Coordinate[0])/(double)this.window_width;
+			
+			XmlWriter.append_text_element(doc, doc.getElementsByTagName(Consts.DATA_ROOT).item(0), Consts.XML_TAG_CHROMOSOME, Chr);
+			XmlWriter.append_text_element(doc, doc.getElementsByTagName(Consts.DATA_ROOT).item(0), Consts.XML_TAG_START, String.valueOf(Coordinate[0]));
+			XmlWriter.append_text_element(doc, doc.getElementsByTagName(Consts.DATA_ROOT).item(0), Consts.XML_TAG_END, String.valueOf(Coordinate[1]));
+			XmlWriter.append_text_element(doc, doc.getElementsByTagName(Consts.DATA_ROOT).item(0), Consts.XML_TAG_LENGTH, String.valueOf(rr.fasta_index[chrid][0]));
+			append_track(Ref,doc,Ref.get_Mode());
+			append_track(Cyto,doc,Cyto.get_Mode());
+		}
+		else
+			XmlWriter.append_text_element(doc, doc.getElementsByTagName(Consts.DATA_ROOT).item(0), Consts.XML_TAG_ERROR,"Invalid Chromosome name");
+		return XmlWriter.xml2string(doc);
 	}
 	public String update(String chr,long start,long end,int window_width){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
@@ -428,6 +445,12 @@ public class Instance {
 		}
 		Document doc=XmlWriter.init(Consts.META_ROOT);
 		CfgReader.write_metalist(doc,chrom_lengths, "ChromosomeList");
+		return XmlWriter.xml2string(doc);
+	}
+	public String get_Cyto(String chr){
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		CytobandReader cbr=new CytobandReader(Cyto.get_Path());
+		Element ele_temp=cbr.write_cytobands(doc, chr, Cyto);
 		return XmlWriter.xml2string(doc);
 	}
 	public String get_Annotations(){
