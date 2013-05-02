@@ -33,7 +33,7 @@ import static FileReaders.Consts.*;
  */
 
 public class VcfReader {
-	private TabixReaderForVCF vcf_tb;
+	TabixReaderForVCF vcf_tb;
 	private Annotations track = null;
 	/**
 	 * limit of bpp

@@ -109,7 +109,7 @@ public class EctypalElement {
 	 */
 	private boolean hasEffect;
 	/////////////////////////////////////////////////////End of field
-	
+
 	/////////////////////////////////////////////////////////////Constructor
 	/**
 	 * Create an ectypal Object of <code>node</code>.
@@ -192,7 +192,7 @@ public class EctypalElement {
 				this.color = e.getTextContent();
 			}
 		}
-		
+
 		if(!firstEqual){
 			if(direction)
 				initiatorSmall = initiatorLarge = -1;
@@ -206,11 +206,11 @@ public class EctypalElement {
 				initiatorSmall = initiatorLarge = Integer.MAX_VALUE;
 		}
 	}
-	
+
 	public String getId(){
 		return this.id;
 	}
-	
+
 	public int size(){
 		return this.subEles.size();
 	}
@@ -256,7 +256,7 @@ public class EctypalElement {
 				ese.getElement().setType(tempAssDss.get(ese));
 		}
 	}
-	
+
 	/**
 	 * Deal a variation in previous deal.
 	 * @throws IOException
@@ -319,7 +319,7 @@ public class EctypalElement {
 
 		return cur;
 	}
-	
+
 	/**
 	 * If the variation type is "SNV" or "INS" or "DEL", and the variation is
 	 * located at the SubElement which type is "Line", then we should deal it
@@ -349,7 +349,7 @@ public class EctypalElement {
 				recordTempAssDss(v, tempAssDss, cur, from <= ese.getFrom() + 1);
 			return;
 		}//End of SNV
-		
+
 		if(type == 2){
 			if (from == ese.getFrom() && basesOfINS.charAt(0) != fr.extract_char(chr, to))
 				recordTempAssDss(v, tempAssDss, cur, true);
@@ -357,7 +357,7 @@ public class EctypalElement {
 				recordTempAssDss(v, tempAssDss, cur, false);
 			return;
 		}//End of INS
-		
+
 		// Find the SubElement where from and to at respectively
 		Entry<EctypalSubElement> fromCur = locate(from, cur);
 		Entry<EctypalSubElement> toCur = locate(to, cur);
@@ -371,7 +371,7 @@ public class EctypalElement {
 		}
 		dealDELASSOrDSS(v, fromCur, toCur, tempAssDss);
 	}
-	
+
 	private void dealDELASSOrDSS(Variant v, Entry<EctypalSubElement> fromCur, Entry<EctypalSubElement> toCur,
 			Map<Entry<EctypalSubElement>, String> tempAssDss) {
 		boolean isFromTypeLine = fromCur.getElement().getType().equals(SUBELEMENT_TYPE_LINE);
@@ -494,7 +494,7 @@ public class EctypalElement {
 		this.stillNeedToDeal = stillNeedToDeal;
 		return true;
 	}
-	
+
 	/**
 	 * Map deletion variant to SubElements.
 	 * @return Number of bases of DEL in Boxes
@@ -506,7 +506,7 @@ public class EctypalElement {
 		if(toCur == null) toCur = subEles.getLast();
 		return new DelMap2SubElement(del, fromCur, toCur, subEles, hasEffect);
 	}
-	
+
 	/*
 	 * Locate the pos to an SubElement. Return the SubElement if we found it, null else.
 	 */
@@ -519,7 +519,7 @@ public class EctypalElement {
 			return moveFromFrontToBack(pos, cur, false);
 		return cur;
 	}
-	
+
 	private boolean variantContainElement(Variant v) {
 		int _from = from - (direction ? 2000 : 500);
 		if(_from < 1) _from = 1;
@@ -541,7 +541,7 @@ public class EctypalElement {
 		}
 	}
 	//////////////////////////////////////////////////////////End of predeal
-	
+
 	//////////////////////////////////////////////////////////Deal
 	public void deal(List<Variant> variants) throws IOException{
 		if(initBoxLen == 0) return;
@@ -595,7 +595,7 @@ public class EctypalElement {
 					next = dealADEL(dms);
 				}
 			}
-			
+
 			if(next != null)
 				next = moveFromFrontToBack(this.to + 1, next, true);
 			return;
@@ -645,11 +645,11 @@ public class EctypalElement {
 				pre = dealADEL(dms);
 			}
 		}
-		
+
 		if(pre != null)
 			moveFromBackToFront(this.from - 1, pre, true);
 	}
-	
+
 	/*
 	 * Deal a SNV variation in the deal stage. 
 	 * For direction=true, the cur is the SubElement where v.getFrom() at; for direction=false, the cur is the SubElement where v.getTo() at. 
@@ -659,7 +659,7 @@ public class EctypalElement {
 	private Entry<EctypalSubElement> dealASNV(Entry<EctypalSubElement> cur, Variant v) throws IOException{
 		int vFromAtThisBox = direction ? (v.getFrom() - cur.getElement().getFrom() + 1) : (cur.getElement().getTo() - v.getTo() + 1);
 		int remain = (boxBaseNumFromFirstBoxBase + vFromAtThisBox) % 3;
-		
+
 		Extract3Bases result = extractFromFasta(cur, v.getFrom(), extractIndex[direction?0:1][0][remain][0], extractIndex[direction?0:1][0][remain][1]);   
 		if (result == null) return cur;
 		char oldTranscription = standardGeneticCode.get(result.sequence);
@@ -667,26 +667,27 @@ public class EctypalElement {
 		// Now we have get the sequence from the fasta file.
 		char transcription = standardGeneticCode.get(result.sequence);
 		//Record this variation in SubElement
-		recordVariant(result, v, oldTranscription + ":" + transcription, cur.getElement());
-		
+		MultiFromVariant record = recordVariant(result, v, oldTranscription + ":" + transcription, cur.getElement());
+
 		if(!hasEffect)
 			return cur;
-		
+
 		dealedVariations.addLast(new DealedVariation(v));
 
 		if(v.getFrom() >= initiatorSmall && v.getTo() <= initiatorLarge){//The variant appeared in the initiator and must change the initiator
 			String changeType = cur.getElement().getType().equals(SUBELEMENT_TYPE_BOX) ? SUBELEMENT_TYPE_LOST_BOX : SUBELEMENT_TYPE_EXTEND_BAND;
 			cur.getElement().setType(changeType);
 			changeInitiator();
+			record.setLetter("^");
 			return cur;
 		}
-		
+
 		if(v.getFrom() >= terminatorSmall && v.getTo() <= terminatorLarge && transcription != '$'){
 			//The variant appeared in the terminator and change the terminator
 			cur.getElement().setType(SUBELEMENT_TYPE_EXTEND_BOX);
 			return direction ? subEles.getNext(cur) : subEles.getPrevious(cur);
 		}
-		
+
 		if(transcription == '$'){//The variant appeared not in the initiator and the terminator and terminator has appeared
 			int resultIndex = direction ? 2 : 0;
 			String changeType = SUBELEMENT_TYPE_BOX.equals(result.pss[resultIndex].subEle.getElement().getType()) 
@@ -696,7 +697,7 @@ public class EctypalElement {
 		//ordinary variant, not in the initiator, not change the terminator, not cause the terminator
 		return cur;
 	}
-	
+
 	/*
 	 * deal a INS variant in the deal stage. 
 	 * If hasEffect=true, the type of cur must be "Box" or "Extend_Box" or "Shift_Box" or "Shift_Extend_Box", but for hasEffect=false, 
@@ -707,6 +708,7 @@ public class EctypalElement {
 	private Entry<EctypalSubElement> dealAINS(Entry<EctypalSubElement> cur, Variant v, Integer curNeedToDealType) throws IOException{
 		int vFromAtThisBox = direction ? (v.getFrom() - cur.getElement().getFrom() + 1) : (cur.getElement().getTo() - v.getTo() + 1);
 		int remain = (boxBaseNumFromFirstBoxBase + vFromAtThisBox) % 3;
+		MultiFromVariant record = null;
 		if(remain == 0) remain = 3;
 		Extract3Bases e3b = null;
 		String trans = null;
@@ -727,18 +729,18 @@ public class EctypalElement {
 			String after = bases2gene(v.getLetter());
 			trans = remain != 3 ? bases2gene(e3b.sequence) : "_";
 			if(remain != 3)
-				recordVariant(e3b, v, trans + ":" + after, cur.getElement());
+				record = recordVariant(e3b, v, trans + ":" + after, cur.getElement());
 			else
 				cur.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{v.getFrom()}, new int[]{v.getTo()}, trans + ":" + after);
 		}else{
 			cur.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{v.getFrom()}, new int[]{v.getTo()}, "#");
 		}
-		
+
 		if(!hasEffect)
 			return cur;
 
 		dealedVariations.addLast(new DealedVariation(v));
-		
+
 		if(curNeedToDealType <= 2){//The current SubElement is Box or Extend_Box
 			if(v.getLetter().length() % 3 == 0){//The length of insert bases is a multiple of 3
 				// now we have record the variant
@@ -762,6 +764,8 @@ public class EctypalElement {
 						}
 					}
 					changeInitiator();
+					if(record != null)
+						record.setLetter("^");
 					return cur;
 				}
 				//End of v.getFrom() >= initiatorSmall && v.getTo() <= initiatorLarge
@@ -785,12 +789,14 @@ public class EctypalElement {
 				return cur;
 				// End of letters.length() % 3 == 0
 			}
-			
+
 			//The length of insert bases is not a multiple of 3
 			if((direction && v.getTo() <= initiatorLarge) || (!direction && v.getFrom() >= initiatorSmall)){//The variant appeared in the initiator
 				//The initiator has lost
 				String changeType = curNeedToDealType == 1 ? SUBELEMENT_TYPE_LOST_BOX : SUBELEMENT_TYPE_EXTEND_BAND;
 				cur.getElement().setType(changeType);
+				if(record != null)
+					record.setLetter("^");
 				return cur;
 			}
 			//End of v.getFrom() >= initiatorSmall && v.getTo() <= initiatorLarge
@@ -826,7 +832,8 @@ public class EctypalElement {
 		Extract3Bases e3b = null;
 		int resultIndex = direction ? 2 : 0;
 		Variant del = dms.deletion;
-		
+		MultiFromVariant record = null;
+
 		if(hasEffect){
 			boxBaseNumDealed -= dms.boxBases;
 			if(dms.boxBases % 3 != 0){
@@ -844,7 +851,7 @@ public class EctypalElement {
 					direction);
 			if(e3b == null) return dms.getUpstreamSubEle(direction);
 		}
-		
+
 		Entry<EctypalSubElement> upSubEle = (e3b==null) ? dms.getUpstreamSubEle(direction) : (e3b.pss[direction ? 0 : 2].subEle);
 		Entry<EctypalSubElement> downSubEle = (e3b==null) ? dms.getDownstreamSubEle(direction) : (e3b.pss[resultIndex].subEle);
 		int downPos = (e3b==null) ? (dms.getDownstreamPos(direction)) : (e3b.pss[resultIndex].position);
@@ -857,16 +864,16 @@ public class EctypalElement {
 			String pre = bases2gene(delBases);
 			String after = remain != 1 ? bases2gene(e3b.sequence) : "_";
 			if(remain != 1)
-				recordVariant(e3b, del, pre + ":" + after, upSubEle.getElement());
+				record = recordVariant(e3b, del, pre + ":" + after, upSubEle.getElement());
 			else
 				upSubEle.getElement().addMultiFromVariant(del.getId(), del.getType(), new int[]{del.getFrom()}, new int[]{del.getTo()}, pre + ":" + after);
 		}else{
 			upSubEle.getElement().addMultiFromVariant(del.getId(), del.getType(), new int[]{del.getFrom()}, new int[]{del.getTo()}, "#");
 		}
-		
+
 		if(!hasEffect)
 			return upSubEle;
-		
+
 		dealedVariations.addLast(new DealedVariation(dms.deletion));
 		if(currentNeedToDeal.get(dms.firstSubEle.getElement().getType()) <= 2){
 			//The upstream SubElement is BOX or EXTEND_BOX
@@ -875,9 +882,11 @@ public class EctypalElement {
 				String changeType = SUBELEMENT_TYPE_BOX.equals(downSubEle.getElement().getType()) ? SUBELEMENT_TYPE_LOST_BOX : SUBELEMENT_TYPE_EXTEND_BAND;
 				upSubEle.getElement().setType(changeType);
 				changeInitiator();
+				if(record != null)
+					record.setLetter("^");
 				return upSubEle;
 			}
-			
+
 			if(overlap(terminatorSmall, terminatorLarge, dms.realFrom, dms.realTo)){//The DEL variant overlaps with the terminator
 				if(dms.boxBases %3 != 0 || e3b == null || !bases2gene(e3b.sequence).contains("$")){//The initiator has lost
 					downSubEle.getElement().setType(SUBELEMENT_TYPE_EXTEND_BOX);
@@ -891,12 +900,12 @@ public class EctypalElement {
 				String changeType = SUBELEMENT_TYPE_BOX.equals(downSubEle.getElement().getType()) ? SUBELEMENT_TYPE_LOST_BOX : SUBELEMENT_TYPE_EXTEND_BAND;
 				return cutWhenAffect(downSubEle, downPos, SUBELEMENT_TYPE_BOX, changeType);
 			}
-			
+
 			if(dms.boxBases % 3 != 0){
 				String changeType = SUBELEMENT_TYPE_BOX.equals(downSubEle.getElement().getType()) ? SUBELEMENT_TYPE_SHIFT_BOX : SUBELEMENT_TYPE_SHIFT_EXTEND_BOX;
 				return cutWhenAffect(downSubEle, downPos, SUBELEMENT_TYPE_BOX, changeType);
 			}
-			
+
 			return upSubEle;
 			//End of firstType <= 2
 		}
@@ -905,18 +914,18 @@ public class EctypalElement {
 			String changeType = SUBELEMENT_TYPE_SHIFT_BOX.equals(downSubEle.getElement().getType()) ? SUBELEMENT_TYPE_BOX : SUBELEMENT_TYPE_EXTEND_BOX;
 			return cutWhenAffect(downSubEle, downPos, downSubEle.getElement().getType(), changeType);
 		}
-		
+
 		return upSubEle;
 	}
-	
+
 	private void changeInitiator(){
 		if(direction)
 			initiatorLarge = Integer.MIN_VALUE;
 		else
 			initiatorSmall = Integer.MAX_VALUE;
 	}
-	
-	private void recordVariant(Extract3Bases e3b, Variant v, String transcription, EctypalSubElement cur){
+
+	private MultiFromVariant recordVariant(Extract3Bases e3b, Variant v, String transcription, EctypalSubElement cur){
 		boolean fstSndContinuous = Position2SubElement.isContinuous(e3b.pss[0], e3b.pss[1]);
 		boolean sndRdContinuous = Position2SubElement.isContinuous(e3b.pss[1], e3b.pss[2]);
 		int[] from = null;
@@ -942,9 +951,9 @@ public class EctypalElement {
 				to = new int[]{e3b.pss[0].position, e3b.pss[1].position, e3b.pss[2].position};
 			}
 		}
-		cur.addMultiFromVariant(v.getId(), v.getType(), from, to, transcription);
+		return cur.addMultiFromVariant(v.getId(), v.getType(), from, to, transcription);
 	}
-	
+
 	/**
 	 * Extract suquence from fasta file, bases at <code>absolutePos</code>, and extract 
 	 * abs(<code>relativeFrom</code>) number of bases in the "BOX" before the <code>absolutePos</code>
@@ -984,7 +993,7 @@ public class EctypalElement {
 		int needToDealNumAfter = relativeTo + (direction ? 0 : 1);
 		Entry<EctypalSubElement> copy = cur;
 		boolean effected = false;
-		
+
 		if(direction){
 			while(needToDealNumPre > 0){
 				if(curPos < copy.getElement().getFrom()){
@@ -1038,11 +1047,11 @@ public class EctypalElement {
 				needToDealNumAfter--;
 				curPos++;
 			}
-			
+
 			result.sequence= new String(resultChars);
 			return result;
 		}
-		
+
 		//End of direction=true
 		//direction = false
 		while(needToDealNumAfter > 0){
@@ -1096,12 +1105,12 @@ public class EctypalElement {
 			needToDealNumPre--;
 			curPos--;
 		}
-		
+
 		result.sequence = InverseAndComplement(resultChars);
 		return result;
 	}
 	//////////////////////////////////////////////////////////End of deal
-	
+
 	////////////////////////////////////////////////////////////Other functions
 	/**
 	 * This method is used for move the current SubElement to another SubElement which contain
@@ -1130,10 +1139,10 @@ public class EctypalElement {
 				cur.getElement().setType(currentNeedToMap.get(cur.getElement().getType()).get(preSubEleNotLineNotBand.getType()));
 			}
 		}
-	
+
 		return cur;
 	}
-	
+
 	/**
 	 * This method is used for move the current SubElement to another SubElement which contain
 	 * the position: <code>pos</code> from back to front.
@@ -1161,10 +1170,10 @@ public class EctypalElement {
 				cur.getElement().setType(currentNeedToMap.get(cur.getElement().getType()).get(preSubEleNotLineNotBand.getType()));
 			}
 		}
-	
+
 		return cur;
 	}
-	
+
 	Element write2XML(Document doc) {
 		Element element = doc.createElement(XML_TAG_ELEMENT);
 		if(id != null)
@@ -1197,14 +1206,14 @@ public class EctypalElement {
 		}
 		return element;
 	}
-	
+
 	/**
 	 * @return Whether this Element still need to deal.
 	 */
 	public boolean stillNeedToDeal() {
 		return !hasEffect || stillNeedToDeal;
 	}
-	
+
 	/////////////////////////////////////////////Cut
 	/**
 	 * Cut the <code>cur</code>. If <code>belongFirst</code>==true, <code>pos</code> &lt; <code>cur.getTo()</code>;
@@ -1238,12 +1247,12 @@ public class EctypalElement {
 			return subEles.addBefore(divideResultSubEles[0], cur);
 		}
 	}
-	
+
 	private Entry<EctypalSubElement> cutWhenAffect(Entry<EctypalSubElement> cur, int pos, String notEffectSubEleType, String effectSubEleType){
 		return direction ? cutWhenAffectWhenPositive(cur, pos, notEffectSubEleType, effectSubEleType)
 				: cutWhenAffectWhenNegative(cur, pos, effectSubEleType, notEffectSubEleType);
 	}
-	
+
 	private Entry<EctypalSubElement> cutWhenAffectWhenPositive(Entry<EctypalSubElement> cur, int pos, String firstType, String secondType){
 		int minus = pos + 1 - cur.getElement().getTo();
 		if(minus <= 0) {
@@ -1270,7 +1279,7 @@ public class EctypalElement {
 			cur.getElement().setType(secondType);
 		return cur;
 	}
-	
+
 	private Entry<EctypalSubElement> cutWhenAffectWhenNegative(Entry<EctypalSubElement> cur, int pos, String firstType, String secondType){
 		int minus = pos - 1 - cur.getElement().getFrom();
 		if(minus >= 0) {
@@ -1298,7 +1307,7 @@ public class EctypalElement {
 		return cur;
 	}
 	/////////////////////////////////////////////End of cut
-	
+
 	private void addBoxBaseNumFromFirstBoxBases(EctypalSubElement cur, int test){
 		boxBaseNumFromFirstBoxBase += cur.getLength();
 	}

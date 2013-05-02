@@ -55,8 +55,11 @@ public class Instance {
 		}
 		Annotations[] Annos=CfgReader.getAnnotations(Assembly);
 		this.Annos=new Hashtable<String, Annotations>(Annos.length,1);
-		for(int i=0;i<Annos.length;i++)
+		for(int i=0;i<Annos.length;i++){
 			this.Annos.put(Annos[i].get_ID(), Annos[i]);
+			init_track(this.Annos.get(Annos[i].get_ID()));
+		}
+			
 		Externals=new Hashtable<String, Annotations>();
 		bpp=1;
 	}
@@ -160,6 +163,18 @@ public class Instance {
 		for(int i=0;i<tracks.length;i++)
 			if(Externals.containsKey(tracks[i]))
 				Externals.remove(tracks[i]);
+	}
+	public void init_Pvar(String track,String PvarID){
+		if(Annos.containsKey(track)){
+			if(PvarID.equals(track)
+					||(Annos.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE))){
+				this.PvarID=PvarID;
+				this.Pvar=SerializationUtils.clone(Annos.get(track));
+				Pvar.set_Mode(Consts.MODE_PACK);
+				if (!PvarID.equals(track))
+					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
+			}
+		}
 	}
 	public String add_Pvar(String track,String mode,String PvarID){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
@@ -569,6 +584,80 @@ public class Instance {
 		}
 		else 
 			append_track(track,doc,mode);
+	}
+	void init_track(Annotations track) {
+		String path_temp=track.get_Path("chr1");
+		String type_temp=track.get_Type();
+		if(type_temp.equals(Consts.FORMAT_BEDGZ))
+			new BedReaderTabix(path_temp);
+		else if(type_temp.equals(Consts.FORMAT_ANNO))
+			new BasicAnnosReader(path_temp);
+		else if(type_temp.equals(Consts.FORMAT_BED))
+			new BedReader(path_temp);
+		else if(type_temp.equals(Consts.FORMAT_BIGBED)){
+			try{
+				new BigBedReader(path_temp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else if(type_temp.equals(Consts.FORMAT_BEDGRAPH))
+			new BedGraphReader(path_temp);
+		else if(type_temp.equals(Consts.FORMAT_BIGWIG))
+			new WiggleReader(path_temp,true);
+		else if(type_temp.equals(Consts.FORMAT_WIG))
+			new WiggleReader(path_temp,false);
+		else if(type_temp.equals(Consts.FORMAT_GRF))
+			 new GRFReader(path_temp);
+		else if(type_temp.equals(Consts.FORMAT_GDF))
+			new GDFReader(path_temp);
+		else if(type_temp.equals(Consts.FORMAT_GFF)){
+			try {
+				new GFFReader(path_temp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else if(type_temp.equals(Consts.FORMAT_GTF)){
+			try {
+				new GTFReader(path_temp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else if(type_temp.equals(Consts.FORMAT_GVF)){
+			try {
+				new GVFReader(path_temp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else if (type_temp.equals(Consts.FORMAT_VCF)){
+			VcfReader vr=new VcfReader(track,"chr1");
+			try{
+				vr.vcf_tb.TabixReaderClose();
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		else if (type_temp.equals(Consts.FORMAT_BAM)){
+			try {
+				new BAMReader(path_temp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		}
+		else if (type_temp.equals(Consts.FORMAT_FASTA)&&bpp<0.5){
+			try{
+				new FastaReader(path_temp);
+			} catch (IOException e){
+				e.printStackTrace();
+			}
+		}
+		else if (type_temp.equals(Consts.FORMAT_CYTO))
+			new CytobandReader(path_temp);
 	}
 	void append_track(Annotations track, Document doc,String mode) {
 		String path_temp=track.get_Path(Chr);

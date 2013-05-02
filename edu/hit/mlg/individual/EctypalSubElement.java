@@ -166,19 +166,22 @@ public class EctypalSubElement {
 	 * @param to	end base of this variation, 1-base. May contain many to.
 	 * @param letter	letter of this variation. Null if this variation doesn't has
 	 *       			any letter.
+	 * @return the new <code>MultiFromVariant</code> instance added   
 	 */
-	void addMultiFromVariant(String id, String type, int[] from, int[] to, String letter) {
+	MultiFromVariant addMultiFromVariant(String id, String type, int[] from, int[] to, String letter) {
 		ensureCapacity();
-		variants[variantsNum++] = new MultiFromVariant(id, type, from, to, letter);
+		variants[variantsNum] = new MultiFromVariant(id, type, from, to, letter);
+		return variants[variantsNum++];
 	}
 	
-	void addMultiFromVariant(MultiFromVariant variant) {
+	MultiFromVariant addMultiFromVariant(MultiFromVariant variant) {
 		ensureCapacity();
-		variants[variantsNum++] = variant;
+		variants[variantsNum] = variant;
+		return variants[variantsNum++];
 	}
 	
-	void addMultiFromVariant(Variant v){
-		addMultiFromVariant(v.getId(), v.getType(), new int[]{v.getFrom()}, new int[]{v.getTo()}, v.getLetter());
+	MultiFromVariant addMultiFromVariant(Variant v){
+		return addMultiFromVariant(v.getId(), v.getType(), new int[]{v.getFrom()}, new int[]{v.getTo()}, v.getLetter());
 	}
 
 	private void ensureCapacity() {

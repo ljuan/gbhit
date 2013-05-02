@@ -50,6 +50,9 @@ public class Interfaces extends HttpServlet{
 			String a=ins.add_Pvar(req.getParameter("tracks"),req.getParameter("modes"),req.getParameter("id"));
 			res.getWriter().print(a);
 		}
+		else if (action.equals("initPvar")){
+			ins.init_Pvar(req.getParameter("tracks"),req.getParameter("id"));
+		}
 		else if (action.equals("removePvar")){
 			ins.remove_Pvar();
 		}

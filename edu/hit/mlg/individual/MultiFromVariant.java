@@ -70,6 +70,10 @@ public class MultiFromVariant {
 		return this.letter;
 	}
 	
+	public void setLetter(String letter) {
+		this.letter = letter;
+	}
+	
 	public int getFirstFrom(){
 		return this.firstFrom;
 	}

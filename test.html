@@ -46,17 +46,21 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					querry="action="+param5+"&gene="+param4;
 				} else if(param5 == "findGene"){
 					querry="action="+param5+"&prefix="+param4;
+				} else if(param5 == "getCytobands"){
+					querry="action="+param5+"&chr="+param4;
 				} else if(param5 == "modiTracks" || param5 == "addTracks" || param5 == "modiPanno" || param5 == "modiPfanno" || param5 == "addPanno" || param5 == "addPfanno" || param5 == "addPclns" || param5 == "modiPclns"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3;
 				} else if(param5 == "addPvar" || param5 == "modiPvar"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&id="+param2;
+				} else if(param5 == "initPvar"){
+					querry="action="+param5+"&tracks="+param4+"&id="+param2;
 				} else if(param5 == "overlapGene"){
 					querry="action="+param5+"&chr="+param1+"&start="+param2+"&end="+param3;
 				} else if(param5 == "addExternals"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&links="+param2+"&types="+param1;
 				} else if(param5 == "getDetail"){
 					querry="action="+param5+"&tracks="+param4+"&id="+param1+"&start="+param2+"&end="+param3;
-				} else if(param5 == "update"){
+				} else if(param5 == "update" || param5 == "refresh"){
 					querry="action="+param5+"&width="+param4+"&chr="+param1+"&start="+param2+"&end="+param3;
 				} else if(param5 == "setParams"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&params="+param2+"&values="+param1;
@@ -117,16 +121,16 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 	<table width=80% border=1 valign="middle" align="center">
 		<tr>
 			<th>Input</th>
-			<th>update</th>
+			<th>update<br>refresh</th>
 			<th>getDetail</th>
 			<th>addExternals</th>
 			<th>setParams</th>
 			<th>overlapGene</th>
-			<th>addPvar<br>modiPvar</th>
+			<th>addPvar<br>modiPvar<br>initPvar</th>
 			<th>addTracks/modiTracks<br>addPanno/modiPanno<br>addPfanno/modiPfanno<br>addPclns/modiPclns</th>
 			<th>removeTracks<br>removeExternals<br>removePclns<br>getParams</th>
 			<th>getGene<br>findGene</th>
-			<th>setAssembly</th>
+			<th>setAssembly<br>getCytobands</th>
 			<th>removePvar<br>removePanno<br>removePfanno<br>getAssemblies<br>getAnnotations<br>getChromosomes</th>
 		<tr align="center">
 			<td><input id="p1" type="text"/></td>
@@ -169,7 +173,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td>tracks</td>
 			<td>tracks</td>
 			<td>prefix/gene</td>
-			<td>assembly</td>
+			<td>assembly/chr</td>
 			<td></td>
 		</tr>
 		<tr align="center">
