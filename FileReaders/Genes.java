@@ -150,7 +150,7 @@ public class Genes{
 		int low=ChrStarts[chr];
 		int up=ChrEnds[chr];
 		int mid=low;
-		while(low<up){
+		while(low<=up){
 			mid=(up+low)/2;
 			if(Starts[mid]<end && Ends[mid]>=start){
 				int[] range=new int[2];
@@ -175,8 +175,9 @@ public class Genes{
 		int low=0;
 		int up=Symbols_sorted.length-1;
 		int mid=low;
-		while(low<up){
+		while(low<=up){
 			mid=(up+low)/2;
+			System.out.println(Symbols_sorted[mid]+"\t"+mid+"\t"+low+"\t"+up);
 			if(Symbols_sorted[mid].startsWith(prefix)){
 				for(int i=mid;i>=0;i--)
 					if(!Symbols_sorted[i].startsWith(prefix))

@@ -173,6 +173,16 @@ public class Instance {
 				Pvar.set_Mode(Consts.MODE_PACK);
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
+				if(Pfanno==null && Panno==null){
+					if(Annos.containsKey("ensemblRegulation") && Annos.get("ensemblRegulation").get_Type().equals(Consts.FORMAT_GRF)){
+						Pfanno=SerializationUtils.clone(Annos.get("ensemblRegulation"));
+						Pfanno.set_Mode(Consts.MODE_PACK);
+					}
+					if(Annos.containsKey("refGene") && Annos.get("refGene").get_Type().equals(Consts.FORMAT_ANNO)){
+						Panno=SerializationUtils.clone(Annos.get("refGene"));
+						Panno.set_Mode(Consts.MODE_PACK);
+					}
+				}
 			}
 		}
 	}
