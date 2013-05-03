@@ -177,7 +177,6 @@ public class Genes{
 		int mid=low;
 		while(low<=up){
 			mid=(up+low)/2;
-			System.out.println(Symbols_sorted[mid]+"\t"+mid+"\t"+low+"\t"+up);
 			if(Symbols_sorted[mid].startsWith(prefix)){
 				for(int i=mid;i>=0;i--)
 					if(!Symbols_sorted[i].startsWith(prefix))
