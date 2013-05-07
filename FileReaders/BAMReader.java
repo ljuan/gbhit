@@ -11,7 +11,7 @@ import edu.hit.mlg.individual.vcf.Variant;
 import net.sf.samtools.*;
 import net.sf.samtools.SAMRecord.SAMTagAndValue;
 import net.sf.samtools.seekablestream.SeekableBufferedStream;
-import net.sf.samtools.seekablestream.SeekableHTTPStream;
+import net.sf.samtools.seekablestream.SeekableStreamFactory;
 import static FileReaders.XmlWriter.append_text_element;
 import static FileReaders.Consts.*;
 
@@ -38,13 +38,6 @@ public class BAMReader {
 	 * BAM index file path
 	 */
 	private String indexFilePath;
-
-	/**
-	 * If the BAM file comes from remote server: fromRemoteServer=true, false
-	 * else. If fromRemoteServer=false, filePath is a path of a local BAM file,
-	 * else an url of a remote BAM file.
-	 */
-	private boolean fromRemoteServer;
 
 	private SAMFileReader samReader = null;
 
@@ -76,7 +69,7 @@ public class BAMReader {
 	 * number of chromosome in the BAM file
 	 */
 	private int sequenceNum = 0;
-	
+
 	/**
 	 * whether chromosomes of all of this SAM file start with "chr" or "CHR"
 	 */
@@ -91,17 +84,13 @@ public class BAMReader {
 	 *            file path or url of the BAM file.
 	 * @param indexFilePath
 	 *            file path of the BAM index file in the server.
-	 * @param fromRemoteServer
-	 *            If the BAM file comes from remote server,
-	 *            fromRemoteServer=true, else false.
 	 * @throws MalformedURLException
 	 * @throws URISyntaxException
 	 */
-	public BAMReader(String filePath, String indexFilePath, boolean fromRemoteServer) 
+	public BAMReader(String filePath, String indexFilePath) 
 			throws MalformedURLException, URISyntaxException {
 		this.filePath = filePath;
 		this.indexFilePath = indexFilePath;
-		this.fromRemoteServer = fromRemoteServer;
 	}
 
 	/**
@@ -116,16 +105,13 @@ public class BAMReader {
 	public BAMReader(String filePath) throws MalformedURLException, URISyntaxException, FileNotFoundException {
 		this.filePath = filePath;
 		if (filePath.startsWith("http://") || filePath.startsWith("ftp://") || filePath.startsWith("https://")) {
-			this.fromRemoteServer = true;
-
 			if (isRemoteFileExists(filePath + ".bai"))
 				this.indexFilePath = filePath + ".bai";
-			else if (BAMReader.isRemoteFileExists(filePath.replace(".bam", ".bai")))
+			else if (isRemoteFileExists(filePath.replace(".bam", ".bai")))
 				this.indexFilePath = filePath.replace(".bam", ".bai");
 			else
 				throw new FileNotFoundException();
 		} else {
-			this.fromRemoteServer = false;
 			if (new File(filePath + ".bai").exists())
 				this.indexFilePath = filePath + ".bai";
 			else if (new File(filePath.replace(".bam", ".bai")).exists())
@@ -695,30 +681,27 @@ public class BAMReader {
 
 	private SAMRecordIterator getIterator(String chr, int start, int end)
 			throws MalformedURLException, FileNotFoundException {
-		SAMRecordIterator samRecItor = null;
 		try {
 			open(false);
 			return samReader.queryOverlapping(hasChromosomePrefix ? chr : chr.substring(3), start, end);
 		} catch (SAMException e) {
-			e.printStackTrace();
-			return samRecItor;
+			return null;
+		} catch (IOException e) {
+			return null;
 		}
 	}
 
-	private void open(boolean b) throws MalformedURLException, FileNotFoundException {
-		if (fromRemoteServer)
-			samReader = new SAMFileReader(new SeekableBufferedStream(new SeekableHTTPStream(new URL(filePath))),
-										  new SeekableBufferedStream(new SeekableHTTPStream(new URL(indexFilePath))), b);
-		else
-			samReader = new SAMFileReader(new File(filePath), new File(indexFilePath), b);
-		
+	private void open(boolean b) throws IOException {
+		samReader = new SAMFileReader(new SeekableBufferedStream(SeekableStreamFactory.getStreamFor(filePath)), 
+		new SeekableBufferedStream(SeekableStreamFactory.getStreamFor(indexFilePath)), 
+		b);
 		String sequenceName = null;
 		//Judge whether chromosomes of all of this SAM file start with "chr" or "CHR"
 		for (SAMSequenceRecord sequenceRecord : samReader.getFileHeader().getSequenceDictionary().getSequences()) {
-			sequenceName = sequenceRecord.getSequenceName();
-			hasChromosomePrefix = sequenceName != null 
-									&& sequenceName.length() > 3 
-									&& sequenceName.substring(0, 3).equalsIgnoreCase(CHROMOSOME_NAME_PREFIX);
+		sequenceName = sequenceRecord.getSequenceName();
+		hasChromosomePrefix = sequenceName != null 
+		&& sequenceName.length() > 3 
+		&& sequenceName.substring(0, 3).equalsIgnoreCase(CHROMOSOME_NAME_PREFIX);
 		}
 	}
 
@@ -729,10 +712,7 @@ public class BAMReader {
 		}
 	}
 
-	private InputStream getInputStream(String path) throws MalformedURLException, FileNotFoundException {
-		if (fromRemoteServer)
-			return new SeekableBufferedStream(new SeekableHTTPStream(new URL(path)));
-		else
-			return new FileInputStream(new File(path));
+	private InputStream getInputStream(String path) throws IOException {
+		return SeekableStreamFactory.getStreamFor(filePath);
 	}
 }
