@@ -24,7 +24,7 @@ import FileReaders.TabixReader;
  * 
  */
 public class GTFReader {
-	private TabixReader tb;
+	private String filePath;
 
 	/**
 	 * 
@@ -32,8 +32,8 @@ public class GTFReader {
 	 *            file path of GTF file
 	 * @throws IOException
 	 */
-	public GTFReader(String filePath) throws IOException {
-		this.tb = new TabixReader(filePath);
+	public GTFReader(String filePath) {
+		this.filePath=filePath;
 	}
 
 	/**
@@ -55,10 +55,12 @@ public class GTFReader {
 		elements.setAttribute(Consts.XML_TAG_ID, track);
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0)
 				.appendChild(elements); // Elements
+		TabixReader tb = null;
 		try {
 			String querystr = (tb.hasChromPrefix() ? chr : chr.substring(3))
 					+ ":" + regionstart + "-" + regionend;
 			String line;
+			tb=new TabixReader(filePath);
 			TabixReader.Iterator Query = tb.query(querystr);
 			StringSplit ss = new StringSplit('\t');
 			if (Query != null) {

@@ -23,7 +23,7 @@ import FileReaders.TabixReader;
  * 
  */
 public class GFFReader {
-	private TabixReader tb;
+	private String filePath;
 
 	/**
 	 * 
@@ -31,8 +31,8 @@ public class GFFReader {
 	 *            file path of GFF file
 	 * @throws IOException
 	 */
-	public GFFReader(String filePath) throws IOException {
-		this.tb = new TabixReader(filePath);
+	public GFFReader(String filePath) {
+		this.filePath=filePath;
 	}
 
 	/**
@@ -57,7 +57,9 @@ public class GFFReader {
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0)
 				.appendChild(elements); // Elements
 
+		TabixReader tb=null;
 		try {
+			tb = new TabixReader(filePath);
 			String querystr = (tb.hasChromPrefix() ? chr : chr.substring(3))
 					+ ":" + regionstart + "-" + regionend;
 			String line;
