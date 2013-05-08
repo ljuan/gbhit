@@ -25,7 +25,7 @@ import FileReaders.XmlWriter;
  * 
  */
 public class GVFReader {
-	private TabixReader tb;
+	private String filePath;
 
 	/**
 	 * 
@@ -33,8 +33,8 @@ public class GVFReader {
 	 *            file path of GVF file
 	 * @throws IOException
 	 */
-	public GVFReader(String filePath) throws IOException {
-		this.tb = new TabixReader(filePath);
+	public GVFReader(String filePath){
+		this.filePath = filePath;
 	}
 
 	public Element get_detail(Document doc, String track, String id,
@@ -43,9 +43,11 @@ public class GVFReader {
 		variants.setAttribute(Consts.XML_TAG_ID, track);
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(variants); // Variants
 		GVF gvf = null;
+		TabixReader tb=null;
 		try {
 			String querystr = (tb.hasChromPrefix() ? chr : chr.substring(3)) + ":" + regionstart + "-" + regionend;
 			String line;
+			tb=new TabixReader(filePath);
 			TabixReader.Iterator Query = tb.query(querystr);
 			StringSplit ss = new StringSplit('\t');
 			if (Query != null) {
@@ -103,12 +105,14 @@ public class GVFReader {
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(variants); // Variants
 
 		boolean equals = true;
+		TabixReader tb=null;
 		try {
 			String querystr = (tb.hasChromPrefix() ? chr : chr.substring(3))
 					+ ":" + regionstart + "-" + regionend;
 			String line;
 			String cur = null;
 			GVF gvf = null;
+			tb=new TabixReader(filePath);
 			TabixReader.Iterator Query = tb.query(querystr);
 			StringSplit ss = new StringSplit('\t');
 			if (Query != null) {
