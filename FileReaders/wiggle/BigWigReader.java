@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.broad.igv.bbfile.*;
 import org.broad.tribble.util.SeekableStream;
+import org.broad.tribble.util.SeekableStreamFactory;
 
 import FileReaders.BAMReader;
 
@@ -28,12 +29,16 @@ public class BigWigReader {
 	private BBFileHeader bbFileHdr;
 
 	private List<BBZoomLevelHeader> zoomLevelHeaders;
+	
+	private SeekableStream stream;
 
+	private String uri;
 	/**
 	 * zoomLevelBases limit. zoomLevelBases must less than:<br>
 	 * ((end - (start - 1)) / (float) width) / zoomLevelBases;
 	 */
 	private int zoomLevelBasesLimit = 20;
+	
 
 	/**
 	 * 
@@ -41,21 +46,8 @@ public class BigWigReader {
 	 *            url or file path
 	 * @throws IOException
 	 */
-	public BigWigReader(String uri) throws IOException {
-		// open big file
-		reader=new BBFileReader(uri);
-		/*if (uri.startsWith("http://") || uri.startsWith("ftp://")
-				|| uri.startsWith("https://")) {
-			if (!BAMReader.isRemoteFileExists(uri))
-				throw new FileNotFoundException("can't find file for:" + uri);
-			SeekableStream ss = new CustomSeekableBufferedStream(new CustomSeekableHTTPStream(
-					new URL(uri)));
-			reader = new BBFileReader(uri, ss);
-		} else {
-			reader = new BBFileReader(uri);
-		}*/
-
-		zoomLevelHeaders = reader.getZoomLevels().getZoomLevelHeaders();
+	public BigWigReader(String uri) {
+		this.uri = uri;
 	}
 
 	/**
@@ -77,6 +69,12 @@ public class BigWigReader {
 	 */
 	public BigWigReader getBigWig(String chrom, int start, int end,
 			boolean contained, DataValueList bigWigs, int windowSize, int step) {
+		try {
+			open();
+		} catch (IOException e) {
+			return null;
+		}
+		
 		// get the big header
 		bbFileHdr = reader.getBBFileHeader();
 
@@ -117,7 +115,7 @@ public class BigWigReader {
 			}
 		}
 
-		//close();
+		close();
 		
 		return this;
 	}
@@ -145,13 +143,24 @@ public class BigWigReader {
 		}
 		return zoomLevelHeaders.size();
 	}
+	
+	private void open() throws IOException {
+		// open big file
+		stream = SeekableStreamFactory.getStreamFor(uri);
+		reader=new BBFileReader(uri, stream);
+		
+		zoomLevelHeaders = reader.getZoomLevels().getZoomLevelHeaders();
+	}
 
-	/*private void close() {
+	private void close() {
 		try {
-			if (reader != null)
-				this.reader.getBBFis().close();
+			if (stream != null){
+				stream.close();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			stream = null;
 		}
-	}*/
+	}
 }

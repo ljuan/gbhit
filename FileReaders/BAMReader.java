@@ -1,19 +1,53 @@
 ﻿package FileReaders;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import org.w3c.dom.*;
+import static FileReaders.Consts.DATA_ROOT;
+import static FileReaders.Consts.MODE_DENSE;
+import static FileReaders.Consts.XML_TAG_DESCRIPTION;
+import static FileReaders.Consts.XML_TAG_DIRECTION;
+import static FileReaders.Consts.XML_TAG_FROM;
+import static FileReaders.Consts.XML_TAG_ID;
+import static FileReaders.Consts.XML_TAG_READ;
+import static FileReaders.Consts.XML_TAG_READS;
+import static FileReaders.Consts.XML_TAG_STEP;
+import static FileReaders.Consts.XML_TAG_TO;
+import static FileReaders.Consts.XML_TAG_TYPE;
+import static FileReaders.Consts.XML_TAG_VALUES;
+import static FileReaders.Consts.XML_TAG_VALUE_LIST;
+import static FileReaders.XmlWriter.append_text_element;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import net.sf.samtools.AbstractBAMFileIndex;
+import net.sf.samtools.CigarElement;
+import net.sf.samtools.CigarOperator;
+import net.sf.samtools.LinearIndex;
+import net.sf.samtools.SAMException;
+import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFormatException;
+import net.sf.samtools.SAMRecord;
+import net.sf.samtools.SAMRecord.SAMTagAndValue;
+import net.sf.samtools.SAMRecordIterator;
+import net.sf.samtools.SAMSequenceRecord;
+import net.sf.samtools.seekablestream.SeekableBufferedStream;
+import net.sf.samtools.seekablestream.SeekableStreamFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import FileReaders.bam.BAMValueList;
 import FileReaders.bam.VariantResolver;
 import edu.hit.mlg.individual.vcf.Variant;
-import net.sf.samtools.*;
-import net.sf.samtools.SAMRecord.SAMTagAndValue;
-import net.sf.samtools.seekablestream.SeekableBufferedStream;
-import net.sf.samtools.seekablestream.SeekableStreamFactory;
-import static FileReaders.XmlWriter.append_text_element;
-import static FileReaders.Consts.*;
 
 /**
  * <pre>
@@ -74,7 +108,7 @@ public class BAMReader {
 	 * whether chromosomes of all of this SAM file start with "chr" or "CHR"
 	 */
 	private boolean hasChromosomePrefix = true;
-
+	
 	public BAMReader() {
 	}
 
@@ -713,6 +747,6 @@ public class BAMReader {
 	}
 
 	private InputStream getInputStream(String path) throws IOException {
-		return SeekableStreamFactory.getStreamFor(filePath);
+		return SeekableStreamFactory.getStreamFor(path);
 	}
 }

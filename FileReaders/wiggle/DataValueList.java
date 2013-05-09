@@ -22,6 +22,8 @@ public class DataValueList {
 	 * ValueList in array format
 	 */
 	private float[] values;
+	
+	private int[] numOfBasePerValue;
 	/**
 	 * size of values
 	 */
@@ -86,8 +88,11 @@ public class DataValueList {
 		width = ((end - this.start) < (windowSize / step)) ? (end - this.start)
 				: (windowSize / step);
 		values = new float[width];
-		for (int i = 0; i < width; i++)
+		numOfBasePerValue = new int[width];
+		for (int i = 0; i < width; i++) {
 			values[i] = 0;
+			numOfBasePerValue[i] = 0;
+		}
 		this.wPerBase = (float) width / (end - this.start);
 		this.bPerWidth = (end - this.start) / (float) width;
 	}
@@ -133,7 +138,7 @@ public class DataValueList {
 		} else {
 			dvs = distribute(dv);
 		}
-
+		
 		if (zoomLevelBases == 1) {
 			updateWithHighestZoom(dvs);
 		} else {
@@ -160,6 +165,7 @@ public class DataValueList {
 				pos = width - 1;
 			}
 			values[pos] += d.getDataValue();
+			numOfBasePerValue[pos]++;
 		}
 	}
 
@@ -189,11 +195,14 @@ public class DataValueList {
 				endPos = width - 1;
 			if (startPos == endPos) {
 				values[startPos] += d.getDataValue() * (thisEnd - thisStart);
+				numOfBasePerValue[startPos] += thisEnd - thisStart;
 			} else {
 				// Calculate the seperate position, use Math.floor(double d)
 				int sepPos = (int) Math.floor(((startPos + 1) * bPerWidth));
 				values[startPos] += d.getDataValue() * (sepPos - thisStart);
 				values[endPos] += d.getDataValue() * (thisEnd - sepPos);
+				numOfBasePerValue[startPos] += sepPos - thisStart;
+				numOfBasePerValue[endPos] += thisEnd - sepPos;
 			}
 		}
 	}
@@ -226,12 +235,15 @@ public class DataValueList {
 		format.setMaximumFractionDigits(3);
 		String formatNum = null;
 		for (int i = 0; i < values.length - 1; i++) {
-			formatNum = format.format(values[i] / bPerWidth);
+			//formatNum = format.format(values[i] / bPerWidth);
+			formatNum = numOfBasePerValue[i]==0 ? "0" : (format.format(values[i] / numOfBasePerValue[i]));
 			builder.append(formatNum);
 			builder.append(";");
 		}
 		if (values.length > 0) {
-			formatNum = format.format(values[values.length - 1] / bPerWidth);
+			//formatNum = format.format(values[values.length - 1] / bPerWidth);
+			formatNum = numOfBasePerValue[numOfBasePerValue.length - 1]==0 ? "0" 
+						: (format.format(values[values.length - 1] / numOfBasePerValue[numOfBasePerValue.length - 1]));
 			builder.append(formatNum);
 		}
 

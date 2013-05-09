@@ -15,6 +15,7 @@ import org.broad.igv.bbfile.BBFileReader;
 import org.broad.igv.bbfile.BedFeature;
 import org.broad.igv.bbfile.BigBedIterator;
 import org.broad.tribble.util.SeekableStream;
+import org.broad.tribble.util.SeekableStreamFactory;
 
 import FileReaders.wiggle.CustomSeekableBufferedStream;
 import FileReaders.wiggle.CustomSeekableHTTPStream;
@@ -38,6 +39,9 @@ public class BigBedReader implements Consts {
 	// get the big header
 	private BBFileHeader bbFileHdr;
 
+	private SeekableStream stream;
+
+	private String uri;
 	/**
 	 * 
 	 * @param uri
@@ -45,27 +49,16 @@ public class BigBedReader implements Consts {
 	 * @throws IOException
 	 */
 	public BigBedReader(String uri) throws IOException {
-		// open big file
-		reader = new BBFileReader(uri);
-		
-	/*	if (uri.startsWith("http://") || uri.startsWith("ftp://")
-				|| uri.startsWith("https://")) {
-			if (!BAMReader.isRemoteFileExists(uri))
-				throw new FileNotFoundException("can't find file for:" + uri);
-			SeekableStream ss = new CustomSeekableBufferedStream(
-					new CustomSeekableHTTPStream(new URL(uri)));
-			reader = new BBFileReader(uri, ss);
-		} else {
-			reader = new BBFileReader(uri);
-		}*/
-		// get the big header
-		bbFileHdr = reader.getBBFileHeader();
+		this.uri = uri;
 	}
 	Element get_detail(Document doc, String track, String id,String chr,long regionstart, long regionend ) throws IOException {
 		Element Elements = doc.createElement(Consts.XML_TAG_ELEMENTS);
 		Elements.setAttribute(Consts.XML_TAG_ID, track);
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(Elements); // Elements
 		
+		open();
+		
+		bbFileHdr = reader.getBBFileHeader();
 		if (chr == null || !bbFileHdr.isHeaderOK() || !bbFileHdr.isBigBed())
 			return Elements;
 		// chromosome was specified, test if it exists in this file
@@ -120,6 +113,9 @@ public class BigBedReader implements Consts {
 				break;
 			}
 		}
+		
+		close();
+			
 		return Elements;
 	}
 	Element write_bed2elements(Document doc, String track, String chr,
@@ -128,6 +124,9 @@ public class BigBedReader implements Consts {
 		Elements.setAttribute(XML_TAG_ID, track);
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Elements); // Elements
 
+		open();
+		
+		bbFileHdr = reader.getBBFileHeader();
 		if (chr == null || !bbFileHdr.isHeaderOK() || !bbFileHdr.isBigBed())
 			return Elements;
 		// chromosome was specified, test if it exists in this file
@@ -159,17 +158,26 @@ public class BigBedReader implements Consts {
 			Elements.appendChild(Ele);
 		}
 
-	//	close();
+		close();
 		
 		return Elements;
 	}
 	
-/*	private void close() {
+	private void open() throws IOException {
+		// open big file
+		stream = SeekableStreamFactory.getStreamFor(uri);
+		reader=new BBFileReader(uri, stream);
+	}
+
+	private void close() {
 		try {
-			if (reader != null)
-				this.reader.getBBFis().close();
+			if (stream != null){
+				stream.close();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			stream = null;
 		}
-	}*/
+	}
 }

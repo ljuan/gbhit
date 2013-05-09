@@ -83,13 +83,9 @@ public class WiggleExtractor {
 	 */
 	public DataValueList extract() throws FileNotFoundException, IOException {
 		if (isBigWig) {
-			try {
-				new BigWigReader(this.filePath).getBigWig(this.chrom,
-						this.start, this.end, false, this.wiggles,
-						this.wiggles.getWindowSize(), this.wiggles.getStep());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			new BigWigReader(this.filePath).getBigWig(this.chrom,
+					this.start, this.end, false, this.wiggles,
+					this.wiggles.getWindowSize(), this.wiggles.getStep());
 		} else {
 			open();
 			extract_wiggle();

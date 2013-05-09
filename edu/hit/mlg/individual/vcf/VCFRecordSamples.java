@@ -20,7 +20,7 @@ public class VCFRecordSamples {
 	public VCFRecordSamples(String[] samples) {
 		int len = samples.length - 9;
 		this.format = samples[8];
-		containGT = format.startsWith("GT:");
+		containGT = format.length() == 2 ? format.equals("GT") : format.startsWith("GT:");
 		this.sampleVariants = new int[len][];
 		this.homos = new String[len];
 		for (int i = 0; i < len; i++) {

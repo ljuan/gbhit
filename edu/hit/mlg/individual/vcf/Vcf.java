@@ -629,10 +629,12 @@ public class Vcf {
 		if (!samples.containGT())
 			return variants;
 		int[] vIndexes = samples.getVariantIndexes(index);
+		
 		if (vIndexes == null)
 			return null;
 		Variant[] vs = new Variant[variants.length];
 		int len = 0;
+		
 		for (int vIndex : vIndexes) {
 			vs[len] = variants[vIndex - 1];
 			vs[len++].setHomo(samples.getHome(index));
