@@ -57,10 +57,10 @@ public class GTFReader {
 				.appendChild(elements); // Elements
 		TabixReader tb = null;
 		try {
+			tb=new TabixReader(filePath);
 			String querystr = (tb.hasChromPrefix() ? chr : chr.substring(3))
 					+ ":" + regionstart + "-" + regionend;
 			String line;
-			tb=new TabixReader(filePath);
 			TabixReader.Iterator Query = tb.query(querystr);
 			StringSplit ss = new StringSplit('\t');
 			if (Query != null) {

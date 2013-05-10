@@ -107,12 +107,12 @@ public class GVFReader {
 		boolean equals = true;
 		TabixReader tb=null;
 		try {
+			tb=new TabixReader(filePath);
 			String querystr = (tb.hasChromPrefix() ? chr : chr.substring(3))
 					+ ":" + regionstart + "-" + regionend;
 			String line;
 			String cur = null;
 			GVF gvf = null;
-			tb=new TabixReader(filePath);
 			TabixReader.Iterator Query = tb.query(querystr);
 			StringSplit ss = new StringSplit('\t');
 			if (Query != null) {
