@@ -195,7 +195,8 @@ public class Instance {
 							&&((VcfSample)(Annos.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifSelected(PvarID))){
 				this.PvarID=PvarID;
 				this.Pvar=SerializationUtils.clone(Annos.get(track));
-				Pvar.set_Mode(mode);
+//				Pvar.set_Mode(mode);
+				Pvar.set_Mode(Consts.MODE_PACK);
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
@@ -217,7 +218,8 @@ public class Instance {
 							&&((VcfSample)(Externals.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifSelected(PvarID))){
 				this.PvarID=PvarID;
 				this.Pvar=SerializationUtils.clone(Externals.get(track));
-				Pvar.set_Mode(mode);
+//				Pvar.set_Mode(mode);
+				Pvar.set_Mode(Consts.MODE_PACK);
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
 				else
@@ -595,11 +597,7 @@ public class Instance {
 		else if(type_temp.equals(Consts.FORMAT_BED))
 			new BedReader(path_temp);
 		else if(type_temp.equals(Consts.FORMAT_BIGBED)){
-			try{
-				new BigBedReader(path_temp);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			new BigBedReader(path_temp);
 		}
 		else if(type_temp.equals(Consts.FORMAT_BEDGRAPH))
 			new BedGraphReader(path_temp);
@@ -668,13 +666,8 @@ public class Instance {
 				}
 			}
 			else if(type_temp.equals(Consts.FORMAT_BIGBED)){
-				BigBedReader bbr;
-				try{
-					bbr=new BigBedReader(path_temp);
-					ele_temp=bbr.write_bed2elements(doc, track.get_ID(), Chr, Coordinate[0], Coordinate[1], bpp);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				BigBedReader bbr=new BigBedReader(path_temp);
+				ele_temp=bbr.write_bed2elements(doc, track.get_ID(), Chr, Coordinate[0], Coordinate[1], bpp);
 			}
 			else if(type_temp.equals(Consts.FORMAT_BEDGRAPH)){
 				BedGraphReader bgr;

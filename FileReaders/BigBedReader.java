@@ -48,7 +48,7 @@ public class BigBedReader implements Consts {
 	 *            url or file path
 	 * @throws IOException
 	 */
-	public BigBedReader(String uri) throws IOException {
+	public BigBedReader(String uri) {
 		this.uri = uri;
 	}
 	Element get_detail(Document doc, String track, String id,String chr,long regionstart, long regionend ) throws IOException {
@@ -119,13 +119,16 @@ public class BigBedReader implements Consts {
 		return Elements;
 	}
 	Element write_bed2elements(Document doc, String track, String chr,
-			long regionstart, long regionend, double bpp) throws IOException {
+			long regionstart, long regionend, double bpp) {
 		Element Elements = doc.createElement(XML_TAG_ELEMENTS);
 		Elements.setAttribute(XML_TAG_ID, track);
 		doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Elements); // Elements
 
-		open();
-		
+		try {
+			open();
+		} catch (IOException e) {
+			return null;
+		}
 		bbFileHdr = reader.getBBFileHeader();
 		if (chr == null || !bbFileHdr.isHeaderOK() || !bbFileHdr.isBigBed())
 			return Elements;
