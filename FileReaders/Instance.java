@@ -13,6 +13,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.apache.commons.lang3.SerializationUtils;
 
+import edu.hit.mlg.individual.GRFElementRegionComparison;
 import edu.hit.mlg.individual.GdfElementSelector;
 import edu.hit.mlg.individual.Individual;
 import edu.hit.mlg.individual.VariantAnalysis;
@@ -182,6 +183,14 @@ public class Instance {
 					if(Annos.containsKey("refGene") && Annos.get("refGene").get_Type().equals(Consts.FORMAT_ANNO)){
 						Panno=SerializationUtils.clone(Annos.get("refGene"));
 						Panno.set_Mode(Consts.MODE_PACK);
+					}
+					if(Annos.containsKey("OMIM") && Annos.get("OMIM").get_Type().equals(Consts.FORMAT_GDF)){
+						Pclns.put("_OMIM",SerializationUtils.clone(Annos.get("OMIM")));
+						Pclns.get("_OMIM").set_Mode(Consts.MODE_DENSE);
+					}
+					if(Annos.containsKey("GWASdb") && Annos.get("GWASdb").get_Type().equals(Consts.FORMAT_GDF)){
+						Pclns.put("_GWASdb",SerializationUtils.clone(Annos.get("GWASdb")));
+						Pclns.get("_GWASdb").set_Mode(Consts.MODE_DENSE);
 					}
 				}
 			}
@@ -396,6 +405,10 @@ public class Instance {
 			else if(type_temp.equals(Consts.FORMAT_GRF)){
 				GRFReader gr = new GRFReader(path_temp);
 				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,(int)Coordinate[0],(int)Coordinate[1]);
+				if(personal){
+					GRFElementRegionComparison rc = new GRFElementRegionComparison(Ele_var);
+					rc.compareRegion(ele_temp);
+				}
 			}
 			else if(type_temp.equals(Consts.FORMAT_GDF)){
 				GDFReader gr = new GDFReader(path_temp);
@@ -410,7 +423,7 @@ public class Instance {
 				GVFReader gr = new GVFReader(path_temp);
 				ele_temp=gr.get_detail(doc, track.get_ID(), id, Chr, start, end);
 				if(personal){
-					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
+					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, start, end, doc);
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
 					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
 				}
@@ -419,7 +432,7 @@ public class Instance {
 				VcfReader vr=new VcfReader(track,Chr);
 				ele_temp=vr.get_detail(doc, track.get_ID(), id, Chr, start, end);
 				if(personal){
-					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
+					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, start, end, doc);
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
 					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
 				}
@@ -563,10 +576,11 @@ public class Instance {
 			}
 		}
 		else if(Pfanno!=null&&track.get_ID().equals(Pfanno.get_ID())&&type_temp.equals(Consts.FORMAT_GRF)&&Class==Consts.PTRACK_CLASS_FANNO){
-			GRFReader gr2;
+			GRFReader gr2 = new GRFReader(Pfanno.get_Path(Chr));;
 			try {
-				gr2 = new GRFReader(Pfanno.get_Path(Chr));
-				Ele_fanno=gr2.write_grf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
+				Ele_fanno = gr2.write_grf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
+				GRFElementRegionComparison rc = new GRFElementRegionComparison(Ele_var);
+				rc.compareRegion(Ele_fanno);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

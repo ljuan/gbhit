@@ -37,7 +37,7 @@ public class VariantMapToDBSNP implements Comparable<VariantMapToDBSNP> {
 	Element write2xml(Document doc, Element parent, boolean isDetail){
 		Element ele = doc.createElement(XML_TAG_VARIANT);
 		if(dbsnp != null){
-			variant.setId(dbsnpId);
+			variant.setDbsnpid(dbsnpId);
 			if(isDetail)
 				variant.setDbsnpInfo(dbsnp.toString());
 		}

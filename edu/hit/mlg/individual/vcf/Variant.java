@@ -25,6 +25,7 @@ public class Variant implements Comparable<Variant> {
 	public static final int hash_BLS = VARIANT_TYPE_BLS.hashCode();
 
 	private String id;// Attribute
+	private String dbsnpid;// Attribute
 	private String type;// Attribute
 	private int from;// Tag
 	private int to;// Tag
@@ -108,6 +109,10 @@ public class Variant implements Comparable<Variant> {
 	public void setType(String type) {
 		this.type = type;
 	}
+	
+	public void setDbsnpid(String dbsnpid) {
+		this.dbsnpid = dbsnpid;
+	}
 
 	public String getType() {
 		return type;
@@ -180,6 +185,8 @@ public class Variant implements Comparable<Variant> {
 		parent.appendChild(v);
 		v.setAttribute(XML_TAG_ID, id);
 		v.setAttribute(XML_TAG_TYPE, type);
+		if(dbsnpid != null)
+			v.setAttribute("dbsnpid", dbsnpid);
 		if (!"".equals(homo))
 			v.setAttribute(XML_TAG_HOMO, homo);
 		XmlWriter.append_text_element(doc, v, XML_TAG_FROM, from + "");
