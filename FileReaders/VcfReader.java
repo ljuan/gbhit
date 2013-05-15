@@ -117,10 +117,19 @@ public class VcfReader {
 			System.out.println(sample);
 	}
 
-	public Element get_detail(Document doc, String track, String id,
+	public Element get_detail(Document doc, Annotations track, String id,
 			String chr, long start, long end) {
 		Variants[] variants = new Variants[1];
-		variants[0] = new Variants(track, null, doc, MODE_DETAIL, 0.1, bppLimit, -1, null);
+		int samplesNum = 0;
+		int[] selectedIndexes = null;
+		VcfSample vcfSample = null;
+
+		if (track.has_Parameter(VCF_HEADER_SAMPLE)) {
+			vcfSample = (VcfSample) track.get_Parameter(VCF_HEADER_SAMPLE);
+			samplesNum = vcfSample.getSamplesNum();
+			selectedIndexes = vcfSample.getSelectedIndexes();
+		}
+		variants[0] = new Variants(track.get_ID(), null, doc, MODE_DETAIL, 0.1, bppLimit, -1, null);
 		Vcf vcf = null;
 		try {
 			String chrom = (Boolean) this.track .get_Parameter(VCF_CHROM_PREFIX) ? chr : chr.substring(3);
@@ -132,11 +141,12 @@ public class VcfReader {
 				ArrayList<Variant> vs_list = new ArrayList<Variant>();
 				Variant[] vs;
 				while (Query.next() != null) {
-					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, 0, null);
+					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, samplesNum, null);
 					Variant[] vs_temp = vcf.getVariants();
-					for (int vs_i = 0; vs_i < vs_temp.length; vs_i++)
+					for (int vs_i = 0; vs_i < vs_temp.length; vs_i++){
 						if (vcf.getID().equals(id) && vs_temp[vs_i].getFrom() == start && vs_temp[vs_i].getTo() == end)
 							vs_list.add(vs_temp[vs_i]);
+					}
 					if (!vs_list.isEmpty()) {
 						vs = new Variant[vs_list.size()];
 						vs_list.toArray(vs);
@@ -160,7 +170,7 @@ public class VcfReader {
 		variants = null;
 		return e1;
 	}
-
+	
 	public Element write_vcf2variants(Document doc, String track, String mode,
 			double bpp/* bases per pixel */, String chr, long start, long end) {
 		float qualLimit = Float.parseFloat((String) (this.track
@@ -243,7 +253,6 @@ public class VcfReader {
 		variants = null;
 		return e1;
 	}
-
 	private String[] getFilterLimit() {
 		Object o = this.track.get_Parameter(VCF_HEADER_FILTER);
 		if (o == null)

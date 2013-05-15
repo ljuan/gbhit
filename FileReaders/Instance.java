@@ -430,7 +430,7 @@ public class Instance {
 			}
 			else if (type_temp.equals(Consts.FORMAT_VCF)){
 				VcfReader vr=new VcfReader(track,Chr);
-				ele_temp=vr.get_detail(doc, track.get_ID(), id, Chr, start, end);
+				ele_temp=vr.get_detail(doc, track, id, Chr, start, end);
 				if(personal){
 					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, start, end, doc);
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
@@ -536,7 +536,7 @@ public class Instance {
 	}
 	void append_Ptrack(Annotations track,Document doc,String mode,int Class) {
 		String type_temp=track.get_Type();
-		if (Coordinate[1]-Coordinate[0]>10000000)
+		if (Coordinate[1]-Coordinate[0]>3000000)
 			return;
 		if(Pvar!=null&&track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_VCF)&&Class==Consts.PTRACK_CLASS_VAR){
 				VcfReader vr=new VcfReader(track,Chr);
@@ -813,6 +813,10 @@ public class Instance {
 		long[] coordinate=new long[2];
 		if (start<1)
 			start=1;
+		if (start>rr.fasta_index[chr_info][0])
+			start=rr.fasta_index[chr_info][0];
+		if (end<1)
+			end=1;
 		if (end>rr.fasta_index[chr_info][0])
 			end=rr.fasta_index[chr_info][0];
 		if(start<=end){
