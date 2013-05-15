@@ -23,7 +23,7 @@ public interface Consts{
 	public static final String VCF_QUAL_LIMIT="qualimit";
 	public static final String VCF_CHROM_PREFIX="chromprefix";
 	
-	public static final String GDF_SNPID="SNPID";
+	public static final String GDF_SNPID="SNPid";
 	public static final String GDF_MUTID="MUTID";
 	public static final String GDF_GENEID="GeneSymbol";
 	

@@ -53,7 +53,7 @@ public class GDFReader {
 							equalSignSplit.split(DNameSplit.getResultByIndex(i));
 							if (equalSignSplit.getResultByIndex(0).equals(GDF_GENEID))
 								element.setAttribute(XML_TAG_SYMBOL, equalSignSplit.getResultByIndex(1));
-							else if (equalSignSplit.getResultByIndex(0).equals(GDF_SNPID))
+							if (equalSignSplit.getResultByIndex(0).equals(GDF_SNPID))
 								element.setAttribute(XML_TAG_VARIANT, equalSignSplit.getResultByIndex(1));
 						}
 
@@ -130,7 +130,7 @@ public class GDFReader {
 						String[] attribute=equalSignSplit.split(attributes[i]).getResult();
 						if (attribute[0].equals(GDF_GENEID))
 							element.setAttribute(XML_TAG_SYMBOL, attribute[1]);
-						else if (attribute[0].equals(GDF_SNPID))
+						if (attribute[0].equals(GDF_SNPID))
 							element.setAttribute(XML_TAG_VARIANT, attribute[1]);
 					}
 					elements.appendChild(element);

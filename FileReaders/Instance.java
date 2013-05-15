@@ -185,12 +185,12 @@ public class Instance {
 						Panno.set_Mode(Consts.MODE_PACK);
 					}
 					if(Annos.containsKey("OMIM") && Annos.get("OMIM").get_Type().equals(Consts.FORMAT_GDF)){
-						Pclns.put("_OMIM",SerializationUtils.clone(Annos.get("OMIM")));
-						Pclns.get("_OMIM").set_Mode(Consts.MODE_DENSE);
+						Pclns.put("OMIM",SerializationUtils.clone(Annos.get("OMIM")));
+						Pclns.get("OMIM").set_Mode(Consts.MODE_DENSE);
 					}
 					if(Annos.containsKey("GWASdb") && Annos.get("GWASdb").get_Type().equals(Consts.FORMAT_GDF)){
-						Pclns.put("_GWASdb",SerializationUtils.clone(Annos.get("GWASdb")));
-						Pclns.get("_GWASdb").set_Mode(Consts.MODE_DENSE);
+						Pclns.put("GWASdb",SerializationUtils.clone(Annos.get("GWASdb")));
+						Pclns.get("GWASdb").set_Mode(Consts.MODE_DENSE);
 					}
 				}
 			}
@@ -536,7 +536,7 @@ public class Instance {
 	}
 	void append_Ptrack(Annotations track,Document doc,String mode,int Class) {
 		String type_temp=track.get_Type();
-		if (Coordinate[1]-Coordinate[0]>1000000)
+		if (Coordinate[1]-Coordinate[0]>10000000)
 			return;
 		if(Pvar!=null&&track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_VCF)&&Class==Consts.PTRACK_CLASS_VAR){
 				VcfReader vr=new VcfReader(track,Chr);
