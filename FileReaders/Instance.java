@@ -588,7 +588,7 @@ public class Instance {
 		else if(Pclns.containsKey(track.get_ID())&&type_temp.equals(Consts.FORMAT_GDF)&&Class==Consts.PTRACK_CLASS_CLN){
 			GDFReader gr3;
 			try {
-				gr3 = new GDFReader(Pfanno.get_Path(Chr));
+				gr3 = new GDFReader(Pclns.get(track.get_ID()).get_Path(Chr));
 				Element ele_cln=gr3.write_gdf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
 				add_att_ifParam(track,ele_cln);
 				GdfElementSelector ges=new GdfElementSelector(doc,Ele_anno,Ele_var);

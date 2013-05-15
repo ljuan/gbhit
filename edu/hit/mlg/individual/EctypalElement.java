@@ -124,9 +124,10 @@ public class EctypalElement {
 		status = new HashSet<String>();
 		this.chr = chr;
 		this.hasEffect = hasEffect;
-		if(fr!=null)
+		if(fr!=null){
 			this.fr=fr;
-		this.chrLen = (int) fr.getChromosomeLength(chr);
+			this.chrLen = (int) fr.getChromosomeLength(chr);
+		}
 		this.id = ele.getAttribute(XML_TAG_ID);
 		if ("".equals(this.id)) this.id = null;
 		this.type = ele.getAttribute(XML_TAG_TYPE);
@@ -135,7 +136,8 @@ public class EctypalElement {
 		if ("".equals(this.symbol))	this.symbol = null;
 		this.variant = ele.getAttribute(XML_TAG_VARIANT);
 		if ("".equals(this.variant)) this.variant = null;
-		this.direction = ele.getElementsByTagName(XML_TAG_DIRECTION).item(0).getTextContent().equals("+");
+		if(ele.getElementsByTagName(XML_TAG_DIRECTION).getLength()>0)
+			this.direction = ele.getElementsByTagName(XML_TAG_DIRECTION).item(0).getTextContent().equals("+");
 		NodeList nodes = ele.getChildNodes();// All Children
 		// The first child must be "From"
 		this.from = Integer.parseInt(nodes.item(0).getTextContent());

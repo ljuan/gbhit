@@ -53,7 +53,8 @@ public class GdfElementSelector {
 			ele = (Element)nodes.item(i);
 			variant = ele.getAttribute(XML_TAG_VARIANT);
 			if(variant != null && !variant.equals("")){
-				if(variantIDs.contains(ele.getAttribute(XML_TAG_ID))){
+//				if(variantIDs.contains(ele.getAttribute(XML_TAG_ID))){
+				if(variantIDs.contains(variant)){
 					//The element contains attribute:Variant and
 					//the value is one of the id of variants.
 					eles.appendChild(new EctypalElement(ele,null, null, true).write2XML(doc));
@@ -63,7 +64,8 @@ public class GdfElementSelector {
 			
 			symbol = ele.getAttribute(XML_TAG_SYMBOL);
 			if(symbol != null && !symbol.equals("")){
-				if(elementSymbols.contains(ele.getAttribute(XML_TAG_ID))){
+//				if(elementSymbols.contains(ele.getAttribute(XML_TAG_ID))){
+				if(elementSymbols.contains(symbol)){
 					//The element doesn't contain attribute:Variant
 					//but contains attribute:Symbol and the value is one of
 					//the id of elements which has beed affected by some variants

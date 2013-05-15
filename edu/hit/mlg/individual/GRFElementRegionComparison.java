@@ -46,9 +46,6 @@ public class GRFElementRegionComparison {
 		if(grfSize == 0)
 			return;
 		
-		System.out.println(variantSize);
-		System.out.println(grfSize);
-		
 		int index = 0;//current index of variant
 		Variant cur = variantRange.get(index);
 		Element ele = null;
