@@ -6,6 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import FileReaders.Consts;
 import FileReaders.XmlWriter;
 
 /**
@@ -186,7 +187,7 @@ public class Variant implements Comparable<Variant> {
 		v.setAttribute(XML_TAG_ID, id);
 		v.setAttribute(XML_TAG_TYPE, type);
 		if(dbsnpid != null)
-			v.setAttribute("dbsnpid", dbsnpid);
+			v.setAttribute(Consts.XML_TAG_DBSNPID, dbsnpid);
 		if (!"".equals(homo))
 			v.setAttribute(XML_TAG_HOMO, homo);
 		XmlWriter.append_text_element(doc, v, XML_TAG_FROM, from + "");

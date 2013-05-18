@@ -736,11 +736,11 @@ public class Instance {
 				GTFReader gr = new GTFReader(path_temp);
 				ele_temp=gr.write_gtf2elements(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 			}
-			else if(type_temp.equals(Consts.FORMAT_GVF)){
+			else if (type_temp.equals(Consts.FORMAT_GVF)&&Coordinate[1]-Coordinate[0]<3000000){
 				GVFReader gr = new GVFReader(path_temp);
 				ele_temp=gr.write_gvf2variants(doc, track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 			}
-			else if (type_temp.equals(Consts.FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<10000000){
+			else if (type_temp.equals(Consts.FORMAT_VCF)&&Coordinate[1]-Coordinate[0]<3000000){
 				VcfReader vr=new VcfReader(track,Chr);
 				ele_temp=vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			//	ele_temp=vr.write_vcf2variants(doc,track.get_ID(),Consts.MODE_PACK,bpp,Chr,Coordinate[0],Coordinate[1]);
