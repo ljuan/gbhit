@@ -79,8 +79,11 @@ public class VcfReader {
 						}
 					}
 				}
-				if (samples != null)
+				if (samples != null){
 					track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(samples), PARAMETER_TYPE_VCFSAMPLE);
+					if(samples.length==1)
+						((VcfSample)(track.get_Parameter(VCF_HEADER_SAMPLE))).setSamples(samples[0]);
+				}
 				if (!filter_header.isEmpty())
 					track.initialize_Parameter(VCF_HEADER_FILTER, filter_header, PARAMETER_TYPE_CHECKBOX);
 				if (!format_header.isEmpty())

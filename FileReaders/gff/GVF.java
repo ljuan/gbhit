@@ -28,6 +28,7 @@ class GVF extends GFF {
 	String[][] variants;
 	int variantNum = 0;
 	String homo = "";
+	String ref = "";
 	String phased = null;
 
 	GVF(String[] str) {
@@ -104,6 +105,8 @@ class GVF extends GFF {
 				this.homo = split.split(s).getResultByIndex(1);
 			} else if (s.startsWith("phased=")) {
 				this.phased = split.split(s).getResultByIndex(1);
+			} else if (s.startsWith("Reference_seq=")) {
+				this.ref = split.split(s).getResultByIndex(1);
 			}
 		}
 	}

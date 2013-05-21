@@ -60,7 +60,6 @@
 						<xs:attribute name="gieStain" type="xs:string"/>
 					</xs:complextType>
 				</xs:element>
-				
 				<xs:element name="Genes" maxOccurs="unbounded" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
@@ -93,12 +92,13 @@
 										<xs:element name="Dbsnp" type="xs:string" minOccurs="0"/>
 									</xs:sequence>
 									<xs:attribute name="id" type="xs:string"/>
+									<xs:attribute name="dd" type="xs:string"/>
 									<xs:attribute name="Type" type="VariantType"/>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
 						<xs:attribute name="id" type="xs:string" use="required"/>
-						<xs:attribute name="superid" type="xs:string" use="required"/>
+						<xs:attribute name="superid" type="xs:string"/>
 						<xs:attribute name="ifParam" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
