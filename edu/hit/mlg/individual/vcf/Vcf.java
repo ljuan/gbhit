@@ -242,26 +242,26 @@ public class Vcf {
 		String[] keyValue = null;
 		char firstChar;
 		StringSplit split = new StringSplit('=');
-		if (!samplesNumEQ0) {
-			// Personal Genemic VCF
-			pgInfo = new PGInfo();
-			for (String one : many) {
-				keyValue = split.split(one).getResult();
-				if ((index = PGInfos_M.get(keyValue[0])) != null)
-					pgInfo.pgInfos[index] = true;
+		// Personal Genemic VCF
+		pgInfo = new PGInfo();
+		for (String one : many) {
+			keyValue = split.split(one).getResult();
+			if ((index = PGInfos_M.get(keyValue[0])) != null)
+				pgInfo.pgInfos[index] = true;
 
-				firstChar = keyValue[0].charAt(0);
-				if ('E' == firstChar) {
-					if ("END".equals(keyValue[0])) {
-						pgInfo.end = getIntValue(keyValue[1]);
-					}
-				} else if ('S' == firstChar) {
-					if ("SVLEN".equals(keyValue[0])) {
-						pgInfo.svlen = getIntValue(keyValue[1]);
-					}
+			firstChar = keyValue[0].charAt(0);
+			if ('E' == firstChar) {
+				if ("END".equals(keyValue[0])) {
+					pgInfo.end = getIntValue(keyValue[1]);
+				}
+			} else if ('S' == firstChar) {
+				if ("SVLEN".equals(keyValue[0])) {
+					pgInfo.svlen = getIntValue(keyValue[1]);
 				}
 			}
-		} else {
+		}
+		
+		if (samplesNumEQ0) { //samplesNumEQ0==0
 			// DBSnp
 			dbSnpInfo = new DBSnpInfo();
 			for (String one : many) {
@@ -629,12 +629,12 @@ public class Vcf {
 		if (!samples.containGT())
 			return variants;
 		int[] vIndexes = samples.getVariantIndexes(index);
-		
+
 		if (vIndexes == null)
 			return null;
 		Variant[] vs = new Variant[variants.length];
 		int len = 0;
-		
+
 		for (int vIndex : vIndexes) {
 			vs[len] = variants[vIndex - 1];
 			vs[len++].setHomo(samples.getHome(index));
@@ -661,7 +661,8 @@ public class Vcf {
 
 	public String getDetail() {
 		StringBuilder description = new StringBuilder();
-		description.append("QUAL:").append(this.Qual).append(";FILTER:")
+//		description.append("REF:").append(this.Ref).append(";QUAL:").append(this.Qual).append(";FILTER:")
+		description.append(";QUAL:").append(this.Qual).append(";FILTER:")
 				.append(this.Filter).append(";INFO:").append(this.Info);
 		if (samples != null) {
 			description.append(";FORMAT:").append(samples.getFormat())
