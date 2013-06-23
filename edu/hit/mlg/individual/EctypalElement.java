@@ -144,11 +144,6 @@ public class EctypalElement {
 		// The second child must be "To"
 		this.to = Integer.parseInt(nodes.item(1).getTextContent());
 		retriveTags(nodes);
-		
-		Entry<EctypalSubElement> ese = subEles.getFirst();
-		while(subEles.getNext(ese) != null) {
-			ese = subEles.getNext(ese);
-		}
 	}
 
 	private void retriveTags(NodeList nodes) {
@@ -616,11 +611,6 @@ public class EctypalElement {
 		for (int i = variants.size() - 1; i >= 0; i--) {
 			if(pre == null) break;
 			v = variants.get(i);
-			
-			Entry<EctypalSubElement> ese = subEles.getFirst();
-			while(subEles.getNext(ese) != null) {
-				ese = subEles.getNext(ese);
-			}
 			
 			if(v.getFrom() > pre.getElement().getTo())
 				continue;
