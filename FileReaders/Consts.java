@@ -94,7 +94,7 @@ public interface Consts{
 	public static final String XML_TAG_COLOR="Color";
 	public static final String XML_TAG_FROM="F";
 	public static final String XML_TAG_TO="T";
-	public static final String XML_TAG_TOCHR="ToChr";
+	public static final String XML_TAG_TOCHR="Mate";
 	public static final String XML_TAG_LETTER="B";
 	public static final String XML_TAG_DESCRIPTION="Des";
 	public static final String XML_TAG_HOMO="h";

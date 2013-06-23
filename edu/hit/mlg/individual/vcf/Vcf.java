@@ -260,7 +260,7 @@ public class Vcf {
 				}
 			}
 		}
-		
+
 		if (samplesNumEQ0) { //samplesNumEQ0==0
 			// DBSnp
 			dbSnpInfo = new DBSnpInfo();
@@ -378,28 +378,14 @@ public class Vcf {
 	 *            True if Alt contains "]", false else.
 	 */
 	private void resolveBracket(boolean isLeft) {
-		String[] fields = null;
-		int chrBase = 0;
-
 		variants = new Variant[1];
 		variants[0] = new Variant();
 		Variant v = variants[0];
 		v.setId(ID);
 		v.setType(VARIANT_TYPE_BLS);
 		v.setFrom(Pos);
-		if (isLeft) {
-			v.setDirection("]");
-			fields = Alt.split("\\]|:");
-			if (Alt.charAt(0) != ']')
-				chrBase++;
-		} else {
-			v.setDirection("[");
-			fields = Alt.split("\\[|:");
-			if (Alt.charAt(0) != '[')
-				chrBase++;
-		}
-		v.setToChr(chroms.get(fields[chrBase++]));
-		v.setTo(getIntValue(fields[chrBase]));
+		v.setTo(Pos);
+		v.setToChr(Alt);
 	}
 
 	/**

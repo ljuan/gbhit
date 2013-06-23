@@ -60,7 +60,7 @@ public class Instance {
 			this.Annos.put(Annos[i].get_ID(), Annos[i]);
 			init_track(this.Annos.get(Annos[i].get_ID()));
 		}
-			
+		init_Pvar("1000genome_CEU","NA12716");
 		Externals=new Hashtable<String, Annotations>();
 		bpp=1;
 	}

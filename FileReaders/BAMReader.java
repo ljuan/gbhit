@@ -19,11 +19,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,6 +64,11 @@ import edu.hit.mlg.individual.vcf.Variant;
 public class BAMReader {
 
 	private static final int SMALL_REGION_NUMBER_LIMIT = 20000;
+	private static final int BIG_REGION_LINEAR_INDEX_SPAN_LIMIT = 10 * 1024 * 1024;
+//	private static final int BIG_REGION_LINEAR_INDEX_SPAN_LIMIT = 10 * 1024 * 1024;
+//	For accuracy, threshold should be set on ~75M
+//	For capability, threshold should be set on ~10M
+	
 	/**
 	 * BAM file path or url.
 	 */
@@ -108,7 +113,7 @@ public class BAMReader {
 	 * whether chromosomes of all of this SAM file start with "chr" or "CHR"
 	 */
 	private boolean hasChromosomePrefix = true;
-	
+
 	public BAMReader() {
 	}
 
@@ -215,7 +220,7 @@ public class BAMReader {
 		boolean already = false;
 
 		bpp = (end - start + 1) / (double) windowSize;
-
+		
 		if (bpp <= 25) {
 			List<SAMRecord> list = readSmallRegion(chr, start, end);
 
@@ -236,10 +241,19 @@ public class BAMReader {
 		// big region
 		if (bpp >= 8 * 1024 && !already) {
 			String result = readBigRegion(chr, start, end, windowSize, step);
+			if(result == null) {
+				result = readMiddleRegion(chr, start, end, windowSize, step);
+			}
 			ele = writeBigRegion(doc, start, end, step, result, track);
 		}
 
 		return ele;
+	}
+	
+	public Element readBAMTest(Document doc, String chr, int start, int end, int windowSize, int step, String mode, String track, boolean middle)
+			throws SAMFormatException, IOException {
+		String result = middle ? readMiddleRegion(chr, start, end, windowSize, step) : readBigRegion(chr, start, end, windowSize, step);
+		return writeBigRegion(doc, start, end, step, result, track);
 	}
 
 	private Element writeDetail(Document doc, List<SAMRecord> list, String track, String id, int start, int end) {
@@ -510,8 +524,9 @@ public class BAMReader {
 		 * index of the given chromosome in BAM file order
 		 */
 		int refIndex = samReader.getFileHeader().getSequenceIndex(chr);
+		if(refIndex == -1)
+			refIndex = samReader.getFileHeader().getSequenceIndex(chr.substring(3));
 		readReference(refIndex);
-
 		InputStream is1 = getInputStream(indexFilePath);
 		readLinearIndex(is1);
 		is1.close();
@@ -525,6 +540,15 @@ public class BAMReader {
 
 		for (int i = 0; i <= nLinearBins; i++)
 			pos[i] = 0;
+		
+		if(chrFileSize[refIndex] == 0) {
+			StringBuilder sb = new StringBuilder();
+			for(int ii=1; ii<windowSize/step; ii++) {
+				sb.append("0;");
+			}
+			sb.append("0");
+			return sb.toString();
+		}
 
 		InputStream is2 = getInputStream(indexFilePath);
 
@@ -549,16 +573,10 @@ public class BAMReader {
 		}
 		is2.close();
 
-		int[] regions = new int[nLinearBins];
-		for (int i = 0; i < nLinearBins; i++)
-			regions[i] = 0;
-
-		// If the first linear index equals 0, we must find the first linear
-		// index which != 0 from the previous
-		// chromosomes forward.
+		// If the first linear index equals 0, we must find the first linear index which != 0 from the previous chromosomes forward.
 		if (pos[0] == 0) {
 			long l = 0;
-			for (int i = refIndex - 1; i >= 0; i++) {
+			for (int i = refIndex - 1; i >= 0; i--) {
 				if (chrLastLinearSpan[i] != 0) {
 					l = chrLastLinearSpan[i];
 					break;
@@ -567,8 +585,24 @@ public class BAMReader {
 			for (int i = 0; pos[i] == 0 && i < pos.length - 1; i++)
 				pos[i] = l;
 		}
+		
+		if(pos[pos.length-1] - pos[0] < BIG_REGION_LINEAR_INDEX_SPAN_LIMIT) {//The data is sparse so we should use middle-algorithm
+			return null;
+		}
 
-		long refSpan = chrFileSize[refIndex + 1] - chrFileSize[refIndex];
+		int[] regions = new int[nLinearBins];
+		for (int i = 0; i < nLinearBins; i++)
+			regions[i] = 0;
+
+
+		long refSpan = 0;//file span of the chromosome
+		for(int ii=refIndex+1; ii<chrFileSize.length; ii++) {
+			if(chrFileSize[ii] != 0){
+				refSpan = chrFileSize[ii] - chrFileSize[refIndex];
+				break;
+			}
+		}
+		
 		boolean firstZero = true;
 		int firstZeroIndex = 0;
 
@@ -640,6 +674,13 @@ public class BAMReader {
 		return result;
 	}
 
+	/**
+	 * Location to the current chromosome
+	 * @param refIndex
+	 * @param is
+	 * @param start start linear index number of given region
+	 * @throws IOException
+	 */
 	private void location(int refIndex, InputStream is, int start) throws IOException {
 		is.skip(8);
 
@@ -649,7 +690,7 @@ public class BAMReader {
 		for (int i = 0; i < refIndex; i++) {
 			nBins = TabixReader.readInt(is);
 			for (int j = 0; j < nBins; j++) {
-				is.skip(4);
+				TabixReader.readInt(is);
 				nChunks = TabixReader.readInt(is);
 				is.skip(16 * nChunks);
 			}
@@ -659,12 +700,13 @@ public class BAMReader {
 
 		nBins = TabixReader.readInt(is);
 		for (int j = 0; j < nBins; j++) {
-			is.skip(4);
+			TabixReader.readInt(is);
 			nChunks = TabixReader.readInt(is);
 			is.skip(16 * nChunks);
 		}
 
-		is.skip(4 + 8 * start);
+		TabixReader.readInt(is);
+		is.skip(8 * start);
 	}
 
 	private void readReference(int refIndex) {
@@ -678,8 +720,14 @@ public class BAMReader {
 		chrReadNum = index.getMetaData(refIndex).getAlignedRecordCount();
 	}
 
+	/**
+	 * Read linear index of current chromosome
+	 * 
+	 * @param is
+	 * @throws IOException
+	 */
 	private void readLinearIndex(InputStream is) throws IOException {
-		is.skip(8);
+		is.skip(8);//Skip "BAI\1"
 
 		int nBins;
 		int nChunks;
@@ -687,9 +735,9 @@ public class BAMReader {
 		for (int i = 0; i < sequenceNum; i++) {
 			nBins = TabixReader.readInt(is);
 			for (int j = 0; j < nBins; j++) {
-				is.skip(4);
+				TabixReader.readInt(is);//Skip distinct bin
 				nChunks = TabixReader.readInt(is);
-				is.skip(16 * nChunks);
+				is.skip(16 * nChunks);//Skip all chunk
 			}
 
 			nLinearBins = TabixReader.readInt(is);
@@ -710,7 +758,10 @@ public class BAMReader {
 			}
 		}
 
-		chrFileSize[sequenceNum] = samReader.getIndex().getStartOfLastLinearBin();
+		//If the original BAM file is very large and divide into many small BAM file,
+		//getStartOfLastLinearBin() of the small BAM file may equals 
+		//getStartOfLastLinearBin() of the original BAM file.
+		chrFileSize[sequenceNum] = Math.min(samReader.getIndex().getStartOfLastLinearBin(), new File(filePath).length());
 	}
 
 	private SAMRecordIterator getIterator(String chr, int start, int end)
