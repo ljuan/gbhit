@@ -26,6 +26,7 @@ public class Individual {
 	private int variantNumLimit = 1000;
 	private boolean isDetail;
 	private String id;
+	private String superid;
 	private String ifParam;
 
 	/**
@@ -36,6 +37,8 @@ public class Individual {
 	 */
 	public Individual(Element variants, boolean isDetail) {
 		this.id = variants.getAttribute(XML_TAG_ID);
+		if(variants.hasAttribute(XML_TAG_SUPERID))
+			this.superid = variants.getAttribute(XML_TAG_SUPERID);
 		this.ifParam = variants.getAttribute(XML_TAG_IFP);
 		this.isDetail = isDetail;
 		NodeList nodeList = variants.getChildNodes();
@@ -153,6 +156,8 @@ public class Individual {
 		Element variants = doc.createElement(XML_TAG_VARIANTS);
 		if(this.id != null && !this.id.isEmpty())
 			variants.setAttribute(XML_TAG_ID, this.id);
+		if(this.superid != null && !this.superid.isEmpty())
+			variants.setAttribute(XML_TAG_SUPERID, this.superid);
 		if(this.ifParam != null && !this.ifParam.isEmpty())
 			variants.setAttribute(XML_TAG_IFP, this.ifParam);
 		for(VariantMapToDBSNP mr : mergeResult)

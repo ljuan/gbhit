@@ -541,7 +541,7 @@ public class Instance {
 		if(Pvar!=null&&track.get_ID().equals(Pvar.get_ID())&&type_temp.equals(Consts.FORMAT_VCF)&&Class==Consts.PTRACK_CLASS_VAR){
 				VcfReader vr=new VcfReader(track,Chr);
 				vr.changeBppLimit(Consts.LIMIT_BPP);
-				Element ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
+				Element ele_var=vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			//	Element ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),Consts.MODE_PACK,bpp,Chr,Coordinate[0],Coordinate[1]);
 				//Cancel Dense-mode-bandwidth saving. transfer all variants to client.
 				add_att_ifParam(track,ele_var);
