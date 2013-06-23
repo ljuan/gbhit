@@ -81,8 +81,13 @@ public class VcfReader {
 				}
 				if (samples != null){
 					track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(samples), PARAMETER_TYPE_VCFSAMPLE);
-					if(samples.length==1)
-						((VcfSample)(track.get_Parameter(VCF_HEADER_SAMPLE))).setSamples(samples[0]);
+				/* This is for automatically select THE sample when load single sample VCF file, 
+				 * cooperate with the sentence in Instance add_Tracks VCF branch, 
+				 * which is also annotated in this version.
+				 * 
+				 * 
+				 * 	if(samples.length==1)
+						((VcfSample)(track.get_Parameter(VCF_HEADER_SAMPLE))).setSamples(samples[0]);*/
 				}
 				if (!filter_header.isEmpty())
 					track.initialize_Parameter(VCF_HEADER_FILTER, filter_header, PARAMETER_TYPE_CHECKBOX);

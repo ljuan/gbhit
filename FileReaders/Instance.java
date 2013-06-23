@@ -546,8 +546,7 @@ public class Instance {
 			//	Element ele_var=vr.write_vcf2variants(doc,"_"+track.get_ID(),Consts.MODE_PACK,bpp,Chr,Coordinate[0],Coordinate[1]);
 				//Cancel Dense-mode-bandwidth saving. transfer all variants to client.
 				add_att_ifParam(track,ele_var);
-				if(PvarID!=null&&!track.get_ID().equals(PvarID))
-					ele_var.setAttribute(Consts.XML_TAG_ID, "_"+PvarID);
+				ele_var.setAttribute(Consts.XML_TAG_ID, "_"+PvarID);
 				Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
 				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
 				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_var);
@@ -745,13 +744,17 @@ public class Instance {
 				VcfReader vr=new VcfReader(track,Chr);
 				ele_temp=vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			//	ele_temp=vr.write_vcf2variants(doc,track.get_ID(),Consts.MODE_PACK,bpp,Chr,Coordinate[0],Coordinate[1]);
-				if(track.has_Parameter(Consts.VCF_HEADER_SAMPLE)
+			/* This is for automatically select THE sample when load single sample VCF file, 
+			 * cooperate with the sentence in VcfReader initialization, 
+			 * which is also annotated in this version.
+			 * 
+			 *  if(track.has_Parameter(Consts.VCF_HEADER_SAMPLE)
 						&&((VcfSample) track.get_Parameter(Consts.VCF_HEADER_SAMPLE)).getSamplesNum()==1
 						&&ele_temp.hasAttribute(Consts.XML_TAG_SUPERID)
 						&&!ele_temp.getAttribute(Consts.XML_TAG_ID).equals(track.get_ID())){
 					ele_temp.removeAttribute(Consts.XML_TAG_SUPERID);
 					ele_temp.setAttribute(Consts.XML_TAG_ID,track.get_ID());
-				}
+				}*/
 			}
 			else if (type_temp.equals(Consts.FORMAT_BAM)){
 				try {
