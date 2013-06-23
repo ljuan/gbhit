@@ -1,6 +1,7 @@
 package FileReaders;
 
 import static FileReaders.Consts.DATA_ROOT;
+import static FileReaders.Consts.VCF_HEADER_SAMPLE;
 import FileReaders.gff.*;
 
 import java.io.File;
@@ -744,6 +745,13 @@ public class Instance {
 				VcfReader vr=new VcfReader(track,Chr);
 				ele_temp=vr.write_vcf2variants(doc,track.get_ID(),mode,bpp,Chr,Coordinate[0],Coordinate[1]);
 			//	ele_temp=vr.write_vcf2variants(doc,track.get_ID(),Consts.MODE_PACK,bpp,Chr,Coordinate[0],Coordinate[1]);
+				if(track.has_Parameter(Consts.VCF_HEADER_SAMPLE)
+						&&((VcfSample) track.get_Parameter(Consts.VCF_HEADER_SAMPLE)).getSamplesNum()==1
+						&&ele_temp.hasAttribute(Consts.XML_TAG_SUPERID)
+						&&!ele_temp.getAttribute(Consts.XML_TAG_ID).equals(track.get_ID())){
+					ele_temp.removeAttribute(Consts.XML_TAG_SUPERID);
+					ele_temp.setAttribute(Consts.XML_TAG_ID,track.get_ID());
+				}
 			}
 			else if (type_temp.equals(Consts.FORMAT_BAM)){
 				try {
