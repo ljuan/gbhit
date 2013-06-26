@@ -100,10 +100,18 @@ public class GdfElementSelector {
 			nodes = eles.getChildNodes();
 			for(int i=0, num=nodes.getLength(); i<num; i++){
 				ele = (Element)nodes.item(i);
-				if(ele.getElementsByTagName(XML_TAG_VARIANT).getLength() > 0 ){
-					symbol = ele.getAttribute(XML_TAG_SYMBOL);
-					if(symbol != null && !"".equals(symbol))
-						elementSymbols.add(symbol);
+				NodeList vnodes = ele.getElementsByTagName(XML_TAG_VARIANT);
+				for(int j=0;j<vnodes.getLength();j++){
+					Element vele = (Element)vnodes.item(j);
+					if(vele.getElementsByTagName(XML_TAG_LETTER).getLength()>0){
+						 String[] letters = vele.getElementsByTagName(XML_TAG_LETTER).item(0).getTextContent().split(":");
+						 if(letters.length<2||!letters[0].equals(letters[1])){
+							 symbol = ele.getAttribute(XML_TAG_SYMBOL);
+							 if(symbol != null && !"".equals(symbol))
+								 elementSymbols.add(symbol);
+							 break;
+						 }
+					}
 				}
 			}
 		}
