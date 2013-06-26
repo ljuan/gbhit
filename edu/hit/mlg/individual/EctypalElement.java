@@ -49,6 +49,7 @@ public class EctypalElement {
 	 * True if the direction of this Element is "+"; false else.
 	 */
 	private boolean direction;// Tag
+	private boolean ifdirection;// Tag
 	private String description = null;// Tag
 	private String color = null;// Tag
 	private LinkedArrayList<EctypalSubElement> subEles = null;
@@ -136,8 +137,12 @@ public class EctypalElement {
 		if ("".equals(this.symbol))	this.symbol = null;
 		this.variant = ele.getAttribute(XML_TAG_VARIANT);
 		if ("".equals(this.variant)) this.variant = null;
-		if(ele.getElementsByTagName(XML_TAG_DIRECTION).getLength()>0)
+		if(ele.getElementsByTagName(XML_TAG_DIRECTION).getLength()>0){
+			this.ifdirection = true;
 			this.direction = ele.getElementsByTagName(XML_TAG_DIRECTION).item(0).getTextContent().equals("+");
+		}
+		else
+			this.ifdirection = false;
 		NodeList nodes = ele.getChildNodes();// All Children
 		// The first child must be "From"
 		this.from = Integer.parseInt(nodes.item(0).getTextContent());
@@ -1193,7 +1198,8 @@ public class EctypalElement {
 			element.setAttribute(XML_TAG_VARIANT, variant);
 		XmlWriter.append_text_element(doc, element, XML_TAG_FROM, String.valueOf(from));
 		XmlWriter.append_text_element(doc, element, XML_TAG_TO, String.valueOf(to));
-		XmlWriter.append_text_element(doc, element, XML_TAG_DIRECTION, direction?"+":"-");
+		if(ifdirection)
+			XmlWriter.append_text_element(doc, element, XML_TAG_DIRECTION, direction?"+":"-");
 		if(description != null)
 			XmlWriter.append_text_element(doc, element, XML_TAG_DESCRIPTION, description);
 		if(color != null)
