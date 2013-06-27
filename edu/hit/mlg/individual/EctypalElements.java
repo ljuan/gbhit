@@ -25,7 +25,6 @@ public class EctypalElements {
 	private Document doc;
 	private List<ControlArea> ctrlAreas;
 	private String id = null; // Attribute
-	private FastaReader fr = null; // Attribute
 	private String ifParam = null; // Attribute
 	private EctypalElement[] eles; // All Elements of this Elements
 	private HashSet<EctypalElement> needToDealEles; // All Elements need to deal of this Elements
@@ -49,7 +48,6 @@ public class EctypalElements {
 	public EctypalElements(Document doc, FastaReader fr, Element elements, Element ctrlArea, String chr, boolean hasEffect) {
 		this.doc = doc;
 		this.ctrlAreas = Element2ControlAreas(ctrlArea);
-		this.fr=fr;
 		this.id = elements.getAttribute(XML_TAG_ID) ;
 		this.ifParam = elements.getAttribute(XML_TAG_IFP);
 		NodeList nodes = elements.getChildNodes();
@@ -74,17 +72,17 @@ public class EctypalElements {
 			for (EctypalElement ee : eles)
 				ee.dealCtrlAreas(cas);
 		}
-		
+
 		for (EctypalElement ee : eles) {
 			ee.preDeal(variants);
 			if (!ee.stillNeedToDeal())
 				needToDealEles.remove(ee);
 		}
-		
+
 		for (EctypalElement ee : needToDealEles) {
 			ee.deal(variants);
 		}
-		
+
 		return write2XML();
 	}
 
@@ -145,12 +143,14 @@ public class EctypalElements {
 					ca2vs.add(cur);
 					if (index == size)
 						break;
+					i--;
 					cur = ctrlAreas.get(index++);
 				}
 			} else if (EctypalSubElement.overlap(v.getFrom(), v.getTo(), cur.from, cur.to)) {
 				ca2vs.add(cur);
 				if (index == size)
 					break;
+				i--;
 				cur = ctrlAreas.get(index++);
 			}
 			if(v.getFrom() > cur.to){

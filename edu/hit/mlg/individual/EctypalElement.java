@@ -254,7 +254,7 @@ public class EctypalElement {
 	private Entry<EctypalSubElement> dealAVariationPreDeal(Variant v, Map<Entry<EctypalSubElement>, String> tempAssDss,
 			Entry<EctypalSubElement> cur) throws IOException {
 		int _type = v.getType().hashCode();
-		
+
 		if(_type == hash_SNV || _type == hash_INS || _type == hash_DEL || _type == hash_CNV || _type == hash_DUP){
 			if(direction && (v.getFrom() > cur.getElement().getTo()))
 				cur = moveFromFrontToBack(v.getFrom(), cur, false);
@@ -262,7 +262,7 @@ public class EctypalElement {
 				cur = moveFromBackToFront(v.getTo(), cur, false);
 			if(cur == null) return null;
 		}
-		
+
 		if(_type == hash_SNV){
 			if (cur.getElement().getType().equals(SUBELEMENT_TYPE_LINE))
 				dealLineInPreDeal(v, 1, null, cur, tempAssDss);
@@ -286,7 +286,7 @@ public class EctypalElement {
 		}
 		if(_type == hash_DEL){
 			DelMap2SubElement dms = map2SubEle(v, cur);
-			
+
 			if (dms != null && dms.boxBases > BOX_LIMIT * initBoxLen) {
 				recordStatus(LARGE_VARIANTION, false);
 				return cur;
@@ -448,8 +448,12 @@ public class EctypalElement {
     		 *	                             |=|
     		 * This case is in the similar way in drection=false
 			 */
-			Entry<EctypalSubElement> eDownstream = (isFS ? subEles.getPrevious(e) : subEles.getNext(e));
-			
+			Entry<EctypalSubElement> eDownstream = null;
+			if(isFS && !direction)
+				eDownstream = subEles.getPrevious(e);
+			else if(!isFS && direction)
+				eDownstream = subEles.getNext(e);
+
 			//we should add variant into the Box the variant affect.
 			e.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{ v.getFrom() }, new int[]{ v.getTo() }, 
 					isFS == direction ? "(" : ")");
@@ -510,7 +514,7 @@ public class EctypalElement {
 		if(fromCur == null) fromCur = subEles.getFirst();
 		Entry<EctypalSubElement> toCur = locate(del.getTo(), fromCur);
 		if(toCur == null) toCur = subEles.getLast();
-		
+
 		return new DelMap2SubElement(del, fromCur, toCur, subEles, hasEffect);
 	}
 
@@ -523,10 +527,10 @@ public class EctypalElement {
 
 		if(pos < cur.getElement().getFrom())
 			return moveFromBackToFront(pos, cur, false);
-			
+
 		if(pos > cur.getElement().getTo())
 			return moveFromFrontToBack(pos, cur, false);
-		
+
 		return cur;
 	}
 
@@ -559,7 +563,7 @@ public class EctypalElement {
 		int typeHash = 0;
 		Integer curNeedToDealType = null;
 		dealedVariations = new LinkedArrayList<DealedVariation>();
-		
+
 		if (direction) {
 			// direction=true, deal from the first variation
 			Entry<EctypalSubElement> next = subEles.getFirst();
@@ -616,7 +620,7 @@ public class EctypalElement {
 		for (int i = variants.size() - 1; i >= 0; i--) {
 			if(pre == null) break;
 			v = variants.get(i);
-			
+
 			if(v.getFrom() > pre.getElement().getTo())
 				continue;
 			if(v.getTo() < pre.getElement().getFrom()){
