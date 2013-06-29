@@ -93,6 +93,9 @@ class VcfSample implements Serializable{
 				return true;
 		return false;
 	}
+	public boolean ifExists(String SampleName){
+		return Samples.containsKey(SampleName);
+	}
 
 	public String[] getSelectedNames() {
 		return selectedNames;

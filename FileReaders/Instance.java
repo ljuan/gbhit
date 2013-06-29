@@ -190,9 +190,9 @@ public class Instance {
 						Pclns.put("OMIM",SerializationUtils.clone(Annos.get("OMIM")));
 						Pclns.get("OMIM").set_Mode(Consts.MODE_DENSE);
 					}
-					if(Annos.containsKey("GWASdb") && Annos.get("GWASdb").get_Type().equals(Consts.FORMAT_GDF)){
-						Pclns.put("GWASdb",SerializationUtils.clone(Annos.get("GWASdb")));
-						Pclns.get("GWASdb").set_Mode(Consts.MODE_DENSE);
+					if(Annos.containsKey("GwasCatalog") && Annos.get("GwasCatalog").get_Type().equals(Consts.FORMAT_GDF)){
+						Pclns.put("GwasCatalog",SerializationUtils.clone(Annos.get("GwasCatalog")));
+						Pclns.get("GwasCatalog").set_Mode(Consts.MODE_DENSE);
 					}
 				}
 			}
@@ -203,7 +203,7 @@ public class Instance {
 		if(Annos.containsKey(track)){
 			if(PvarID.equals(track)
 					||(Annos.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
-							&&((VcfSample)(Annos.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifSelected(PvarID))){
+							&&((VcfSample)(Annos.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifExists(PvarID))){
 				this.PvarID=PvarID;
 				this.Pvar=SerializationUtils.clone(Annos.get(track));
 //				Pvar.set_Mode(mode);
