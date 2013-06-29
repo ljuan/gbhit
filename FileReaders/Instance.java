@@ -59,7 +59,8 @@ public class Instance {
 		this.Annos=new Hashtable<String, Annotations>(Annos.length,1);
 		for(int i=0;i<Annos.length;i++){
 			this.Annos.put(Annos[i].get_ID(), Annos[i]);
-			init_track(this.Annos.get(Annos[i].get_ID()));
+			if(Annos[i].get_Group().equals(Consts.GROUP_CLASS_PG))
+				init_track(this.Annos.get(Annos[i].get_ID()));
 		}
 		init_Pvar("1000genome_CEU","NA12716");
 		Externals=new Hashtable<String, Annotations>();

@@ -62,7 +62,7 @@ public interface Consts{
 	public static final String GROUP_CLASS_GENE="Gene";
 	public static final String GROUP_CLASS_DBSNP="dbSNP";
 	public static final String GROUP_CLASS_KG="1000g";
-	public static final String GROUP_CLASS_PG="pGenome";
+	public static final String GROUP_CLASS_PG="PersonalGenome";
 	public static final String GROUP_CLASS_RNA="RNA";
 	public static final String GROUP_CLASS_DATA="data";
 	public static final String GROUP_CLASS_BASIC="Basic";

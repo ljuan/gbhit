@@ -16,7 +16,7 @@ import FileReaders.XmlWriter;
  * 
  */
 public class Variant implements Comparable<Variant> {
-	public static final String LARGE_VARIANTION = "LargeVariation";
+	public static final String LARGE_VARIANTION = "LargeSV_affected";
 	public static final int hash_SNV = VARIANT_TYPE_SNV.hashCode();
 	public static final int hash_INS = VARIANT_TYPE_INSERTION.hashCode();
 	public static final int hash_DEL = VARIANT_TYPE_DELETION.hashCode();
