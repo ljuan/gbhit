@@ -491,13 +491,17 @@ public class Instance {
 		return XmlWriter.xml2string(doc);
 	}
 	public String get_Annotations(){
-		String[] anno_names=new String[Annos.size()+3+Pclns.size()];
+		String[] anno_names_internal=new String[Annos.size()];
 		int i=0;
 		Enumeration<Annotations> annos_enum=Annos.elements();
 		for(i=0;i<Annos.size();i++){
 			Annotations temp=annos_enum.nextElement();
-			anno_names[i]=temp.get_Group()+":"+temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
+			anno_names_internal[i]=temp.get_Group()+":"+temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
 		}
+		Arrays.sort(anno_names_internal);
+		String[] anno_names=new String[Annos.size()+3+Pclns.size()];
+		for(i=0;i<anno_names_internal.length;i++)
+			anno_names[i]=anno_names_internal[i];
 		if(Pvar!=null)
 			anno_names[i++]="Pvar:_"+this.PvarID+"@"+Pvar.get_ID()+":"+Pvar.get_Mode()+":"+Pvar.get_Type();
 		if(Pfanno!=null)
