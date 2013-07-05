@@ -86,7 +86,7 @@
 										<xs:element name="From" type="xs:long"/>
 										<xs:element name="To" type="xs:long"/>
 										<xs:element name="Letter" type="SeqLimit" minOccurs="0"/>
-										<xs:element name="ToChr" type="xs:string" minOccurs="0"/>
+										<xs:element name="Mate" type="xs:string" minOccurs="0"/>
 										<xs:element name="Direction" type="xs:string" minOccurs="0"/>
 										<xs:element name="Description" type="xs:string" minOccurs="0"/>
 										<xs:element name="Dbsnp" type="xs:string" minOccurs="0"/>

@@ -36,7 +36,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 				 var param5=document.getElementById("p5").value;
 				 var querry="getAssemblies";
 				 req.onreadystatechange = getReadyStateHandler;
-				if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "getChromosomes" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno"){
+				if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "getChromosomes" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno" || param5 == "getSession"){
 					querry="action="+param5;
 				} else if(param5 == "removeTracks" || param5 == "removeExternals" || param5 == "getParams" || param5 == "removePclns"){
 					querry="action="+param5+"&tracks="+param4;
@@ -131,7 +131,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<th>removeTracks<br>removeExternals<br>removePclns<br>getParams</th>
 			<th>getGene<br>findGene</th>
 			<th>setAssembly<br>getCytobands</th>
-			<th>removePvar<br>removePanno<br>removePfanno<br>getAssemblies<br>getAnnotations<br>getChromosomes</th>
+			<th>removePvar<br>removePanno<br>removePfanno<br>getAssemblies<br>getSession<br>getAnnotations<br>getChromosomes</th>
 		<tr align="center">
 			<td><input id="p1" type="text"/></td>
 			<td>Chromosome</td>
