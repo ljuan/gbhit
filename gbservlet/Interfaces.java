@@ -8,7 +8,8 @@ import java.util.Map;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import FileReaders.*;
+import filereaders.*;
+
 
 public class Interfaces extends HttpServlet{
 	
@@ -17,11 +18,19 @@ public class Interfaces extends HttpServlet{
 		HttpSession session=req.getSession();
 		if(session.getAttribute("Instance")==null)
 			session.setAttribute("Instance", new Instance());
+		if(res!=null){
+			res.setHeader("Cache-Control", "no-cache,must-revalidate");
+			res.setHeader("Pragma", "no-cache");
+			res.setHeader("Expires", "-1");
+		}
 		Instance ins=(Instance) session.getAttribute("Instance");
 		String action=req.getParameter("action");
 		if (action.equals("getAssemblies")){
 			String a=ins.get_Assemblies();
 			res.getWriter().print(a);
+		}
+		if (action.equals("getSession")){
+			res.getWriter().print(session.getId());
 		}
 		else if (action.equals("getAnnotations")){
 			String a=ins.get_Annotations();
