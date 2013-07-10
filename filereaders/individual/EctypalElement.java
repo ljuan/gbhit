@@ -53,6 +53,7 @@ public class EctypalElement {
 	private boolean ifdirection;// Tag
 	private String description = null;// Tag
 	private String color = null;// Tag
+	private String source = null; //Tag for gdf/grf
 	private LinkedArrayList<EctypalSubElement> subEles = null;
 	/**
 	 * Whether this Element still need to do in the current stage.
@@ -144,6 +145,8 @@ public class EctypalElement {
 		}
 		else
 			this.ifdirection = false;
+		if(ele.getElementsByTagName(XML_TAG_SOURCE).getLength()>0)
+			this.source=ele.getElementsByTagName(XML_TAG_SOURCE).item(0).getTextContent();
 		NodeList nodes = ele.getChildNodes();// All Children
 		// The first child must be "From"
 		this.from = Integer.parseInt(nodes.item(0).getTextContent());
@@ -1209,13 +1212,15 @@ public class EctypalElement {
 			XmlWriter.append_text_element(doc, element, XML_TAG_DESCRIPTION, description);
 		if(color != null)
 			XmlWriter.append_text_element(doc, element, XML_TAG_COLOR, color);
+		if(source != null)
+			XmlWriter.append_text_element(doc, element, XML_TAG_SOURCE, source);
 		StringBuilder builder = new StringBuilder();
 		for(String s : status){
 			builder.append(s);
 			builder.append(';');
 		}
 		if(builder.length() > 1){
-			XmlWriter.append_text_element(doc, element, "status", builder.substring(0, builder.length()-1));
+			XmlWriter.append_text_element(doc, element, XML_TAG_STATUS, builder.substring(0, builder.length()-1));
 		}
 		Entry<EctypalSubElement> next = subEles.getFirst();
 		while (next != null) {

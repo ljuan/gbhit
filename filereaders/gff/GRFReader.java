@@ -118,12 +118,10 @@ public class GRFReader {
 					element = doc.createElement(XML_TAG_ELEMENT);
 					String FactorName = FactorNameSplit.split(split.getResultByIndex(8)).getResultByIndex(0);
 					element.setAttribute(XML_TAG_ID, equalSignSplit.split(FactorName).getResultByIndex(1));
-					XmlWriter.append_text_element(doc, element,
-							XML_TAG_FROM, split.getResultByIndex(3));
-					XmlWriter.append_text_element(doc, element, XML_TAG_TO,
-							split.getResultByIndex(4));
-					XmlWriter.append_text_element(doc, element, XML_TAG_DIRECTION,
-							split.getResultByIndex(6));
+					XmlWriter.append_text_element(doc, element,	XML_TAG_FROM, split.getResultByIndex(3));
+					XmlWriter.append_text_element(doc, element, XML_TAG_TO,	split.getResultByIndex(4));
+					XmlWriter.append_text_element(doc, element,	XML_TAG_SOURCE, split.getResultByIndex(1));
+					XmlWriter.append_text_element(doc, element, XML_TAG_DIRECTION,split.getResultByIndex(6));
 					elements.appendChild(element);
 				}
 			}

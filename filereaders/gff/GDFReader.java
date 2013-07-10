@@ -126,6 +126,7 @@ public class GDFReader {
 					element.setAttribute(XML_TAG_TYPE, split.getResultByIndex(2));
 					XmlWriter.append_text_element(doc, element, XML_TAG_FROM, split.getResultByIndex(3));
 					XmlWriter.append_text_element(doc, element, XML_TAG_TO, split.getResultByIndex(4));
+					XmlWriter.append_text_element(doc, element, XML_TAG_SOURCE, split.getResultByIndex(1));
 					String[] attributes=DNameSplit.split(split.getResultByIndex(8)).getResult();
 					for(int i=0;i<attributes.length;i++){
 						String[] attribute=equalSignSplit.split(attributes[i]).getResult();

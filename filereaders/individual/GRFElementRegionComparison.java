@@ -1,18 +1,18 @@
 package filereaders.individual;
 
-import static filereaders.Consts.DATA_ROOT;
-import static filereaders.Consts.XML_TAG_FROM;
-import static filereaders.Consts.XML_TAG_TO;
-import static filereaders.Consts.XML_TAG_VARIANT;
+import static filereaders.Consts.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import filereaders.Rgb;
+import filereaders.XmlWriter;
 import filereaders.gff.GRFReader;
 import filereaders.individual.vcf.Variant;
 
@@ -22,13 +22,15 @@ public class GRFElementRegionComparison {
 	 * Just record each from and start of the variants
 	 */
 	private List<Variant> variantRange;
+	private Document doc;
 	
 	/**
 	 * 
 	 * @param variants	VCF variants
 	 */
-	public GRFElementRegionComparison(Element variants){
+	public GRFElementRegionComparison(Document doc, Element variants){
 		getRangesFromVariant(variants);
+		this.doc=doc;
 	}
 	
 	
@@ -54,11 +56,15 @@ public class GRFElementRegionComparison {
 		Element toEle = null;
 		int from = 0;
 		int to = 0;
-		
+		int colornum=0;
+		HashMap<String,String> colormap=new HashMap<String,String>();
 		for(int i=0; i<grfSize; i++) {
 			ele = (Element)grfs.item(i);
 			fromEle = (Element)(ele.getElementsByTagName(XML_TAG_FROM).item(0));
 			toEle = (Element)(ele.getElementsByTagName(XML_TAG_TO).item(0));
+			String source=((Element)(ele.getElementsByTagName(XML_TAG_SOURCE).item(0))).getTextContent();
+			if(!colormap.containsKey(source))
+				colormap.put(source, Rgb.getColor(colornum++));
 			from = Integer.parseInt(fromEle.getTextContent());
 			to = Integer.parseInt(toEle.getTextContent());
 			if(to < cur.getFrom())
@@ -72,6 +78,8 @@ public class GRFElementRegionComparison {
 				continue;
 			}
 			ele.setAttribute(XML_TAG_VARIANT, "true");
+			if(ele.getElementsByTagName(XML_TAG_COLOR).getLength()==0)
+				XmlWriter.append_text_element(doc, ele, XML_TAG_COLOR, new Rgb((String)colormap.get(source)).ToString());
 		}
 	}
 	

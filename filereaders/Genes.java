@@ -6,6 +6,7 @@ import java.util.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 /* 
  * This class is for reading HGNC gene annotation.
  * Including HGNC ID, RefSeq ID, UCSC known gene ID, Ensembl ID, Entrez ID,
@@ -32,7 +33,7 @@ public class Genes{
 	private static Integer[] ChrEnds;
 	static {
 		int current_chr=-1;
-		File hgnc=new File(CfgReader.getBasicGenes("hg19").get_Path());
+		File hgnc=new File(CfgReader.getBasicGenes(Consts.CURRENT_ASSEMBLY).get_Path());
 		ByteBufferChannel bbc=new ByteBufferChannel(hgnc,0,hgnc.length());
 		String[] temp=bbc.ToString(Consts.DEFAULT_ENCODE).split("\n");
 		ArrayList<String> ChrList_temp=new ArrayList<String>();
@@ -130,21 +131,46 @@ public class Genes{
 		return genes;
 	}
 	public static Element overlap_Genes(Document doc, String chr, int start, int end){
+		return overlap_Genes(doc, chr, start, end, null);
+	}
+	public static Element overlap_Genes(Document doc, String chr, int start, int end, IndividualStat is){
 		Element genes = doc.createElement(Consts.XML_TAG_GENES);
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(genes); 
 		if(ChrMap.containsKey(chr)){
 			int[] range=binarySearchOverlap(ChrMap.get(chr),start,end);
 			if(range!=null){
+				float[] scores=null;
+				if(is!=null)
+					scores=is.get_GeneScores(range[1], range[0]);
 				for(int i=range[0];i<=range[1];i++){
 					Element gene=doc.createElement(Consts.XML_TAG_GENE);
 					gene.setAttribute(Consts.XML_TAG_ID, Symbols[i]);
 					XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_FROM, Integer.toString(Starts[i]+1));
 					XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_TO, Integer.toString(Ends[i]));
+					if(is!=null)
+						XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_SCORE, Float.toString(Math.round(scores[i-range[0]]*10)/10));
 					genes.appendChild(gene);
 				}
 			}
 		}
 		return genes;
+	}
+	public static String get_Gene(int idx){
+		return ChrList[Chrs[idx]]+"\t"+Starts[idx]+"\t"+Ends[idx]+"\t"+Symbols[idx];
+	}
+	public static int geneNum(){
+		return Symbols.length;
+	}
+	public static int[] get_GeneRange(int idx){
+		return new int[] {Starts[idx],Ends[idx]};
+	}
+	public static String get_GeneSymbol(int idx){
+		return Symbols[idx];
+	}
+	public static int[] binarySearchOverlap(String chr,int start,int end){
+		if(ChrMap.containsKey(chr))
+			return binarySearchOverlap(ChrMap.get(chr),start,end);
+		return null;
 	}
 	static int[] binarySearchOverlap(int chr,int start,int end){
 		int low=ChrStarts[chr];

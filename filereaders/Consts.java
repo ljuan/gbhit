@@ -8,6 +8,7 @@ public interface Consts{
 //	public static final String CYTO_DATA="/home/ljuan/gbdata/hg19/hg19.fa";
 	
 	public static final String DEFAULT_ENCODE="ISO-8859-1";
+	public static final String CURRENT_ASSEMBLY="hg19";
 	public static final String META_ROOT="MetaDataExchange";
 	public static final String DATA_ROOT="DataExchange";
 	
@@ -20,7 +21,7 @@ public interface Consts{
 	public static final String VCF_HEADER_INFO="INFO";
 	public static final String VCF_HEADER_FORMAT="Format";
 	public static final String VCF_HEADER_SAMPLE="Samples";
-	public static final String VCF_QUAL_LIMIT="Qualimit";
+	public static final String VCF_QUAL_LIMIT="QualityCriteria";
 	public static final String VCF_CHROM_PREFIX="chromprefix";
 	
 	public static final String GDF_SNPID="SNPid";
@@ -110,6 +111,7 @@ public interface Consts{
 	public static final String XML_TAG_ELEMENT="E";
 	public static final String XML_TAG_ELEMENTS="Es";
 	public static final String XML_TAG_SUBELEMENT="S";
+	public static final String XML_TAG_STATUS="status";
 	
 	public static final String XML_TAG_PARAMETER="Parameter";
 	public static final String XML_TAG_PARAMETERS="Parameters";

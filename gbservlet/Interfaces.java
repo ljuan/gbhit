@@ -1,9 +1,15 @@
 package gbservlet;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
+import org.apache.commons.fileupload.disk.*;
+import org.apache.commons.fileupload.util.*;
+import org.apache.commons.fileupload.servlet.*;
+import org.apache.commons.fileupload.*;
+import org.apache.commons.math.util.MultidimensionalCounter.Iterator;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -42,6 +48,10 @@ public class Interfaces extends HttpServlet{
 		}
 		else if (action.equals("getCytobands")){
 			String a=ins.get_Cyto(req.getParameter("chr"));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("getCytoband")){
+			String a=ins.get_SingleCytoScore(req.getParameter("chr"),req.getParameter("id"));
 			res.getWriter().print(a);
 		}
 		else if (action.equals("setAssembly")){
@@ -135,6 +145,82 @@ public class Interfaces extends HttpServlet{
 			int window_width=Integer.parseInt(req.getParameter("width"));
 			String a=ins.refresh(chr, start, end, window_width);
 			res.getWriter().print(a);
+		}
+		else if (action.equals("getStat")){
+			String filename=ins.save_Stat(session.getId());
+			if(filename!=null){
+				File temp=new File(System.getProperty("java.io.tmpdir")+"/"+session.getId()+".stat");
+				if(temp.exists()&&temp.isFile()){
+					InputStream fis=null;
+					OutputStream os=null;
+					try{
+						fis = new BufferedInputStream(new FileInputStream(temp));
+						byte[] buffer = new byte[fis.available()];
+						fis.read(buffer);
+						fis.close();
+						res.reset();
+						res.setContentType("application/force-download");
+						res.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename+".stat.txt", Consts.DEFAULT_ENCODE));
+						res.addHeader("Content-Length", "" + temp.length());
+						os = new BufferedOutputStream(res.getOutputStream());
+						res.setContentType("application/octet-stream");
+						os.write(buffer);
+						os.flush();
+						os.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						if(fis!=null){
+							fis.close();
+							fis=null;
+						}
+						if(os!=null){
+							os.close();
+							os=null;
+						}
+					}
+				}
+			}
+		}
+		else if (action.equals("upStat")){
+			File tmpdir=new File(System.getProperty("java.io.tmpdir"));
+			File ftemp=null;
+			String filepath=null;
+			if(tmpdir.isDirectory()){
+				ftemp=File.createTempFile(session.getId(),"stat",tmpdir);
+				int maxFileSize = 20*1024*1024;
+				int maxMemSize = 2000*1024;
+				filepath=System.getProperty("java.io.tmpdir")+"/"+session.getId()+".stat";
+				String contentType=req.getContentType();
+				if((contentType.indexOf("multipart/form-data")>=0)){
+					DiskFileItemFactory factory = new DiskFileItemFactory();
+					factory.setSizeThreshold(maxMemSize);
+					factory.setRepository(tmpdir);
+					ServletFileUpload upload = new ServletFileUpload(factory);
+					upload.setSizeMax(maxFileSize);
+					try{
+						List fileItems = upload.parseRequest(req);
+						java.util.Iterator i = fileItems.iterator();
+						while(i.hasNext()){
+							FileItem fi = (FileItem)i.next();
+							if(!fi.isFormField()){
+								String fieldName=fi.getFieldName();
+								String fileName=fi.getName();
+								boolean isInMemory = fi.isInMemory();
+								long sizeInBytes=fi.getSize();
+								fi.write(ftemp);
+							}
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+					}finally{
+						
+					}
+				}
+			}
+			if(ftemp!=null){
+				ins.load_Stat(filepath);
+			}
 		}
 	}
 /*	private <T extends Enum<T>> EnumSet<T> decode_annos(Class<T> annoSet, long elements){

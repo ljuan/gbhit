@@ -40,6 +40,7 @@ public class Instance {
 	Annotations Pfanno=null;
 	Element Ele_fanno=null;
 	Hashtable<String,Annotations> Pclns=new Hashtable<String,Annotations>();
+	IndividualStat is=null;
 	
 	public Instance (){
 		initialize("hg19");
@@ -178,6 +179,7 @@ public class Instance {
 				Pvar.set_Mode(Consts.MODE_PACK);
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
+				is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),get_BasicAnnos());
 				if(Pfanno==null && Panno==null){
 					if(Annos.containsKey("ensemblRegulation") && Annos.get("ensemblRegulation").get_Type().equals(Consts.FORMAT_GRF)){
 						Pfanno=SerializationUtils.clone(Annos.get("ensemblRegulation"));
@@ -211,6 +213,7 @@ public class Instance {
 				Pvar.set_Mode(Consts.MODE_PACK);
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
+				is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),get_BasicAnnos());
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
 				if(Pfanno!=null)
 					append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
@@ -409,7 +412,7 @@ public class Instance {
 				GRFReader gr = new GRFReader(path_temp);
 				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,(int)Coordinate[0],(int)Coordinate[1]);
 				if(personal){
-					GRFElementRegionComparison rc = new GRFElementRegionComparison(Ele_var);
+					GRFElementRegionComparison rc = new GRFElementRegionComparison(doc, Ele_var);
 					rc.compareRegion(ele_temp);
 				}
 			}
@@ -465,7 +468,7 @@ public class Instance {
 	}
 	public String get_OverlapGenes(String chr,int start,int end){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
-		Genes.overlap_Genes(doc, chr,start,end);
+		Genes.overlap_Genes(doc, chr,start,end,is);
 		return XmlWriter.xml2string(doc);
 	}
 	public String get_Assemblies(){
@@ -488,8 +491,28 @@ public class Instance {
 	public String get_Cyto(String chr){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		CytobandReader cbr=new CytobandReader(Cyto.get_Path());
-		Element ele_temp=cbr.write_cytobands(doc, chr, Cyto);
+		Element ele_temp=cbr.write_cytobands(doc, chr);
 		return XmlWriter.xml2string(doc);
+	}
+	public String get_SingleCytoScore(String chr, String id){
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		CytobandReader cbr=new CytobandReader(Cyto.get_Path());
+		Element ele_temp=cbr.write_cytoband(doc, chr, id, is, rr, Pvar);
+		return XmlWriter.xml2string(doc);
+	}
+	public void load_Stat(String filepath){
+		if(is!=null)
+			is.load_Stat(filepath);
+	}
+	public String save_Stat(String session){
+		if(is!=null&&Pvar!=null){
+			is.save_Stat(session);
+			if(PvarID==null||PvarID.equals("")||PvarID.equals(Pvar.get_ID()))
+				return Pvar.get_ID();
+			else
+				return Pvar.get_ID()+"_"+PvarID;
+		}
+		return null;
 	}
 	public String get_Annotations(){
 		String[] anno_names_internal=new String[Annos.size()];
@@ -586,7 +609,7 @@ public class Instance {
 			GRFReader gr2 = new GRFReader(Pfanno.get_Path(Chr));;
 			try {
 				Ele_fanno = gr2.write_grf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
-				GRFElementRegionComparison rc = new GRFElementRegionComparison(Ele_var);
+				GRFElementRegionComparison rc = new GRFElementRegionComparison(doc,Ele_var);
 				rc.compareRegion(Ele_fanno);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -790,7 +813,7 @@ public class Instance {
 			}
 			else if (type_temp.equals(Consts.FORMAT_CYTO)){
 				CytobandReader cbr=new CytobandReader(path_temp);
-				ele_temp=cbr.write_cytobands(doc, Chr, track);
+				ele_temp=cbr.write_cytobands(doc, Chr);
 			}
 			
 			if(ele_temp!=null
@@ -848,4 +871,22 @@ public class Instance {
 		return coordinate;
 	}
 
+	Annotations[] get_BasicAnnos(){
+		ArrayList<Annotations> annolist=new ArrayList<Annotations>();
+		Enumeration<Annotations> annos_enum=Annos.elements();
+		for(int i=0;i<Annos.size();i++){
+			Annotations anno_temp=annos_enum.nextElement();
+			if(anno_temp.get_Type().equals(Consts.FORMAT_ANNO))
+				annolist.add(anno_temp);
+		}
+		Enumeration<Annotations> externals_enum=Externals.elements();
+		for(int i=0;i<Externals.size();i++){
+			Annotations external_temp=externals_enum.nextElement();
+			if(external_temp.get_Type().equals(Consts.FORMAT_ANNO))
+				annolist.add(external_temp);
+		}
+		Annotations[] annos=new Annotations[annolist.size()];
+		annolist.toArray(annos);
+		return annos;
+	}
 }

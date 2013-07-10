@@ -90,7 +90,11 @@ public class VariantAnalysis {
 		}
 		
 	}
-	
+	public Element easydeal() throws IOException {
+		List<Variant> firstList=variants;
+		EctypalElements ee = new EctypalElements(doc, fr, elements, ctrlAreas, chr, false);
+		return firstList.size() > 0 ? ee.deal(firstList) : ee.write2XML();
+	}
 	/**
 	 * Copy all variants from Element:variants
 	 * @param variants
