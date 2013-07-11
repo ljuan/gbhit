@@ -179,7 +179,6 @@ public class Instance {
 				Pvar.set_Mode(Consts.MODE_PACK);
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
-				is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),get_BasicAnnos());
 				if(Pfanno==null && Panno==null){
 					if(Annos.containsKey("ensemblRegulation") && Annos.get("ensemblRegulation").get_Type().equals(Consts.FORMAT_GRF)){
 						Pfanno=SerializationUtils.clone(Annos.get("ensemblRegulation"));
@@ -198,6 +197,10 @@ public class Instance {
 						Pclns.get("GwasCatalog").set_Mode(Consts.MODE_DENSE);
 					}
 				}
+				if(Panno==null)
+					is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),get_BasicAnnos());
+				else
+					is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),new Annotations[]{Panno});
 			}
 		}
 	}
@@ -213,7 +216,6 @@ public class Instance {
 				Pvar.set_Mode(Consts.MODE_PACK);
 				if (!PvarID.equals(track))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
-				is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),get_BasicAnnos());
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
 				if(Pfanno!=null)
 					append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
@@ -225,6 +227,10 @@ public class Instance {
 						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
 					}
 				}
+				if(Panno==null)
+					is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),get_BasicAnnos());
+				else
+					is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),new Annotations[]{Panno});
 			}
 		}
 		else if(Externals.containsKey(track)){
