@@ -53,7 +53,7 @@ public class Rgb{
 				init(0,0,0);
 		}
 		else if(ColorScheme.containsKey(rgb)){
-			int[] scheme=ColorScheme.get("rgb");
+			int[] scheme=ColorScheme.get(rgb);
 			init(scheme[0],scheme[1],scheme[2]);
 		}
 		else

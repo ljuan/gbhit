@@ -36,7 +36,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 				 var param5=document.getElementById("p5").value;
 				 var querry="getAssemblies";
 				 req.onreadystatechange = getReadyStateHandler;
-				if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "getChromosomes" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno" || param5 == "getSession"){
+				if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "getChromosomes" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno" || param5 == "getSession"|| param5== "getStat"){
 					querry="action="+param5;
 				} else if(param5 == "removeTracks" || param5 == "removeExternals" || param5 == "getParams" || param5 == "removePclns"){
 					querry="action="+param5+"&tracks="+param4;
@@ -64,10 +64,27 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					querry="action="+param5+"&width="+param4+"&chr="+param1+"&start="+param2+"&end="+param3;
 				} else if(param5 == "setParams"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&params="+param2+"&values="+param1;
+				} else if(param5 == "upStat"){
+					querry="action="+param5;
+				} else if(param5 == "getCytoband"){
+					querry="action="+param5+"&chr="+param4+"&id="+param3;
 				} 
+				if(param5 == "getStat"){
+					window.open("servlet/test.do?"+querry);
+				} else if(param5 == "upStat"){
+					var fileObj = document.getElementById("uploadfile").files[0];
+					var form = new FormData();
+					form.append("file", fileObj);
+					form.append("enctype", "multipart/form-data");
+				//	req.setRequestHeader("Content-Type","multipart/form-data");
+					req.open("POST","servlet/test.do?"+querry,true);
+					req.send(form);
+				}
+				else{
 				 req.open("GET","servlet/test.do?"+querry,true);
 			//	 req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 				 req.send(null);
+				}
 			}
 			function getReadyStateHandler() {
 				if (req.readyState == 4){
@@ -128,6 +145,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<th>overlapGene</th>
 			<th>addPvar<br>modiPvar<br>initPvar</th>
 			<th>addTracks/modiTracks<br>addPanno/modiPanno<br>addPfanno/modiPfanno<br>addPclns/modiPclns</th>
+			<th>getCytoband</th>
 			<th>removeTracks<br>removeExternals<br>removePclns<br>getParams</th>
 			<th>getGene<br>findGene</th>
 			<th>setAssembly<br>getCytobands</th>
@@ -139,7 +157,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td>Types</td>
 			<td>Values</td>
 			<td>Chromosome</td>
-			<td colspan="6"></td>
+			<td colspan="7"></td>
 		</tr>
 		<tr align="center">
 			<td><input id="p2" type="text"/></td>
@@ -149,7 +167,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td>Params</td>
 			<td>Start</td>
 			<td>id</td>
-			<td colspan="5"></td>
+			<td colspan="6"></td>
 		</tr>
 		<tr align="center">
 			<td><input id="p3" type="text"/></td>
@@ -160,6 +178,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td>End</td>
 			<td>modes</td>
 			<td>modes</td>
+			<td>id</td>
 			<td colspan="4"></td>
 		</tr>
 		<tr align="center">
@@ -171,6 +190,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td></td>
 			<td>tracks</td>
 			<td>tracks</td>
+			<td>chr</td>
 			<td>tracks</td>
 			<td>prefix/gene</td>
 			<td>assembly/chr</td>
@@ -189,9 +209,11 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td>action</td>
 			<td>action</td>
 			<td>action</td>
+			<td>action</td>
 		</tr>
-		<tr><td colspan="12"><button id="buttonn" onclick="update()">update</button></td></tr>
-		<tr><td colspan="12" style="word-break:break-all"><div id="divv"></div></td></tr>
+		<tr><td colspan="13"><button id="buttonn" onclick="update()">update</button></td></tr>
+		<tr><td colspan="13"><input type="file" name="uploadfile" id="uploadfile"/></td></tr>
+		<tr><td colspan="13" style="word-break:break-all"><div id="divv"></div></td></tr>
 	</table>
 	
     </body>

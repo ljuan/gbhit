@@ -64,8 +64,8 @@ public class Instance {
 			if(Annos[i].get_Group().equals(Consts.GROUP_CLASS_PG))
 				init_track(this.Annos.get(Annos[i].get_ID()));
 		}
-		init_Pvar("1000genome_CEU","NA12716");
 		Externals=new Hashtable<String, Annotations>();
+		init_Pvar("1000genome_CEU","NA12716");
 		bpp=1;
 	}
 	public String refresh(String chr,long start,long end,int window_width){

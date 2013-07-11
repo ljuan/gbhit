@@ -45,8 +45,7 @@ public class IndividualStat {
 	public void load_Stat(String filepath){
 		BufferedReader in=null;
 		try{
-			if (filepath.startsWith("http://")
-					||filepath.startsWith("https://")||filepath.startsWith("ftp://")){
+			if (filepath.startsWith("http://")||filepath.startsWith("https://")||filepath.startsWith("ftp://")){
 				URL url=new URL(filepath);
 				in=new BufferedReader(new InputStreamReader(url.openStream()));
 			}
@@ -60,9 +59,10 @@ public class IndividualStat {
 				while((line=in.readLine())!=null){
 					String[] temp=line.split("\t");
 					if(i<cytolen)
-						CytoScores[i++]=Integer.parseInt(temp[4]);
+						CytoScores[i]=Float.parseFloat(temp[4]);
 					else
-						GeneScores[i++]=Integer.parseInt(temp[4]);
+						GeneScores[i-cytolen]=Float.parseFloat(temp[4]);
+					i++;
 				}
 				in.close();
 			}
@@ -74,8 +74,7 @@ public class IndividualStat {
 		File ftemp=null;
 		BufferedWriter out;
 		try{
-			File tempdir=new File(System.getProperty("java.io.tmpdir"));
-			ftemp=File.createTempFile(session,"stat",tempdir);
+			ftemp=new File(System.getProperty("java.io.tmpdir")+"/"+session+".stat");
 			out=new BufferedWriter(new FileWriter(ftemp));
 			for(int i=0;i<Cytobands.length;i++)
 				out.write(Cytobands[i][0]+"\t"+Cytobands[i][1]+"\t"+Cytobands[i][2]+"\t"+Cytobands[i][3]+"\t"+CytoScores[i]+"\n");
@@ -130,7 +129,7 @@ public class IndividualStat {
 				Element[] ele_annos=new Element[annos.length];
 				for(int k=0;k<annos.length;k++)
 					ele_annos[k]=bar[k].write_ba2elements(doc, annos[k].get_ID(), chr, subrange[0]+1, subrange[1], 0.5);
-				GeneScores[j]=calc_Score(doc, ref, ele_annos, ele_var, chr, Genes.get_GeneSymbol(j));
+				GeneScores[j]=Math.round(calc_Score(doc, ref, ele_annos, ele_var, chr, Genes.get_GeneSymbol(j))*10)/10;
 				CytoScores[i]=CytoScores[i]>GeneScores[j]?CytoScores[i]:GeneScores[j];
 			}
 	}

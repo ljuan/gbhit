@@ -160,10 +160,13 @@ public class Interfaces extends HttpServlet{
 						fis.close();
 						res.reset();
 						res.setContentType("application/force-download");
+						res.setHeader("Cache-Control", "no-cache,must-revalidate");
+						res.setHeader("Pragma", "no-cache");
+						res.setHeader("Expires", "-1");
 						res.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename+".stat.txt", Consts.DEFAULT_ENCODE));
 						res.addHeader("Content-Length", "" + temp.length());
 						os = new BufferedOutputStream(res.getOutputStream());
-						res.setContentType("application/octet-stream");
+				//		res.setContentType("application/octet-stream");
 						os.write(buffer);
 						os.flush();
 						os.close();
@@ -182,17 +185,30 @@ public class Interfaces extends HttpServlet{
 				}
 			}
 		}
-		else if (action.equals("upStat")){
+	}
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
+		//res.setContentType("application/xml");
+		HttpSession session=req.getSession();
+		if(session.getAttribute("Instance")==null)
+			session.setAttribute("Instance", new Instance());
+		if(res!=null){
+			res.setHeader("Cache-Control", "no-cache,must-revalidate");
+			res.setHeader("Pragma", "no-cache");
+			res.setHeader("Expires", "-1");
+		}
+		Instance ins=(Instance) session.getAttribute("Instance");
+		String action=req.getParameter("action");
+		if (action.equals("upStat")){
 			File tmpdir=new File(System.getProperty("java.io.tmpdir"));
 			File ftemp=null;
 			String filepath=null;
 			if(tmpdir.isDirectory()){
-				ftemp=File.createTempFile(session.getId(),"stat",tmpdir);
 				int maxFileSize = 20*1024*1024;
 				int maxMemSize = 2000*1024;
-				filepath=System.getProperty("java.io.tmpdir")+"/"+session.getId()+".stat";
 				String contentType=req.getContentType();
-				if((contentType.indexOf("multipart/form-data")>=0)){
+				if(contentType.indexOf("multipart/form-data")>=0){
+					filepath=System.getProperty("java.io.tmpdir")+"/"+session.getId()+".stat";
+					ftemp=new File(filepath);
 					DiskFileItemFactory factory = new DiskFileItemFactory();
 					factory.setSizeThreshold(maxMemSize);
 					factory.setRepository(tmpdir);
@@ -204,11 +220,8 @@ public class Interfaces extends HttpServlet{
 						while(i.hasNext()){
 							FileItem fi = (FileItem)i.next();
 							if(!fi.isFormField()){
-								String fieldName=fi.getFieldName();
-								String fileName=fi.getName();
-								boolean isInMemory = fi.isInMemory();
-								long sizeInBytes=fi.getSize();
 								fi.write(ftemp);
+								res.setStatus(200);
 							}
 						}
 					}catch(Exception e){
