@@ -197,11 +197,25 @@ public class Instance {
 						Pclns.get("GwasCatalog").set_Mode(Consts.MODE_DENSE);
 					}
 				}
-				if(Panno==null)
-					is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),get_BasicAnnos());
-				else
-					is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),new Annotations[]{Panno});
+				init_IndividualStat();
 			}
+		}
+	}
+	private void init_IndividualStat(){
+		if(Pvar!=null){
+			if(Panno==null)
+				is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),get_BasicAnnos());
+			else
+				is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),new Annotations[]{Panno});
+			String isfp="";
+			if (!PvarID.equals(Pvar.get_ID()))
+				isfp=Pvar.get_ID()+"_"+PvarID+".stat.txt";
+			else
+				isfp=Pvar.get_ID()+".stat.txt";
+			isfp=Pvar.get_Path("chr1").substring(0,Pvar.get_Path("chr1").lastIndexOf("/")+1)+isfp;
+			File isf=new File(isfp);
+			if(isf.exists()&&isf.isFile())
+				is.load_Stat(isfp);
 		}
 	}
 	public String add_Pvar(String track,String mode,String PvarID){
@@ -227,10 +241,7 @@ public class Instance {
 						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
 					}
 				}
-				if(Panno==null)
-					is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),get_BasicAnnos());
-				else
-					is=new IndividualStat(new CytobandReader(Cyto.get_Path()).getCytobands(),new Annotations[]{Panno});
+				init_IndividualStat();
 			}
 		}
 		else if(Externals.containsKey(track)){
