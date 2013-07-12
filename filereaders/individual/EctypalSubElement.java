@@ -297,7 +297,7 @@ public class EctypalSubElement {
 	 * @return
 	 */
 	static boolean notLineNotBand(String type){
-		return !SUBELEMENT_TYPE_LINE.equals(type) && !SUBELEMENT_TYPE_BAND.equals(type);
+		return !SUBELEMENT_TYPE_LINE.equals(type) && !SUBELEMENT_TYPE_BAND.equals(type) && !SUBELEMENT_TYPE_SKIP_BAND.equals(type) && !SUBELEMENT_TYPE_EXTEND_BAND.equals(type);
 	}
 	
 	static boolean shouldAddBoxBases(String type, boolean hasEffect){
