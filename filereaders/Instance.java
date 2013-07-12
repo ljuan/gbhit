@@ -267,6 +267,7 @@ public class Instance {
 						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
 					}
 				}
+				init_IndividualStat();
 			}
 		}
 		return XmlWriter.xml2string(doc);
