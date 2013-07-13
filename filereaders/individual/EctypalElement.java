@@ -340,20 +340,24 @@ public class EctypalElement {
 			Map<Entry<EctypalSubElement>, String> tempAssDss) throws IOException {
 		int from = v.getFrom();
 		int to = v.getTo();
-		EctypalSubElement ese = cur.getElement();
-		if(type == 1){
-			if(!(from > ese.getFrom() + 1 && from < ese.getTo() - 1))
-				recordTempAssDss(v, tempAssDss, cur, from <= ese.getFrom() + 1);
+		if(cur!=null){
+			EctypalSubElement ese = cur.getElement();
+			if(type == 1){
+				if(!(from > ese.getFrom() + 1 && from < ese.getTo() - 1))
+					recordTempAssDss(v, tempAssDss, cur, from <= ese.getFrom() + 1);
+				return;
+			}//End of SNV
+	
+			if(type == 2){
+				if (from == ese.getFrom() && basesOfINS.charAt(0) != fr.extract_char(chr, to))
+					recordTempAssDss(v, tempAssDss, cur, true);
+				else if(to == ese.getTo() && basesOfINS.charAt(basesOfINS.length() - 1) != fr.extract_char(chr, from))
+					recordTempAssDss(v, tempAssDss, cur, false);
+				return;
+			}//End of INS
+		}
+		else if(type==1 || type==2)
 			return;
-		}//End of SNV
-
-		if(type == 2){
-			if (from == ese.getFrom() && basesOfINS.charAt(0) != fr.extract_char(chr, to))
-				recordTempAssDss(v, tempAssDss, cur, true);
-			else if(to == ese.getTo() && basesOfINS.charAt(basesOfINS.length() - 1) != fr.extract_char(chr, from))
-				recordTempAssDss(v, tempAssDss, cur, false);
-			return;
-		}//End of INS
 
 		// Find the SubElement where from and to at respectively
 		Entry<EctypalSubElement> fromCur = locate(from, cur);

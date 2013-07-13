@@ -276,6 +276,7 @@ public class Instance {
 		Pvar=null;
 		PvarID=null;
 		Ele_var=null;
+		is=null;
 	}
 	public String add_Panno(String track,String mode){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
@@ -509,7 +510,7 @@ public class Instance {
 	public String get_Cyto(String chr){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		CytobandReader cbr=new CytobandReader(Cyto.get_Path());
-		Element ele_temp=cbr.write_cytobands(doc, chr);
+		Element ele_temp=cbr.write_cytobands(doc, chr, is);
 		return XmlWriter.xml2string(doc);
 	}
 	public String get_SingleCytoScore(String chr, String id){
@@ -831,7 +832,7 @@ public class Instance {
 			}
 			else if (type_temp.equals(Consts.FORMAT_CYTO)){
 				CytobandReader cbr=new CytobandReader(path_temp);
-				ele_temp=cbr.write_cytobands(doc, Chr);
+				ele_temp=cbr.write_cytobands(doc, Chr, is);
 			}
 			
 			if(ele_temp!=null
