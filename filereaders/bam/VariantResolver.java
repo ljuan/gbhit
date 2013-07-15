@@ -74,6 +74,7 @@ public class VariantResolver {
 		if (count == len) {
 			Variant[] vs = new Variant[len + len];
 			System.arraycopy(variants, 0, vs, 0, len);
+			variants=vs;//added by Liran
 			len += len;
 		}
 	}

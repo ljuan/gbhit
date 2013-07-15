@@ -477,7 +477,14 @@ public class EctypalElement {
 				String change = isFS ? (direction ? isUp : isDown) : (direction ? isDown : isUp);
 				tempAssDss.put(e, change);	
 				if(isBox && eDownstream != null && SUBELEMENT_TYPE_BAND.equals(eDownstream.getElement().getType())) {
-					tempAssDss.put(eDownstream, SUBELEMENT_TYPE_SKIP_BOX.equals(change) ? SUBELEMENT_TYPE_SKIP_BAND : SUBELEMENT_TYPE_EXTEND_BAND);
+		//			tempAssDss.put(eDownstream, SUBELEMENT_TYPE_SKIP_BOX.equals(change) ? SUBELEMENT_TYPE_SKIP_BAND : SUBELEMENT_TYPE_EXTEND_BAND);
+		//wrong logic -- by Liran
+					if(SUBELEMENT_TYPE_SKIP_BOX.equals(change))
+						tempAssDss.put(eDownstream, SUBELEMENT_TYPE_SKIP_BAND);
+				}
+				else if(!isBox && eDownstream != null && SUBELEMENT_TYPE_BOX.equals(eDownstream.getElement().getType())) {
+					if(SUBELEMENT_TYPE_SKIP_BAND.equals(change))
+						tempAssDss.put(eDownstream, SUBELEMENT_TYPE_SKIP_BOX);
 				}
 			}
 		}
