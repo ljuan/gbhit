@@ -1167,7 +1167,8 @@ public class EctypalElement {
 			cur = subEles.getNext(cur);
 			if(cur == null) break;
 			if(dealStage && hasEffect && preSubEleNotLineNotBand != null && notLineNotBand(cur.getElement().getType())){
-				cur.getElement().setType(currentNeedToMap.get(cur.getElement().getType()).get(preSubEleNotLineNotBand.getType()));
+				if(currentNeedToMap.containsKey(cur.getElement().getType()))//added by Liran to prevent unexpected input
+					cur.getElement().setType(currentNeedToMap.get(cur.getElement().getType()).get(preSubEleNotLineNotBand.getType()));
 			}
 		}
 
@@ -1198,7 +1199,8 @@ public class EctypalElement {
 			cur = subEles.getPrevious(cur);
 			if(cur == null) break;
 			if(dealStage && hasEffect && preSubEleNotLineNotBand != null && notLineNotBand(cur.getElement().getType())){
-				cur.getElement().setType(currentNeedToMap.get(cur.getElement().getType()).get(preSubEleNotLineNotBand.getType()));
+				if(currentNeedToMap.containsKey(cur.getElement().getType()))//added by Liran to prevent unexpected input
+					cur.getElement().setType(currentNeedToMap.get(cur.getElement().getType()).get(preSubEleNotLineNotBand.getType()));
 			}
 		}
 
