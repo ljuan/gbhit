@@ -4,6 +4,7 @@ import static filereaders.individual.EctypalSubElement.*;
 
 import java.io.IOException;
 
+import filereaders.Consts;
 import filereaders.FastaReader;
 import filereaders.individual.vcf.Variant;
 import filereaders.tools.LinkedArrayList;
@@ -102,6 +103,7 @@ class DealedVariation{
 		int realFrom;
 		int realTo;
 		private boolean hasEffect;
+		int coveredExons=0;
 		
 		/**
 		 * @param deletion The DEL variant
@@ -140,9 +142,12 @@ class DealedVariation{
 		 */
 		private void countBoxBases(LinkedArrayList<EctypalSubElement> subEles, boolean hasEffect){
 			Entry<EctypalSubElement> cur = firstSubEle;
-			while(cur.getElement().getFrom() <= lastSubEle.getElement().getFrom()){
+			while(cur!=null&&cur.getElement().getFrom() <= lastSubEle.getElement().getFrom()){
 				if(shouldAddBoxBases(cur.getElement().getType(), hasEffect))
 					boxBases += cur.getElement().getLength();
+				if(!cur.getElement().getType().equals(Consts.SUBELEMENT_TYPE_LINE)&&hasEffect&&cur.getElement().getFrom()>firstSubEle.getElement().getFrom()){
+					coveredExons++;
+				}
 				cur = subEles.getNext(cur);
 			}
 			boxBases -= lastSubEle.getElement().getTo() - realTo;

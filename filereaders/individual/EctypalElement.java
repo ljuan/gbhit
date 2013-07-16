@@ -258,7 +258,6 @@ public class EctypalElement {
 	private Entry<EctypalSubElement> dealAVariationPreDeal(Variant v, Map<Entry<EctypalSubElement>, String> tempAssDss,
 			Entry<EctypalSubElement> cur) throws IOException {
 		int _type = v.getType().hashCode();
-
 		if(_type == hash_SNV || _type == hash_INS || _type == hash_DEL || _type == hash_CNV || _type == hash_DUP){
 			if(direction && (v.getFrom() > cur.getElement().getTo()))
 				cur = moveFromFrontToBack(v.getFrom(), cur, false);
@@ -291,7 +290,7 @@ public class EctypalElement {
 		if(_type == hash_DEL){
 			DelMap2SubElement dms = map2SubEle(v, cur);
 
-			if (dms != null && dms.boxBases > BOX_LIMIT * initBoxLen) {
+			if (dms != null && (dms.coveredExons>0 || dms.boxBases > BOX_LIMIT * initBoxLen)) {
 				recordStatus(LARGE_VARIANTION, false);
 				return cur;
 			}
