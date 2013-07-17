@@ -64,7 +64,7 @@ import filereaders.individual.vcf.Variant;
  */
 public class BAMReader {
 
-	private static final int SMALL_REGION_NUMBER_LIMIT = 20000;
+	private static final int SMALL_REGION_NUMBER_LIMIT = 10000;
 	private static final int BIG_REGION_LINEAR_INDEX_SPAN_LIMIT = 10 * 1024 * 1024;
 //	private static final int BIG_REGION_LINEAR_INDEX_SPAN_LIMIT = 10 * 1024 * 1024;
 //	For accuracy, threshold should be set on ~75M

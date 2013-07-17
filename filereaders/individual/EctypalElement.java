@@ -271,7 +271,7 @@ public class EctypalElement {
 		int _type = v.getType().hashCode();
 		if(variantContainElement(v)){
 			recordStatus(LARGE_VARIANTION, false);
-			recordStatus(v.getType(), false);
+			recordStatus("Whole gene "+v.getType(), false);
 			return cur;
 		}
 		if(_type == hash_SNV || _type == hash_INS || _type == hash_DEL || _type == hash_CNV || _type == hash_DUP){
