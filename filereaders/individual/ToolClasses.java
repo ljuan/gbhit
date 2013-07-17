@@ -120,6 +120,8 @@ class DealedVariation{
 			this.subEles = subEles;
 			this.hasEffect = hasEffect;
 			
+			countcoveredExons(subEles,hasEffect);
+			
 			while(!shouldAddBoxBases(this.firstSubEle.getElement().getType(), hasEffect)){
 				this.firstSubEle = subEles.getNext(this.firstSubEle);
 				if(this.firstSubEle == null || this.firstSubEle.getElement().getFrom() > this.lastSubEle.getElement().getFrom()){
@@ -140,14 +142,22 @@ class DealedVariation{
 		/**
 		 * Count the number of bases of the deletion in the "BOX"
 		 */
+		private void countcoveredExons(LinkedArrayList<EctypalSubElement> subEles, boolean hasEffect){
+			//By Liran, Add to provide another criteria to eliminate the large deletion affect element from needtodeal
+			Entry<EctypalSubElement> cur = subEles.getFirst();
+			while(cur!=null&&cur.getElement().getFrom() <= subEles.getLast().getElement().getFrom()){
+				if(!cur.getElement().getType().equals(Consts.SUBELEMENT_TYPE_LINE)&&hasEffect
+						&&cur.getElement().getFrom()>=deletion.getFrom()&&cur.getElement().getTo()<=deletion.getTo()){
+					coveredExons++;
+				}
+				cur = subEles.getNext(cur);
+			}
+		}
 		private void countBoxBases(LinkedArrayList<EctypalSubElement> subEles, boolean hasEffect){
 			Entry<EctypalSubElement> cur = firstSubEle;
 			while(cur!=null&&cur.getElement().getFrom() <= lastSubEle.getElement().getFrom()){
 				if(shouldAddBoxBases(cur.getElement().getType(), hasEffect))
 					boxBases += cur.getElement().getLength();
-				if(!cur.getElement().getType().equals(Consts.SUBELEMENT_TYPE_LINE)&&hasEffect&&cur.getElement().getFrom()>firstSubEle.getElement().getFrom()){
-					coveredExons++;
-				}
 				cur = subEles.getNext(cur);
 			}
 			boxBases -= lastSubEle.getElement().getTo() - realTo;

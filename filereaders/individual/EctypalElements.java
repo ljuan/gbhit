@@ -67,21 +67,46 @@ public class EctypalElements {
 	 * @return
 	 * @throws IOException
 	 */
+	public int currentPool(List<Variant> variants, List<Variant> current, int idx, int from, int to){
+		for(int i=0;i<current.size();i++)
+			if(current.get(i).getTo()<from)
+				current.remove(i--);
+			else if(current.get(i).getFrom()>from)
+				break;
+		for(;idx<variants.size();idx++)
+			if(variants.get(idx).getFrom()>to)
+				break;
+			else if(variants.get(idx).getTo()<from)
+				continue;
+			else
+				current.add(variants.get(idx));
+		return idx;
+		
+	}
 	public Element deal(List<Variant> variants) throws IOException {
+		
 		List<ControlArea> cas = ctrlArea2Variants(variants);
 		if (cas != null && cas.size() > 0) {
 			for (EctypalElement ee : eles)
 				ee.dealCtrlAreas(cas);
 		}
 
+		List<Variant> current=new ArrayList<Variant>();//added by Liran to improve the performace
+		int idx=0;//added by Liran to improve the performace
 		for (EctypalElement ee : eles) {
-			ee.preDeal(variants);
+//			ee.preDeal(variants);
+			idx=currentPool(variants,current,idx,ee.getFrom()-(ee.getStrand()?2000:500),ee.getTo()+(ee.getStrand()?500:2000));//added by Liran to improve the performace
+			ee.preDeal(current);//added by Liran to improve the performace
 			if (!ee.stillNeedToDeal())
 				needToDealEles.remove(ee);
 		}
 
+		current=new ArrayList<Variant>();//added by Liran to improve the performace
+		idx=0;//added by Liran to improve the performace
 		for (EctypalElement ee : needToDealEles) {
-			ee.deal(variants);
+//			ee.deal(variants);
+			idx=currentPool(variants,current,idx,ee.getFrom()-(ee.getStrand()?2000:500),ee.getTo()+(ee.getStrand()?500:2000));//added by Liran to improve the performace
+			ee.deal(current);//added by Liran to improve the performace
 		}
 
 		return write2XML();

@@ -204,6 +204,15 @@ public class EctypalElement {
 	public String getId(){
 		return this.id;
 	}
+	public int getFrom(){
+		return this.from;
+	}
+	public int getTo(){
+		return this.to;
+	}
+	public boolean getStrand(){
+		return this.direction;
+	}
 
 	public int size(){
 		return this.subEles.size();
@@ -232,7 +241,8 @@ public class EctypalElement {
 				if(v.getTo() < next.getElement().getFrom())
 					continue;
 				next = dealAVariationPreDeal(v, tempAssDss,	next);
-				if (next == null) break;
+		//		if (next == null) break; --By Liran to Avoid missing large variation containing the Element
+				if (next == null) next=subEles.getLast(); //--By Liran to Avoid missing large variation containing the Element
 			}
 		} else {
 			// Deal from the last variation
@@ -242,7 +252,8 @@ public class EctypalElement {
 				if(v.getFrom() > pre.getElement().getTo())
 					continue;
 				pre = dealAVariationPreDeal(v, tempAssDss, pre);
-				if (pre == null) break;
+		//		if (pre == null) break;   --By Liran to Avoid missing large variation containing the Element
+				if (pre == null) pre=subEles.getFirst();  // --By Liran to Avoid missing large variation containing the Element
 			}
 		}
 		if (!hasEffect || stillNeedToDeal){
@@ -258,6 +269,11 @@ public class EctypalElement {
 	private Entry<EctypalSubElement> dealAVariationPreDeal(Variant v, Map<Entry<EctypalSubElement>, String> tempAssDss,
 			Entry<EctypalSubElement> cur) throws IOException {
 		int _type = v.getType().hashCode();
+		if(variantContainElement(v)){
+			recordStatus(LARGE_VARIANTION, false);
+			recordStatus(v.getType(), false);
+			return cur;
+		}
 		if(_type == hash_SNV || _type == hash_INS || _type == hash_DEL || _type == hash_CNV || _type == hash_DUP){
 			if(direction && (v.getFrom() > cur.getElement().getTo()))
 				cur = moveFromFrontToBack(v.getFrom(), cur, false);
@@ -278,15 +294,13 @@ public class EctypalElement {
 			return cur;
 		}
 		if(_type == hash_BLS){
-			if (v.getFrom() >= from && v.getFrom() <= to)
+			if (v.getFrom() >= from && v.getFrom() <= to){
+				recordStatus(LARGE_VARIANTION, false);
 				recordStatus(v.getType(), false);
+			}
 			return cur;
 		} 
 		// DEL, CNV, INV or DUP
-		if(variantContainElement(v)){
-			recordStatus(v.getType(), false);
-			return cur;
-		}
 		if(_type == hash_DEL){
 			DelMap2SubElement dms = map2SubEle(v, cur);
 
