@@ -567,6 +567,8 @@ public class Instance {
 				Annos.get(tracks[i]).write_anno2parameter(doc);
 			else if(Externals.containsKey(tracks[i]))
 				Externals.get(tracks[i]).write_anno2parameter(doc);
+			else if(tracks[i].startsWith("_")&&tracks[i].substring(1).equals(Pvar.get_ID()))
+				Pvar.write_anno2parameter(doc);
 		return XmlWriter.xml2string(doc);
 	}
 	public void set_Params(String[] tracks,String[] params,String[] values){
@@ -575,6 +577,8 @@ public class Instance {
 				Annos.get(tracks[i]).set_Parameters(params[i], values[i]);
 			else if(Externals.containsKey(tracks[i]))
 				Externals.get(tracks[i]).set_Parameters(params[i], values[i]);
+			else if(tracks[i].startsWith("_")&&tracks[i].substring(1).equals(Pvar.get_ID()))
+				Pvar.set_Parameters(params[i], values[i]);
 		}
 	}
 	void set_mode(String track,String mode){
