@@ -52,7 +52,7 @@ public class VcfReader {
 				Map<String, String[]> format_header = new HashMap<String, String[]>();
 				String[] samples = null;
 				String line = "";
-				filter_header.put("PASS", true);
+				filter_header.put("PASS", false);
 				String str = null;
 				while ((line = vcf_tb.readLine()).startsWith("#")) {
 					str = line.substring(2, 8);
@@ -98,7 +98,7 @@ public class VcfReader {
 				if (!info_header.isEmpty())
 					track.initialize_Parameter(VCF_HEADER_INFO, info_header, PARAMETER_TYPE_INVISABLE);
 				track.initialize_Parameter(VCF_CHROM_PREFIX, vcf_tb.hasChromPrefix(), PARAMETER_TYPE_INVISABLE);
-				track.initialize_Parameter(VCF_QUAL_LIMIT, "-1", PARAMETER_TYPE_STRING);
+				track.initialize_Parameter(VCF_QUAL_LIMIT, "0", PARAMETER_TYPE_STRING);
 			}
 			this.track = track;
 		} catch (IOException e) {
@@ -229,10 +229,10 @@ public class VcfReader {
 					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, samplesNum, selectedIndexes);
 					if (vcf.altIsDot())
 						continue;
+					if (vcf.shouldBeFilteredByQualLimit(qualLimit) || vcf.shouldBeFilteredByFilterLimit(filterLimit))
+						continue;
 					if (!vcf.isDBSnp() && siNotNull) {
 						// Personal Genemic VCF
-						if (vcf.shouldBeFilteredByQualLimit(qualLimit) || vcf.shouldBeFilteredByFilterLimit(filterLimit))
-							continue;
 						for (int i = 0; i < len; i++) {
 							vs = vcf.getVariants(i);
 							if (vs != null)

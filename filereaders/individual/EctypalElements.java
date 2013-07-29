@@ -91,22 +91,22 @@ public class EctypalElements {
 				ee.dealCtrlAreas(cas);
 		}
 
-		List<Variant> current=new ArrayList<Variant>();//added by Liran to improve the performace
-		int idx=0;//added by Liran to improve the performace
+//		List<Variant> current=new ArrayList<Variant>();//added by Liran to improve the performace
+//		int idx=0;//added by Liran to improve the performace
 		for (EctypalElement ee : eles) {
-//			ee.preDeal(variants);
-			idx=currentPool(variants,current,idx,ee.getFrom()-(ee.getStrand()?2000:500),ee.getTo()+(ee.getStrand()?500:2000));//added by Liran to improve the performace
-			ee.preDeal(current);//added by Liran to improve the performace
+			ee.preDeal(variants);
+//			idx=currentPool(variants,current,idx,ee.getFrom()-(ee.getStrand()?2000:500),ee.getTo()+(ee.getStrand()?500:2000));//added by Liran to improve the performace
+//			ee.preDeal(current);//added by Liran to improve the performace
 			if (!ee.stillNeedToDeal())
 				needToDealEles.remove(ee);
 		}
 
-		current=new ArrayList<Variant>();//added by Liran to improve the performace
-		idx=0;//added by Liran to improve the performace
+//		current=new ArrayList<Variant>();//added by Liran to improve the performace
+//		idx=0;//added by Liran to improve the performace
 		for (EctypalElement ee : needToDealEles) {
-//			ee.deal(variants);
-			idx=currentPool(variants,current,idx,ee.getFrom()-(ee.getStrand()?2000:500),ee.getTo()+(ee.getStrand()?500:2000));//added by Liran to improve the performace
-			ee.deal(current);//added by Liran to improve the performace
+			ee.deal(variants);
+//			idx=currentPool(variants,current,idx,ee.getFrom()-(ee.getStrand()?2000:500),ee.getTo()+(ee.getStrand()?500:2000));//added by Liran to improve the performace
+//			ee.deal(current);//added by Liran to improve the performace
 		}
 
 		return write2XML();

@@ -21,7 +21,7 @@ public interface Consts{
 	public static final String VCF_HEADER_INFO="INFO";
 	public static final String VCF_HEADER_FORMAT="Format";
 	public static final String VCF_HEADER_SAMPLE="Samples";
-	public static final String VCF_QUAL_LIMIT="QualityCriteria";
+	public static final String VCF_QUAL_LIMIT="QualityThreshold";
 	public static final String VCF_CHROM_PREFIX="chromprefix";
 	
 	public static final String GDF_SNPID="SNPid";

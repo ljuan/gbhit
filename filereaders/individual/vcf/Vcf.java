@@ -135,15 +135,16 @@ public class Vcf {
 		// For NO Variation, Alt is dot ‘.’. Wo should filter this vcf
 		if (whetherAltIsDot)
 			return;
-		Qual = ".".equals(temp[5]) ? -1 : Float.parseFloat(temp[5]);
+		Qual = ".".equals(temp[5]) ? 0 : Float.parseFloat(temp[5]);
 
 		Filter = temp[6];
 		FilterSet = new HashSet<String>();
 
 		StringSplit split = new StringSplit(',');
 		split.split(temp[6]);
-		for(int index=0, len=split.getResultNum(); index<len; index++)
-			FilterSet.add(split.getResultByIndex(index));
+		if(!Filter.equals("."))
+			for(int index=0, len=split.getResultNum(); index<len; index++)
+				FilterSet.add(split.getResultByIndex(index));
 
 		Info = temp[7];
 		if (samplesFilter != null) {
@@ -576,7 +577,7 @@ public class Vcf {
 	 * @return Return true if this VCF instance should be filtered. False else.
 	 */
 	public boolean shouldBeFilteredByFilterLimit(String[] filters) {
-		if (filters == null || FilterSet.contains("PASS"))
+		if (filters == null)// || FilterSet.contains("PASS")) --By Liran
 			return false;
 		for (String f : filters) {
 			if (FilterSet.contains(f))
