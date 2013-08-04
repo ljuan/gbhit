@@ -1034,17 +1034,21 @@ public class EctypalElement {
 			}
 		}
 		
+		//add by Liran for recording variant which has effect
 		String[] transafter=transcription.split(":");
 		if(transafter[0].indexOf("$")>0 && transafter[1].indexOf("$")<0 && v.getEffect()<6)//terminator loss
-			v.setEffect(6); //add by Liran for recording variant which has effect
-		else if(transafter[0].indexOf("$")<0 && transafter[1].indexOf("$")>0 && v.getEffect()<7)//terminator loss
-			v.setEffect(7); //add by Liran for recording variant which has effect
+			v.setEffect(6); 
+		else if(transafter[0].indexOf("$")<0 && transafter[1].indexOf("$")>0 && v.getEffect()<7)//terminator gain
+			v.setEffect(7); 
 		else if(v.getType().hashCode()==hash_INS && v.getEffect()<4)//amino acid insertion
-			v.setEffect(4); //add by Liran for recording variant which has effect
+			v.setEffect(4);
 		else if(v.getType().hashCode()==hash_DEL && v.getEffect()<5)//amino acid deletion
-			v.setEffect(5); //add by Liran for recording variant which has effect
-		else if(v.getType().hashCode()==hash_SNV && v.getEffect()<3)//amino acide substitution
-			v.setEffect(3); //add by Liran for recording variant which has effect
+			v.setEffect(5);
+		else if(v.getType().hashCode()==hash_SNV)
+			if(transafter[0].equals(transafter[1]) && v.getEffect()<2)//synonymous
+				v.setEffect(2); 
+			else if(!transafter[0].equals(transafter[1]) && v.getEffect()<3)//amino acide substitution
+				v.setEffect(3); 
 		
 		return cur.addMultiFromVariant(v.getId(), v.getType(), from, to, transcription);
 	}
