@@ -1,0 +1,962 @@
+﻿<html lang="en">
+	<head>
+		<style type="text/css">
+			body {
+				background: #f6f8f8;
+				cursor: auto;
+				padding-top: 45px;
+			}
+		</style>
+		<script language="JavaScript" type="text/javascript">
+			var url = window.location.href;
+			var pos = url.indexOf("=");
+			var str = url.substring(pos + 1);
+			var titleValue = "Human ";
+			//titleValue = titleValue + str;
+			//window.onload=function(){
+			//document.title=titleValue;
+			//}
+		</script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery-1.7.2-min.js"></script>
+		<link rel="stylesheet" type="text/css" href="./css/imgareaselect-default.css" />
+		<link rel="stylesheet" type="text/css" href="./css/div-line.css" />
+		<link rel="stylesheet" type="text/css" href="./css/track-table.css" />
+		<link rel="stylesheet" type="text/css" href="./css/thickbox.css" media="screen"/>
+		<link rel="stylesheet" type="text/css" href="./css/jquery-ui.css" />
+		<link rel="stylesheet" type="text/css" href="./css/jquery-ui-1.10.2.custom.min.css" />
+		<link rel="stylesheet" type="text/css" href="./css/menu-ui.css" />
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery.imgareaselect.min.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/Concurrent.Thread.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery.imgareaselect.pack.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/trackMove.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jump.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/dragToZoomin.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/thickbox.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery.cookie.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery-ui-1.10.2.custom.min.js"></script>
+		<script language="JavaScript" type="text/javascript">
+			
+			function hideWarnBox() {
+				var warnBox = document.getElementById("errorDiv");
+				warnBox.style.display = "none";
+				warnBox.innerHTML = '';
+			}
+			
+		</script>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title id="browserTitle">Personal Genome Browser</title>
+	</head>
+	<body>
+		<div id="menu-container">
+			<center>
+				<div id="menu-center">
+					<ul>
+						<li id="indsetWindow-li" style="line-height: 42px;" title="individual" class="help-li">
+							<span id="indsetBtn"></span>
+							<span style="font-size: 20px;">Individuals</span>	
+						</li>
+						<li style="line-height: 34px;">
+							<span id="backward"></span>
+							<span id="forward"></span>
+						</li>
+						<li>
+							<div style="height: 27px;padding: 8px 0;">
+								<div style="background: #ffffff;height: 27px;display: inline-block">
+									<div style="height: 21px;display: inline-block;width: 200px;padding: 3px 2px;">
+										<input id="search_field" type="text" placeholder="loation, gene or keyword" style="border: none;height: 21px;width: 200px;"/>
+									</div>
+									<div id="search" style="display:inline;height:21px;padding-right:5px;font-size:15px;" onclick="jump();">
+										Search
+									</div>
+								</div>
+							</div>
+						</li>
+						<li style="line-height: 40px;">
+							<span style="font-size: 20px; float: left;">Zoom:</span>
+							<span id="zoomout" style="float: left;padding-right:3px;padding-left:3px;"></span>
+							<div id="slider-cont" class="ui-widget ui-widget-content ui-corner-all">
+								<div id="slider"></div>
+							</div>
+							<span id="zoomin" style="float: left;padding-left:3px;"></span>
+						</li>
+						<!--<li id="track-manage-li" style="line-height: 42px;">
+							<span id="trackmanage"></span>
+							<span style="font-size: 20px;">track manage</span>
+						</li>-->
+						<li style="line-height: 42px;" title="custom track" alt="#TB_inline?height=315;width=700;inlineId=myOnPageContent" class="thickbox custom-track-li">
+							<span id="customtrack"></span>
+							<span style="font-size: 20px;">Custom track</span>	
+						</li>
+						<li id="helpWindow-li" style="line-height: 42px;" title="help" class="help-li">
+							<span id="helpBtn"></span>
+							<span style="font-size: 20px;">Help</span>	
+						</li>
+					</ul>
+				</div>
+			</center>
+		</div>
+		<center>
+			<div style="width: 1180px;height: 70px;padding-bottom:10px;">
+				<span id="web-icon"></span>
+				<span id="web-name">Personal Genome Browser</span>
+			</div>
+			<div id="track-pannel">
+				<center>
+					<div id="errorDiv" style="border: solid;width: 800px;display: none">
+						<center>
+							Warning/Error(s)
+						</center>
+						<ul id="WarnList"></ul>
+						<center>
+							<button id="hiddenButton" onclick="hideWarnBox()">
+								OK
+							</button>
+							<button id="returnButton" onclick="window.history.back(-1)" style="display: none">
+								Return
+							</button>
+						</center>
+					</div>
+				</center>
+				<center>
+					<br/>
+					<table id="cytobandsTable" style="margin-bottom: 10px;">
+						<tr>
+							<td id="chrNumTd">chr21</td>
+							<td><canvas id="cytobandsCanvas" width="1000px" height="15"></canvas></td>
+							<td ><span id="browseJump">Scan</span></td>
+							<td ><img id="browseJumpIcon2" src="./image/browserJumpIcon.png" style="cursor:pointer;"/><!--<span id="browseJumpIcon"></span>--></td>
+						</tr>
+					</table>
+					
+					<div style="width: 1108px;height: 13px;">
+						<div id="userIndex" style="width: 951px;float: right; border-left: solid 1px #aaa; border-right: solid 1px #aaa;height: 10px;padding-bottom: 3px;">
+							<span id="start_user_label" style="float: left; font-size: 10px;color:#aaa;">33,031,597</span>
+							<span id="end_user_label" style=" float: right; font-size: 10px;color:#aaa;">33,041,570</span>
+							<center>
+								<span id="searchLength_user_label" style="font-size: 10px;color:#aaa;">9,974bp</span>
+							</center>
+						</div>
+					</div>
+					<div id="divTrack">
+						<table id="tableTrack" cellspacing="0">
+							<tr>
+								<td class="trackOperator">
+									<div class="trackOperatorDIV"></div>
+								</td>
+								<td class="trackName"><canvas id="thRefTrack1" width="100" height="50" style="background: #ffffff"></canvas></td>
+								<td class="trackContent"><canvas id="refTrack1" width="2850" height="50" class="canvasTrackcontent" title="shift+click and drag to zoom in"></canvas></td>
+							</tr>
+						</table>
+					</div>
+					<div id="tracksmanageOnmainPannel" style="width:750px;border:none;margin-top:20px;"></div>
+				</center>
+			</div>
+		</center>
+		<div id="verticalLine" style="background: rgba(255,255,255,0);border-right: dotted 1px #000;position: absolute;z-index:48;display: none"></div>
+		<div id="verticalLine2" style="background: rgba(255,255,255,0);border-right: dotted 1px #000;position: absolute;z-index:500;display: none"></div>
+		<span id="indexSpan" style="background: white;border: 1px solid #ADADAD;position: absolute;z-index:49;display: none;font-size: 10px"></span>
+		<div id="myOnPageContent" style="display: none">
+			<div id="tabContentDiv">
+				<ul>
+					<li>
+						<a href="#one_track_tab">add one track</a>
+					</li>
+					<li>
+						<a href="#more_track_tab">add more</a>
+					</li>
+					<li id="removeexternals_li">
+						<a href="#remove_track_tab">remove</a>
+					</li>
+				</ul>
+				<div id="one_track_tab">
+					<center>
+						<table cellspacing="10px" style="font: 14px Arial,Helvetica,sans-serif;">
+							<tr>
+								<td style="text-align: right;">track name</td>
+								<td>
+								<input id="customTrackId" type="text" style="border: solid 1px #A3A3A3"/><span style="color:#777;">(cannot start width "_")</span>
+								</td>
+							</tr>
+							<tr>
+								<td style="text-align: right;">display mode</td>
+								<td>
+								<select id="customTrackDisplayMode" style="border: solid 1px #A3A3A3">
+									<option>hide</option>
+									<option>dense</option>
+									<option>pack</option>
+								</select></td>
+							</tr>
+							<tr>
+								<td style="text-align: right;">data type</td>
+								<td>
+								<select id="customTrackDataType" style="border: solid 1px #A3A3A3">
+									<option>ANNO</option>
+									<option>BAM</option>
+									<option>BB</option>
+									<option>BEDGZ</option>
+									<option>BW</option>
+									<option>GDF</option>
+									<option>GRF</option>
+									<option>GVF</option>
+									<option>VCF</option>
+								</select></td>
+							</tr>
+							<tr style="vertical-align:top">
+								<td style="text-align: right;">data urls</td>
+								<td>
+								<table style="border: solid 1px #A3A3A3">
+									<tr style="vertical-align: top">
+										<td>
+										<table id="urlInfo" style="text-align: center;max-height: 20px; font: 14px Arial,Helvetica,sans-serif">
+											<tr>
+												<td style="background: #446CB3;width: 250px;color:#FFFFFF;">url</td>
+												<td style="background: #446CB3;width: 150px;color:#FFFFFF;">chr</td>
+												<td style="background: #446CB3;width: 50px;color:#FFFFFF;">del</td>
+											</tr>
+											<tr>
+												<td>
+												<input type="text" style="width: 250px;background: #E5E5E5"/>
+												</td>
+												<td>
+												<input type="text" readonly="readonly" name="chrCheckBoxInput" style="width: 150px;background: #E5E5E5" onclick="currentChrSelectInput=this;chrSelectInputClick()"/>
+												</td>
+												<td><img alt="pic" src="./image/delete.png" style="cursor: pointer" onclick="$(this).parent().parent().remove();"/></td>
+											</tr>
+										</table></td>
+										<td style="padding-top: 3px"><img alt="pic" src="./image/sq_plus.png" style="cursor: pointer" onclick="addExternalUrl()"/></td>
+									</tr>
+								</table></td>
+							</tr>
+						</table>
+						<br/>
+						<br/>
+						<table style="font: 14px Arial,Helvetica,sans-serif">
+							<tr>
+								<td style="text-align: center;width: 200px">
+								<input type="button" value="Submit" style="width: 60px;font: 14px Arial,Helvetica,sans-serif" onclick="customTrackSubmit()"/>
+								</td>
+								<td style="text-align: center; width: 200px">
+								<input type="button" value="Clear" style="width: 60px;font: 14px Arial,Helvetica,sans-serif" onclick="clearAllInput()"/>
+								</td>
+							</tr>
+						</table>
+						<div id="chrSelectDiv" style="position: absolute;z-index: 1000;background: #E5E5E5;display: none; border: 1px solid #A3A3A3;font: 14px Arial,Helvetica,sans-serif">
+							<table id="chrSelectTable" style="font: 14px Arial,Helvetica,sans-serif"></table>
+							<input id="checkAll" type="checkbox" onclick="chrCheckAll()">
+							ALL
+							<br/>
+							<input type="button" value="OK" onclick="chrSelectDivOkButton()" style="width: 55px;font: 14px Arial,Helvetica,sans-serif"/>
+							<input type="button" value="Cancel" onclick="chrSelectDivCancelButton()" style="width: 55px;font: 14px Arial,Helvetica,sans-serif"/>
+						</div>
+					</center>
+				</div>
+				<div id="more_track_tab">
+					Paste<span id="customtrackconfigformat" style="cursor:default" title="The format of the configure text is:&#13 tracks=track1,track2&modes=mode1,mode2&types=type1,type2&links=link1,chr1:link2-1;chr2:link2-1;chr3:link2-2;chr4:link2-3;"><I> configure text:</I></span>
+					<div style="margin-top: 5px; margin-bottom: 20px;">
+						<textarea id="uploadfile_configureText" style="width: 100%; height: 168; resize: none" 
+						placeholder="In this box,you can upload more than one track at a time by inputting file URLs. You need to set the four parameters:tracks, modes, types and links. The format of the configure text is:&#13 tracks=track1,track2&modes=mode1,mode2&types=type1,type2&links=link1,chr1:link2-1;chr2:link2-1;chr3:link2-2;chr4:link2-3;"></textarea>
+					</div>
+					<center>
+						<table style="font: 14px Arial,Helvetica,sans-serif">
+							<tr>
+								<td style="text-align: center;width: 200px">
+								<input id="customtrackByconfigSubmitBtn" type="button" value="Submit" style="width: 60px;font: 14px Arial,Helvetica,sans-serif" onclick=""/>
+								</td>
+								<td style="text-align: center; width: 200px">
+								<input id="customtrackByConfigClearBtn" type="button" value="Clear" style="width: 60px;font: 14px Arial,Helvetica,sans-serif" onclick=""/>
+								</td>
+							</tr>
+						</table>
+					</center>
+				</div>
+				<div id="remove_track_tab">
+					<div style="width: 653px; border: solid 1px #A3A3A3;">
+						<div id="externals_container" style="min-height: 166px;">
+							<table>
+								<tr>
+									<td style="width: 217px;"><input type="checkbox"><label style="font-size: 12px;">phastCons_vertebrate</label></td>
+									<td style="width: 217px;"><input type="checkbox"><label style="font-size: 12px;">phastCons_vertebrate</label></td>
+									<td style="width: 217px;"><input type="checkbox"><label style="font-size: 12px;">phastCons_vertebrate</label></td>
+								</tr>
+							</table>
+						</div>
+					
+					<div>
+						<center>
+							<div style="padding-top: 10px; padding-bottom: 10px;"><input id="remove_externals_all" type="checkbox"><label for="remove_externals_all">ALL</label></div>
+						</center>
+					</div>
+					</div>
+					<center>
+						<div style="padding-top: 10px;">
+							<input id="remove_externals_btn" type="button" value="remove selected">
+						</div>
+					</center>
+				</div>
+			</div>
+		</div>
+		<div id="tracksettingDIV" style="display: none"></div>
+		<table id="decoriteminfo" cellspacing="0" cellpadding="0" border="0" onmouseout="document.body.addEventListener('mousedown', decorCanvasLeftclickHide, false);"
+		onmouseover="document.body.removeEventListener('mousedown', decorCanvasLeftclickHide, false);" style="display: none; position: absolute; z-index: 5; left: 1005px; top:
+		611px;">
+			<tbody>
+				<tr>
+					<td align="left"><canvas id="decoriteminfopointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
+				</tr>
+				<tr>
+					<td style="padding:0px;border-radius:4px;-moz-border-radius:4px;overflow:hidden; background:rgba(0,0,0,0.85);
+
+					-moz-box-shadow:5px 5px 5px #888; -webkit-box-shadow:5px 5px 5px #888; box-shadow:5px 5px 5px #888; ">
+					<div id="detailInforLoading" style="height: 30px; padding-top: 20px;">
+						<center>
+							<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
+						</center>
+					</div>
+					<div id="decoriteminfosays" style="color:white;font-size:12px;display:none;">
+						<table cellspacing="0" cellpadding="0" style="width:100%;margin-top:10px;margin-bottom:10px;">
+							<tbody>
+								<tr>
+									<td id="tooltip_symbol" style="color:white;padding-left:10px;padding-right:10px;font:italic bold 18px Georgia;">KIAA1217</td>
+									<td align="right" style="color:white;padding-right:10px;font-size: 12px"><span id="tooltip_id"> uc001irt.4</span><span id="tooltip_geneType" class="clb3" onclick="window.open('http://genome.ucsc.edu/cgi-bin/hgGene?hgg_type=knownGene&db=hg19&hgg_gene=uc001irt.4')"> UCSC <span style="font-size:14px">↗</span> </span></td>
+								</tr>
+								<tr>
+									<td id="tooltip_scale" style="color:white;padding:10px;padding-top:0px;font-size: 12px" colspan="2">chr10:24497719-24836772 forward</td>
+								</tr>
+								<tr>
+									<td style="border-top:solid 1px #A46C96;border-bottom:solid 1px #8F5A82;" colspan="2">
+									<div id="hook39" onmouseout="this.style.backgroundColor='transparent'" onmouseover="this.style.backgroundColor='rgb(122,122,122)'" style="color: white; cursor: pointer; padding-
+
+									left: 20px; padding-right: 10px; background-color: transparent; font-size: 12px" onclick="toggle39()">
+										⊞ show gene structure
+									</div>
+									<div id="bait39" style="color:#D6B8CE;display:none;padding-left:20px;padding-right:10px;font-size: 12px">
+										5' UTR: 403 bp, 24497719-24498122
+										<br>
+										3' UTR: 1519 bp, 24835253-24836772
+										<br>
+										17 exons
+										<div style="color:#D6B8CE;height:140px;overflow-y:scroll; font-size: 12px">
+											<ol>
+												<li>
+													70 bp, 24498122-24498192
+												</li>
+												<li>
+													284 bp, 24508554-24508838
+												</li>
+												<li>
+													199 bp, 24669797-24669996
+												</li>
+												<li>
+													199 bp, 24721923-24722122
+												</li>
+												<li>
+													94 bp, 24727314-24727408
+												</li>
+												<li>
+													833 bp, 24762156-24762989
+												</li>
+												<li>
+													50 bp, 24784075-24784125
+												</li>
+												<li>
+													167 bp, 24790307-24790474
+												</li>
+												<li>
+													176 bp, 24802187-24802363
+												</li>
+												<li>
+													131 bp, 24809051-24809182
+												</li>
+												<li>
+													148 bp, 24810710-24810858
+												</li>
+												<li>
+													442 bp, 24813251-24813693
+												</li>
+												<li>
+													184 bp, 24816864-24817048
+												</li>
+												<li>
+													164 bp, 24820758-24820922
+												</li>
+												<li>
+													168 bp, 24821998-24822166
+												</li>
+												<li>
+													123 bp, 24833909-24834032
+												</li>
+												<li>
+													498 bp, 24834755-24835253
+												</li>
+											</ol>
+										</div>
+									</div></td>
+								</tr>
+							</tbody>
+						</table>
+					</div><div id="decoriteminfosaysajax" style="margin: 10px; color: white; font-size: 12px; width: 300px;"></div></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<table id="variantDetailTooltip" cellspacing="0" cellpadding="0" border="0" style="position:absolute;display:none;z-index:51;border-collapse: collapse;">
+			<tbody>
+				<tr>
+					<td align="left"><canvas id="variantDetailTooltipPointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
+				</tr>
+				<tr>
+					<td style="background: rgba(0,0,0,0.85); border-radius:4px; -moz-border-radius:4px; -moz-box-shadow:5px 5px 5px #888; -webkit-box-shadow:5px 5px 5px #888; box-shadow:5px 5px 5px #888;">
+						<div id="variantDetailLoading" style="height: 30px; padding-top: 15px; width: 300px;">
+							<center>
+								<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
+							</center>
+						</div>
+						<div id="variantDetailContent" style="padding: 10px; display: none;">
+							<table id="variantDetailContentTable" style="color: #FFFFFF;border-collapse: collapse;">
+								<tr>
+									<td  colspan="2">
+										<span id="variantDetailContent_id" style="color:white;font:italic bold 18px Georgia;">rs17883296</span>
+										<span id="variantDetailContent_link" class="clb3" style="float:right; margin-left:30px;">dbSNP</span>
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										Scale:
+									</td>
+									<td id="variantDetailContent_scale" valign="top">
+										chr21:33031822-33031822
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px;">
+									<td valign="top" id="variantDetailContent_Type">
+										Type:
+									</td>
+									<td valign="top" id="variantDetailContent_Type_Content">
+										SNV
+									</td>
+								</tr>
+								<tr id="variantDetailContent_Letter_trNode" style="color:white;font-size: 12px;">
+									<td valign="top">
+										Letter:
+									</td>
+									<td valign="top" id="variantDetailContent_Letter_Content">
+										T
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										QUAL:
+									</td>
+									<td valign="top" id="variantDetailContent_QUAL_Content">
+										-1.0
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										FILTER:
+									</td>
+									<td valign="top" id="variantDetailContent_FILTER_Content">
+										.
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										INFO:
+									</td>
+									<td valign="top">
+										<div id="variantDetailContent_INFO_Content" style="width: 300px; height: 45px; overflow: auto">
+											RSPOS=33031822;GMAF=0.0046;dbSNPBuildID=124;SSR=0;SAO=0;VP=050000020001040116000100;GENEINFO=SOD1:6647;WGT=1;VC=SNV;R5;VLD;GNO;KGPhase1;KGPROD;OTHERKG;POPFREQ=693(176/88):0.00568181818181818(1/1),15085(122/61):0(0/0),15086(170/85):0(0/0),15087(194/97):0(0/0),15088(200/100):0(0/0),15089(186/93):0(0/0),15090(178/89):0(0/0),15091(178/89):0(0/0),15092(188/94):0.0425531914893617(8/8),15093(128/64):0(0/0),15094(110/55):0(0/0),15095(196/98):0(0/0),15096(176/88):0.0113636363636364(2/2),15147(2174/1087):0.00459981600735971(10/10),15152(120/60):0(0/0),15153(28/14):0(0/0)
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<table id="readDetailTooltip" cellspacing="0" cellpadding="0" border="0" style="position: absolute; display: none; border-collapse: collapse;">
+			<tbody>
+				<tr>
+					<td align="left"><canvas id="readDetailTooltipPointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
+				</tr>
+				<tr>
+					<td style="background: rgba(0,0,0,0.85); border-radius:4px; -moz-border-radius:4px; -moz-box-shadow:5px 5px 5px #888; -webkit-box-shadow:5px 5px 5px #888; box-shadow:5px 5px 5px #888;">
+						<div id="readDetailLoading" style="height: 30px; padding-top: 15px; width: 300px;">
+							<center>
+								<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
+							</center>
+						</div>
+						<div id="readDetailContent" style="padding: 10px;display: none;">
+							<table id="readDetailContentTable" style="color: #FFFFFF">
+								<tr>
+									<td id="readDetailContent_id" style="color:white;font:italic bold 12px Georgia;" colspan="2">
+										100327_2_HWI-EAS435:1:2:105:4763:20231
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										Scale:
+									</td>
+									<td id="readDetailContent_scale" valign="top">
+										chr21:33031822-33031822
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<table id="repeatMaskDetailTooltip" cellspacing="0" cellpadding="0" border="0" style="position:absolute;display:none;z-index:51;border-collapse: collapse;">
+			<tbody>
+				<tr>
+					<td align="left"><canvas id="repeatMaskDetailTooltipPointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
+				</tr>
+				<tr>
+					<td style="background: rgba(0,0,0,0.85); border-radius:4px; -moz-border-radius:4px; -moz-box-shadow:5px 5px 5px #888; -webkit-box-shadow:5px 5px 5px #888; box-shadow:5px 5px 5px #888;">
+						<div id="repeatMaskDetailLoading" style="height: 30px; padding-top: 15px; width: 300px;">
+							<center>
+								<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
+							</center>
+						</div>
+						<div id="repeatMaskDetailContent" style="padding: 10px; display: none;">
+							<table id="repeatMaskDetailContentTable" style="color: #FFFFFF;border-collapse: collapse;">
+								<tr>
+									<td id="repeatMaskDetailContent_id" style="color:white;font:italic bold 18px Georgia;" colspan="2">
+										rs17883296
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										Scale:
+									</td>
+									<td id="repeatMaskDetailContent_scale" valign="top">
+										chr21:33031822-33031822
+									</td>
+								</tr>
+								<tr id="repeatMaskDetailContent_direction_trNode" style="color:white;font-size: 12px;">
+									<td valign="top" id="repeatMaskDetailContent_direction">
+										Direction:
+									</td>
+									<td valign="top" id="repeatMaskDetailContent_direction_Content">
+										+
+									</td>
+								</tr>
+								<tr id="repeatMaskDetail_color_trNode" style="color:white;font-size: 12px;">
+									<td valign="top">
+										Color:
+									</td>
+									<td valign="top" id="repeatMaskDetail_color_content">
+										0,0,0
+									</td>
+								</tr>
+								<tr id="repeatMaskDetail_Des_trNode" style="color:white;font-size: 12px;">
+									<td valign="top" style="width:50px;">
+										Description:
+									</td>
+									<td valign="top" id="repeatMaskDetail_Des_content" style="width:400px;word-break:break-all;">
+										0,0,0
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div id="personalPannel">
+			<div id="personalPannelTitle">
+				<div id="ppTitle">
+					personal genome
+				</div>
+				<div id="ppClose">
+					<span id="ppCloseBtn">Close</span>
+				</div>
+				<div id="ppMin">
+					<span id="ppMinBtn">Min</span>
+				</div>
+				<div id="ppSet">
+					<span id="ppSetBtn">Setting</span>
+				</div>
+			</div>
+			<div id="ppContent">
+				<table id="ppTrackTable"></table>
+			</div>
+			<table id="variantDetailTooltipOnPP" cellspacing="0" cellpadding="0" border="0" style="position:absolute;display:none;z-index:51;border-collapse: collapse;">
+			<tbody>
+				<tr>
+					<td align="left"><canvas id="variantDetailTooltipPointerOnPP" style="margin-left:4px;" height="9" width="17"></canvas></td>
+				</tr>
+				<tr>
+					<td style="background: rgba(0,0,0,0.85); border-radius:4px; -moz-border-radius:4px; -moz-box-shadow:5px 5px 5px #888; -webkit-box-shadow:5px 5px 5px #888; box-
+
+shadow:5px 5px 5px #888;">
+						<div id="variantDetailLoadingOnPP" style="height: 30px; padding-top: 15px; width: 300px;">
+							<center>
+								<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
+							</center>
+						</div>
+						<div id="variantDetailContentOnPP" style="padding: 10px; display: none;">
+							<table id="variantDetailContentTableOnPP" style="color: #FFFFFF;border-collapse: collapse;">
+								<tr>
+									<td  colspan="2">
+										<span id="variantDetailContent_idOnPP" style="color:white;font:italic bold 18px Georgia;">rs17883296</span>
+										<span id="variantDetailContent_linkOnPP" class="clb3" style="float:right; margin-left:30px;">dbSNP</span>
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										Scale:
+									</td>
+									<td id="variantDetailContent_scaleOnPP" valign="top">
+										chr21:33031822-33031822
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px;">
+									<td valign="top" id="variantDetailContent_TypeOnPP">
+										Type:
+									</td>
+									<td valign="top" id="variantDetailContent_Type_ContentOnPP">
+										SNV
+									</td>
+								</tr>
+								<tr id="variantDetailContent_Mate_trNodeOnPP" style="color:white;font-size: 12px;">
+									<td valign="top" id="variantDetailContent_MateOnPP">
+										Mate:
+									</td>
+									<td valign="top" id="variantDetailContent_Mate_ContentOnPP">
+										12345
+									</td>
+								</tr>
+								<tr id="variantDetailContent_Letter_trNodeOnPP" style="color:white;font-size: 12px;">
+									<td valign="top">
+										Letter:
+									</td>
+									<td valign="top" id="variantDetailContent_Letter_ContentOnPP">
+										T
+									</td>
+								</tr>
+								<tr id="variantDetailContent_dbSNPID_trNodeOnPP" style="color:white;font-size: 12px;">
+									<td valign="top">
+										dbsnpID:
+									</td>
+									<td valign="top" id="variantDetailContent_dbSNPID_ContentOnPP">
+										T
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										QUAL:
+									</td>
+									<td valign="top" id="variantDetailContent_QUAL_ContentOnPP">
+										-1.0
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										FILTER:
+									</td>
+									<td valign="top" id="variantDetailContent_FILTER_ContentOnPP">
+										.
+									</td>
+								</tr>
+								<tr style="color:white;font-size: 12px">
+									<td valign="top">
+										INFO:
+									</td>
+									<td valign="top">
+										<div id="variantDetailContent_INFO_ContentOnPP" style="width: 300px; height: 45px; overflow: auto">
+											RSPOS=33031822;GMAF=0.0046;dbSNPBuildID=124;SSR=0;SAO=0;VP=050000020001040116000100
+										</div>
+									</td>
+								</tr>
+								<tr id="variantDetailContent_dbSNPAnno_trNodeOnPP" style="color:white;font-size: 12px">
+									<td valign="top">
+										dbSNPAnno:
+									</td>
+									<td valign="top" id="variantDetailContent_dbSNPAnno_ContentOnPP" style="width:300px; word-break: break-all;">
+										RSPOS=33031822;GMAF=0.0046;dbSNPBuildID=124;SSR=0;SAO=0;VP=050000020001040116000100
+									</td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<table id="personalGeneDetail" cellspacing="0" cellpadding="0" border="0"  style="display: none; position: absolute; z-index: 51; left: 1005px; top:
+		611px;">
+			<tbody>
+				<tr>
+					<td align="left"><canvas id="personalGeneDetailPointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
+				</tr>
+				<tr>
+					<td style="padding:0px;border-radius:4px;-moz-border-radius:4px;overflow:hidden; background:rgba(0,0,0,0.85);
+
+					-moz-box-shadow:5px 5px 5px #888; -webkit-box-shadow:5px 5px 5px #888; box-shadow:5px 5px 5px #888; ">
+					<div id="personalGeneDetailLoading" style="height: 30px; padding-top: 20px;">
+						<center>
+							<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
+						</center>
+					</div>
+					<div id="personalGeneDetailInfor" style="color:white;font-size:12px;display:none;">
+						<table cellspacing="0" cellpadding="0" style="width:100%;margin-top:10px;margin-bottom:10px;">
+							<tbody>
+								<tr>
+									<td id="personalGeneDetailSymbol" style="color:white;padding-left:10px;padding-right:10px;font:italic bold 18px Georgia;">KIAA1217</td>
+									<td id="personalGeneDetail-ID" align="right" style="color:white;padding-right:10px;font-size: 12px">12345</td>
+								</tr>
+								<tr>
+									<td id="personalGeneDetailScale" style="color:white;padding:10px;padding-top:0px;font-size: 12px" colspan="2">chr10:24497719-24836772 forward</td>
+								</tr>
+								<tr>
+									<td style="border-top:solid 1px #A46C96;border-bottom:solid 1px #8F5A82;" colspan="2">
+									<div id="personalGeneDetail-showGeneStructBtn" onmouseout="this.style.backgroundColor='transparent'" onmouseover="this.style.backgroundColor='rgb(122,122,122)'" style="color: white; cursor: pointer; padding-left: 20px; padding-right: 10px; background-color: transparent; font-size: 12px" onclick="personalGeneStructureShow()">
+										⊞ show gene structure
+									</div>
+									<div id="personalGeneDetail-geneStruct" style="color:#D6B8CE;display:none;padding-left:20px;padding-right:10px;font-size: 12px">
+										5' UTR: 403 bp, 24497719-24498122
+										<br>
+										3' UTR: 1519 bp, 24835253-24836772
+										<br>
+										17 exons
+										<div style="color:#D6B8CE;height:140px;overflow-y:scroll; font-size: 12px">
+											<ol>
+												<li>
+													70 bp, 24498122-24498192
+												</li>
+												<li>
+													284 bp, 24508554-24508838
+												</li>
+												<li>
+													199 bp, 24669797-24669996
+												</li>
+											</ol>
+										</div>
+									</div></td>
+								</tr>
+								<tr id="personalGeneDetailVariantTrnode">
+									<td style="border-bottom:solid 1px #8F5A82;" colspan="2">
+										<div id="personalGeneDetail-showVariantsBtn" onmouseout="this.style.backgroundColor='transparent'" onmouseover="this.style.backgroundColor='rgb(122,122,122)'" style="color: white; cursor: pointer; padding-left: 20px; padding-right: 10px; background-color: transparent; font-size: 12px" onclick="personalGeneVariantShow()">
+											⊞ show variants
+										</div>
+										<div id="personalGeneDetail-variants" style="color:#D6B8CE;display:none;padding-left:20px;padding-right:10px;font-size: 12px">
+											5 variants
+											<div style="color:#D6B8CE;height:50px;overflow-y:scroll; font-size: 12px">
+												<ol>
+													<li>
+														70 bp, 24498122-24498192
+													</li>
+													<li>
+														284 bp, 24508554-24508838
+													</li>
+													<li>
+														199 bp, 24669797-24669996
+													</li>
+												</ol>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr id="personalGeneDetailStatusTrnode">
+									<td style="border-bottom:solid 1px #8F5A82;" colspan="2">
+										<div id="personalGeneDetail-showStatusBtn" onmouseout="this.style.backgroundColor='transparent'" onmouseover="this.style.backgroundColor='rgb(122,122,122)'" style="color: white; cursor: pointer; padding-left: 20px; padding-right: 10px; background-color: transparent; font-size: 12px" onclick="personalGeneStatusShow()">
+											⊞ show statuses
+										</div>
+										<div id="personalGeneDetail-status" style="color:#D6B8CE;display:none;padding-left:20px;padding-right:10px;font-size: 12px">
+											2 statuses
+											<div style="color:#D6B8CE;height:50px;overflow-y:scroll; font-size: 12px">
+												<ol>
+													<li>
+														70 bp, 24498122-24498192
+													</li>
+													<li>
+														284 bp, 24508554-24508838
+													</li>
+												</ol>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div style="margin: 10px; color: white; font-size: 12px; width: 300px;"></div></td>
+				</tr>
+			</tbody>
+		</table>
+		</div>
+		<div id="personalPannelSetting">
+			<div id="personalPannelSettingTitle">
+				<div id="ppsTitle">
+					personal tracks setting
+				</div>
+				<div id="ppsClose">
+					<span id="ppsCloseBtn">close</span>
+				</div>
+			</div>
+			<div id="ppsContent">
+				<center style="padding-top: 30px;padding-bottom: 30px;">
+<!--					<div id="PvarSet">
+						<div id="PvarSetTitle" onclick="pvarSetToggle()">
+							<span id="PvarSetTitleStr">Personal Variants</span>
+							<div id="PvarSetTitleIcon"></div>
+						</div>
+						<div id="PvarSetContent">
+							<table id="PvarTable"></table>
+						</div>
+					</div> -->
+					<div id="PfannoSet">
+						<div id="PfannoSetTitle" onclick="pfannoSetToggle()">
+							<span id="PfannoSetTitleStr">Individual Functional Elements</span>
+							<div id="PfannoSetTitleIcon"></div>
+						</div>
+						<div id="PfannoSetContent">
+							<table id="PfannoTable"></table>
+							<input id="PfannoSetClrBtn" type="button" value="clear"/>
+						</div>
+					</div>
+					<div id="PannoSet">
+						<div id="PannoSetTitle" onclick="pannoSetToggle()">
+							<span id="PannoSetTitleStr">Individual Genes</span>
+							<div id="PannoSetTitleIcon"></div>
+						</div>
+						<div id="PannoSetContent">
+							<table id="PannoTable"></table>
+							<input id="PannoSetClrBtn" type="button" value="clear"/>
+						</div>
+					</div>
+					<div id="PclnsSet">
+						<div id="PclnsSetTitle" onclick="pclnsSetToggle()">
+							<span id="PclnsSetTitleStr">Individual Phenotype</span>
+							<div id="PclnsSetTitleIcon"></div>
+						</div>
+						<div id="PclnsSetContent">
+							<table id="PclnsTable"></table>
+							<input id="PclnsSetClrBtn" type="button" value="clear"/>
+						</div>
+					</div>
+				</center>
+			</div>
+		</div>
+		<div id="trackItems_setting">
+			<div id="trackItems_setting_title">
+				<div id="ts_title">
+					tracks setting
+				</div>
+				<div id="ts_close">
+					<span id="ts_closeBtn">close</span>
+				</div>
+			</div>
+			<div id="ts_content">
+				
+			</div>
+		</div>
+		<div id="overlayDIV" class="overlayStyle"></div>
+		<div id="helpWindow">
+			<div id="helpWindow_title">
+				<div id="HW_title">
+					Help
+				</div>
+				<div id="HW_close">
+					<span id="HW_closeBtn">Close</span>
+				</div>
+			</div>
+			<div id="HW_content">
+				<img src="./image/help2.png" alt="pic" />
+			</div>
+		</div>
+		<div id="helpWindow_overlayDIV" class="overlayStyle"></div>
+		<div id="indsetWindow">
+			<div id="indsetWindow_title">
+				<div id="IW_title">
+					Set Individual	
+				</div>
+				<div id="IW_close">
+					<span id="IW_closeBtn">Close</span>
+				</div>
+			</div>
+			<div id="IW_content">
+				<!--content to be imported-->	
+			</div>
+		</div>
+		<div id="indsetWindow_overlayDIV" class="overlayStyle"></div>
+		<div id="browseJumpWindow">
+			<div id="browseJumpWindow_title">
+				<div id="BJW_title">
+					Functional Scan 
+				</div>
+				<div id="BJW_close">
+					<span id="BJW_closeBtn">Close</span>
+				</div>
+			</div>
+			<div id="BJW_stat" style="width:790px;float:left;">
+				<input id="get_stat" type="submit" onclick="BJW_getStat()" value="Save scan result"/>
+				<input id="up_stat" type="submit" onclick="BJW_upStat()" value="Upload scan result"/>
+				<input id="file_field" type="file" placeholder="upload stat file"/>
+				<span id="upload_success"></span>
+			</div>
+			<div id="BJW_content">
+				<div id="BJW_genome" style="width:600px; float:left"></div>
+				<div id="BJW_genelist" style="width:170px; max-height:570px; overflow:auto; float:left"></div>
+				<!--content to be imported-->	
+			</div>
+		</div>
+		<div id="browseJumpWindow_overlayDIV" class="overlayStyle"></div>
+		<img id="imgSNV_A" class="displayHide" src="./image/imgSNV_A.png" alt="pic" />
+		<img id="imgSNV_C" class="displayHide" src="./image/imgSNV_C.png" alt="pic" />
+		<img id="imgSNV_G" class="displayHide" src="./image/imgSNV_G.png" alt="pic" />
+		<img id="imgSNV_T" class="displayHide" src="./image/imgSNV_T.png" alt="pic" />
+		<img id="imgDEL" class="displayHide" src="./image/imgDEL.png" alt="pic" />
+		<img id="imgINS" class="displayHide" src="./image/imgINS.png" alt="pic" />
+		<img id="imgCNV" class="displayHide" src="./image/imgCNV.png" alt="pic" />
+		<img id="imgDUP" class="displayHide" src="./image/imgDUP.png" alt="pic" />
+		<img id="imgINV" class="displayHide" src="./image/imgINV.png" alt="pic" />
+		<img id="imgBLS" class="displayHide" src="./image/imgBLS.png" alt="pic" />
+		<img id="imgOTH" class="displayHide" src="./image/imgOTH.png" alt="pic" />
+		<img id="img_A" class="displayHide" src="./image/A.png" alt="pic" />
+		<img id="img_B" class="displayHide" src="./image/B.png" alt="pic" />
+		<img id="img_C" class="displayHide" src="./image/C.png" alt="pic" />
+		<img id="img_D" class="displayHide" src="./image/D.png" alt="pic" />
+		<img id="img_E" class="displayHide" src="./image/E.png" alt="pic" />
+		<img id="img_F" class="displayHide" src="./image/F.png" alt="pic" />
+		<img id="img_G" class="displayHide" src="./image/G.png" alt="pic" />
+		<img id="img_H" class="displayHide" src="./image/H.png" alt="pic" />
+		<img id="img_I" class="displayHide" src="./image/I.png" alt="pic" />
+		<img id="img_J" class="displayHide" src="./image/J.png" alt="pic" />
+		<img id="img_K" class="displayHide" src="./image/K.png" alt="pic" />
+		<img id="img_L" class="displayHide" src="./image/L.png" alt="pic" />
+		<img id="img_M" class="displayHide" src="./image/M.png" alt="pic" />
+		<img id="img_N" class="displayHide" src="./image/N.png" alt="pic" />
+		<img id="img_O" class="displayHide" src="./image/O.png" alt="pic" />
+		<img id="img_P" class="displayHide" src="./image/P.png" alt="pic" />
+		<img id="img_Q" class="displayHide" src="./image/Q.png" alt="pic" />
+		<img id="img_R" class="displayHide" src="./image/R.png" alt="pic" />
+		<img id="img_S" class="displayHide" src="./image/S.png" alt="pic" />
+		<img id="img_T" class="displayHide" src="./image/T.png" alt="pic" />
+		<img id="img_U" class="displayHide" src="./image/U.png" alt="pic" />
+		<img id="img_V" class="displayHide" src="./image/V.png" alt="pic" />
+		<img id="img_W" class="displayHide" src="./image/W.png" alt="pic" />
+		<img id="img_Y" class="displayHide" src="./image/Y.png" alt="pic" />
+		<img id="img_Z" class="displayHide" src="./image/Z.png" alt="pic" />
+		<img id="imgDEL_AA" class="displayHide" src="./image/imgDEL_AA.png" alt="pic" />
+		<img id="imgINS_AA" class="displayHide" src="./image/imgINS_AA.png" alt="pic" />
+		<img id="imgOTH_AA" class="displayHide" src="./image/imgOTH_AA.png" alt="pic" />
+		<img id="imgStart" class="displayHide" src="./image/start.png" alt="pic" />
+		<img id="imgStart2" class="displayHide" src="./image/start2.png" alt="pic" />
+		<img id="imgStop" class="displayHide" src="./image/stop.png" alt="pic" />
+		<img id="imgStop2" class="displayHide" src="./image/stop2.png" alt="pic" />
+		<img id="imgASS" class="displayHide" src="./image/ASS.png" alt="pic" />
+		<img id="imgDSS" class="displayHide" src="./image/DSS.png" alt="pic" />
+		<img id="imgShift" class="displayHide" src="./image/shift.png" alt="pic" />
+		<img id="bkgImg_shift" class="displayHide" src="./image/bkgImg_shift.png" alt="pic" />
+		<img id="bkgImg_pshift" class="displayHide" src="./image/bkgImg_pshift.png" alt="pic" />
+		<img id="imgStatus" class="displayHide" src="./image/imgStatus.png" alt="pic" />
+		<div id="select_info" class="ui-front ui-corner-all" style="display:none; position: absolute; border: 1px #ccc solid"> </div>
+		<script language="JavaScript" type="text/javascript" src="./scripts/raphael-min.js"></script>
+	</body>
+</html>
