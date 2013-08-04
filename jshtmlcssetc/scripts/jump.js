@@ -41,6 +41,7 @@ var xmlParamSample= "Samples";
 
 var xmlAttributeId = "id";
 var xmlAttributeType = "Y";
+var xmlAttributeEffect = "e";//added by Liran for recording variant effect
 var xmlAttribute_gieStain = "gS";
 var xmlAttributeSymbol = "Symbol";
 var xmlAttribute_dbSNPID = "dd";
@@ -2153,6 +2154,20 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 	imgSNV_C = document.getElementById("imgSNV_C");
 	imgSNV_G = document.getElementById("imgSNV_G");
 	imgSNV_T = document.getElementById("imgSNV_T");
+/////color code variant by effect --Liran
+	var imgDELe, imgINSe, imgSNVe, imgCNVe, imgDUPe, imgINVe, imgBLSe, imgOTHe, imgSNV_Ae, imgSNV_Ce, imgSNV_Ge, imgSNV_Te;
+	imgINSe = document.getElementById("imgINSe");
+	imgDELe = document.getElementById("imgDELe");
+	imgCNVe = document.getElementById("imgCNVe");
+	imgDUPe = document.getElementById("imgDUPe");
+	imgINVe = document.getElementById("imgINVe");
+	imgBLSe = document.getElementById("imgBLSe");
+	imgOTHe = document.getElementById("imgOTHe");
+	imgSNV_Ae = document.getElementById("imgSNV_Ae");
+	imgSNV_Ce = document.getElementById("imgSNV_Ce");
+	imgSNV_Ge = document.getElementById("imgSNV_Ge");
+	imgSNV_Te = document.getElementById("imgSNV_Te");
+/////color code variant by effect --Liran
 
 	for( i = 0; i < variantNodes.length; i++) {
 		variantIds[i] = variantNodes[i].getAttribute(xmlAttributeId);
@@ -2317,35 +2332,39 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 									personalPannel.Pvar.details[packVariants[i][j]].bottom = y + imgHeight;
 								}
 							}
+							var variantEffect = variantNodes[packVariants[i][j]].getAttribute(xmlAttributeEffect);
+							if (!variantEffect){
+								variantEffect = 0;
+							}
 							if(variantTypes[packVariants[i][j]] == variantType_SNV) {
 								switch(variantNodes[packVariants[i][j]].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue) {
 									case "A":
-										imgSNV = imgSNV_A;
+										imgSNV = variantEffect>2 ? imgSNV_Ae : imgSNV_A;
 										break;
 									case "C":
-										imgSNV = imgSNV_C;
+										imgSNV = variantEffect>2 ? imgSNV_Ce : imgSNV_C;
 										break;
 									case "G":
-										imgSNV = imgSNV_G
+										imgSNV = variantEffect>2 ? imgSNV_Ge : imgSNV_G;
 										break;
 									default:
-										imgSNV = imgSNV_T;
+										imgSNV = variantEffect>2 ? imgSNV_Te : imgSNV_T;
 								}
 								ctx2.drawImage(imgSNV, imgFroms[packVariants[i][j]], y);
 							} else if(variantTypes[packVariants[i][j]] == variantType_INSERTION) {
-								ctx2.drawImage(imgINS, imgFroms[packVariants[i][j]], y);
+								ctx2.drawImage(variantEffect>2 ? imgINSe : imgINS, imgFroms[packVariants[i][j]], y);
 							} else if(variantTypes[packVariants[i][j]] == variantType_DELETION) {
-								ctx2.drawImage(imgDEL, imgFroms[packVariants[i][j]], y);
+								ctx2.drawImage(variantEffect>2 ? imgDELe : imgDEL, imgFroms[packVariants[i][j]], y);
 							} else if(variantTypes[packVariants[i][j]] == variantType_CNV) {
-								ctx2.drawImage(imgCNV, imgFroms[packVariants[i][j]], y);
+								ctx2.drawImage(variantEffect>2 ? imgCNVe : imgCNV, imgFroms[packVariants[i][j]], y);
 							} else if(variantTypes[packVariants[i][j]] == variantType_DUPLICATION) {
-								ctx2.drawImage(imgDUP, imgFroms[packVariants[i][j]], y);
+								ctx2.drawImage(variantEffect>2 ? imgDUPe : imgDUP, imgFroms[packVariants[i][j]], y);
 							} else if(variantTypes[packVariants[i][j]] == variantType_INVERSION) {
-								ctx2.drawImage(imgINV, imgFroms[packVariants[i][j]], y);
+								ctx2.drawImage(variantEffect>2 ? imgINVe : imgINV, imgFroms[packVariants[i][j]], y);
 							} else if(variantTypes[packVariants[i][j]] == variantType_BLS) {
-								ctx2.drawImage(imgBLS, imgFroms[packVariants[i][j]], y);
+								ctx2.drawImage(variantEffect>2 ? imgBLSe : imgBLS, imgFroms[packVariants[i][j]], y);
 							} else {
-								ctx2.drawImage(imgOTH, imgFroms[packVariants[i][j]], y);
+								ctx2.drawImage(variantEffect>2 ? imgOTHe : imgOTH, imgFroms[packVariants[i][j]], y);
 							}
 							
 							ctx2.fillText(variantIds[packVariants[i][j]], imgFroms[packVariants[i][j]] - ctx2.measureText(variantIds[packVariants[i][j]]).width, y + imgHeight - 2);
