@@ -167,6 +167,7 @@ public class EctypalElements {
 				int minus = (v.getType().equals(VARIANT_TYPE_INSERTION)) ? 1 : 0;
 				if (v.getFrom() >= cur.from - minus && v.getFrom() <= cur.to) {
 					ca2vs.add(cur);
+					v.setEffect(1);//add by Liran for record which variant has effect
 					if (index == size)
 						break;
 					i--;
@@ -174,6 +175,7 @@ public class EctypalElements {
 				}
 			} else if (EctypalSubElement.overlap(v.getFrom(), v.getTo(), cur.from, cur.to)) {
 				ca2vs.add(cur);
+				v.setEffect(1);//add by Liran for record which variant has effect
 				if (index == size)
 					break;
 				i--;

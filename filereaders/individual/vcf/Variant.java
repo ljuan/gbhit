@@ -37,6 +37,23 @@ public class Variant implements Comparable<Variant> {
 	private String description;// Tag
 	private String homo;// //Attribute
 	private String dbsnpInfo;// Tag
+	
+	private int effect = 0;//Attribute --added by Liran for record variant which has effect
+	/*
+	 * 0 - no effect
+	 * 1 - in regulation area
+	 * 2 - synonymous
+	 * 3 - amino acid substitution
+	 * 4 - amino acid insertion
+	 * 5 - amino acid deletion
+	 * 6 - terminator loss
+	 * 7 - terminator gain
+	 * 8 - dss loss
+	 * 9 - ass loss
+	 * 10 - frame shift
+	 * 11 - initiator loss
+	 * 12 - exon breaking SV
+	 */
 
 	public Variant() {
 		this.homo = "";
@@ -115,7 +132,7 @@ public class Variant implements Comparable<Variant> {
 	public void setDbsnpid(String dbsnpid) {
 		this.dbsnpid = dbsnpid;
 	}
-
+	
 	public String getType() {
 		return type;
 	}
@@ -164,6 +181,14 @@ public class Variant implements Comparable<Variant> {
 		return this.dbsnpInfo;
 	}
 	
+	public void setEffect(int effect){
+		this.effect=effect;
+	}
+	
+	public int getEffect(){
+		return this.effect;
+	}
+
 	/**
 	 * Write to xml in an Variants element of BAMRecords.
 	 * 
@@ -191,6 +216,8 @@ public class Variant implements Comparable<Variant> {
 			v.setAttribute(Consts.XML_TAG_DBSNPID, dbsnpid);
 		if (!"".equals(homo))
 			v.setAttribute(XML_TAG_HOMO, homo);
+		if (effect!=0)
+			v.setAttribute(XML_TAG_EFFECT, String.valueOf(effect));
 		XmlWriter.append_text_element(doc, v, XML_TAG_FROM, from + "");
 		XmlWriter.append_text_element(doc, v, XML_TAG_TO, to + "");
 		if (letter != null && outputLetter)
@@ -201,7 +228,7 @@ public class Variant implements Comparable<Variant> {
 			XmlWriter.append_text_element(doc, v, XML_TAG_DIRECTION, direction);
 		if (description != null)
 			XmlWriter.append_text_element(doc, v, XML_TAG_DESCRIPTION, description);
-		if(dbsnpInfo != null)
+		if (dbsnpInfo != null)
 			XmlWriter.append_text_element(doc, v, XML_TAG_DBSNP, dbsnpInfo);
 	}
 	

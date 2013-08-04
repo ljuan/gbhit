@@ -1,5 +1,10 @@
 package filereaders.individual;
 
+import static filereaders.Consts.XML_TAG_ID;
+import static filereaders.Consts.XML_TAG_IFP;
+import static filereaders.Consts.XML_TAG_SUPERID;
+import static filereaders.Consts.XML_TAG_VARIANTS;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +15,7 @@ import org.w3c.dom.NodeList;
 
 import filereaders.FastaReader;
 import filereaders.individual.vcf.Variant;
+import filereaders.tools.StringSplit;
 
 
 
@@ -77,6 +83,7 @@ public class VariantAnalysis {
 			EctypalElements ee = new EctypalElements(doc, fr, elements, ctrlAreas, chr, false);
 			first = firstList.size() > 0 ? ee.deal(firstList) : ee.write2XML();
 
+			remerge(firstList,null);
 			return new Element[]{ first };
 		}else{
 			List<Variant> firstList = (List<Variant>)divide[0];
@@ -86,6 +93,7 @@ public class VariantAnalysis {
 			EctypalElements ee2 = new EctypalElements(doc, fr, elements, ctrlAreas, chr, true);
 			second = secondList.size() > 0 ? ee2.deal(secondList) : ee2.write2XML();
 
+			remerge(firstList,secondList);
 			return new Element[]{ first, second };
 		}
 		
@@ -95,6 +103,42 @@ public class VariantAnalysis {
 		EctypalElements ee = new EctypalElements(doc, fr, elements, ctrlAreas, chr, false);
 		return firstList.size() > 0 ? ee.deal(firstList) : ee.write2XML();
 	}
+	
+	public Element variants2xml(Document doc, String id, String superid){
+		Element variants = doc.createElement(XML_TAG_VARIANTS);
+		variants.setAttribute(XML_TAG_ID, id);
+		variants.setAttribute(XML_TAG_SUPERID, superid);
+		for (Variant v : this.variants)
+			v.write2xml(doc, variants);
+		return variants;
+	}
+	
+	@SuppressWarnings("unchecked")
+	void remerge(List<Variant> firstList, List<Variant> secondList){
+		if(secondList==null)
+			variants=firstList;
+		else{
+			String homo;
+			StringSplit split = new StringSplit('|');
+			int i1=0;
+			int i2=0;
+			for(Variant variant : variants){
+				homo = variant.getHomo();
+				split.split(homo);
+				if('0' != split.getResultByIndex(0).charAt(0)){
+					int eff1=firstList.get(i1++).getEffect();
+					if(variant.getEffect()<eff1)
+						variant.setEffect(eff1);
+				}
+				if('0' != split.getResultByIndex(1).charAt(0)){
+					int eff2=secondList.get(i2++).getEffect();
+					if(variant.getEffect()<eff2)
+						variant.setEffect(eff2);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Copy all variants from Element:variants
 	 * @param variants

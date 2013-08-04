@@ -85,7 +85,8 @@ public class VariantMapToDBSNP implements Comparable<VariantMapToDBSNP> {
 		
 		return divide ? new Object[]{ result1, result2 } : new Object[]{ variants };
 	}
-
+	
+	
 	@Override
 	public int compareTo(VariantMapToDBSNP o) {
 		return this.variant.compareTo(o.variant);

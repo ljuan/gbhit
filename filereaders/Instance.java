@@ -567,7 +567,7 @@ public class Instance {
 				Annos.get(tracks[i]).write_anno2parameter(doc);
 			else if(Externals.containsKey(tracks[i]))
 				Externals.get(tracks[i]).write_anno2parameter(doc);
-			else if(tracks[i].startsWith("_")&&tracks[i].substring(1).equals(Pvar.get_ID()))
+			else if(tracks[i].startsWith("_")&&tracks[i].substring(tracks[i].indexOf("@")+1).equals(Pvar.get_ID()))
 				Pvar.write_anno2parameter(doc);
 		return XmlWriter.xml2string(doc);
 	}
@@ -619,6 +619,11 @@ public class Instance {
 				add_att_ifParam(track,ele_anno);
 				VariantAnalysis ee = new VariantAnalysis(doc, rr, ele_anno, Ele_fanno, Ele_var, Chr);
 				Ele_anno=ee.deal();
+				if(Ele_var.getParentNode()==doc.getElementsByTagName(DATA_ROOT).item(0))
+					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(Ele_var);
+				Ele_var=ee.variants2xml(doc, "_"+PvarID,"_"+Pvar.get_ID());
+				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
+				add_att_ifParam(Pvar,Ele_var);
 				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_anno[0]);
 				if(Ele_anno.length > 1){
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_anno[1]);
@@ -634,6 +639,10 @@ public class Instance {
 				Ele_fanno = gr2.write_grf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
 				GRFElementRegionComparison rc = new GRFElementRegionComparison(doc,Ele_var);
 				rc.compareRegion(Ele_fanno);
+				if(Ele_var.getParentNode()==doc.getElementsByTagName(DATA_ROOT).item(0))
+					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(Ele_var);
+				Ele_var=rc.variants2xml(doc, "_"+PvarID,"_"+Pvar.get_ID());
+				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

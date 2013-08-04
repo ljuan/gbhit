@@ -272,6 +272,7 @@ public class EctypalElement {
 		if(variantContainElement(v)){
 			recordStatus(LARGE_VARIANTION, false);
 			recordStatus("Whole gene "+v.getType(), false);
+			v.setEffect(12); //add by Liran for recording variant which has effect
 			return cur;
 		}
 		if(_type == hash_SNV || _type == hash_INS || _type == hash_DEL || _type == hash_CNV || _type == hash_DUP){
@@ -297,6 +298,7 @@ public class EctypalElement {
 			if (v.getFrom() >= from && v.getFrom() <= to){
 				recordStatus(LARGE_VARIANTION, false);
 				recordStatus(v.getType(), false);
+				v.setEffect(12); //add by Liran for recording variant which has effect
 			}
 			return cur;
 		} 
@@ -306,6 +308,7 @@ public class EctypalElement {
 
 			if (dms != null && (dms.coveredExons>0 || dms.boxBases > BOX_LIMIT * initBoxLen)) {
 				recordStatus(LARGE_VARIANTION, false);
+				v.setEffect(12); //add by Liran for recording variant which has effect
 				return cur;
 			}
 			dealLineInPreDeal(v, 3, null, 
@@ -313,8 +316,10 @@ public class EctypalElement {
 			return cur;
 		}
 		if(_type == hash_INV){
-			if (overlap(v.getFrom(), v.getTo(), from, to))
+			if (overlap(v.getFrom(), v.getTo(), from, to)){
 				recordStatus(LARGE_VARIANTION, false);
+				v.setEffect(12); //add by Liran for recording variant which has effect
+			}
 			return cur;
 		}
 		if(_type == hash_CNV || _type == hash_DUP){
@@ -322,6 +327,7 @@ public class EctypalElement {
 			if (contained(v.getFrom(), v.getTo(), from, to) 
 				&& !(ese.getType().equals(SUBELEMENT_TYPE_LINE) && contained(v.getFrom(), v.getTo(), ese.getFrom(), ese.getTo()))) {
 				recordStatus(LARGE_VARIANTION, false);
+				v.setEffect(12); //add by Liran for recording variant which has effect
 				return cur;
 			}
 			return cur;
@@ -478,6 +484,8 @@ public class EctypalElement {
 			//we should add variant into the Box the variant affect.
 			e.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{ v.getFrom() }, new int[]{ v.getTo() }, 
 					isFS == direction ? "(" : ")");
+			if(v.getEffect()<=8)
+				v.setEffect(isFS == direction ? 8 : 9); //add by Liran for recording variant which has effect
 			if(hasEffect){
 				//For hasEffect==true, we should change the type of the Box the variant affect.
 				int small = (direction ? initiatorSmall : terminatorSmall);
@@ -713,6 +721,14 @@ public class EctypalElement {
 		//Record this variation in SubElement
 		MultiFromVariant record = recordVariant(result, v, oldTranscription + ":" + transcription, cur.getElement());
 
+		///////////
+		if(v.getFrom() >= initiatorSmall && v.getTo() <= initiatorLarge && oldTranscription == 'M' && transcription !='M'){//The variant appeared in the initiator and must change the initiator
+			record.setLetter("^");
+			if(v.getEffect()<11)
+				v.setEffect(11);
+		}
+		//////////added by Liran to fix no initiator bug in non-haseffect individuals
+		
 		if(!hasEffect)
 			return cur;
 
@@ -722,7 +738,6 @@ public class EctypalElement {
 			String changeType = cur.getElement().getType().equals(SUBELEMENT_TYPE_BOX) ? SUBELEMENT_TYPE_LOST_BOX : SUBELEMENT_TYPE_EXTEND_BAND;
 			cur.getElement().setType(changeType);
 			changeInitiator();
-			record.setLetter("^");
 			return cur;
 		}
 
@@ -774,11 +789,26 @@ public class EctypalElement {
 			trans = remain != 3 ? bases2gene(e3b.sequence) : "_";
 			if(remain != 3)
 				record = recordVariant(e3b, v, trans + ":" + after, cur.getElement());
-			else
+			else{
 				cur.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{v.getFrom()}, new int[]{v.getTo()}, trans + ":" + after);
+				if(v.getEffect()<4)//amino acid insertion/
+					v.setEffect(4); //add by Liran for recording variant which has effect
+				if(after.indexOf("$")>0 && v.getEffect()<7)//terminator gain
+					v.setEffect(7); //add by Liran for recording variant which has effect
+			}
+			///////////
+			if((direction && v.getTo() <= initiatorLarge) || (!direction && v.getFrom() >= initiatorSmall) && record!=null){//The variant appeared in the initiator
+				record.setLetter("^");
+				if(v.getEffect()<11)
+					v.setEffect(11);
+			}
+			//////////added by Liran to fix no initiator bug in non-haseffect individuals
 		}else{
 			cur.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{v.getFrom()}, new int[]{v.getTo()}, "#");
+			if(v.getEffect()<10)//frame shift
+				v.setEffect(10); //add by Liran for recording variant which has effect
 		}
+		
 
 		if(!hasEffect)
 			return cur;
@@ -808,8 +838,6 @@ public class EctypalElement {
 						}
 					}
 					changeInitiator();
-					if(record != null)
-						record.setLetter("^");
 					return cur;
 				}
 				//End of v.getFrom() >= initiatorSmall && v.getTo() <= initiatorLarge
@@ -839,8 +867,6 @@ public class EctypalElement {
 				//The initiator has lost
 				String changeType = curNeedToDealType == 1 ? SUBELEMENT_TYPE_LOST_BOX : SUBELEMENT_TYPE_EXTEND_BAND;
 				cur.getElement().setType(changeType);
-				if(record != null)
-					record.setLetter("^");
 				return cur;
 			}
 			//End of v.getFrom() >= initiatorSmall && v.getTo() <= initiatorLarge
@@ -909,10 +935,24 @@ public class EctypalElement {
 			String after = remain != 1 ? bases2gene(e3b.sequence) : "_";
 			if(remain != 1)
 				record = recordVariant(e3b, del, pre + ":" + after, upSubEle.getElement());
-			else
-				upSubEle.getElement().addMultiFromVariant(del.getId(), del.getType(), new int[]{del.getFrom()}, new int[]{del.getTo()}, pre + ":" + after);
+			else{
+				record = upSubEle.getElement().addMultiFromVariant(del.getId(), del.getType(), new int[]{del.getFrom()}, new int[]{del.getTo()}, pre + ":" + after);
+				if(del.getEffect()<5)//amino acid deletion
+					del.setEffect(5); //add by Liran for recording variant which has effect
+				if(pre.indexOf("$")>0 && del.getEffect()<6)//terminator loss
+					del.setEffect(6); //add by Liran for recording variant which has effect
+			}
+			///////////
+			if(overlap(initiatorSmall, initiatorLarge, dms.realFrom, dms.realTo)&&record!=null){
+				record.setLetter("^");
+				if(del.getEffect()<11)
+					del.setEffect(11);
+			}
+			//////////added by Liran to fix no initiator bug in non-haseffect individuals
 		}else{
 			upSubEle.getElement().addMultiFromVariant(del.getId(), del.getType(), new int[]{del.getFrom()}, new int[]{del.getTo()}, "#");
+			if(del.getEffect()<10)//frame shift
+				del.setEffect(10); //add by Liran for recording variant which has effect
 		}
 
 		if(!hasEffect)
@@ -926,8 +966,6 @@ public class EctypalElement {
 				String changeType = SUBELEMENT_TYPE_BOX.equals(downSubEle.getElement().getType()) ? SUBELEMENT_TYPE_LOST_BOX : SUBELEMENT_TYPE_EXTEND_BAND;
 				upSubEle.getElement().setType(changeType);
 				changeInitiator();
-				if(record != null)
-					record.setLetter("^");
 				return upSubEle;
 			}
 
@@ -995,6 +1033,19 @@ public class EctypalElement {
 				to = new int[]{e3b.pss[0].position, e3b.pss[1].position, e3b.pss[2].position};
 			}
 		}
+		
+		String[] transafter=transcription.split(":");
+		if(transafter[0].indexOf("$")>0 && transafter[1].indexOf("$")<0 && v.getEffect()<6)//terminator loss
+			v.setEffect(6); //add by Liran for recording variant which has effect
+		else if(transafter[0].indexOf("$")<0 && transafter[1].indexOf("$")>0 && v.getEffect()<7)//terminator loss
+			v.setEffect(7); //add by Liran for recording variant which has effect
+		else if(v.getType().hashCode()==hash_INS && v.getEffect()<4)//amino acid insertion
+			v.setEffect(4); //add by Liran for recording variant which has effect
+		else if(v.getType().hashCode()==hash_DEL && v.getEffect()<5)//amino acid deletion
+			v.setEffect(5); //add by Liran for recording variant which has effect
+		else if(v.getType().hashCode()==hash_SNV && v.getEffect()<3)//amino acide substitution
+			v.setEffect(3); //add by Liran for recording variant which has effect
+		
 		return cur.addMultiFromVariant(v.getId(), v.getType(), from, to, transcription);
 	}
 

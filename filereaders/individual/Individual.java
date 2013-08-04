@@ -168,6 +168,7 @@ public class Individual {
 		return variants;
 	}
 
+
 	private Variant variantInMap(Variant variant) {
 		Variant[] vs = int2Variants.get(variant.getFrom());
 		if (vs == null)
