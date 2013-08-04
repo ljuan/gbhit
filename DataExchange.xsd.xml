@@ -93,6 +93,7 @@
 									</xs:sequence>
 									<xs:attribute name="id" type="xs:string"/>
 									<xs:attribute name="dd" type="xs:string"/>
+									<xs:attribute name="e" type="xs:integer"/>
 									<xs:attribute name="Type" type="VariantType"/>
 								</xs:complexType>
 							</xs:element>

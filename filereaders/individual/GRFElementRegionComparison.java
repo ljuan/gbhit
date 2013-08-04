@@ -78,11 +78,20 @@ public class GRFElementRegionComparison {
 				continue;
 			}
 			ele.setAttribute(XML_TAG_VARIANT, "true");
+			if(cur.getEffect()<1)
+				cur.setEffect(1);
 			if(ele.getElementsByTagName(XML_TAG_COLOR).getLength()==0)
 				XmlWriter.append_text_element(doc, ele, XML_TAG_COLOR, new Rgb((String)colormap.get(source)).ToString());
 		}
 	}
-	
+	public Element variants2xml(Document doc, String id, String superid){
+		Element variants = doc.createElement(XML_TAG_VARIANTS);
+		variants.setAttribute(XML_TAG_ID, id);
+		variants.setAttribute(XML_TAG_SUPERID, superid);
+		for (Variant v : this.variantRange)
+			v.write2xml(doc, variants);
+		return variants;
+	}
 	/**
 	 * Extract all range from Variant.
 	 * @param variants
