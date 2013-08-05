@@ -42,6 +42,7 @@ public class Instance {
 	Hashtable<String,Annotations> Pclns=new Hashtable<String,Annotations>();
 	IndividualStat is=null;
 	
+	
 	public Instance (){
 		initialize("hg19");
 	}

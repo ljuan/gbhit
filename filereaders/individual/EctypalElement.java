@@ -272,7 +272,8 @@ public class EctypalElement {
 		if(variantContainElement(v)){
 			recordStatus(LARGE_VARIANTION, false);
 			recordStatus("Whole gene "+v.getType(), false);
-			v.setEffect(12); //add by Liran for recording variant which has effect
+			if(v.getEffect()<12)
+				v.setEffect(12); //add by Liran for recording variant which has effect
 			return cur;
 		}
 		if(_type == hash_SNV || _type == hash_INS || _type == hash_DEL || _type == hash_CNV || _type == hash_DUP){
@@ -298,7 +299,8 @@ public class EctypalElement {
 			if (v.getFrom() >= from && v.getFrom() <= to){
 				recordStatus(LARGE_VARIANTION, false);
 				recordStatus(v.getType(), false);
-				v.setEffect(12); //add by Liran for recording variant which has effect
+				if(v.getEffect()<12)
+					v.setEffect(12); //add by Liran for recording variant which has effect
 			}
 			return cur;
 		} 
@@ -308,7 +310,8 @@ public class EctypalElement {
 
 			if (dms != null && (dms.coveredExons>0 || dms.boxBases > BOX_LIMIT * initBoxLen)) {
 				recordStatus(LARGE_VARIANTION, false);
-				v.setEffect(12); //add by Liran for recording variant which has effect
+				if(v.getEffect()<12)
+					v.setEffect(12); //add by Liran for recording variant which has effect
 				return cur;
 			}
 			dealLineInPreDeal(v, 3, null, 
@@ -318,7 +321,8 @@ public class EctypalElement {
 		if(_type == hash_INV){
 			if (overlap(v.getFrom(), v.getTo(), from, to)){
 				recordStatus(LARGE_VARIANTION, false);
-				v.setEffect(12); //add by Liran for recording variant which has effect
+				if(v.getEffect()<12)
+					v.setEffect(12); //add by Liran for recording variant which has effect
 			}
 			return cur;
 		}
@@ -327,7 +331,8 @@ public class EctypalElement {
 			if (contained(v.getFrom(), v.getTo(), from, to) 
 				&& !(ese.getType().equals(SUBELEMENT_TYPE_LINE) && contained(v.getFrom(), v.getTo(), ese.getFrom(), ese.getTo()))) {
 				recordStatus(LARGE_VARIANTION, false);
-				v.setEffect(12); //add by Liran for recording variant which has effect
+				if(v.getEffect()<12)
+					v.setEffect(12); //add by Liran for recording variant which has effect
 				return cur;
 			}
 			return cur;

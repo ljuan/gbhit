@@ -184,6 +184,44 @@ class CfgReader{
 		}
 		return null;
 	}
+	public static Annotations getBasicAnnovar(String assemblyid){
+		NodeList assemlist = doc.getElementsByTagName(Consts.XML_TAG_ASSEMBLY);
+		int id=0;
+		while(id<assemlist.getLength()){
+			if (assemlist.item(id).getAttributes().getNamedItem(Consts.XML_TAG_ID).getTextContent().equals(assemblyid))
+				break;
+			id++;
+		}
+		if(assemlist == null)
+			return null;
+		Element assembly=(Element)assemlist.item(id);
+		NodeList annolist=assembly.getElementsByTagName(Consts.XML_TAG_ANNOTATION);
+		for(int i=0;i<annolist.getLength();i++){
+			Element anno=(Element)annolist.item(i);
+			String group=anno.getAttributes().getNamedItem(Consts.XML_TAG_GROUP).getTextContent();
+			String format=anno.getElementsByTagName(Consts.XML_TAG_FORMAT).item(0).getTextContent();
+			if(format.equals(Consts.FORMAT_ANNOVAR)&&group.equals(Consts.GROUP_CLASS_BASIC)){
+				String name=anno.getAttributes().getNamedItem(Consts.XML_TAG_ID).getTextContent();
+				String mode=anno.getElementsByTagName(Consts.XML_TAG_DEFAULT).item(0).getTextContent();
+				NodeList pathlist=anno.getElementsByTagName(Consts.XML_TAG_PATH);
+				if(pathlist.getLength() == 1){
+					String path=pathlist.item(0).getTextContent();
+					return new Annotations(name,path,format,mode,group);
+				}
+				else if(pathlist.getLength() > 1){
+					String[][] paths=new String[pathlist.getLength()][2];
+					for(int j=0;j<pathlist.getLength();j++){
+						paths[j][0]=pathlist.item(j).getAttributes().getNamedItem(Consts.XML_TAG_KEY).getTextContent();
+						paths[j][1]=pathlist.item(j).getTextContent();
+					}
+					return new Annotations(name,paths,format,mode,group);
+				}
+			}
+			else
+				continue;
+		}
+		return null;
+	}
 	static Annotations[] getAnnotations(String assemblyid){
 		NodeList assemlist = doc.getElementsByTagName(Consts.XML_TAG_ASSEMBLY);
 		int id=0;
