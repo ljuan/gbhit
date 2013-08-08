@@ -102,6 +102,14 @@ public class Interfaces extends HttpServlet{
 			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 			res.getWriter().print(a);
 		}
+		else if (action.equals("setScoreMethod")){
+			String a=ins.set_ScoreMethod(req.getParameter("scoremeth"));
+			res.getWriter().print(a);
+		}
+		else if (action.equals("getScoreMethods")){
+			String a=ins.get_ScoreMethods();
+			res.getWriter().print(a);
+		}
 		else if (action.equals("getDetail")){
 			String a=ins.get_Detail(req.getParameter("tracks"), req.getParameter("id"), Integer.parseInt(req.getParameter("start")), Integer.parseInt(req.getParameter("end")));
 			res.getWriter().print(a);

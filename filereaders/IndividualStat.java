@@ -102,7 +102,7 @@ public class IndividualStat {
 		}
 		return scores;
 	}
-	public void fill_Cyto(String chr, String id, FastaReader ref, Annotations pvar){
+	public void fill_Cyto(String chr, String id, FastaReader ref, Annotations pvar, String method){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		int start=0,end=0;
 		int i=0;
@@ -126,10 +126,14 @@ public class IndividualStat {
 					ele_var=new GVFReader(pvar.get_Path(chr)).write_gvf2variants(doc, pvar.get_ID(), chr, subrange[0]+1, subrange[1]);
 				else if(pvar.get_Type().equals(Consts.FORMAT_VCF))
 					ele_var=new VcfReader(pvar,chr).write_vcf2variants(doc, pvar.get_ID(), Consts.MODE_PACK, 0.5, chr, subrange[0]+1, subrange[1]);
-				Element[] ele_annos=new Element[annos.length];
-				for(int k=0;k<annos.length;k++)
-					ele_annos[k]=bar[k].write_ba2elements(doc, annos[k].get_ID(), chr, subrange[0]+1, subrange[1], 0.5);
-				GeneScores[j]=Math.round(calc_Score(doc, ref, ele_annos, ele_var, chr, Genes.get_GeneSymbol(j))*10)/10;
+				if(method == null){
+					Element[] ele_annos=new Element[annos.length];
+					for(int k=0;k<annos.length;k++)
+						ele_annos[k]=bar[k].write_ba2elements(doc, annos[k].get_ID(), chr, subrange[0]+1, subrange[1], 0.5);
+					GeneScores[j]=Math.round(calc_Score(doc, ref, ele_annos, ele_var, chr, Genes.get_GeneSymbol(j))*10)/10;
+				}
+				else
+					GeneScores[j]=Math.round(Annovar.score_vars(ele_var, method, chr, ref)*10)/10;
 				CytoScores[i]=CytoScores[i]>GeneScores[j]?CytoScores[i]:GeneScores[j];
 			}
 	}

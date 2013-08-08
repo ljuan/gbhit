@@ -139,6 +139,7 @@ personalTrackItems.Pannos = [];
 personalTrackItems.Pfannos = [];
 personalTrackItems.Pclnss = [];
 personalPannel.personalTrackItems = personalTrackItems;
+var scoremethPvar = "PGB"; // added by Liran for recording current scoring method
 
 var control_scanning=0;//for stop scanning when close BrowseJumpWindow
 /*$(function(){
@@ -2368,6 +2369,22 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 							}
 							
 							ctx2.fillText(variantIds[packVariants[i][j]], imgFroms[packVariants[i][j]] - ctx2.measureText(variantIds[packVariants[i][j]]).width, y + imgHeight - 2);
+							/////added by Liran for effect block
+							var vee = 0;
+							if (scoremethPvar != "PGB") {
+								vee = (variantEffect - 2) / 10;
+							} else {
+								vee = variantEffect - 2;
+							}
+
+							ctx2.fillStyle="rgb(133,122,185)";
+							var minuss = 0;
+							while(minuss < vee && minuss < 10){
+								ctx2.fillRect(imgFroms[packVariants[i][j]]+imgWidth-3, y+imgHeight-minuss-1, 4, 1);
+								minuss = minuss + 2;
+							}
+							ctx2.fillStyle="rgb(0,0,0)";
+							/////added by Liran for effect block
 						}
 						y = y + imgHeight + 3;
 					}
@@ -5695,40 +5712,49 @@ function setPersonalPannel(){
 	$("#personalPannelSetting").css("display","block");
 	document.getElementById("ppsCloseBtn").onclick = overlayHide;
 	overlayDIV.onclick = overlayHide;
-//	var PvarTable = document.getElementById("PvarTable");
+	var PvarTable = document.getElementById("PvarTable");
 	var PfannoTable = document.getElementById("PfannoTable");
 	var PannoTable = document.getElementById("PannoTable");
 	var PclnsTable = document.getElementById("PclnsTable");
 	var trNode, tdNode;
 	var radioObj, labelObj;
 	var i;
-//	PvarTable.innerHTML = "";
-//	for(i = 0; i<personalPannel.personalTrackItems.Pvars.length; i++){
-//		if(i % 4 == 0) {
-//			trNode = PvarTable.insertRow(-1);
-//		}
-//		tdNode = trNode.insertCell(-1);
-//		radioObj = document.createElement("input");
-//		radioObj.id = personalPannel.personalTrackItems.Pvars[i] + "radio";
-//		radioObj.type = "radio";
-//		radioObj.name = "personalVar";
-//		radioObj.value = personalPannel.personalTrackItems.Pvars[i];
-//		if(personalPannel.personalTrackItems.Pvars[i] == personalPannel.Pvar.id){
-//			radioObj.checked = true;
-//		}
-//		tdNode.appendChild(radioObj);
-//		labelObj = document.createElement("label");
-//		labelObj.setAttribute("for", personalPannel.personalTrackItems.Pvars[i] + "radio");
-//		labelObj.innerHTML = personalPannel.personalTrackItems.Pvars[i];
-//		tdNode.appendChild(labelObj);
-//	
-//		radioObj.onclick = function(event){
-//			var target = event.target || event.srcElement;
-//			var Pvar_id = target.getAttribute("value").replace("_","");
-//			
-//			addPvarHttpRequest(Pvar_id);
-//		};
-//	}
+	////modified by Liran for scoring method setting
+	PvarTable.innerHTML = "";
+	var pattern = /<.*?>/g;
+	var XMLHttpReq9 = createXMLHttpRequest();
+	XMLHttpReq9.open("GET","servlet/test.do?action=getScoreMethods",false);
+	XMLHttpReq9.send(null);
+	var scoremethlist=XMLHttpReq9.responseText.replace(pattern,"");
+	var scoremeths_temp=scoremethlist.split(",");
+
+	for(i = 0; i<scoremeths_temp.length; i++){
+		if(i % 4 == 0) {
+			trNode = PvarTable.insertRow(-1);
+		}
+		tdNode = trNode.insertCell(-1);
+		radioObj = document.createElement("input");
+		radioObj.id = scoremeths_temp[i] + "radio";
+		radioObj.type = "radio";
+		radioObj.name = "personalVar";
+		radioObj.value = scoremeths_temp[i];
+		if(scoremeths_temp[i] == scoremethPvar){
+			radioObj.checked = true;
+		}
+		tdNode.appendChild(radioObj);
+		labelObj = document.createElement("label");
+		labelObj.setAttribute("for", scoremeths_temp[i] + "radio");
+		labelObj.innerHTML = scoremeths_temp[i];
+		tdNode.appendChild(labelObj);
+	
+		radioObj.onclick = function(event){
+			var target = event.target || event.srcElement;
+			scoremethPvar = target.getAttribute("value");
+
+			setScoreMethHttpRequest();
+		};
+	}
+	////modified by Liran for scoring method setting
 	PfannoTable.innerHTML = "";
 	for(i = 0; i<personalPannel.personalTrackItems.Pfannos.length; i++){
 		if(i % 4 == 0) {
@@ -5921,6 +5947,13 @@ function pclnsSetToggle() {
 
 /***************************End***************************************/
 
+function setScoreMethHttpRequest() {
+	////added by Liran for scoring method setting
+	var url = "servlet/test.do?action=setScoreMethod&scoremeth="+scoremethPvar;
+	XMLHttpReq.onreadystatechange = handle_addPvar_Request;
+	XMLHttpReq.open("GET", url, true);
+	XMLHttpReq.send(null);
+}
 function addPvarHttpRequest(trackId) {
 	var url = "servlet/test.do?action=addPvar&tracks=";
 	var P_id, P_track, P_mode;

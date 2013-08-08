@@ -216,7 +216,7 @@ public class Variant implements Comparable<Variant> {
 			v.setAttribute(Consts.XML_TAG_DBSNPID, dbsnpid);
 		if (!"".equals(homo))
 			v.setAttribute(XML_TAG_HOMO, homo);
-		if (effect!=0)
+		if (effect>0)
 			v.setAttribute(XML_TAG_EFFECT, String.valueOf(effect));
 		XmlWriter.append_text_element(doc, v, XML_TAG_FROM, from + "");
 		XmlWriter.append_text_element(doc, v, XML_TAG_TO, to + "");
@@ -238,6 +238,8 @@ public class Variant implements Comparable<Variant> {
 		v.setType(ele.getAttribute(XML_TAG_TYPE));
 		String homo = ele.getAttribute(XML_TAG_HOMO);
 		v.setHomo(homo);
+		if(ele.hasAttribute(XML_TAG_EFFECT))
+			v.setEffect(Integer.parseInt(ele.getAttribute(XML_TAG_EFFECT)));
 		
 		NodeList children = ele.getChildNodes();
 		v.setFrom(Integer.parseInt(children.item(0).getTextContent()));

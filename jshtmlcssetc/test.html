@@ -36,7 +36,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 				 var param5=document.getElementById("p5").value;
 				 var querry="getAssemblies";
 				 req.onreadystatechange = getReadyStateHandler;
-				if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "getChromosomes" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno" || param5 == "getSession"|| param5== "getStat"){
+				if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "getChromosomes" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno" || param5 == "getSession"|| param5== "getStat" || param5 == "upStat" || param5 == "getScoreMethods"){
 					querry="action="+param5;
 				} else if(param5 == "removeTracks" || param5 == "removeExternals" || param5 == "getParams" || param5 == "removePclns"){
 					querry="action="+param5+"&tracks="+param4;
@@ -64,11 +64,11 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					querry="action="+param5+"&width="+param4+"&chr="+param1+"&start="+param2+"&end="+param3;
 				} else if(param5 == "setParams"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&params="+param2+"&values="+param1;
-				} else if(param5 == "upStat"){
-					querry="action="+param5;
 				} else if(param5 == "getCytoband"){
 					querry="action="+param5+"&chr="+param4+"&id="+param3;
-				} 
+				} else if(param5 == "setScoreMethod"){
+					querry="action="+param5+"&scoremeth="+param4;
+				}
 				if(param5 == "getStat"){
 					window.open("servlet/test.do?"+querry);
 				} else if(param5 == "upStat"){
@@ -148,8 +148,8 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<th>getCytoband</th>
 			<th>removeTracks<br>removeExternals<br>removePclns<br>getParams</th>
 			<th>getGene<br>findGene</th>
-			<th>setAssembly<br>getCytobands</th>
-			<th>removePvar<br>removePanno<br>removePfanno<br>getAssemblies<br>getSession<br>getAnnotations<br>getChromosomes</th>
+			<th>setAssembly<br>getCytobands<br>setScoreMethod</th>
+			<th>removePvar<br>removePanno<br>removePfanno<br>getAssemblies<br>getSession<br>getAnnotations<br>getChromosomes<br>getScoreMethods<br>getStat<br>upStat</th>
 		<tr align="center">
 			<td><input id="p1" type="text"/></td>
 			<td>Chromosome</td>
@@ -193,7 +193,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td>chr</td>
 			<td>tracks</td>
 			<td>prefix/gene</td>
-			<td>assembly/chr</td>
+			<td>assembly/chr/scoremeth</td>
 			<td></td>
 		</tr>
 		<tr align="center">

@@ -41,7 +41,7 @@ public class Instance {
 	Element Ele_fanno=null;
 	Hashtable<String,Annotations> Pclns=new Hashtable<String,Annotations>();
 	IndividualStat is=null;
-	
+	String scoremeth = null;
 	
 	public Instance (){
 		initialize("hg19");
@@ -517,7 +517,7 @@ public class Instance {
 	public String get_SingleCytoScore(String chr, String id){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		CytobandReader cbr=new CytobandReader(Cyto.get_Path());
-		Element ele_temp=cbr.write_cytoband(doc, chr, id, is, rr, Pvar);
+		Element ele_temp=cbr.write_cytoband(doc, chr, id, is, rr, Pvar,scoremeth);
 		return XmlWriter.xml2string(doc);
 	}
 	public void load_Stat(String filepath){
@@ -533,6 +533,22 @@ public class Instance {
 				return Pvar.get_ID()+"_"+PvarID;
 		}
 		return null;
+	}
+	public String set_ScoreMethod(String scoremeth){
+		if(Annovar.ScoreMeth.containsKey(scoremeth))
+			this.scoremeth=Annovar.ScoreMeth.get(scoremeth);
+		else
+			this.scoremeth=null;
+		if(Pvar!=null && PvarID != null)
+			return add_Pvar(Pvar.get_ID(),Pvar.get_Mode(),PvarID);
+		return null;
+	}
+	public String get_ScoreMethods(){
+		Document doc=XmlWriter.init(Consts.META_ROOT);
+		String[] scoremethlist=new String[Annovar.ScoreMeth.keySet().size()];
+		Annovar.ScoreMeth.keySet().toArray(scoremethlist);
+		CfgReader.write_metalist(doc, scoremethlist ,"ScoreMethList");
+		return XmlWriter.xml2string(doc);
 	}
 	public String get_Annotations(){
 		String[] anno_names_internal=new String[Annos.size()];
@@ -602,6 +618,10 @@ public class Instance {
 				if(PvarID!=null&&!track.get_ID().equals(PvarID))
 					ele_var.setAttribute(Consts.XML_TAG_ID, "_"+PvarID);
 				Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
+				if(scoremeth!=null){
+					Ele_var = Annovar.score_vars(doc, Ele_var, scoremeth, Chr, rr);
+					add_att_ifParam(track,Ele_var);
+				}
 				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
 				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_var);
 		}
@@ -610,6 +630,10 @@ public class Instance {
 			Element ele_var=gr.write_gvf2variants(doc, "_"+track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 			add_att_ifParam(track,ele_var);
 			Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
+			if(scoremeth!=null){
+				Ele_var = Annovar.score_vars(doc, Ele_var, scoremeth, Chr, rr);
+				add_att_ifParam(track,Ele_var);
+			}
 			doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
 			doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_var);
 		}
@@ -620,11 +644,13 @@ public class Instance {
 				add_att_ifParam(track,ele_anno);
 				VariantAnalysis ee = new VariantAnalysis(doc, rr, ele_anno, Ele_fanno, Ele_var, Chr);
 				Ele_anno=ee.deal();
-				if(Ele_var.getParentNode()==doc.getElementsByTagName(DATA_ROOT).item(0))
-					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(Ele_var);
-				Ele_var=ee.variants2xml(doc, "_"+PvarID,"_"+Pvar.get_ID());
-				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
-				add_att_ifParam(Pvar,Ele_var);
+				if(scoremeth==null){
+					if(Ele_var.getParentNode()==doc.getElementsByTagName(DATA_ROOT).item(0))
+						doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(Ele_var);
+					Ele_var=ee.variants2xml(doc, "_"+PvarID,"_"+Pvar.get_ID());
+					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
+					add_att_ifParam(Pvar,Ele_var);
+				}
 				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_anno[0]);
 				if(Ele_anno.length > 1){
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_anno[1]);
@@ -640,10 +666,13 @@ public class Instance {
 				Ele_fanno = gr2.write_grf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
 				GRFElementRegionComparison rc = new GRFElementRegionComparison(doc,Ele_var);
 				rc.compareRegion(Ele_fanno);
-				if(Ele_var.getParentNode()==doc.getElementsByTagName(DATA_ROOT).item(0))
-					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(Ele_var);
-				Ele_var=rc.variants2xml(doc, "_"+PvarID,"_"+Pvar.get_ID());
-				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
+				if(scoremeth==null){
+					if(Ele_var.getParentNode()==doc.getElementsByTagName(DATA_ROOT).item(0))
+						doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(Ele_var);
+					Ele_var=rc.variants2xml(doc, "_"+PvarID,"_"+Pvar.get_ID());
+					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(Ele_var);
+					add_att_ifParam(Pvar,Ele_var);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
