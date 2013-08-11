@@ -5,6 +5,8 @@ import java.net.URLEncoder;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
+
 import org.apache.commons.fileupload.disk.*;
 import org.apache.commons.fileupload.util.*;
 import org.apache.commons.fileupload.servlet.*;
@@ -31,43 +33,37 @@ public class Interfaces extends HttpServlet{
 		}
 		Instance ins=(Instance) session.getAttribute("Instance");
 		String action=req.getParameter("action");
+		String a = null;
 		if (action.equals("getAssemblies")){
-			String a=ins.get_Assemblies();
-			res.getWriter().print(a);
+			a=ins.get_Assemblies();
 		}
 		if (action.equals("getSession")){
-			res.getWriter().print(session.getId());
+			a = session.getId();
 		}
 		else if (action.equals("getAnnotations")){
-			String a=ins.get_Annotations();
-			res.getWriter().print(a);
+			a=ins.get_Annotations();
 		}
 		else if (action.equals("getChromosomes")){
-			String a=ins.get_Chromosomes();
-			res.getWriter().print(a);
+			a=ins.get_Chromosomes();
 		}
 		else if (action.equals("getCytobands")){
-			String a=ins.get_Cyto(req.getParameter("chr"));
-			res.getWriter().print(a);
+			a=ins.get_Cyto(req.getParameter("chr"));
 		}
 		else if (action.equals("getCytoband")){
-			String a=ins.get_SingleCytoScore(req.getParameter("chr"),req.getParameter("id"));
-			res.getWriter().print(a);
+			a=ins.get_SingleCytoScore(req.getParameter("chr"),req.getParameter("id"));
 		}
 		else if (action.equals("setAssembly")){
 			ins=new Instance(req.getParameter("assembly"));
 			session.setAttribute("Instance", ins);
 		}
 		else if (action.equals("modiTracks")||action.equals("addTracks")){
-			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
-			res.getWriter().print(a);
+			a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 		}
 		else if (action.equals("removeTracks")){
 			ins.remove_Tracks(req.getParameter("tracks").split(","));
 		}
 		else if (action.equals("modiPvar")||action.equals("addPvar")){
-			String a=ins.add_Pvar(req.getParameter("tracks"),req.getParameter("modes"),req.getParameter("id"));
-			res.getWriter().print(a);
+			a=ins.add_Pvar(req.getParameter("tracks"),req.getParameter("modes"),req.getParameter("id"));
 		}
 		else if (action.equals("initPvar")){
 			ins.init_Pvar(req.getParameter("tracks"),req.getParameter("id"));
@@ -76,64 +72,51 @@ public class Interfaces extends HttpServlet{
 			ins.remove_Pvar();
 		}
 		else if (action.equals("modiPanno")||action.equals("addPanno")){
-			String a=ins.add_Panno(req.getParameter("tracks"),req.getParameter("modes"));
-			res.getWriter().print(a);
+			a=ins.add_Panno(req.getParameter("tracks"),req.getParameter("modes"));
 		}
 		else if (action.equals("removePanno")){
 			ins.remove_Panno();
 		}
 		else if (action.equals("modiPfanno")||action.equals("addPfanno")){
-			String a=ins.add_Pfanno(req.getParameter("tracks"),req.getParameter("modes"));
-			res.getWriter().print(a);
+			a=ins.add_Pfanno(req.getParameter("tracks"),req.getParameter("modes"));
 		}
 		else if (action.equals("removePfanno")){
-			String a=ins.remove_Pfanno();
-			res.getWriter().print(a);
+			a=ins.remove_Pfanno();
 		}
 		else if (action.equals("modiPclns")||action.equals("addPclns")){
-			String a=ins.add_Pclns(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
-			res.getWriter().print(a);
+			a=ins.add_Pclns(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 		}
 		else if (action.equals("removePclns")){
 			ins.remove_Pclns(req.getParameter("tracks").split(","));
 		}
 		else if (action.equals("setParams")){
 			ins.set_Params(req.getParameter("tracks").split(","), req.getParameter("params").split(","), req.getParameter("values").split(","));
-			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
-			res.getWriter().print(a);
+			a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 		}
 		else if (action.equals("setScoreMethod")){
-			String a=ins.set_ScoreMethod(req.getParameter("scoremeth"));
-			res.getWriter().print(a);
+			a=ins.set_ScoreMethod(req.getParameter("scoremeth"));
 		}
 		else if (action.equals("getScoreMethods")){
-			String a=ins.get_ScoreMethods();
-			res.getWriter().print(a);
+			a=ins.get_ScoreMethods();
 		}
 		else if (action.equals("getDetail")){
-			String a=ins.get_Detail(req.getParameter("tracks"), req.getParameter("id"), Integer.parseInt(req.getParameter("start")), Integer.parseInt(req.getParameter("end")));
-			res.getWriter().print(a);
+			a=ins.get_Detail(req.getParameter("tracks"), req.getParameter("id"), Integer.parseInt(req.getParameter("start")), Integer.parseInt(req.getParameter("end")));
 		}
 		else if (action.equals("findGene")){
-			String a=ins.find_Gene(req.getParameter("prefix"));
-			res.getWriter().print(a);
+			a=ins.find_Gene(req.getParameter("prefix"));
 		}
 		else if (action.equals("getGene")){
-			String a=ins.get_Geneinfo(req.getParameter("gene"));
-			res.getWriter().print(a);
+			a=ins.get_Geneinfo(req.getParameter("gene"));
 		}
 		else if (action.equals("overlapGene")){
-			String a=ins.get_OverlapGenes(req.getParameter("chr"), Integer.parseInt(req.getParameter("start")), Integer.parseInt(req.getParameter("end")));
-			res.getWriter().print(a);
+			a=ins.get_OverlapGenes(req.getParameter("chr"), Integer.parseInt(req.getParameter("start")), Integer.parseInt(req.getParameter("end")));
 		}
 		else if (action.equals("getParams")){
-			String a=ins.get_Parameters(req.getParameter("tracks").split(","));
-			res.getWriter().print(a);
+			a=ins.get_Parameters(req.getParameter("tracks").split(","));
 		}
 		else if (action.equals("addExternals")){
 			ins.add_Externals(req.getParameter("tracks").split(","),req.getParameter("links").split(","), req.getParameter("types").split(","),req.getParameter("modes").split(","));
-			String a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
-			res.getWriter().print(a);
+			a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 		}
 		else if (action.equals("removeExternals")){
 			ins.remove_Externals(req.getParameter("tracks").split(","));
@@ -143,16 +126,14 @@ public class Interfaces extends HttpServlet{
 			long start=Long.parseLong(req.getParameter("start"));
 			long end=Long.parseLong(req.getParameter("end"));
 			int window_width=Integer.parseInt(req.getParameter("width"));
-			String a=ins.update(chr, start, end, window_width);
-			res.getWriter().print(a);
+			a=ins.update(chr, start, end, window_width);
 		}
 		else if (action.equals("refresh")){
 			String chr=req.getParameter("chr");
 			long start=Long.parseLong(req.getParameter("start"));
 			long end=Long.parseLong(req.getParameter("end"));
 			int window_width=Integer.parseInt(req.getParameter("width"));
-			String a=ins.refresh(chr, start, end, window_width);
-			res.getWriter().print(a);
+			a=ins.refresh(chr, start, end, window_width);
 		}
 		else if (action.equals("getStat")){
 			String filename=ins.save_Stat(session.getId());
@@ -192,6 +173,17 @@ public class Interfaces extends HttpServlet{
 					}
 				}
 			}
+		}
+		PrintWriter out;
+		if(a!=null){
+			if (GzipUtils.isGzipSupported(req) && !GzipUtils.isGzipDisabled(req) && a.length()>1024*16){
+				out = GzipUtils.getGzipWriter(res);
+				res.setHeader("Content-Encoding", "gzip");
+			}
+			else
+				out = res.getWriter();
+			out.print(a);
+			out.close();
 		}
 	}
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
@@ -261,4 +253,24 @@ public class Interfaces extends HttpServlet{
 		}
 		return elements;
 	}*/
+}
+
+class GzipUtils {
+	public static boolean isGzipSupported(HttpServletRequest request) {
+		String encodings = request.getHeader("Accept-Encoding");
+		return ((encodings != null) && (encodings.indexOf("gzip") != -1));
+	}
+	public static boolean isGzipDisabled(HttpServletRequest request) {
+        String flag = request.getParameter("disableGzip");
+        return ((flag != null) && (!flag.equalsIgnoreCase("false")));
+    }
+	public static PrintWriter getGzipWriter(HttpServletResponse response){
+        try {
+            return (new PrintWriter(new GZIPOutputStream(response.getOutputStream())));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
