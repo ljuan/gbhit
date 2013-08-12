@@ -157,10 +157,10 @@ $(function(){
 function historyback(){
 	history.back();
 	var urlParameter = QueryString();
-	assemblyNum = urlParameter["assemblyNum"];
-	chrNum = urlParameter["chrNum"];
-	startIndex = parseInt(urlParameter["startIndex"]);
-	endIndex = parseInt(urlParameter["endIndex"]);
+	assemblyNum = urlParameter["Assembly"];
+	chrNum = urlParameter["Chr"];
+	startIndex = parseInt(urlParameter["Start"]);
+	endIndex = parseInt(urlParameter["End"]);
 	if(startIndex > endIndex) {
 		var start2end;
 		start2end = endIndex;
@@ -206,10 +206,10 @@ function historyback(){
 function historyforward(){
 	history.forward();
 	var urlParameter = QueryString();
-	assemblyNum = urlParameter["assemblyNum"];
-	chrNum = urlParameter["chrNum"];
-	startIndex = parseInt(urlParameter["startIndex"]);
-	endIndex = parseInt(urlParameter["endIndex"]);
+	assemblyNum = urlParameter["Assembly"];
+	chrNum = urlParameter["Chr"];
+	startIndex = parseInt(urlParameter["Start"]);
+	endIndex = parseInt(urlParameter["End"]);
 	if(startIndex > endIndex) {
 		var start2end;
 		start2end = endIndex;
@@ -350,13 +350,13 @@ function showRef() {
 	url = url + "&width=";
 	url = url + trackLength;
 	
-	var tempHref = "browser.html?assemblyNum=Feb.2009(GRCh37/hg19)&chrNum=";
+	var tempHref = "browser.html?Chr=";
 	tempHref = tempHref + chrNum;
-	tempHref = tempHref + "&startIndex=";
+	tempHref = tempHref + "&Start=";
 	tempHref = tempHref + startIndex;
-	tempHref = tempHref + "&endIndex=";
+	tempHref = tempHref + "&End=";
 	tempHref = tempHref + endIndex;
-	tempHref = tempHref + "&width=" + trackLength;
+//	tempHref = tempHref + "&width=" + trackLength;
 	window.history.pushState("", "title", tempHref);
 
 	window.localStorage.clear();
@@ -5078,15 +5078,15 @@ function handleGetChrLengthStateChange(){
 				searchLength_user = end_user - start_user + 1;
 				startIndex = start_user - searchLength_user;
 				endIndex = end_user + searchLength_user;
-				url = url + assemblyNum;
-				url = url + "&chrNum=";
+//				url = url + assemblyNum;
+				url = url + "?Chr=";
 				url = url + chrNum;
-				url = url + "&startIndex=";
+				url = url + "&Start=";
 				url = url + startIndex;
-				url = url + "&endIndex=";
+				url = url + "&End=";
 				url = url + endIndex;
-				url = url + "&width=";
-				url = url + "2850";
+//				url = url + "&width=";
+//				url = url + "2850";
 				window.location.href = url;
 				return;
 			}
@@ -7573,7 +7573,7 @@ $(document).ready(function(){
 /*********************************************************END: the options and visualisition cytobands********************************************************************/
 
 function initPvar(){
-	var url = "servlet/test.do?action=initPvar&modes=pack&tracks=1000genome_PUR&id=HG00637";
+	var url = "servlet/test.do?action=initPvar&modes=pack&tracks=1000genome_CEU&id=NA12716";
 	XMLHttpReq5.onreadystatechange = function(){};
 	XMLHttpReq5.open("GET", url, false);
 	XMLHttpReq5.send(null);
@@ -7581,16 +7581,16 @@ function initPvar(){
 
 $(document).ready(function() {
 	var urlParameter = QueryString();
-	if((urlParameter["assemblyNum"] + ".") == "undefined."){
-		window.location.href = "browser.html?assemblyNum=Feb.2009%28GRCh37/hg19%29&chrNum=chr21&startIndex=33021623&endIndex=33051544&width=2850";
+	if((urlParameter["Chr"] + ".") == "undefined."){
+		window.location.href = "browser.html?Chr=chr21&Start=33021623&End=33051544";
 		return;
 	}
 	//initPvar();
-	if((urlParameter["assemblyNum"] + ".") != "undefined.") {
-		assemblyNum = urlParameter["assemblyNum"];
-		chrNum = urlParameter["chrNum"];
-		startIndex = parseInt(urlParameter["startIndex"]);
-		endIndex = parseInt(urlParameter["endIndex"]);
+	if((urlParameter["Chr"] + ".") != "undefined.") {
+		assemblyNum = urlParameter["Assembly"];
+		chrNum = urlParameter["Chr"];
+		startIndex = parseInt(urlParameter["Start"]);
+		endIndex = parseInt(urlParameter["End"]);
 		if(startIndex > endIndex) {
 			var start2end;
 			start2end = endIndex;

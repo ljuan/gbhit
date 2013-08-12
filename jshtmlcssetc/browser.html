@@ -17,7 +17,6 @@
 			//document.title=titleValue;
 			//}
 		</script>
-		<script language="JavaScript" type="text/javascript" src="./scripts/jquery-1.7.2-min.js"></script>
 		<link rel="stylesheet" type="text/css" href="./css/imgareaselect-default.css" />
 		<link rel="stylesheet" type="text/css" href="./css/div-line.css" />
 		<link rel="stylesheet" type="text/css" href="./css/track-table.css" />
@@ -25,24 +24,6 @@
 		<link rel="stylesheet" type="text/css" href="./css/jquery-ui.css" />
 		<link rel="stylesheet" type="text/css" href="./css/jquery-ui-1.10.2.custom.min.css" />
 		<link rel="stylesheet" type="text/css" href="./css/menu-ui.css" />
-		<script language="JavaScript" type="text/javascript" src="./scripts/jquery.imgareaselect.min.js"></script>
-		<script language="JavaScript" type="text/javascript" src="./scripts/Concurrent.Thread.js"></script>
-		<script language="JavaScript" type="text/javascript" src="./scripts/jquery.imgareaselect.pack.js"></script>
-		<script language="JavaScript" type="text/javascript" src="./scripts/trackMove.js"></script>
-		<script language="JavaScript" type="text/javascript" src="./scripts/jump.js"></script>
-		<script language="JavaScript" type="text/javascript" src="./scripts/dragToZoomin.js"></script>
-		<script language="JavaScript" type="text/javascript" src="./scripts/thickbox.js"></script>
-		<script language="JavaScript" type="text/javascript" src="./scripts/jquery.cookie.js"></script>
-		<script language="JavaScript" type="text/javascript" src="./scripts/jquery-ui-1.10.2.custom.min.js"></script>
-		<script language="JavaScript" type="text/javascript">
-			
-			function hideWarnBox() {
-				var warnBox = document.getElementById("errorDiv");
-				warnBox.style.display = "none";
-				warnBox.innerHTML = '';
-			}
-			
-		</script>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title id="browserTitle">Personal Genome Browser</title>
 	</head>
@@ -66,7 +47,7 @@
 										<input id="search_field" type="text" placeholder="loation, gene or keyword" style="border: none;height: 21px;width: 200px;"/>
 									</div>
 									<div id="search" style="display:inline;height:21px;padding-right:5px;font-size:15px;" onclick="jump();">
-										Search
+									Go	
 									</div>
 								</div>
 							</div>
@@ -857,20 +838,6 @@ shadow:5px 5px 5px #888;">
 			</div>
 		</div>
 		<div id="overlayDIV" class="overlayStyle"></div>
-		<div id="helpWindow">
-			<div id="helpWindow_title">
-				<div id="HW_title">
-					Help
-				</div>
-				<div id="HW_close">
-					<span id="HW_closeBtn">Close</span>
-				</div>
-			</div>
-			<div id="HW_content">
-				<img src="./image/help2.png" alt="pic" />
-			</div>
-		</div>
-		<div id="helpWindow_overlayDIV" class="overlayStyle"></div>
 		<div id="indsetWindow">
 			<div id="indsetWindow_title">
 				<div id="IW_title">
@@ -888,7 +855,7 @@ shadow:5px 5px 5px #888;">
 		<div id="browseJumpWindow">
 			<div id="browseJumpWindow_title">
 				<div id="BJW_title">
-					Functional Scan 
+					Functional Variants Scan 
 				</div>
 				<div id="BJW_close">
 					<span id="BJW_closeBtn">Close</span>
@@ -907,6 +874,26 @@ shadow:5px 5px 5px #888;">
 			</div>
 		</div>
 		<div id="browseJumpWindow_overlayDIV" class="overlayStyle"></div>
+
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery-1.7.2-min.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery.imgareaselect.min.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery.imgareaselect.pack.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/trackMove.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jump.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/dragToZoomin.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/thickbox.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery.cookie.js"></script>
+		<script language="JavaScript" type="text/javascript" src="./scripts/jquery-ui-1.10.2.custom.min.js"></script>
+		<script language="JavaScript" type="text/javascript">
+			
+			function hideWarnBox() {
+				var warnBox = document.getElementById("errorDiv");
+				warnBox.style.display = "none";
+				warnBox.innerHTML = '';
+			}
+			
+		</script>
+
 		<img id="imgSNV_A" class="displayHide" src="./image/imgSNV_A.png" alt="pic" />
 		<img id="imgSNV_C" class="displayHide" src="./image/imgSNV_C.png" alt="pic" />
 		<img id="imgSNV_G" class="displayHide" src="./image/imgSNV_G.png" alt="pic" />
@@ -969,6 +956,20 @@ shadow:5px 5px 5px #888;">
 		<img id="bkgImg_shift" class="displayHide" src="./image/bkgImg_shift.png" alt="pic" />
 		<img id="bkgImg_pshift" class="displayHide" src="./image/bkgImg_pshift.png" alt="pic" />
 		<img id="imgStatus" class="displayHide" src="./image/imgStatus.png" alt="pic" />
+		<div id="helpWindow">
+			<div id="helpWindow_title">
+				<div id="HW_title">
+					Help
+				</div>
+				<div id="HW_close">
+					<span id="HW_closeBtn">Close</span>
+				</div>
+			</div>
+			<div id="HW_content">
+				<img src="./image/help.jpg" alt="pic" />
+			</div>
+		</div>
+		<div id="helpWindow_overlayDIV" class="overlayStyle"></div>
 		<div id="select_info" class="ui-front ui-corner-all" style="display:none; position: absolute; border: 1px #ccc solid"> </div>
 		<script language="JavaScript" type="text/javascript" src="./scripts/raphael-min.js"></script>
 	</body>
