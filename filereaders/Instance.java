@@ -514,6 +514,12 @@ public class Instance {
 		Element ele_temp=cbr.write_cytobands(doc, chr, is);
 		return XmlWriter.xml2string(doc);
 	}
+	public String get_Cyto(){
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		CytobandReader cbr=new CytobandReader(Cyto.get_Path());
+		Element ele_temp=cbr.write_cytobands(doc, null, is);
+		return XmlWriter.xml2string(doc);
+	}
 	public String get_SingleCytoScore(String chr, String id){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		CytobandReader cbr=new CytobandReader(Cyto.get_Path());

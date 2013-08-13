@@ -21,14 +21,22 @@ public class CytobandReader {
 	public Element write_cytobands(Document doc, String chr){
 		return write_cytobands(doc,chr,null);
 	}
+	public Element write_cytobands(Document doc, IndividualStat is){
+		return write_cytobands(doc,null,is);
+	}
+	public Element write_cytobands(Document doc){
+		return write_cytobands(doc,null,null);
+	}
 	public Element write_cytobands(Document doc, String chr, IndividualStat is){
 		Element Cytobands = doc.createElement(Consts.XML_TAG_CYTOBANDS);
 		for (int i = 0; i < cytobands.length; i++) 
-			if(cytobands[i].startsWith(chr+"\t")){
+			if(chr==null || cytobands[i].startsWith(chr+"\t")){
 				String[] cytoband_temp=cytobands[i].split("\t");
 				Element Cytoband = doc.createElement(Consts.XML_TAG_CYTOBAND);
 				Cytoband.setAttribute(Consts.XML_TAG_ID, cytoband_temp[3]);
 				Cytoband.setAttribute(Consts.XML_TAG_GIESTAIN, cytoband_temp[4]);
+				if(chr==null)
+					XmlWriter.append_text_element(doc, Cytoband, Consts.XML_TAG_CHROMOSOME, cytoband_temp[0]);
 				XmlWriter.append_text_element(doc, Cytoband, Consts.XML_TAG_FROM, String.valueOf(Long.parseLong(cytoband_temp[1])+1));
 				XmlWriter.append_text_element(doc, Cytoband, Consts.XML_TAG_TO, String.valueOf(Long.parseLong(cytoband_temp[2])));
 				if(is!=null && is.get_CytoScores(i, i)[0]>=0)

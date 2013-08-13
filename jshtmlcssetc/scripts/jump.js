@@ -824,7 +824,7 @@ function insertSettingBtn(trackId, ifParam, superId) {
 		if(trackOperatorNode.getElementsByClassName("setting").length == 0) {
 			var spanNode = document.createElement("span");
 			spanNode.setAttribute("class", "setting thickbox");
-			spanNode.setAttribute("title", "track setting");
+			spanNode.setAttribute("title", "track parameters setting");
 			spanNode.setAttribute("alt", "#TB_inline?height=300;width=650;inlineId=tracksettingDIV");
 			spanNode.setAttribute("id", "servlet/test.do?action=getParams&tracks=" + superId);
 			trackOperatorNode.appendChild(spanNode);
@@ -8815,65 +8815,6 @@ function loadChrBand(){
 	var font_size2=16;
 	var font_size2_text=font_size2+"px Candara";
 
-	XMLHttpReq7.open("GET","servlet/test.do?action=getChromosomes",false);
-	XMLHttpReq7.send(null);
-	var chrlist=XMLHttpReq7.responseText.replace(pattern,"");
-	var chrs_temp=chrlist.split(",");
-	var chrs=[];
-	var total=0;
-	for(var idx=0;idx<chrs_temp.length;idx++){
-		var chrtemp=chrs_temp[idx].split(":");
-		chrs[idx]={};
-		chrs[idx].name=chrtemp[0];
-		chrs[idx].lengthh=parseInt(chrtemp[1]);
-		chrs[idx].from=total+1;
-		chrs[idx].to=total+parseInt(chrtemp[1]);
-		chrs[idx].bands=[];
-		total=total+parseInt(chrtemp[1]);
-		//********switchable with later similar code to save initializing time
-		XMLHttpReq7.open("GET","servlet/test.do?action=getCytobands&chr="+chrs[idx].name,false);
-		XMLHttpReq7.send(null);
-		var cytobandsNode = XMLHttpReq7.responseXML.getElementsByTagName(xmlTagCytobands)[0];
-		var cytobandNodes = cytobandsNode.getElementsByTagName(xmlTagCytoBand);
-		if(cytobandNodes.length == 0) {
-			chrs[idx].bands[0] = {};
-			chrs[idx].bands[0].id=chrs[idx].name;
-			chrs[idx].bands[0].gieStain="";
-			chrs[idx].bands[0].from=total-chrs[idx].to+1;
-			chrs[idx].bands[0].to=total-chrs[idx].from+1;
-			chrs[idx].bands[0].score=-1;
-			//To be test.
-		}
-		for( i = 0; i < cytobandNodes.length; i++) {
-			chrs[idx].bands[i] = {};
-			chrs[idx].bands[i].id = cytobandNodes[i].getAttribute(xmlAttributeId);
-			chrs[idx].bands[i].gieStain = cytobandNodes[i].getAttribute(xmlAttribute_gieStain);
-			chrs[idx].bands[i].from = parseInt(cytobandNodes[i].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue);
-			chrs[idx].bands[i].to = parseInt(cytobandNodes[i].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue);
-			chrs[idx].bands[i].score = -1;
-			if(cytobandNodes[i].getElementsByTagName(xmlTagScore).length > 0){
-				chrs[idx].bands[i].score = parseFloat(cytobandNodes[i].getElementsByTagName(xmlTagScore)[0].childNodes[0].nodeValue);
-			}
-		}
-		if(cytobandNodes.length == 1) {
-			chrs[idx].bands[0].from=total-chrs[idx].to+1;
-			chrs[idx].bands[0].to=total-chrs[idx].from+1;
-			//To be test.
-		}
-		//#####################
-	}
-	for (var idx=0;idx<chrs.length;idx++){
-		if(chrs[idx].lengthh<total/180){
-			chrs[idx].to=chrs[idx].from+total/180;
-			total=total+total/180-chrs[idx].lengthh;
-		}
-	}
-	for (var idx=0;idx<chrs.length;idx++){
-		chrs[idx].from=chrs[idx].from+total/180*idx;
-		chrs[idx].to=chrs[idx].to+total/180*idx;
-	}
-	total=total+total/180*chrs.length;
-	
 	var colorlist = {
 		gpos100 : "rgb(0,0,0)",
 		gpos    : "rgb(0,0,0)",
@@ -8916,6 +8857,59 @@ function loadChrBand(){
 		chrM  : "rgb(204,204,153)",
 		chr0  : "rgb(204,204,153)"
 	}
+
+	XMLHttpReq7.open("GET","servlet/test.do?action=getChromosomes",false);
+	XMLHttpReq7.send(null);
+	var chrlist=XMLHttpReq7.responseText.replace(pattern,"");
+	var chrs_temp=chrlist.split(",");
+	var chrs=[];
+	var chrs_map=[];
+	var total=0;
+	for(var idx=0;idx<chrs_temp.length;idx++){
+		var chrtemp=chrs_temp[idx].split(":");
+		chrs[idx]={};
+		chrs[idx].name=chrtemp[0];
+		chrs[idx].lengthh=parseInt(chrtemp[1]);
+		chrs[idx].from=total+1;
+		chrs[idx].to=total+parseInt(chrtemp[1]);
+		chrs[idx].bands=[];
+		total=total+parseInt(chrtemp[1]);
+		chrs_map[chrtemp[0]]=idx;
+	}
+
+	for (var idx=0;idx<chrs.length;idx++){
+		if(chrs[idx].lengthh<total/180){
+			chrs[idx].to=chrs[idx].from+total/180;
+			total=total+total/180-chrs[idx].lengthh;
+		}
+	}
+	for (var idx=0;idx<chrs.length;idx++){
+		chrs[idx].from=chrs[idx].from+total/180*idx;
+		chrs[idx].to=chrs[idx].to+total/180*idx;
+	}
+	total=total+total/180*chrs.length;
+
+	XMLHttpReq7.open("GET","servlet/test.do?action=getAllCytobands",false);
+	XMLHttpReq7.send(null);
+	//********switchable with later similar code to save initializing time
+	var cytobandsNode = XMLHttpReq7.responseXML.getElementsByTagName(xmlTagCytobands)[0];
+	var cytobandNodes = cytobandsNode.getElementsByTagName(xmlTagCytoBand);
+	for( i = 0; i < cytobandNodes.length; i++) {
+		var idx = chrs_map[cytobandNodes[i].getElementsByTagName(xmlTagChrNum)[0].childNodes[0].nodeValue];
+		var curi = chrs[idx].bands.length;
+		chrs[idx].bands[curi] = {};
+		chrs[idx].bands[curi].id = cytobandNodes[i].getAttribute(xmlAttributeId);
+		chrs[idx].bands[curi].gieStain = cytobandNodes[i].getAttribute(xmlAttribute_gieStain);
+		chrs[idx].bands[curi].from = parseInt(cytobandNodes[i].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue);
+		chrs[idx].bands[curi].to = parseInt(cytobandNodes[i].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue);
+		chrs[idx].bands[curi].score = -1;
+		if(cytobandNodes[i].getElementsByTagName(xmlTagScore).length > 0){
+			chrs[idx].bands[curi].score = parseFloat(cytobandNodes[i].getElementsByTagName(xmlTagScore)[0].childNodes[0].nodeValue);
+		}
+	}
+	chrs[chrs_map["chrM"]].bands[0].from=total-chrs[chrs_map["chrM"]].to+1;
+	chrs[chrs_map["chrM"]].bands[0].to=total-chrs[chrs_map["chrM"]].from+1;
+	//#####################
 
 	var R = Raphael("BJW_genome", l+30, l+30);
 	var G = Raphael("BJW_genelist",150,l);

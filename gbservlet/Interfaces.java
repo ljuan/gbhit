@@ -46,6 +46,9 @@ public class Interfaces extends HttpServlet{
 		else if (action.equals("getChromosomes")){
 			a=ins.get_Chromosomes();
 		}
+		else if (action.equals("getAllCytobands")){
+			a=ins.get_Cyto();
+		}
 		else if (action.equals("getCytobands")){
 			a=ins.get_Cyto(req.getParameter("chr"));
 		}
