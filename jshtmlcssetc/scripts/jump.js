@@ -8185,40 +8185,16 @@ function tracksettingpannel_close(){
 }
 function trackItems_setting3(){//individualItems setting
 	var pattern = /<.*?>/g;
-	XMLHttpReq6.open("GET","servlet/test.do?action=getAnnotations",false);
+	XMLHttpReq6.open("GET","servlet/test.do?action=getIndividuals",false);
 	XMLHttpReq6.send(null);
-	var annolist=XMLHttpReq6.responseText.replace(pattern,"");
-	var annos_temp=annolist.split(",");
+	var indslist=XMLHttpReq6.responseText.replace(pattern,"");
+	var inds_temp=indslist.split(",");
 	var individuals=[];//includes personal TRACKs, each unit has trackname, samples, samples is also array
-	for(var idx=0;idx<annos_temp.length;idx++){
-		var anno_temp=annos_temp[idx].split(":");
-		if(anno_temp[0] == xmlGroupIG){
-			individuals[individuals.length] = {};
-			individuals[individuals.length-1].track = anno_temp[1];
-			individuals[individuals.length-1].samples = [];
-			XMLHttpReq6.open("GET","servlet/test.do?action=getParams&tracks="+individuals[individuals.length-1].track,false);
-			XMLHttpReq6.send(null);
-			var individualsNode = XMLHttpReq6.responseXML.getElementsByTagName(xmlTagParameters);
-			if(individualsNode.length > 0){
-				var individualNodes = individualsNode[0].getElementsByTagName(xmlTagParameter);
-				for (var i=0;i<individualNodes.length;i++){
-					if(individualNodes[i].getAttribute(xmlAttributeId) == xmlParamSample){
-						var sampleslist=individualNodes[i].getElementsByTagName(xmlTagOptions)[0].childNodes;
-						var sampleTemps="";
-						for(var si=0;si<sampleslist.length;si++){
-							sampleTemps=sampleTemps+sampleslist[si].nodeValue;
-						}
-						var samplesTemp=sampleTemps.split(";");
-						for(var si=0;si<samplesTemp.length;si++){
-							individuals[individuals.length-1].samples[si]=samplesTemp[si].split(":")[0];
-						}
-					}
-				}
-			}
-			if(individuals[individuals.length-1].samples.length == 0){
-				individuals[individuals.length-1].samples[0]=individuals[individuals.length-1].track;
-			}
-		}
+	for(var idx=0;idx<inds_temp.length;idx++){
+		var ind_temp=inds_temp[idx].split(":");
+		individuals[individuals.length] = {};
+		individuals[individuals.length-1].track = ind_temp[0];
+		individuals[individuals.length-1].samples = ind_temp[1].split(";");
 	}
 	var trackItems_setting_divObj = document.getElementById("indsetWindow");
 	var ts_content_centerObj = document.getElementById("IW_content");//.getElementsByTagName("center")[0]

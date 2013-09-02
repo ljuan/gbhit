@@ -583,6 +583,38 @@ public class Instance {
 		CfgReader.write_metalist(doc,anno_names, "AnnotationList");
 		return XmlWriter.xml2string(doc);
 	}
+	public String get_Individuals(){
+		ArrayList<String> individuals = new ArrayList<String>();
+		int i=0;
+		Enumeration<Annotations> annos_enum=Annos.elements();
+		for(i=0;i<Annos.size();i++){
+			Annotations temp=annos_enum.nextElement();
+			if(temp.get_Group().equals(Consts.GROUP_CLASS_PG)){
+				StringBuffer individual=new StringBuffer();
+				individual.append(temp.get_ID());
+				individual.append(":");
+				if(temp.get_Type().equals(Consts.FORMAT_VCF)&&temp.has_Parameter(Consts.VCF_HEADER_SAMPLE)){
+					String[] samples=((VcfSample) temp.get_Parameter(Consts.VCF_HEADER_SAMPLE)).getSampleNames();
+					for(int j=0;j<samples.length-1;j++){
+						individual.append(samples[j]);
+						individual.append(";");
+					}
+					if(samples.length>0)
+						individual.append(samples[samples.length-1]);
+				}
+				else{
+					individual.append(temp.get_ID());
+				}
+				individuals.add(individual.toString());
+			}
+		}
+		String[] individuals_names = new String[individuals.size()];
+		individuals.toArray(individuals_names);
+		Arrays.sort(individuals_names);
+		Document doc=XmlWriter.init(Consts.META_ROOT);
+		CfgReader.write_metalist(doc,individuals_names, "IndividualList");
+		return XmlWriter.xml2string(doc);
+	}
 	public String get_Parameters(String[] tracks){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		for(int i=0;i<tracks.length;i++)

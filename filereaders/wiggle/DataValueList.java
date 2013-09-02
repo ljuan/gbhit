@@ -196,6 +196,8 @@ public class DataValueList {
 			if (startPos == endPos) {
 				values[startPos] += d.getDataValue() * (thisEnd - thisStart);
 				numOfBasePerValue[startPos] += thisEnd - thisStart;
+			} else if(startPos > endPos){
+				continue;
 			} else {
 				// Calculate the seperate position, use Math.floor(double d)
 				int sepPos = (int) Math.floor(((startPos + 1) * bPerWidth));
