@@ -2374,7 +2374,10 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 							if (scoremethPvar != "PGB") {
 								vee = (variantEffect - 2) / 10;
 							} else {
-								vee = variantEffect - 2;
+								if(variantEffect == 3){
+									variantEffect++;
+								}
+								vee = variantEffect - 3;
 							}
 
 							ctx2.fillStyle="rgb(133,122,185)";
