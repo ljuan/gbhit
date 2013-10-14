@@ -798,7 +798,7 @@ public class EctypalElement {
 				cur.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{v.getFrom()}, new int[]{v.getTo()}, trans + ":" + after);
 				if(v.getEffect()<4)//amino acid insertion/
 					v.setEffect(4); //add by Liran for recording variant which has effect
-				if(after.indexOf("$")>0 && v.getEffect()<7)//terminator gain
+				if(after.indexOf("$")>=0 && v.getEffect()<7)//terminator gain
 					v.setEffect(7); //add by Liran for recording variant which has effect
 			}
 			///////////
@@ -833,7 +833,7 @@ public class EctypalElement {
 					}
 					if(!initiatorLost){
 						//The initiator hasn't lost
-						if(trans.indexOf("$") > 0){//The terminator appeared
+						if(trans.indexOf("$") >= 0){//The terminator appeared
 							String changeType = curNeedToDealType == 1 ? SUBELEMENT_TYPE_LOST_BOX : SUBELEMENT_TYPE_EXTEND_BAND;
 							if((direction && v.getTo() == initiatorSmall) || (!direction && v.getFrom() == initiatorLarge)){
 								cur.getElement().setType(changeType);
@@ -944,7 +944,7 @@ public class EctypalElement {
 				record = upSubEle.getElement().addMultiFromVariant(del.getId(), del.getType(), new int[]{del.getFrom()}, new int[]{del.getTo()}, pre + ":" + after);
 				if(del.getEffect()<5)//amino acid deletion
 					del.setEffect(5); //add by Liran for recording variant which has effect
-				if(pre.indexOf("$")>0 && del.getEffect()<6)//terminator loss
+				if(pre.indexOf("$")>=0 && del.getEffect()<6)//terminator loss
 					del.setEffect(6); //add by Liran for recording variant which has effect
 			}
 			///////////
@@ -1041,9 +1041,9 @@ public class EctypalElement {
 		
 		//add by Liran for recording variant which has effect
 		String[] transafter=transcription.split(":");
-		if(transafter[0].indexOf("$")>0 && transafter[1].indexOf("$")<0 && v.getEffect()<6)//terminator loss
+		if(transafter[0].indexOf("$")>=0 && transafter[1].indexOf("$")<0 && v.getEffect()<6)//terminator loss
 			v.setEffect(6); 
-		else if(transafter[0].indexOf("$")<0 && transafter[1].indexOf("$")>0 && v.getEffect()<7)//terminator gain
+		else if(transafter[0].indexOf("$")<0 && transafter[1].indexOf("$")>=0 && v.getEffect()<7)//terminator gain
 			v.setEffect(7); 
 		else if(v.getType().hashCode()==hash_INS && v.getEffect()<4)//amino acid insertion
 			v.setEffect(4);
