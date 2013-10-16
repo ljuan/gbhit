@@ -2337,6 +2337,9 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 							if (!variantEffect){
 								variantEffect = 0;
 							}
+							if (scoremethPvar != "PGB") {
+								variantEffect = variantEffect - 10;
+							}
 							if(variantTypes[packVariants[i][j]] == variantType_SNV) {
 								switch(variantNodes[packVariants[i][j]].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue) {
 									case "A":
@@ -2372,7 +2375,7 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 							/////added by Liran for effect block
 							var vee = 0;
 							if (scoremethPvar != "PGB") {
-								vee = (variantEffect - 2) / 10;
+								vee = (variantEffect - 3) / 5 + 1;
 							} else {
 								if(variantEffect == 3){
 									variantEffect++;
