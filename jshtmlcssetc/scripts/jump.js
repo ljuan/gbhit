@@ -2949,7 +2949,8 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							break;
 						case "shBox":
 							var drawImage_eleWidth = subElementWidth;
-							var drawImage_imgWidth = $(bkgImg_shift).width();
+							//var drawImage_imgWidth = $(bkgImg_shift).width();
+							var drawImage_imgWidth = 1496;
 							var drawImage_from = subElementRelativeFroms[i][j];
 							var drawImage_drawWidth;
 							while(drawImage_eleWidth > 0){
@@ -2974,7 +2975,8 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							break;
 						case "psBox":
 							var drawImage_eleWidth = subElementWidth;
-							var drawImage_imgWidth = $(bkgImg_pshift).width();
+							//var drawImage_imgWidth = $(bkgImg_pshift).width();
+							var drawImage_imgWidth = 1494;
 							var drawImage_from = subElementRelativeFroms[i][j];
 							var drawImage_drawWidth;
 							while(drawImage_eleWidth > 0){
@@ -2998,7 +3000,8 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							break;
 						case "seBox":
 							var drawImage_eleWidth = subElementWidth;
-							var drawImage_imgWidth = $(bkgImg_shift).width();
+							//var drawImage_imgWidth = $(bkgImg_shift).width();
+							var drawImage_imgWidth = 1496;
 							var drawImage_from = subElementRelativeFroms[i][j];
 							var drawImage_drawWidth;
 							while(drawImage_eleWidth > 0){
@@ -3018,7 +3021,8 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							break;
 						case "pseBox":
 							var drawImage_eleWidth = subElementWidth;
-							var drawImage_imgWidth = $(bkgImg_pshift).width();
+							//var drawImage_imgWidth = $(bkgImg_pshift).width();
+							var drawImage_imgWidth = 1494;
 							var drawImage_from = subElementRelativeFroms[i][j];
 							var drawImage_drawWidth;
 							while(drawImage_eleWidth > 0){
@@ -3114,7 +3118,8 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							break;
 						case "shBox":
 							var drawImage_eleWidth = subElementWidth2;
-							var drawImage_imgWidth = $(bkgImg_shift).width();
+							//var drawImage_imgWidth = $(bkgImg_shift).width();
+							var drawImage_imgWidth = 1496;
 							var drawImage_from = subElementRelativeFroms2[i][j];
 							var drawImage_drawWidth;
 							while(drawImage_eleWidth > 0){
@@ -3139,7 +3144,8 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							break;
 						case "psBox":
 							var drawImage_eleWidth = subElementWidth2;
-							var drawImage_imgWidth = $(bkgImg_pshift).width();
+							//var drawImage_imgWidth = $(bkgImg_pshift).width();
+							var drawImage_imgWidth = 1494;
 							var drawImage_from = subElementRelativeFroms2[i][j];
 							var drawImage_drawWidth;
 							while(drawImage_eleWidth > 0){
@@ -3162,7 +3168,8 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							break;
 						case "seBox":
 							var drawImage_eleWidth = subElementWidth2;
-							var drawImage_imgWidth = $(bkgImg_shift).width();
+							//var drawImage_imgWidth = $(bkgImg_shift).width();
+							var drawImage_imgWidth = 1496;
 							var drawImage_from = subElementRelativeFroms2[i][j];
 							var drawImage_drawWidth;
 							while(drawImage_eleWidth > 0){
@@ -3182,7 +3189,8 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							break;
 						case "pseBox":
 							var drawImage_eleWidth = subElementWidth2;
-							var drawImage_imgWidth = $(bkgImg_pshift).width();
+							//var drawImage_imgWidth = $(bkgImg_pshift).width();
+							var drawImage_imgWidth = 1494;
 							var drawImage_from = subElementRelativeFroms2[i][j];
 							var drawImage_drawWidth;
 							while(drawImage_eleWidth > 0){
@@ -3857,7 +3865,8 @@ function showPersonalGeneByImg_OneNode(canvas1, canvas2, geneNode, mode) {
 								break;
 							case "shBox":
 								var drawImage_eleWidth = subElementWidth;
-								var drawImage_imgWidth = $(bkgImg_shift).width();
+								//var drawImage_imgWidth = $(bkgImg_shift).width();
+								var drawImage_imgWidth = 1496;
 								var drawImage_from = subElementRelativeFroms[i][j];
 								var drawImage_drawWidth;
 								while(drawImage_eleWidth > 0){
@@ -3886,7 +3895,8 @@ function showPersonalGeneByImg_OneNode(canvas1, canvas2, geneNode, mode) {
 								break;
 							case "psBox":
 								var drawImage_eleWidth = subElementWidth;
-								var drawImage_imgWidth = $(bkgImg_shift).width();
+								//var drawImage_imgWidth = $(bkgImg_shift).width();
+								var drawImage_imgWidth = 1496;
 								var drawImage_from = subElementRelativeFroms[i][j];
 								var drawImage_drawWidth;
 								while(drawImage_eleWidth > 0){
@@ -3910,7 +3920,8 @@ function showPersonalGeneByImg_OneNode(canvas1, canvas2, geneNode, mode) {
 								break;
 							case "seBox":
 								var drawImage_eleWidth = subElementWidth;
-								var drawImage_imgWidth = $(bkgImg_shift).width();
+								//var drawImage_imgWidth = $(bkgImg_shift).width();
+								var drawImage_imgWidth = 1496;
 								var drawImage_from = subElementRelativeFroms[i][j];
 								var drawImage_drawWidth;
 								while(drawImage_eleWidth > 0){
@@ -3934,7 +3945,8 @@ function showPersonalGeneByImg_OneNode(canvas1, canvas2, geneNode, mode) {
 								break;
 							case "pseBox":
 								var drawImage_eleWidth = subElementWidth;
-								var drawImage_imgWidth = $(bkgImg_shift).width();
+								//var drawImage_imgWidth = $(bkgImg_shift).width();
+								var drawImage_imgWidth = 1496;
 								var drawImage_from = subElementRelativeFroms[i][j];
 								var drawImage_drawWidth;
 								while(drawImage_eleWidth > 0){
@@ -4261,7 +4273,8 @@ function drawPersonalGeneSubElement(from, to, width, type, direction, y, colorSt
 			break;
 		case "shBox":
 			var drawImage_eleWidth = width;
-			var drawImage_imgWidth = $(bkgImg_shift).width();
+			//var drawImage_imgWidth = $(bkgImg_shift).width();
+			var drawImage_imgWidth = 1496;
 			var drawImage_from = from;
 			var drawImage_drawWidth;
 			while(drawImage_eleWidth > 0){
@@ -4290,7 +4303,8 @@ function drawPersonalGeneSubElement(from, to, width, type, direction, y, colorSt
 			break;
 		case "psBox":
 			var drawImage_eleWidth = width;
-			var drawImage_imgWidth = $(bkgImg_pshift).width();
+			//var drawImage_imgWidth = $(bkgImg_pshift).width();
+			var drawImage_imgWidth = 1494;
 			var drawImage_from = from;
 			var drawImage_drawWidth;
 			while(drawImage_eleWidth > 0){
@@ -4314,7 +4328,8 @@ function drawPersonalGeneSubElement(from, to, width, type, direction, y, colorSt
 			break;
 		case "seBox":
 			var drawImage_eleWidth = width;
-			var drawImage_imgWidth = $(bkgImg_shift).width();
+			//var drawImage_imgWidth = $(bkgImg_shift).width();
+			var drawImage_imgWidth = 1496;
 			var drawImage_from = from;
 			var drawImage_drawWidth;
 			while(drawImage_eleWidth > 0){
@@ -4339,7 +4354,8 @@ function drawPersonalGeneSubElement(from, to, width, type, direction, y, colorSt
 			break;
 		case "pseBox":
 			var drawImage_eleWidth = width;
-			var drawImage_imgWidth = $(bkgImg_pshift).width();
+			//var drawImage_imgWidth = $(bkgImg_pshift).width();
+			var drawImage_imgWidth = 1494;
 			var drawImage_from = from;
 			var drawImage_drawWidth;
 			while(drawImage_eleWidth > 0){
@@ -8889,8 +8905,6 @@ function loadChrBand(){
 			chrs[idx].bands[curi].score = parseFloat(cytobandNodes[i].getElementsByTagName(xmlTagScore)[0].childNodes[0].nodeValue);
 		}
 	}
-	chrs[chrs_map["chrM"]].bands[0].from=total-chrs[chrs_map["chrM"]].to+1;
-	chrs[chrs_map["chrM"]].bands[0].to=total-chrs[chrs_map["chrM"]].from+1;
 	//#####################
 
 	var R = Raphael("BJW_genome", l+30, l+30);
@@ -9100,12 +9114,7 @@ function loadChrBand(){
 						var bandfrom=chrs[chrom].bands[i].from+chrs[chrom].lengthh/180*i;
 						var bandto=chrs[chrom].bands[i].to+chrs[chrom].lengthh/180*i;
 						var chromlen;
-						if(chrs[chrom].bands.length <=1){
-							chromlen=chrs[chrom].lengthh;
-						}
-						else{
-							chromlen=chrs[chrom].lengthh+chrs[chrom].lengthh/180*chrs[chrom].bands.length;
-						}
+						chromlen=chrs[chrom].lengthh+chrs[chrom].lengthh/180*chrs[chrom].bands.length;
 						attr["fill-opacity"]=0;
 						bands[chrom][i]=R.path(drawPath(bandfrom,bandto,chromlen,radius+chrthick+dis_chr2band,bandthick)).attr(attr);
 						bandsscore[chrom][i]=R.path(drawPath(bandfrom,bandto,chromlen,radius+chrthick+dis_chr2band+bandthick+5,5)).attr({fill:cytoscore2color(chrs[chrom].bands[i].score),stroke:"#FFF","stroke-width":0,"fill-opacity":1});
