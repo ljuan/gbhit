@@ -798,7 +798,7 @@ public class EctypalElement {
 				cur.getElement().addMultiFromVariant(v.getId(), v.getType(), new int[]{v.getFrom()}, new int[]{v.getTo()}, trans + ":" + after);
 				if(v.getEffect()<4)//amino acid insertion/
 					v.setEffect(4); //add by Liran for recording variant which has effect
-				if(after.indexOf("$")>=0 && v.getEffect()<7)//terminator gain
+				if(trans.indexOf("$")<0 && after.indexOf("$")>=0 && v.getEffect()<7)//terminator gain
 					v.setEffect(7); //add by Liran for recording variant which has effect
 			}
 			///////////
@@ -944,7 +944,7 @@ public class EctypalElement {
 				record = upSubEle.getElement().addMultiFromVariant(del.getId(), del.getType(), new int[]{del.getFrom()}, new int[]{del.getTo()}, pre + ":" + after);
 				if(del.getEffect()<5)//amino acid deletion
 					del.setEffect(5); //add by Liran for recording variant which has effect
-				if(pre.indexOf("$")>=0 && del.getEffect()<6)//terminator loss
+				if(after.indexOf("$")<0 && pre.indexOf("$")>=0 && del.getEffect()<6)//terminator loss
 					del.setEffect(6); //add by Liran for recording variant which has effect
 			}
 			///////////

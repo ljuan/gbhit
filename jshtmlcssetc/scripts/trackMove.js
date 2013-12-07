@@ -737,9 +737,9 @@ function handle_getPersonalGeneDetailRequest(){
 							Amino_Acid_variantType = "ASS lost";
 						}
 					}else{
-						if((variantLetters[0] + "").indexOf("$")!= -1){
-							Amino_Acid_variantType = "Terminator lost";
-						}else if((variantLetters[1] + "").indexOf("$")!= -1){
+						if((variantLetters[0] + "").indexOf("$")!= -1 && (variantLetters[1] + "").indexOf("$")==-1){
+							Amino_Acid_variantType = "Terminator loss";
+						}else if((variantLetters[1] + "").indexOf("$")!= -1 && (variantLetters[0] + "").indexOf("$")==-1){
 							Amino_Acid_variantType = "Terminator gain";
 						}else if((variantLetters[0] + "").length > (variantLetters[1] + "").length || (variantLetters[1] + "").indexOf("_") != -1){
 							Amino_Acid_variantType = "Amino acid deletion: " + variantLetters[0] + "->" + variantLetters[1];

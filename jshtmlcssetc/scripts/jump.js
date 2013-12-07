@@ -3067,9 +3067,9 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							}
 						} else {
 							if((variantLetters[i][j][k] + "").indexOf("$") != -1) {
-								if((geneVariantLetters[0] + "").indexOf("$") != -1) {
+								if((geneVariantLetters[0] + "").indexOf("$") != -1 && (geneVariantLetters[1] + "").indexOf("$") == -1) {
 									ctx2.drawImage(imgStop2, (variantRelativeFroms[i][j][k] + variantRelativeTos[i][j][k] - img_width) / 2, 0);
-								} else {
+								} else if ((geneVariantLetters[1] + "").indexOf("$") != -1 && (geneVariantLetters[0] + "").indexOf("$") == -1) {
 									ctx2.drawImage(imgStop, (variantRelativeFroms[i][j][k] + variantRelativeTos[i][j][k] - img_width) / 2, 0);
 								}
 							} else {
@@ -3235,9 +3235,9 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 							}
 						} else {
 							if((variantLetters2[i][j][k] + "").indexOf("$") != -1) {
-								if((geneVariantLetters[0] + "").indexOf("$") != -1) {
+								if((geneVariantLetters[0] + "").indexOf("$") != -1 && (geneVariantLetters[1] + "").indexOf("$")==-1) {
 									ctx2.drawImage(imgStop2, (variantRelativeFroms2[i][j][k] + variantRelativeTos2[i][j][k] - img_width) / 2, 10 + 3 + img_height);
-								} else {
+								} else if((geneVariantLetters[1] + "").indexOf("$") != -1 && (geneVariantLetters[0] + "").indexOf("$")==-1) {
 									ctx2.drawImage(imgStop, (variantRelativeFroms2[i][j][k] + variantRelativeTos2[i][j][k] - img_width) / 2, 10 + 3 + img_height);
 								}
 							} else {
@@ -3369,9 +3369,9 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 										}
 									} else {
 										if((variantLetters[packVariants[i][j]][m][k] + "").indexOf("$") != -1) {
-											if((geneVariantLetters[0] + "").indexOf("$") != -1) {
+											if((geneVariantLetters[0] + "").indexOf("$") != -1 && (geneVariantLetters[1] + "").indexOf("$") == -1) {
 												ctx2.drawImage(imgStop2, (variantRelativeFroms[packVariants[i][j]][m][k] + variantRelativeTos[packVariants[i][j]][m][k] - img_width) / 2, y - 10 - img_height);
-											} else {
+											} else if((geneVariantLetters[1] + "").indexOf("$") != -1 && (geneVariantLetters[0] + "").indexOf("$") == -1) {
 												ctx2.drawImage(imgStop, (variantRelativeFroms[packVariants[i][j]][m][k] + variantRelativeTos[packVariants[i][j]][m][k] - img_width) / 2, y - 10 - img_height);
 											}
 										} else {
@@ -3426,9 +3426,9 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 											}
 										} else {
 											if((variantLetters[packVariants[i][j]][k][m] + "").indexOf("$") != -1) {
-												if((geneVariantLetters[0] + "").indexOf("$") != -1) {
+												if((geneVariantLetters[0] + "").indexOf("$") != -1 && (geneVariantLetters[1] + "").indexOf("$")==-1) {
 													ctx2.drawImage(imgStop2, (variantRelativeFroms[packVariants[i][j]][k][m] + variantRelativeTos[packVariants[i][j]][k][m] - img_width) / 2, y - 10 - img_height);
-												} else {
+												} else if((geneVariantLetters[1] + "").indexOf("$") != -1 && (geneVariantLetters[0] + "").indexOf("$")==-1) {
 													ctx2.drawImage(imgStop, (variantRelativeFroms[packVariants[i][j]][k][m] + variantRelativeTos[packVariants[i][j]][k][m] - img_width) / 2, y - 10 - img_height);
 												}
 											} else {
@@ -3504,9 +3504,9 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 										}
 									} else {
 										if((variantLetters2[packVariants2[i][j]][m][k] + "").indexOf("$") != -1) {
-											if((geneVariantLetters[0] + "").indexOf("$") != -1) {
+											if((geneVariantLetters[0] + "").indexOf("$") != -1 && (geneVariantLetters[1] + "").indexOf("$")==-1) {
 												ctx2.drawImage(imgStop2, (variantRelativeFroms2[packVariants2[i][j]][m][k] + variantRelativeTos2[packVariants2[i][j]][m][k] - img_width) / 2, y - 10 - img_height);
-											} else {
+											} else if((geneVariantLetters[1] + "").indexOf("$") != -1 && (geneVariantLetters[0] + "").indexOf("$")==-1) {
 												ctx2.drawImage(imgStop, (variantRelativeFroms2[packVariants2[i][j]][m][k] + variantRelativeTos2[packVariants2[i][j]][m][k] - img_width) / 2, y - 10 - img_height);
 											}
 										} else {
@@ -3561,9 +3561,9 @@ function showPersonalGeneByImg_TwoNode(canvas1, canvas2, geneNode, geneNode2, mo
 											}
 										} else {
 											if((variantLetters2[packVariants2[i][j]][k][m] + "").indexOf("$") != -1) {
-												if((geneVariantLetters[0] + "").indexOf("$") != -1) {
+												if((geneVariantLetters[0] + "").indexOf("$") != -1 && (geneVariantLetters[1] + "").indexOf("$")==-1) {
 													ctx2.drawImage(imgStop2, (variantRelativeFroms2[packVariants2[i][j]][k][m] + variantRelativeTos2[packVariants2[i][j]][k][m] - img_width) / 2, y - 10 - img_height);
-												} else {
+												} else if((geneVariantLetters[1] + "").indexOf("$") != -1 && (geneVariantLetters[0] + "").indexOf("$")==-1) {
 													ctx2.drawImage(imgStop, (variantRelativeFroms2[packVariants2[i][j]][k][m] + variantRelativeTos2[packVariants2[i][j]][k][m] - img_width) / 2, y - 10 - img_height);
 												}
 											} else {
@@ -3992,9 +3992,9 @@ function showPersonalGeneByImg_OneNode(canvas1, canvas2, geneNode, mode) {
 								}
 							}else{
 								if((variantLetters[i][j][k]+"").indexOf("$")!= -1){
-									if((geneVariantLetters[0] + "").indexOf("$")!= -1){
+									if((geneVariantLetters[0] + "").indexOf("$")!= -1 && (geneVariantLetters[1] + "").indexOf("$")==-1){
 										ctx2.drawImage(imgStop2, (variantRelativeFroms[i][j][k] + variantRelativeTos[i][j][k] - img_width) / 2, 0);
-									}else{
+									}else if((geneVariantLetters[1] + "").indexOf("$") != -1 && (geneVariantLetters[0] + "").indexOf("$")==-1) {
 										ctx2.drawImage(imgStop, (variantRelativeFroms[i][j][k] + variantRelativeTos[i][j][k] - img_width) / 2, 0);
 									}
 								}else{
@@ -4100,9 +4100,9 @@ function showPersonalGeneByImg_OneNode(canvas1, canvas2, geneNode, mode) {
 											}
 										}else{
 											if(( variantLetters[packVariants[i][j]][m][k]+"").indexOf("$")!= -1){
-												if((geneVariantLetters[0] + "").indexOf("$")!= -1){
+												if((geneVariantLetters[0] + "").indexOf("$")!= -1 && (geneVariantLetters[1] + "").indexOf("$")==-1){
 													ctx2.drawImage(imgStop2, (variantRelativeFroms[packVariants[i][j]][m][k] + variantRelativeTos[packVariants[i][j]][m][k] - img_width) / 2, y - 10 - img_height);
-												}else{
+												}else if((geneVariantLetters[1] + "").indexOf("$") != -1 && (geneVariantLetters[0] + "").indexOf("$")==-1) {
 													ctx2.drawImage(imgStop, (variantRelativeFroms[packVariants[i][j]][m][k] + variantRelativeTos[packVariants[i][j]][m][k] - img_width) / 2, y - 10 - img_height);
 												}
 											}else{
@@ -4157,9 +4157,9 @@ function showPersonalGeneByImg_OneNode(canvas1, canvas2, geneNode, mode) {
 												}
 											}else{
 												if(( variantLetters[packVariants[i][j]][k][m]+"").indexOf("$")!= -1){
-													if((geneVariantLetters[0] + "").indexOf("$")!= -1){
+													if((geneVariantLetters[0] + "").indexOf("$")!= -1 && (geneVariantLetters[1] + "").indexOf("$")==-1){
 														ctx2.drawImage(imgStop2, (variantRelativeFroms[packVariants[i][j]][k][m] + variantRelativeTos[packVariants[i][j]][k][m] - img_width) / 2, y - 10 - img_height);
-													}else{
+													}else if((geneVariantLetters[1] + "").indexOf("$") != -1 && (geneVariantLetters[0] + "").indexOf("$")==-1) {
 														ctx2.drawImage(imgStop, (variantRelativeFroms[packVariants[i][j]][k][m] + variantRelativeTos[packVariants[i][j]][k][m] - img_width) / 2, y - 10 - img_height);
 													}
 												}else{
