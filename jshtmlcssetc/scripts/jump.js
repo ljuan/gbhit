@@ -4511,6 +4511,8 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 	var localStorageJsonObj;
 	var geneNodeName_show = geneNodeName;
 
+	var Pfanno_Pclns_Node=null;//add by Liran for Pfanno/Pclns detail, null: not Personalpannel track, -1:Pfanno, 0,1,2... Pclns index.
+
 	var colorStyle = "#000";
 	if(geneNodeName == "refGene") {
 		colorStyle = "#8B8B00";
@@ -4531,6 +4533,19 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 	
 	if(((/^_/).test(geneNodeName))){
 		geneNodeName_show = (geneNodeName + "").replace("_","");
+		//add by Liran for Pfanno/Pclns detail
+		if(geneNodeName==personalPannel.Pfanno.id){
+			Pfanno_Pclns_Node=-1;
+			personalPannel.Pfanno.details = [];
+		} else{
+			for(var Pclns_idx=0;Pclns_idx<personalPannel.Pclns.length;Pclns_idx++){
+				if(geneNodeName==personalPannel.Pclns[Pclns_idx].id){
+					Pfanno_Pclns_Node=Pclns_idx;
+					personalPannel.Pclns[Pclns_idx].details = [];
+				}
+			}
+		}
+		//add by Liran for Pfanno/Pclns detail
 	}
 	
 	if(trackItemIndex< trackItems.length){
@@ -4565,6 +4580,23 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 				trackItems[trackItemIndex].details[i].from = elementFroms[i].childNodes[0].nodeValue;
 				trackItems[trackItemIndex].details[i].to = elementTos[i].childNodes[0].nodeValue;
 			}
+			//add by Liran for Pfanno/Pclns details
+			if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1){
+				personalPannel.Pfanno.details[i] = [];
+				personalPannel.Pfanno.details[i].id = elementIds[i];
+				personalPannel.Pfanno.details[i].left = elementRelativeFroms[i];
+				personalPannel.Pfanno.details[i].right = elementRelativeTos[i];
+				personalPannel.Pfanno.details[i].from = elementFroms[i].childNodes[0].nodeValue;
+				personalPannel.Pfanno.details[i].to = elementTos[i].childNodes[0].nodeValue;
+			} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0){
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i] = [];
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].id = elementIds[i];
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].left = elementRelativeFroms[i];
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].right = elementRelativeTos[i];
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].from = elementFroms[i].childNodes[0].nodeValue;
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].to = elementTos[i].childNodes[0].nodeValue;
+			}
+			//add by Liran for Pfanno/Pclns details
 		}
 		if(canvas1.getContext && canvas2.getContext) {
 			var ctx1 = canvas1.getContext('2d');
@@ -4613,6 +4645,15 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 							trackItems[trackItemIndex].details[i].top = 0;
 							trackItems[trackItemIndex].details[i].bottom = 10;
 						}
+						//add by Liran for Pfanno/Pclns details
+						if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1){
+							personalPannel.Pfanno.details[i].top = 0;
+							personalPannel.Pfanno.details[i].bottom = 10;
+						} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0){
+							personalPannel.Pclns[Pfanno_Pclns_Node].details[i].top = 0;
+							personalPannel.Pclns[Pfanno_Pclns_Node].details[i].bottom = 10;
+						}
+						//add by Liran for Pfanno/Pclns details
 					}
 				} else {
 					var packVariants = [], squishVariants = [];
@@ -4656,6 +4697,17 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 										trackItems[trackItemIndex].details[packVariants[i][j]].top = y - 10;
 										trackItems[trackItemIndex].details[packVariants[i][j]].bottom = y;
 									}
+									//add by Liran for Pfanno/Pclns details
+									if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1){
+										personalPannel.Pfanno.details[packVariants[i][j]].left = elementRelativeFroms[packVariants[i][j]] - ctx2.measureText(elementIds[packVariants[i][j]]).width - 3;
+										personalPannel.Pfanno.details[packVariants[i][j]].top = y - 10;
+										personalPannel.Pfanno.details[packVariants[i][j]].bottom = y;
+									} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0){
+										personalPannel.Pclns[Pfanno_Pclns_Node].details[packVariants[i][j]].left = elementRelativeFroms[packVariants[i][j]] - ctx2.measureText(elementIds[packVariants[i][j]]).width - 3;
+										personalPannel.Pclns[Pfanno_Pclns_Node].details[packVariants[i][j]].top = y - 10;
+										personalPannel.Pclns[Pfanno_Pclns_Node].details[packVariants[i][j]].bottom = y;
+									}
+									//add by Liran for Pfanno/Pclns details
 									if(elementIds[i] != ".") {
 										ctx2.fillStyle = elementColors[packVariants[i][j]];
 										ctx2.strokeStyle = elementColors[packVariants[i][j]];
@@ -4723,6 +4775,15 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 									trackItems[trackItemIndex].details[squishVariants[i][j]].top = y;
 									trackItems[trackItemIndex].details[squishVariants[i][j]].bottom = y + 5;
 								}
+								//add by Liran for Pfanno/Pclns details
+								if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1){
+									personalPannel.Pfanno.details[squishVariants[i][j]].top = y;
+									personalPannel.Pfanno.details[squishVariants[i][j]].bottom = y + 5;
+								} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0){
+									personalPannel.Pclns[Pfanno_Pclns_Node].details[squishVariants[i][j]].top = y;
+									personalPannel.Pclns[Pfanno_Pclns_Node].details[squishVariants[i][j]].bottom = y + 5;
+								}
+								//add by Liran for Pfanno/Pclns details
 								elementRelativeWidth = Math.abs(parseInt(elementRelativeTos[squishVariants[i][j]] - elementRelativeFroms[squishVariants[i][j]] + 1));
 								if(elementDirections[squishVariants[i][j]] == "." || elementRelativeWidth <= 3) {
 									ctx2.fillRect(elementRelativeFroms[squishVariants[i][j]], y, elementRelativeWidth, 5);
@@ -4792,6 +4853,23 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 				trackItems[trackItemIndex].details[i].from = elementFroms[i].childNodes[0].nodeValue;
 				trackItems[trackItemIndex].details[i].to = elementTos[i].childNodes[0].nodeValue;
 			}
+			//add by Liran for Pfanno/Pclns details
+			if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1){
+				personalPannel.Pfanno.details[i] = [];
+				personalPannel.Pfanno.details[i].id = elementIds[i];
+				personalPannel.Pfanno.details[i].left = elementRelativeFroms[i];
+				personalPannel.Pfanno.details[i].right = elementRelativeTos[i];
+				personalPannel.Pfanno.details[i].from = elementFroms[i].childNodes[0].nodeValue;
+				personalPannel.Pfanno.details[i].to = elementTos[i].childNodes[0].nodeValue;
+			} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0){
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i] = [];
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].id = elementIds[i];
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].left = elementRelativeFroms[i];
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].right = elementRelativeTos[i];
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].from = elementFroms[i].childNodes[0].nodeValue;
+				personalPannel.Pclns[Pfanno_Pclns_Node].details[i].to = elementTos[i].childNodes[0].nodeValue;
+			}
+			//add by Liran for Pfanno/Pclns details
 		}
 
 		if(canvas1.getContext && canvas2.getContext) {
@@ -4832,8 +4910,16 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 					for( i = 0; i < geneNodes.length; i++) {
 						trackItems[trackItemIndex].details[i].top = 0;
 						trackItems[trackItemIndex].details[i].bottom = 10;
-
 					}
+					//add by Liran for Pfanno/Pclns details
+					if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1){
+						personalPannel.Pfanno.details[i].top = 0;
+						personalPannel.Pfanno.details[i].bottom = 10;
+					} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0){
+						personalPannel.Pclns[Pfanno_Pclns_Node].details[i].top = 0;
+						personalPannel.Pclns[Pfanno_Pclns_Node].details[i].bottom = 10;
+					}
+					//add by Liran for Pfanno/Pclns details
 				} else {
 					var packVariants = [], squishVariants = [];
 					if((mode == "pack") && (geneNodes.length <= parseInt(trackLength / 50) * 50)) {//geneNodes.length <= parseInt(trackLength / 50   此判断是假定一个gene最小占位为50，则宽为trackLength，高为50的track可放的最多gene数目
@@ -4876,6 +4962,17 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 										trackItems[trackItemIndex].details[packVariants[i][j]].top = y - 10;
 										trackItems[trackItemIndex].details[packVariants[i][j]].bottom = y;
 									}
+									//add by Liran for Pfanno/Pclns details
+									if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1){
+										personalPannel.Pfanno.details[packVariants[i][j]].left = elementRelativeFroms[packVariants[i][j]] - ctx2.measureText(elementIds[packVariants[i][j]]).width - 3;
+										personalPannel.Pfanno.details[packVariants[i][j]].top = y - 10;
+										personalPannel.Pfanno.details[packVariants[i][j]].bottom = y;
+									} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0){
+										personalPannel.Pclns[Pfanno_Pclns_Node].details[packVariants[i][j]].left = elementRelativeFroms[packVariants[i][j]] - ctx2.measureText(elementIds[packVariants[i][j]]).width - 3;
+										personalPannel.Pclns[Pfanno_Pclns_Node].details[packVariants[i][j]].top = y - 10;
+										personalPannel.Pclns[Pfanno_Pclns_Node].details[packVariants[i][j]].bottom = y;
+									}
+									//add by Liran for Pfanno/Pclns details
 									if(elementIds[i] != ".") {
 										ctx2.fillStyle = elementColors[packVariants[i][j]];
 										ctx2.strokeStyle = elementColors[packVariants[i][j]];
@@ -5006,6 +5103,15 @@ function showGene(canvas1, canvas2, geneNode, mode) {
 									trackItems[trackItemIndex].details[squishVariants[i][j]].top = y;
 									trackItems[trackItemIndex].details[squishVariants[i][j]].bottom = y + 5;
 								}
+								//add by Liran for Pfanno/Pclns details
+								if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1){
+									personalPannel.Pfanno.details[squishVariants[i][j]].top = y;
+									personalPannel.Pfanno.details[squishVariants[i][j]].bottom = y + 5;
+								} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0){
+									personalPannel.Pclns[Pfanno_Pclns_Node].details[squishVariants[i][j]].top = y;
+									personalPannel.Pclns[Pfanno_Pclns_Node].details[squishVariants[i][j]].bottom = y + 5;
+								}
+								//add by Liran for Pfanno/Pclns details
 								for( k = 0; k < subElements[squishVariants[i][j]].length; k++) {
 									subElementWidth = Math.abs(subElemnetRelativeTos[squishVariants[i][j]][k] - subElementRelativeFroms[squishVariants[i][j]][k] + 1);
 									if(subElementTypes[squishVariants[i][j]][k] == subElementTypeLineValue) {
@@ -9313,6 +9419,8 @@ function loadChrBand(){
 										var inputsf=ogenes[gidx].from;
 										var inputet=ogenes[gidx].to;
 										document.getElementById("search_field").value=chrs[click].name+":"+inputsf.toLocaleString().replace(/\.0+$/,"")+"-"+inputet.toLocaleString().replace(/\.0+$/,"");
+										browseJumpWindow_close();
+										jump();
 
 									};
 								})(ogeneso[gidx].text,gidx);

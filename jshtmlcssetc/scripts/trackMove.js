@@ -359,6 +359,11 @@ function canvasMousemove(evt) {
 	var eventTarget = evt.target || evt.srcElement;
 	var trNode = eventTarget.parentNode.parentNode;
 	var trackId = trNode.id;
+	//add by Liran for Pfanno and Pclns track details
+	if(trackId==null || trackId==""){
+		trackId=trNode.parentNode.id;
+	}
+	//add by Liran for Pfanno and Pclns track details
 	var i, j;
 	var evtCanvasX, evtCanvasY;
 	for( i = 0; i < trackItems.length; i++) {
@@ -369,6 +374,24 @@ function canvasMousemove(evt) {
 	evtCanvasX = evtMouseCoods.x - $(eventTarget).position().left;
 	evtCanvasY = evtMouseCoods.y - $(eventTarget).position().top;
 
+	//add by Liran for Pfanno and Pclns track details
+	var Pfanno_Pclns_Node=null;
+	if(trackId.substring(0,1)=="_"){
+		if(trackId==personalPannel.Pfanno.id){
+			Pfanno_Pclns_Node=-1;
+		} else {
+			for(var Pclns_idx=0;Pclns_idx<personalPannel.Pclns.length;Pclns_idx++){
+				if(trackId==personalPannel.Pclns[Pclns_idx].id){
+					Pfanno_Pclns_Node=Pclns_idx;
+				}
+			}
+		}
+
+		evtCanvasX = evtCanvasX - $("#personalPannel").position().left;
+		evtCanvasY = evtCanvasY - $("#personalPannel").position().top;
+	}
+	//add by Liran for Pfanno and Pclns track details
+
 	if(i < trackItems.length) {
 		for( j = 0; j < trackItems[i].details.length; j++) {
 			if(evtCanvasX >= trackItems[i].details[j].left && evtCanvasX <= trackItems[i].details[j].right && evtCanvasY >= trackItems[i].details[j].top && evtCanvasY <= trackItems[i].details[j].bottom) {
@@ -377,11 +400,37 @@ function canvasMousemove(evt) {
 				break;
 			}
 		}
+		if(j >= trackItems[i].details.length) {
+			$(eventTarget).css("cursor", "url(./image/Grabber.cur),auto");
+			//document.body.style.cursor = "auto";
+		}
 	}
-	if(j >= trackItems[i].details.length) {
-		$(eventTarget).css("cursor", "url(./image/Grabber.cur),auto");
-		//document.body.style.cursor = "auto";
+
+	//add by Liran for Pfanno and Pclns track details
+	if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1){
+		for( j = 0; j < personalPannel.Pfanno.details.length; j++) {
+			if(evtCanvasX >= personalPannel.Pfanno.details[j].left && evtCanvasX <= personalPannel.Pfanno.details[j].right && evtCanvasY >= personalPannel.Pfanno.details[j].top && evtCanvasY <= personalPannel.Pfanno.details[j].bottom) {
+				//document.body.style.cursor = "pointer";
+				$(eventTarget).css("cursor", "pointer");
+				break;
+			}
+		}
+		if(j >= personalPannel.Pfanno.details.length) {
+			$(eventTarget).css("cursor", "url(./image/Grabber.cur),auto");
+		}
+	} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0){
+		for( j = 0; j < personalPannel.Pclns[Pfanno_Pclns_Node].details.length; j++) {
+			if(evtCanvasX >= personalPannel.Pclns[Pfanno_Pclns_Node].details[j].left && evtCanvasX <= personalPannel.Pclns[Pfanno_Pclns_Node].details[j].right && evtCanvasY >= personalPannel.Pclns[Pfanno_Pclns_Node].details[j].top && evtCanvasY <= personalPannel.Pclns[Pfanno_Pclns_Node].details[j].bottom) {
+				//document.body.style.cursor = "pointer";
+				$(eventTarget).css("cursor", "pointer");
+				break;
+			}
+		}
+		if(j >= personalPannel.Pclns[Pfanno_Pclns_Node].details.length) {
+			$(eventTarget).css("cursor", "url(./image/Grabber.cur),auto");
+		}
 	}
+	//add by Liran for Pfanno and Pclns track details
 }
 
 function canvasClick(evt) {
@@ -1356,16 +1405,40 @@ function canvasClickForRepeat(evt) {
 	var eventTarget = evt.target || evt.srcElement;
 	var trNode = eventTarget.parentNode.parentNode;
 	var trackId = trNode.id;
+
+	//add by Liran for Pfanno and Pclns track details
+	if(trackId==null || trackId==""){
+		trackId=trNode.parentNode.id;
+	}
+	//add by Liran for Pfanno and Pclns track details
 	var i, j,k;
 	
-	evtCanvasX = evtMouseCoods.x - $(eventTarget).position().left;
-	evtCanvasY = evtMouseCoods.y - $(eventTarget).position().top;
-
 	for( i = 0; i < trackItems.length; i++) {
 		if(trackItems[i].id == trackId) {
 			break;
 		}
 	}
+	evtCanvasX = evtMouseCoods.x - $(eventTarget).position().left;
+	evtCanvasY = evtMouseCoods.y - $(eventTarget).position().top;
+
+	//add by Liran for Pfanno and Pclns track details
+	var Pfanno_Pclns_Node=null;
+	if(trackId.substring(0,1)=="_"){
+		if(trackId==personalPannel.Pfanno.id){
+			Pfanno_Pclns_Node=-1;
+		} else {
+			for(var Pclns_idx=0;Pclns_idx<personalPannel.Pclns.length;Pclns_idx++){
+				if(trackId==personalPannel.Pclns[Pclns_idx].id){
+					Pfanno_Pclns_Node=Pclns_idx;
+				}
+			}
+		}
+
+		evtCanvasX = evtCanvasX - $("#personalPannel").position().left;
+		evtCanvasY = evtCanvasY - $("#personalPannel").position().top;
+	}
+	//add by Liran for Pfanno and Pclns track details
+
 
 	if(i < trackItems.length) {
 		for( j = 0; j < trackItems[i].details.length; j++) {
@@ -1393,6 +1466,61 @@ function canvasClickForRepeat(evt) {
 						
 			//Ajax to get the gene details
 			getRepeatDetailHttpRequest(trackId, trackItems[i].details[j].id, trackItems[i].details[j].from, trackItems[i].details[j].to);
+		}
+	}
+	if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node==-1) {
+		for( j = 0; j < personalPannel.Pfanno.details.length; j++) {
+			if(evtCanvasX >= personalPannel.Pfanno.details[j].left && evtCanvasX <= personalPannel.Pfanno.details[j].right && evtCanvasY >= personalPannel.Pfanno.details[j].top && evtCanvasY <= personalPannel.Pfanno.details[j].bottom) {
+				//show details
+				break;
+			}
+		}
+		if(j < personalPannel.Pfanno.details.length) {
+			//draw the pointer
+			drawDecoriteminfopointer("repeatMaskDetailTooltipPointer");
+			//set the position & display
+			$(document.getElementById("repeatMaskDetailTooltip")).css("top", evtMouseCoods.y);
+			$(document.getElementById("repeatMaskDetailTooltip")).css("left", evtMouseCoods.x - 10);
+			$(document.getElementById("repeatMaskDetailTooltip")).css("display", "block");
+			//set the cursor style & event handler
+			$(eventTarget).css("cursor", "auto");
+			$(document.getElementById("repeatMaskDetailTooltip")).css("cursor", "auto");
+			//document.body.style.cursor = "auto";
+			$(document.getElementById("repeatMaskDetailTooltip")).unbind("mouseenter");
+			$(document.getElementById("repeatMaskDetailTooltip")).mouseenter(function() {
+				document.body.style.cursor = "auto";
+			});
+			document.body.addEventListener("mousedown", mousedownOutsideRepeatTooltip, false);
+						
+			//Ajax to get the gene details
+			getRepeatDetailHttpRequest(trackId, personalPannel.Pfanno.details[j].id, personalPannel.Pfanno.details[j].from, personalPannel.Pfanno.details[j].to);
+		}
+	} else if(Pfanno_Pclns_Node!=null && Pfanno_Pclns_Node>=0) {
+		for( j = 0; j < personalPannel.Pclns[Pfanno_Pclns_Node].details.length; j++) {
+			if(evtCanvasX >= personalPannel.Pclns[Pfanno_Pclns_Node].details[j].left && evtCanvasX <= personalPannel.Pclns[Pfanno_Pclns_Node].details[j].right && evtCanvasY >= personalPannel.Pclns[Pfanno_Pclns_Node].details[j].top && evtCanvasY <= personalPannel.Pclns[Pfanno_Pclns_Node].details[j].bottom) {
+				//show details
+				break;
+			}
+		}
+		if(j < personalPannel.Pclns[Pfanno_Pclns_Node].details.length) {
+			//draw the pointer
+			drawDecoriteminfopointer("repeatMaskDetailTooltipPointer");
+			//set the position & display
+			$(document.getElementById("repeatMaskDetailTooltip")).css("top", evtMouseCoods.y);
+			$(document.getElementById("repeatMaskDetailTooltip")).css("left", evtMouseCoods.x - 10);
+			$(document.getElementById("repeatMaskDetailTooltip")).css("display", "block");
+			//set the cursor style & event handler
+			$(eventTarget).css("cursor", "auto");
+			$(document.getElementById("repeatMaskDetailTooltip")).css("cursor", "auto");
+			//document.body.style.cursor = "auto";
+			$(document.getElementById("repeatMaskDetailTooltip")).unbind("mouseenter");
+			$(document.getElementById("repeatMaskDetailTooltip")).mouseenter(function() {
+				document.body.style.cursor = "auto";
+			});
+			document.body.addEventListener("mousedown", mousedownOutsideRepeatTooltip, false);
+						
+			//Ajax to get the gene details
+			getRepeatDetailHttpRequest(trackId, personalPannel.Pclns[Pfanno_Pclns_Node].details[j].id, personalPannel.Pclns[Pfanno_Pclns_Node].details[j].from, personalPannel.Pclns[Pfanno_Pclns_Node].details[j].to);
 		}
 	}
 }
