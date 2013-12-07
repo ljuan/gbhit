@@ -110,6 +110,16 @@ public class Genes{
 		return genes;
 	}
 	public static Element find_Gene(Document doc, String prefix){
+		prefix=prefix.toUpperCase();
+		if(prefix.matches("C[XY0-9]+ORF")){
+			prefix=prefix.replaceFirst("ORF", "orf");
+		}
+		else if(prefix.matches("C[XY0-9]+OR")){
+			prefix=prefix.replaceFirst("OR", "or");
+		}
+		else if(prefix.matches("^C[XY0-9]+O")){
+			prefix=prefix.replaceFirst("O", "o");
+		}
 		Element genes = doc.createElement(Consts.XML_TAG_GENES);
 		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(genes); 
 		int match=binarySearchPrefix(prefix);
