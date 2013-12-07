@@ -54,6 +54,9 @@ public class GRFReader {
 						XmlWriter.append_text_element(doc, element, XML_TAG_FROM, split.getResultByIndex(3));
 						XmlWriter.append_text_element(doc, element, XML_TAG_TO, split.getResultByIndex(4));
 
+						XmlWriter.append_text_element(doc, element,	XML_TAG_SOURCE, split.getResultByIndex(1));
+						XmlWriter.append_text_element(doc, element, XML_TAG_DIRECTION,split.getResultByIndex(6));
+
 						StringBuilder builder = new StringBuilder();
 						builder.append(XML_TAG_CHROMOSOME);
 						builder.append("=");

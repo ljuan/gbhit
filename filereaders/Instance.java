@@ -430,7 +430,7 @@ public class Instance {
 			}
 			else if(type_temp.equals(Consts.FORMAT_GRF)){
 				GRFReader gr = new GRFReader(path_temp);
-				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,(int)Coordinate[0],(int)Coordinate[1]);
+				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,start,end);
 				if(personal){
 					GRFElementRegionComparison rc = new GRFElementRegionComparison(doc, Ele_var);
 					rc.compareRegion(ele_temp);
@@ -438,7 +438,7 @@ public class Instance {
 			}
 			else if(type_temp.equals(Consts.FORMAT_GDF)){
 				GDFReader gr = new GDFReader(path_temp);
-				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,(int)Coordinate[0],(int)Coordinate[1]);
+				ele_temp=gr.get_detail(doc, track.get_ID(),id, Chr,start,end);
 				if(personal){
 					GdfElementSelector ges=new GdfElementSelector(doc,Ele_anno,Ele_var);
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ges.select(ele_temp));
