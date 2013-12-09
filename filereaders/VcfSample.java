@@ -18,7 +18,7 @@ class VcfSample implements Serializable{
 	private Map<String, BooleanIndex> Samples;
 	private String[] SampleNames;
 	private int[] selectedIndexes;
-	private String[] selectedNames;
+	private String[] selectedNames=null;
 
 	/**
 	 * Add all samples
@@ -88,9 +88,10 @@ class VcfSample implements Serializable{
 		return selectedIndexes;
 	}
 	public boolean ifSelected(String SampleName){
-		for(int i=0;i<selectedNames.length;i++)
-			if(SampleName.equals(selectedNames[i]))
-				return true;
+		if(selectedNames!=null)
+			for(int i=0;i<selectedNames.length;i++)
+				if(SampleName.equals(selectedNames[i]))
+					return true;
 		return false;
 	}
 	public boolean ifExists(String SampleName){

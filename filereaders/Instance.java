@@ -164,6 +164,8 @@ public class Instance {
 				else{
 					Externals.put(tracks[i], new Annotations(tracks[i],links[i],types[i],modes[i],Consts.GROUP_CLASS_USR));
 				}
+				if(types[i].equals(Consts.FORMAT_VCF))
+					init_track(Externals.get(tracks[i])); 
 			}
 	}
 	public void remove_Externals(String[] tracks){
@@ -221,16 +223,19 @@ public class Instance {
 	}
 	public String add_Pvar(String track,String mode,String PvarID){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
-		if(Annos.containsKey(track)){
+		if(Externals.containsKey(track)){
 			if(PvarID.equals(track)
-					||(Annos.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
-							&&((VcfSample)(Annos.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifExists(PvarID))){
+					||(Externals.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
+							&&((VcfSample)(Externals.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifExists(PvarID))){
 				this.PvarID=PvarID;
-				this.Pvar=SerializationUtils.clone(Annos.get(track));
+				this.Pvar=SerializationUtils.clone(Externals.get(track));
 //				Pvar.set_Mode(mode);
 				Pvar.set_Mode(Consts.MODE_PACK);
-				if (!PvarID.equals(track))
+				if(Externals.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
+							&&((VcfSample)(Externals.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifExists(PvarID))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
+				else
+					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, "");
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
 				if(Pfanno!=null)
 					append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
@@ -245,18 +250,17 @@ public class Instance {
 				init_IndividualStat();
 			}
 		}
-		else if(Externals.containsKey(track)){
+		else if(Annos.containsKey(track)){
 			if(PvarID.equals(track)
-					||(Externals.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
-							&&((VcfSample)(Externals.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifSelected(PvarID))){
+					||(Annos.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
+							&&((VcfSample)(Annos.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifExists(PvarID))){
 				this.PvarID=PvarID;
-				this.Pvar=SerializationUtils.clone(Externals.get(track));
+				this.Pvar=SerializationUtils.clone(Annos.get(track));
 //				Pvar.set_Mode(mode);
 				Pvar.set_Mode(Consts.MODE_PACK);
-				if (!PvarID.equals(track))
+				if(Annos.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
+							&&((VcfSample)(Annos.get(track).get_Parameter(Consts.VCF_HEADER_SAMPLE))).ifExists(PvarID))
 					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, PvarID);
-				else
-					Pvar.set_Parameters(Consts.VCF_HEADER_SAMPLE, "");
 				append_Ptrack(Pvar,doc,Pvar.get_Mode(),Consts.PTRACK_CLASS_VAR);
 				if(Pfanno!=null)
 					append_Ptrack(Pfanno,doc,Pfanno.get_Mode(),Consts.PTRACK_CLASS_FANNO);
@@ -549,6 +553,16 @@ public class Instance {
 			return add_Pvar(Pvar.get_ID(),Pvar.get_Mode(),PvarID);
 		return null;
 	}
+	public String get_ScoreMethod(){
+		Document doc=XmlWriter.init(Consts.META_ROOT);
+		String[] scoremethlist=new String[1];
+		if(this.scoremeth!=null)
+			scoremethlist[0]=scoremeth;
+		else
+			scoremethlist[0]="PGB";
+		CfgReader.write_metalist(doc, scoremethlist ,"ScoreMethList");
+		return XmlWriter.xml2string(doc);
+	}
 	public String get_ScoreMethods(){
 		Document doc=XmlWriter.init(Consts.META_ROOT);
 		String[] scoremethlist=new String[Annovar.ScoreMeth.keySet().size()];
@@ -583,6 +597,19 @@ public class Instance {
 		CfgReader.write_metalist(doc,anno_names, "AnnotationList");
 		return XmlWriter.xml2string(doc);
 	}
+	public String get_Externals(){
+		String[] externals_names=new String[Externals.size()];
+		int i=0;
+		Enumeration<Annotations> externals_enum=Externals.elements();
+		for(i=0;i<Externals.size();i++){
+			Annotations temp=externals_enum.nextElement();
+			externals_names[i]=temp.get_Group()+":"+temp.get_ID()+":"+temp.get_Mode()+":"+temp.get_Type();
+		}
+		Arrays.sort(externals_names);
+		Document doc=XmlWriter.init(Consts.META_ROOT);
+		CfgReader.write_metalist(doc,externals_names, "AnnotationList");
+		return XmlWriter.xml2string(doc);
+	}
 	public String get_Individuals(){
 		ArrayList<String> individuals = new ArrayList<String>();
 		int i=0;
@@ -590,6 +617,38 @@ public class Instance {
 		for(i=0;i<Annos.size();i++){
 			Annotations temp=annos_enum.nextElement();
 			if(temp.get_Group().equals(Consts.GROUP_CLASS_PG)){
+				StringBuffer individual=new StringBuffer();
+				individual.append(temp.get_ID());
+				individual.append(":");
+				if(temp.get_Type().equals(Consts.FORMAT_VCF)&&temp.has_Parameter(Consts.VCF_HEADER_SAMPLE)){
+					String[] samples=((VcfSample) temp.get_Parameter(Consts.VCF_HEADER_SAMPLE)).getSampleNames();
+					for(int j=0;j<samples.length-1;j++){
+						individual.append(samples[j]);
+						individual.append(";");
+					}
+					if(samples.length>0)
+						individual.append(samples[samples.length-1]);
+				}
+				else{
+					individual.append(temp.get_ID());
+				}
+				individuals.add(individual.toString());
+			}
+		}
+		String[] individuals_names = new String[individuals.size()];
+		individuals.toArray(individuals_names);
+		Arrays.sort(individuals_names);
+		Document doc=XmlWriter.init(Consts.META_ROOT);
+		CfgReader.write_metalist(doc,individuals_names, "IndividualList");
+		return XmlWriter.xml2string(doc);
+	}
+	public String get_ExIndividuals(){
+		ArrayList<String> individuals = new ArrayList<String>();
+		int i=0;
+		Enumeration<Annotations> externals_enum=Externals.elements();
+		for(i=0;i<Externals.size();i++){
+			Annotations temp=externals_enum.nextElement();
+			if(temp.get_Type().equals(Consts.FORMAT_VCF)||temp.get_Type().equals(Consts.FORMAT_GVF)){
 				StringBuffer individual=new StringBuffer();
 				individual.append(temp.get_ID());
 				individual.append(":");

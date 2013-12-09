@@ -43,6 +43,9 @@ public class Interfaces extends HttpServlet{
 		else if (action.equals("getAnnotations")){
 			a=ins.get_Annotations();
 		}
+		else if (action.equals("getExternals")){
+			a=ins.get_Externals();
+		}
 		else if (action.equals("getChromosomes")){
 			a=ins.get_Chromosomes();
 		}
@@ -51,6 +54,9 @@ public class Interfaces extends HttpServlet{
 		}
 		else if (action.equals("getIndividuals")){
 			a=ins.get_Individuals();
+		}
+		else if (action.equals("getExIndividuals")){
+			a=ins.get_ExIndividuals();
 		}
 		else if (action.equals("getCytobands")){
 			a=ins.get_Cyto(req.getParameter("chr"));
@@ -102,6 +108,9 @@ public class Interfaces extends HttpServlet{
 		else if (action.equals("setScoreMethod")){
 			a=ins.set_ScoreMethod(req.getParameter("scoremeth"));
 		}
+		else if (action.equals("getScoreMethod")){
+			a=ins.get_ScoreMethod();
+		}
 		else if (action.equals("getScoreMethods")){
 			a=ins.get_ScoreMethods();
 		}
@@ -123,6 +132,10 @@ public class Interfaces extends HttpServlet{
 		else if (action.equals("addExternals")){
 			ins.add_Externals(req.getParameter("tracks").split(","),req.getParameter("links").split(","), req.getParameter("types").split(","),req.getParameter("modes").split(","));
 			a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
+		}
+		else if (action.equals("addExIndividuals")){
+			ins.add_Externals(req.getParameter("tracks").split(","),req.getParameter("links").split(","), req.getParameter("types").split(","),req.getParameter("modes").split(","));
+			a=ins.get_ExIndividuals();
 		}
 		else if (action.equals("removeExternals")){
 			ins.remove_Externals(req.getParameter("tracks").split(","));
