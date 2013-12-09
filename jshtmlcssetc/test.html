@@ -36,7 +36,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 				 var param5=document.getElementById("p5").value;
 				 var querry="getAssemblies";
 				 req.onreadystatechange = getReadyStateHandler;
-				if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "getChromosomes" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno" || param5 == "getSession"|| param5== "getStat" || param5 == "upStat" || param5 == "getScoreMethods" || param5 == "getAllCytobands"){
+				 if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "getChromosomes" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno" || param5 == "getSession"|| param5== "getStat" || param5 == "upStat" || param5 == "getScoreMethods" || param5 == "getAllCytobands" || param5 == "getIndividuals" || param5 == "getExternals" || param5 == "getExIndividuals" || param5 == "getScoreMethod"){
 					querry="action="+param5;
 				} else if(param5 == "removeTracks" || param5 == "removeExternals" || param5 == "getParams" || param5 == "removePclns"){
 					querry="action="+param5+"&tracks="+param4;
@@ -56,7 +56,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					querry="action="+param5+"&tracks="+param4+"&id="+param2;
 				} else if(param5 == "overlapGene"){
 					querry="action="+param5+"&chr="+param1+"&start="+param2+"&end="+param3;
-				} else if(param5 == "addExternals"){
+				} else if(param5 == "addExternals" || param5 == "addExIndividuals"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&links="+param2+"&types="+param1;
 				} else if(param5 == "getDetail"){
 					querry="action="+param5+"&tracks="+param4+"&id="+param1+"&start="+param2+"&end="+param3;
@@ -140,7 +140,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<th>Input</th>
 			<th>update<br>refresh</th>
 			<th>getDetail</th>
-			<th>addExternals</th>
+			<th>addExternals<br>addExIndividuals</th>
 			<th>setParams</th>
 			<th>overlapGene</th>
 			<th>addPvar<br>modiPvar<br>initPvar</th>
@@ -149,7 +149,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<th>removeTracks<br>removeExternals<br>removePclns<br>getParams</th>
 			<th>getGene<br>findGene</th>
 			<th>setAssembly<br>getCytobands<br>setScoreMethod</th>
-			<th>removePvar<br>removePanno<br>removePfanno<br>getAssemblies<br>getSession<br>getAnnotations<br>getChromosomes<br>getScoreMethods<br>getStat<br>upStat<br>getAllCytobands</th>
+			<th>removePvar<br>removePanno<br>removePfanno<br>getAssemblies<br>getSession<br>getAnnotations<br>getExternals<br>getChromosomes<br>getScoreMethod<br>getScoreMethods<br>getStat<br>upStat<br>getAllCytobands<br>getIndividuals<br>getExIndividuals</th>
 		<tr align="center">
 			<td><input id="p1" type="text"/></td>
 			<td>Chromosome</td>
