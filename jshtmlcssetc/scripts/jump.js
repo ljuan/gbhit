@@ -681,7 +681,7 @@ function handleUpdateStateChange() {
 								if(element_nodes[j].getAttribute("id") == personalPannel.Pclns[i].id) {
 									pclns_flag = true;
 									canvasNodes = document.getElementById(personalPannel.Pclns[i].id).getElementsByTagName("canvas");
-									showGene(canvasNodes[0], canvasNodes[1], element_nodes[j], personalPannel.Pfanno.mode);
+									showGene(canvasNodes[0], canvasNodes[1], element_nodes[j], personalPannel.Pclns[i].mode);
 									break;
 								}
 							}
@@ -2652,9 +2652,15 @@ function overScaleShow(trackId) {
 		canvas2.height = 10;
 		canvas2.style.height = 10;
 		ctx1.fillStyle = "#000";
-		ctx1.fillText(trackId, canvas1.width - ctx1.measureText(trackId).width, 8);
+		var trackId_show;
+		if(trackId.startsWith("_")){
+			trackId_show=trackId.substring(1);
+		} else {
+			trackId_show=trackId;
+		}
+		ctx1.fillText(trackId_show, canvas1.width - ctx1.measureText(trackId_show).width, 8);
 		ctx2.fillStyle = "#000";
-		var tempStr = "zoom in to <= 1,000,000 bases to view items";
+		var tempStr = "The request range is too large for this track OR the track data are currently unavailable";//"zoom in to <= 1,000,000 bases to view items";
 		ctx2.fillText(tempStr, (canvas2.width - ctx2.measureText(tempStr).width) / 2, 8);
 	}
 	if(document.getElementById(trackId).getElementsByClassName("thickbox").length > 0){
@@ -6138,18 +6144,26 @@ function handle_addPvar_Request() {
 			//personal genome
 			createPPGTrack(personalPannel.Pvar.id, personalPannel.Pvar.mode);
 			var canvasNodes = document.getElementById(personalPannel.Pvar.id).getElementsByTagName("canvas");
-			showVariantByImg(canvasNodes[0], canvasNodes[1], personal_genome_node, personalPannel.Pvar.mode);
+			if(personal_genome_node){//Liran to fix bugs in scenario "zoom out larger than 1M, load individual, then zoom in smaller than 1M".
+				showVariantByImg(canvasNodes[0], canvasNodes[1], personal_genome_node, personalPannel.Pvar.mode);
+			} else {
+				overScaleShow(personalPannel.Pvar.id);
+			}
 			//Pfanno track
 			if(personalPannel.Pfanno.id){
 				var personal_fanno_node;
+				createPPOtherTrack(personalPannel.Pfanno.id, personalPannel.Pfanno.mode);
 				for(i=0;i<elementNodes.length;i++){
 					if(personalPannel.Pfanno.id == elementNodes[i].getAttribute("id")){
 						personal_fanno_node = elementNodes[i];
-						createPPOtherTrack(personalPannel.Pfanno.id, personalPannel.Pfanno.mode);
-						canvasNodes = document.getElementById(personalPannel.Pfanno.id).getElementsByTagName("canvas");
-						showGene(canvasNodes[0], canvasNodes[1], personal_fanno_node, personalPannel.Pfanno.mode);
 						break;
 					}
+				}
+				if(personal_fanno_node){//Liran to fix bugs in scenario "zoom out larger than 1M, load individual, then zoom in smaller than 1M".
+					canvasNodes = document.getElementById(personalPannel.Pfanno.id).getElementsByTagName("canvas");
+					showGene(canvasNodes[0], canvasNodes[1], personal_fanno_node, personalPannel.Pfanno.mode);
+				} else {
+					overScaleShow(personalPannel.Pfanno.id);
 				}
 			}
 			if(personalPannel.Panno.id){
@@ -6165,18 +6179,26 @@ function handle_addPvar_Request() {
 					showPersonalGeneByImg_OneNode(canvasNodes[0], canvasNodes[1], personal_anno_nodes[0], personalPannel.Panno.mode);
 				}else if(personal_anno_nodes.length == 2){
 					showPersonalGeneByImg_TwoNode(canvasNodes[0], canvasNodes[1], personal_anno_nodes[0], personal_anno_nodes[1], personalPannel.Panno.mode);
+				}else{//Liran to fix bugs in scenario "zoom out larger than 1M, load individual, then zoom in smaller than 1M".
+					overScaleShow(personalPannel.Panno.id);
 				}
 			}
 			//Pclns tracks
 			if(personalPannel.Pclns.length > 0){
+				var pclns_flag;//Liran to fix bugs in scenario "zoom out larger than 1M, load individual, then zoom in smaller than 1M".
 				for(i=0;i<personalPannel.Pclns.length;i++){
+					pclns_flag = false;
+					createPPOtherTrack(personalPannel.Pclns[i].id, personalPannel.Pclns[i].mode);
 					for(j=0;j<elementNodes.length;j++){
 						if(elementNodes[j].getAttribute("id")==personalPannel.Pclns[i].id){
-							createPPOtherTrack(personalPannel.Pclns[i].id, personalPannel.Pclns[i].mode);
+							pclns_flag = true;
 							canvasNodes = document.getElementById(personalPannel.Pclns[i].id).getElementsByTagName("canvas");
-							showGene(canvasNodes[0], canvasNodes[1], elementNodes[j], personalPannel.Pfanno.mode);
+							showGene(canvasNodes[0], canvasNodes[1], elementNodes[j], personalPannel.Pclns[i].mode);
 							break;
 						}
+					}
+					if(!pclns_flag){
+						overScaleShow(personalPannel.Pclns[i].id);
 					}
 				}
 			}
