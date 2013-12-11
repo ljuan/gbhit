@@ -8336,6 +8336,9 @@ function tracksettingpannel_close(){
 function trackItems_setting3(){//individualItems setting
 
 	document.getElementById("indset_radio").innerHTML="";
+	document.getElementById("builtin_1000g").innerHTML="Loading...";
+	document.getElementById("builtin_others").innerHTML="Loading...";
+	document.getElementById("external_uploaded").innerHTML="Loading...";
 
 	var individuals=[];//includes personal TRACKs, each unit has trackname, samples, samples is also array
 	var exindividuals=[];//includes personal TRACKs, each unit has trackname, samples, samples is also array
@@ -9256,7 +9259,7 @@ function loadChrBand(){
 				getSingleCytoAsync(0,0,2);
 			}
 			else {
-				error_warn=R.text(0,30,"Please load personal variants").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+				error_warn=R.text(0,30,"Please load personal variants from 'Load Individual' menu").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
 			}
 		};
 		scang_button[0].onmouseout = function(){
@@ -9278,7 +9281,7 @@ function loadChrBand(){
 				getSingleCytoAsync(click,0,1);
 			}
 			else {
-				error_warn=R.text(0,30,"Please load personal variants and select chromosome").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+				error_warn=R.text(0,30,"Please load personal variants from 'Load Individual' menu and select a chromosome").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
 			}
 		};
 		scanc_button[0].onmouseout = function(){
@@ -9300,7 +9303,7 @@ function loadChrBand(){
 				getSingleCytoAsync(click,blick,0);
 			}
 			else {
-				error_warn=R.text(0,30,"Please load personal variants and select cytoband").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+				error_warn=R.text(0,30,"Please load personal variants from 'Load Individual' menu and select a cytoband").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
 			}
 		};
 		scanb_button[0].onmouseout = function(){
@@ -9725,7 +9728,7 @@ function BJW_getStat() {
 	if(personalPannel.Pvar.id)
 		window.open("servlet/test.do?action=getStat");
 	else
-		document.getElementById("upload_success").innerHTML="Please load personal variants";
+		document.getElementById("upload_success").innerHTML="Please load personal variants from 'Load Indivdiual' menu";
 }
 function BJW_upStat() {
 	var fileObj = document.getElementById("file_field").files[0];
