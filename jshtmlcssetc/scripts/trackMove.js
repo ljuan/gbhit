@@ -554,6 +554,7 @@ function handle_getDetailHttpRequest(){
 				geneType = "RefSeq";
 				url = "http://www.ncbi.nlm.nih.gov/nuccore/" + geneId;
 			}
+
 			
 			//output the information to tooltip
 			document.getElementById("tooltip_symbol").innerHTML = geneSymbol;
@@ -1536,6 +1537,8 @@ function handle_getRepeatDetailHttpRequest(){
 	if(XMLHttpReq3.readyState == 4) {
 		if(XMLHttpReq3.status == 200) {
 			var XMLDoc = XMLHttpReq3.responseXML;
+			var repeatsNode =  XMLDoc.getElementsByTagName(xmlTagElements)[0];
+			var trackId = repeatsNode.getAttribute(xmlAttributeId);
 			var repeatNode =  XMLDoc.getElementsByTagName(xmlTagElement)[0];
 			var repeatId = repeatNode.getAttribute(xmlAttributeId);
 			var repeatFrom = repeatNode.getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue;
@@ -1563,6 +1566,21 @@ function handle_getRepeatDetailHttpRequest(){
 				$("#repeatMaskDetail_Des_content").html(repeatDes);
 			}else{
 				$("#repeatMaskDetail_Des_trNode").css("display","none");
+			}
+			if(trackId == "OMIM" || trackId =="_OMIM" ){
+				var patternOMIM = /^.*,.*(\d{6}).*$/;
+				if(patternOMIM.test(repeatId)){
+					var OMIMentry = RegExp.$1;
+					$("#repeatMaskDetailContent_link").css("display","block");
+					document.getElementById("repeatMaskDetailContent_link").onclick = function(){
+						window.open("http://omim.org/entry/"+OMIMentry);
+					};
+				}else{
+					$("#repeatMaskDetailContent_link").css("display","none");
+				//	document.getElementById("repeatMaskDetailContent_link").onclick = function(){};
+				}
+			}else{
+					$("#repeatMaskDetailContent_link").css("display","none");
 			}
 			
 			$("#repeatMaskDetailLoading").css("display","none");

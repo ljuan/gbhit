@@ -2653,7 +2653,7 @@ function overScaleShow(trackId) {
 		canvas2.style.height = 10;
 		ctx1.fillStyle = "#000";
 		var trackId_show;
-		if(trackId.startsWith("_")){
+		if(trackId.substring(0,1) == "_"){
 			trackId_show=trackId.substring(1);
 		} else {
 			trackId_show=trackId;
@@ -8347,7 +8347,8 @@ function trackItems_setting3(){//individualItems setting
 		individuals[individuals.length-1].samples = ind_temp[1].split(";");
 	}
 	var trackItems_setting_divObj = document.getElementById("indsetWindow");
-	var ts_content_centerObj = document.getElementById("IW_content");//.getElementsByTagName("center")[0]
+//	var ts_content_centerObj = document.getElementById("IW_content");//.getElementsByTagName("center")[0]
+	var ts_content_centerObj = document.getElementById("indset_radio");//.getElementsByTagName("center")[0]
 	ts_content_centerObj.innerHTML = "";
 	var group_divObj;
 	var group_title_divObj, group_content_divObj;
