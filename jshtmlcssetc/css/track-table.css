@@ -677,9 +677,9 @@ span#web-name{
 	text-align: left;
 	padding-left: 35px;
 	padding-right: 35px;
-	padding-top: 20px;
+	padding-top: 10px;
 	padding-bottom: 20px;
-	height:700px;
+	height:710px;
 	overflow-y: auto;
 }
 #IW_content label{
@@ -748,16 +748,16 @@ span#web-name{
 	width:500px;
 	max-width:500px;
 	max-height:150px;
-	overflow-y:auto;
+	overflow:auto;
 	float:left;
 	border:1px solid #74a2cf;
 	margin:3px;
 }
 .IW_radio_selection{
-	height:467px;
-	max-height:467px;
-	width:200px;
-	max-width:200px;
+	height:466px;
+	max-height:466px;
+	width:190px;
+	max-width:190px;
 	overflow:auto;
 	float:right;
 	border:1px solid #74a2cf;
@@ -773,8 +773,8 @@ span#web-name{
 	margin-bottom:5px;
 }
 .IW_external_upload{
-	height:200px;
-	max-height:200px;
+	height:240px;
+	max-height:240px;
 	border:1px solid #74a2cf;
 	overflow:auto;
 	margin:3px;
@@ -793,6 +793,27 @@ span#web-name{
 	color: #FFFFFF;
 	cursor:pointer;
 	margin:3px;
+	padding:7px;
+	float:left;
+}
+.IW_track_close_btn{
+	background: #74a2cf;
+	color: #FFFFFF;
+	font: 12px Arial, Helvetica, sans-serif;
+	margin-right:3px;
+	margin-top:3px;
+	margin-bottom:3px;
+	padding:7px;
+	float:left;
+}
+.IW_track_close_btn:hover{
+	font: 12px Arial, Helvetica, sans-serif;
+	background: #bdc9e1;
+	color: #FFFFFF;
+	cursor:pointer;
+	margin-right:3px;
+	margin-top:3px;
+	margin-bottom:3px;
 	padding:7px;
 	float:left;
 }

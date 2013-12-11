@@ -8335,6 +8335,8 @@ function tracksettingpannel_close(){
 }
 function trackItems_setting3(){//individualItems setting
 
+	document.getElementById("indset_radio").innerHTML="";
+
 	var individuals=[];//includes personal TRACKs, each unit has trackname, samples, samples is also array
 	var exindividuals=[];//includes personal TRACKs, each unit has trackname, samples, samples is also array
 
@@ -8346,7 +8348,7 @@ function trackItems_setting3(){//individualItems setting
 	XMLHttpReq6.send(null);
 	indslist=XMLHttpReq6.responseText.replace(pattern,"");
 	inds_temp=indslist.split(",");
-	if(inds_temp!=null && inds_temp!=""){
+	if(inds_temp!=null && inds_temp[0]!=""){
 		for(var idx=0;idx<inds_temp.length;idx++){
 			var ind_temp=inds_temp[idx].split(":");
 			individuals[individuals.length] = {};
@@ -8359,7 +8361,7 @@ function trackItems_setting3(){//individualItems setting
 	XMLHttpReq6.send(null);
 	indslist=XMLHttpReq6.responseText.replace(pattern,"");
 	inds_temp=indslist.split(",");
-	if(inds_temp!=null && inds_temp!=""){
+	if(inds_temp!=null && inds_temp[0]!=""){
 		for(var idx=0;idx<inds_temp.length;idx++){
 			var ind_temp=inds_temp[idx].split(":");
 			exindividuals[exindividuals.length] = {};
@@ -8368,14 +8370,13 @@ function trackItems_setting3(){//individualItems setting
 		}
 	}
 
+	document.getElementById("builtin_1000g").innerHTML="";
+	document.getElementById("builtin_others").innerHTML="";
+	document.getElementById("external_uploaded").innerHTML="";
+
 	var group_title_divObj, group_content_divObj;
 	var radioObj, radioboxObj, labelObj;
 	var i,j,k;
-
-	document.getElementById("builtin_1000g").innerHTML="";
-	document.getElementById("builtin_others").innerHTML="";
-	document.getElementById("indset_radio").innerHTML="";
-	document.getElementById("external_uploaded").innerHTML="";
 
 	for(i = 0; i < individuals.length; i++){
 		group_title_divObj = document.createElement("div");
@@ -8404,7 +8405,7 @@ function trackItems_setting3(){//individualItems setting
 			radioboxObj.type = "radio";
 			radioboxObj.name = "individualselection";
 			radioboxObj.value = individuals[i].samples[j]+'@'+individuals[i].track;
-			if('_' + individuals[i].samples[j] == personalPannel.Pvar.id){
+			if('_' + individuals[i].samples[j] == personalPannel.Pvar.id && individuals[i].track == initPvar_superid){
 				radioboxObj.checked = true;
 			}
 			radioObj.appendChild(radioboxObj);
@@ -8416,7 +8417,8 @@ function trackItems_setting3(){//individualItems setting
 
 			$(radioObj).css({
 				"float":"left",
-				"clear":"both"
+				"clear":"both",
+				"margin":"2px"
 			});
 			
 			radioboxObj.onclick = function(event){
@@ -8448,11 +8450,31 @@ function trackItems_setting3(){//individualItems setting
 		}
 	}
 	for(i = 0; i < exindividuals.length; i++){
-		group_title_divObj = document.createElement("div");
+		var group_title_and_btn = document.createElement("div");
+		document.getElementById("external_uploaded").appendChild(group_title_and_btn);
+		$(group_title_and_btn).css("float","left");
+		group_title_divObj = document.createElement("span");
 		group_title_divObj.id = exindividuals[i].track + "_group_title";
 		group_title_divObj.className = "IW_track_btn";
-		document.getElementById("external_uploaded").appendChild(group_title_divObj);
+		group_title_and_btn.appendChild(group_title_divObj);
 		group_title_divObj.innerHTML=exindividuals[i].track;
+		var group_del_btn = document.createElement("span");
+		group_title_and_btn.appendChild(group_del_btn);
+		group_del_btn.id = exindividuals[i].track + "_del_btn";
+		group_del_btn.className = "IW_track_close_btn";
+		group_del_btn.innerHTML = "&times";
+
+		group_del_btn.onclick = function(event){
+			var target = event.target || event.srcElement;
+			var trackId_temp = target.id.substring(0,target.id.length-8);
+			if(initPvar_superid != trackId_temp){
+				XMLHttpReq6.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId_temp,false);
+				XMLHttpReq6.send(null);
+				target.parentNode.remove();
+			}else{
+				alert("Please remove the user data from personal genome panel first.");
+			}
+		};
 
 		group_content_divObj = document.createElement("div");
 		group_content_divObj.id = exindividuals[i].track + "_group_content";
@@ -8469,7 +8491,7 @@ function trackItems_setting3(){//individualItems setting
 			radioboxObj.type = "radio";
 			radioboxObj.name = "individualselection";
 			radioboxObj.value = exindividuals[i].samples[j]+'@'+exindividuals[i].track;
-			if('_' + exindividuals[i].samples[j] == personalPannel.Pvar.id){
+			if('_' + exindividuals[i].samples[j] == personalPannel.Pvar.id && exindividuals[i].track == initPvar_superid){
 				radioboxObj.checked = true;
 			}
 			radioObj.appendChild(radioboxObj);
@@ -9722,6 +9744,59 @@ function BJW_upStat() {
 				document.getElementById("upload_success").innerHTML="Upload Failed";
 			}
 		}
+	}
+}
+function addExIndividual(){
+	var trackId = document.getElementById("pg_upload_name").value;
+	var trackType = document.getElementById("pg_upload_type").value;
+	var trackURL = document.getElementById("pg_upload_url").value;
+
+	var pattern = /<.*?>/g;
+	var indslist;
+	var inds_temp;
+
+	XMLHttpReq6.open("GET","servlet/test.do?action=getAnnotations",false);
+	XMLHttpReq6.send(null);
+	indslist=XMLHttpReq6.responseText.replace(pattern,"");
+	inds_temp=indslist.split(",");
+	
+	var ifexists = false;
+	if(inds_temp!=null && inds_temp[0]!=""){
+		for(var idx=0;idx<inds_temp.length;idx++){
+			var ind_temp=inds_temp[idx].split(":");
+			if(trackId == ind_temp[1]){
+				ifexists = true;
+			}
+		}
+	}
+
+	XMLHttpReq6.open("GET","servlet/test.do?action=getExternals",false);
+	XMLHttpReq6.send(null);
+	indslist=XMLHttpReq6.responseText.replace(pattern,"");
+	inds_temp=indslist.split(",");
+	if(inds_temp!=null && inds_temp[0]!=""){
+		for(var idx=0;idx<inds_temp.length;idx++){
+			var ind_temp=inds_temp[idx].split(":");
+			if(trackId == ind_temp[1]){
+				ifexists = true;
+			}
+		}
+	}
+	
+	if(trackId!=null && trackType!=null && trackURL!=null && trackId!="" && trackType!="" && trackURL!=""){
+		if(trackId.substring(0,1)=='_'){
+			alert("The track name cannot start with '_'.");
+		}else if(ifexists){
+			alert("The track name exists.");
+		}else if(trackType!="VCF" && trackType!="GVF"){
+			alert("This data type is not supported.");
+		}else{
+			XMLHttpReq6.open("GET","servlet/test.do?action=addExIndividuals&modes=hide&tracks="+trackId+"&types="+trackType+"&links="+trackURL,false);
+			XMLHttpReq6.send(null);
+			trackItems_setting3()
+		}
+	}else{
+		alert("Please fill all required parameters.");
 	}
 }
 /*为解决搜索框与personal gene detail box出现冲突而添加的代码，从根本上解决之后不需要这段代码
