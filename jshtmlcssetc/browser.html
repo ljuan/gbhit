@@ -31,15 +31,18 @@
 		<div id="menu-container">
 			<center>
 				<div id="menu-center">
+					<span style="float:left;margin:3px"><img src="image/logo3.png" width="80" height="40"></img></span>
 					<ul>
 						<li id="indsetWindow-li" style="line-height: 42px;" title="individual" class="help-li">
 							<span id="indsetBtn"></span>
-							<span style="font-size: 20px;">Load Individual</span>	
+							<span style="font-size: 18px;">Load Individual</span>	
 						</li>
+<!--
 						<li style="line-height: 34px;">
 							<span id="backward"></span>
 							<span id="forward"></span>
 						</li>
+-->
 						<li>
 							<div style="height: 27px;padding: 8px 0;">
 								<div style="background: #ffffff;height: 27px;display: inline-block">
@@ -53,7 +56,7 @@
 							</div>
 						</li>
 						<li style="line-height: 40px;">
-							<span style="font-size: 20px; float: left;">Zoom:</span>
+							<span style="font-size: 18px; float: left;">Zoom:</span>
 							<span id="zoomout" style="float: left;padding-right:3px;padding-left:3px;"></span>
 							<div id="slider-cont" class="ui-widget ui-widget-content ui-corner-all">
 								<div id="slider"></div>
@@ -64,13 +67,13 @@
 							<span id="trackmanage"></span>
 							<span style="font-size: 20px;">track manage</span>
 						</li>-->
-						<li style="line-height: 42px;" title="custom track" alt="#TB_inline?height=315;width=700;inlineId=myOnPageContent" class="thickbox custom-track-li">
+						<li style="line-height: 42px;" title="Custom Track" alt="#TB_inline?height=315;width=700;inlineId=myOnPageContent" class="thickbox custom-track-li">
 							<span id="customtrack"></span>
-							<span style="font-size: 20px;">Upload custom track</span>	
+							<span style="font-size: 18px;">Upload Custom Track</span>	
 						</li>
 						<li id="helpWindow-li" style="line-height: 42px;" title="help" class="help-li">
 							<span id="helpBtn"></span>
-							<span style="font-size: 20px;">Help</span>	
+							<span style="font-size: 18px;">Help</span>	
 						</li>
 					</ul>
 				</div>
@@ -98,7 +101,7 @@
 					<br/>
 					<table id="cytobandsTable" style="margin-bottom: 10px;">
 						<tr>
-							<td id="chrNumTd">chr21</td>
+							<td id="chrNumTd" style="font:16px Candara,Arial,Helvetica">chr21</td>
 							<td><canvas id="cytobandsCanvas" width="1000px" height="15"></canvas></td>
 							<td ><span id="browseJump">Scan</span></td>
 							<td ><img id="browseJumpIcon2" src="./image/browserJumpIcon.png" style="cursor:pointer;"/><!--<span id="browseJumpIcon"></span>--></td>
@@ -120,7 +123,7 @@
 								<td class="trackOperator">
 									<div class="trackOperatorDIV"></div>
 								</td>
-								<td class="trackName"><canvas id="thRefTrack1" width="100" height="50" style="background: #ffffff"></canvas></td>
+								<td class="trackName"><canvas id="thRefTrack1" width="100" height="50" style="background: #f1eef6"></canvas></td>
 								<td class="trackContent"><canvas id="refTrack1" width="2850" height="50" class="canvasTrackcontent" title="shift+click and drag to zoom in"></canvas></td>
 							</tr>
 						</table>
@@ -136,26 +139,26 @@
 			<div id="tabContentDiv">
 				<ul>
 					<li>
-						<a href="#one_track_tab">add one track</a>
+						<a href="#one_track_tab">Add One Track</a>
 					</li>
 					<li>
-						<a href="#more_track_tab">add multiple tracks</a>
+						<a href="#more_track_tab">Add Multiple Tracks</a>
 					</li>
 					<li id="removeexternals_li">
-						<a href="#remove_track_tab">remove custom tracks</a>
+						<a href="#remove_track_tab">Remove Custom Tracks</a>
 					</li>
 				</ul>
 				<div id="one_track_tab">
 					<center>
-						<table cellspacing="10px" style="font: 14px Arial,Helvetica,sans-serif;">
+						<table cellspacing="10px" style="font: 14px Candara, Arial,Helvetica,sans-serif;">
 							<tr>
-								<td style="text-align: right;">track name</td>
+								<td style="text-align: right;">Track Name</td>
 								<td>
 								<input id="customTrackId" type="text" style="border: solid 1px #A3A3A3"/><span style="color:#777;">(cannot start with "_")</span>
 								</td>
 							</tr>
 							<tr>
-								<td style="text-align: right;">display mode</td>
+								<td style="text-align: right;">Display Mode</td>
 								<td>
 								<select id="customTrackDisplayMode" style="border: solid 1px #A3A3A3">
 									<option>hide</option>
@@ -164,7 +167,7 @@
 								</select></td>
 							</tr>
 							<tr>
-								<td style="text-align: right;">data type</td>
+								<td style="text-align: right;">Data Type</td>
 								<td>
 								<select id="customTrackDataType" style="border: solid 1px #A3A3A3">
 									<option>ANNO</option>
@@ -179,16 +182,16 @@
 								</select></td>
 							</tr>
 							<tr style="vertical-align:top">
-								<td style="text-align: right;">data urls</td>
+								<td style="text-align: right;">Data URLs</td>
 								<td>
 								<table style="border: solid 1px #A3A3A3">
 									<tr style="vertical-align: top">
 										<td>
-										<table id="urlInfo" style="text-align: center;max-height: 20px; font: 14px Arial,Helvetica,sans-serif">
+										<table id="urlInfo" style="text-align: center;max-height: 20px; font: 14px Candara, Arial,Helvetica,sans-serif">
 											<tr>
-												<td style="background: #74a2cf;width: 250px;color:#FFFFFF;">url</td>
-												<td style="background: #74a2cf;width: 150px;color:#FFFFFF;">chr</td>
-												<td style="background: #74a2cf;width: 50px;color:#FFFFFF;">del</td>
+												<td style="background: #74a2cf;width: 250px;color:#FFFFFF;">URL</td>
+												<td style="background: #74a2cf;width: 150px;color:#FFFFFF;">Chr</td>
+												<td style="background: #74a2cf;width: 50px;color:#FFFFFF;">Del</td>
 											</tr>
 											<tr>
 												<td>
@@ -207,23 +210,23 @@
 						</table>
 						<br/>
 						<br/>
-						<table style="font: 14px Arial,Helvetica,sans-serif">
+						<table style="font: 14px Candara, Arial,Helvetica,sans-serif">
 							<tr>
 								<td style="text-align: center;width: 200px">
-								<input type="button" value="Submit" style="width: 60px;font: 14px Arial,Helvetica,sans-serif" onclick="customTrackSubmit()"/>
+								<input type="button" value="Submit" style="width: 60px;font: 14px Candara, Arial,Helvetica,sans-serif" onclick="customTrackSubmit()"/>
 								</td>
 								<td style="text-align: center; width: 200px">
-								<input type="button" value="Clear" style="width: 60px;font: 14px Arial,Helvetica,sans-serif" onclick="clearAllInput()"/>
+								<input type="button" value="Clear" style="width: 60px;font: 14px Candara, Arial,Helvetica,sans-serif" onclick="clearAllInput()"/>
 								</td>
 							</tr>
 						</table>
-						<div id="chrSelectDiv" style="position: absolute;z-index: 1000;background: #E5E5E5;display: none; border: 1px solid #A3A3A3;font: 14px Arial,Helvetica,sans-serif">
-							<table id="chrSelectTable" style="font: 14px Arial,Helvetica,sans-serif"></table>
+						<div id="chrSelectDiv" style="position: absolute;z-index: 1000;background: #E5E5E5;display: none; border: 1px solid #A3A3A3;font: 14px Candara, Arial,Helvetica,sans-serif">
+							<table id="chrSelectTable" style="font: 14px Candara, Arial,Helvetica,sans-serif"></table>
 							<input id="checkAll" type="checkbox" onclick="chrCheckAll()">
 							ALL
 							<br/>
-							<input type="button" value="OK" onclick="chrSelectDivOkButton()" style="width: 55px;font: 14px Arial,Helvetica,sans-serif"/>
-							<input type="button" value="Cancel" onclick="chrSelectDivCancelButton()" style="width: 55px;font: 14px Arial,Helvetica,sans-serif"/>
+							<input type="button" value="OK" onclick="chrSelectDivOkButton()" style="width: 55px;font: 14px Candara, Arial,Helvetica,sans-serif"/>
+							<input type="button" value="Cancel" onclick="chrSelectDivCancelButton()" style="width: 55px;font: 14px Candara, Arial,Helvetica,sans-serif"/>
 						</div>
 					</center>
 				</div>
@@ -234,13 +237,13 @@
 						placeholder="In this box,you can upload more than one track at a time by inputting file URLs. You need to set the four parameters:tracks, modes, types and links. The format of the configure text is:&#13 tracks=track1,track2&modes=mode1,mode2&types=type1,type2&links=link1,chr1:link2-1;chr2:link2-1;chr3:link2-2;chr4:link2-3;"></textarea>
 					</div>
 					<center>
-						<table style="font: 14px Arial,Helvetica,sans-serif">
+						<table style="font: 14px Candara, Arial,Helvetica,sans-serif">
 							<tr>
 								<td style="text-align: center;width: 200px">
-								<input id="customtrackByconfigSubmitBtn" type="button" value="Submit" style="width: 60px;font: 14px Arial,Helvetica,sans-serif" onclick=""/>
+								<input id="customtrackByconfigSubmitBtn" type="button" value="Submit" style="width: 60px;font: 14px Candara, Arial,Helvetica,sans-serif" onclick=""/>
 								</td>
 								<td style="text-align: center; width: 200px">
-								<input id="customtrackByConfigClearBtn" type="button" value="Clear" style="width: 60px;font: 14px Arial,Helvetica,sans-serif" onclick=""/>
+								<input id="customtrackByConfigClearBtn" type="button" value="Clear" style="width: 60px;font: 14px Candara, Arial,Helvetica,sans-serif" onclick=""/>
 								</td>
 							</tr>
 						</table>
@@ -549,7 +552,7 @@
 		<div id="personalPannel">
 			<div id="personalPannelTitle">
 				<div id="ppTitle">
-					personal genome
+					Personal Genome
 				</div>
 				<div id="ppClose">
 					<span id="ppCloseBtn">Close</span>
@@ -647,14 +650,14 @@ shadow:5px 5px 5px #888;">
 										INFO:
 									</td>
 									<td valign="top">
-										<div id="variantDetailContent_INFO_ContentOnPP" style="width: 300px; height: 45px; overflow: auto">
+										<div id="variantDetailContent_INFO_ContentOnPP" style="width: 300px; word-break:break-all">
 											RSPOS=33031822;GMAF=0.0046;dbSNPBuildID=124;SSR=0;SAO=0;VP=050000020001040116000100
 										</div>
 									</td>
 								</tr>
 								<tr id="variantDetailContent_dbSNPAnno_trNodeOnPP" style="color:white;font-size: 12px">
 									<td valign="top">
-										dbSNPAnno:
+										dbSNP INFO:
 									</td>
 									<td valign="top" id="variantDetailContent_dbSNPAnno_ContentOnPP" style="width:300px; word-break: break-all;">
 										RSPOS=33031822;GMAF=0.0046;dbSNPBuildID=124;SSR=0;SAO=0;VP=050000020001040116000100
@@ -847,15 +850,15 @@ shadow:5px 5px 5px #888;">
 			<div id="IW_content">
 				<!--content to be imported-->	
 				<div class="IW_external_upload">
-					<div class="IW_subtitle">Upload Your Own Individual Genome Data</div>
+					<div class="IW_subtitle">Upload Individual Genome</div>
 					<div id="external_upload" style = "margin:5px;padding-top:5px">
-						<table>
+						<table style="font:12px Candara, Arial, Helvetica, sans-serif">
 							<tr>
-								<td>Track Name:</td>
-								<td><input id="pg_upload_name" type="text" size="30" placeholder="Please input the track name"/></td>
+								<td colspan=2 width="100">Track Name:</td>
+								<td colspan=2><input id="pg_upload_name" type="text" size="30" placeholder="Please input the track name"/></td>
 							</tr>
 							<tr>
-								<td>Data Format:</td>
+								<td colspan=2>File Format:</td>
 								<td>
 									<select id="pg_upload_type">
 										<option value="VCF">VCF</option>
@@ -863,19 +866,34 @@ shadow:5px 5px 5px #888;">
 									</select>
 								</td>
 							<tr>
-								<td>Data File URL:</td>
-								<td><input id="pg_upload_url" type="text" size="80" placeholder="Please input the URL of tabix compressed and indexed VCF/GVF file"/></td>
+								<td><input id="url_of_url_or_upload" name="url_or_upload" type="radio" checked/></td>
+								<td>URL:</td>
+								<td><input id="pg_upload_url" type="text" size="60" placeholder="Please input the URL of Tabix compressed and indexed VCF/GVF"/>(Recommended)</td>
 							</tr>
 							<tr>
-								<td colspan=2><center><input type="submit" onclick="addExIndividual()" value="Submit"/></center><td>
+								<td><input id="upload_of_url_or_upload" name="url_or_upload" type="radio"/></td>
+								<td>Data File:</td>
+								<td><input id="pg_upload_file" type="file"/>(&lt;20MB)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>Index File:</td>
+								<td><input id="pg_upload_file2" type="file"/></td>
+							</tr>
+							<tr>
+								<td colspan=4><center><span id="uprogress"/></center></td>
+							</tr>
+							<tr>
+								<td colspan=4><center><input type="submit" onclick="addExIndividual()" value="Submit"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" onclick="fill_example_pg()" value="Example"/></center></td>
 							</tr>
 						</table>
 						Note:
 						<br>1. The track name cannot be same to existing tracks and cannot start with '_'.
 						<br>2. The data must be compressed and indexed by <a href=http://samtools.sourceforge.net/tabix.shtml>Tabix</a>.
-						<br>3. The data file and index file must be placed together, the index file name should be data file name + '.idx'.
-						<br>4. The data file should follow standard format. Check the format standard of <a href=http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41>VCF</a> and <a href=http://www.sequenceontology.org/resources/gvf.html>GVF</a>.
-						<br>5. The header line '#CHROM...' is required for VCF file.
+						<br>3. User can either provide accessible data URL link (recommended) or locally upload data and index files.
+						<br>4. For URL link, the data file and index file must be placed together, the index file name should be data file name + '.tbi'.
+						<br>5. The data file should follow standard format. Check the format standard of <a href=http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41>VCF</a> and <a href=http://www.sequenceontology.org/resources/gvf.html>GVF</a>.
+						<br>6. The header line '#CHROM...' is required for VCF file.
 					</div>
 				</div>
 				<div class="IW_radio_selection">
@@ -883,16 +901,12 @@ shadow:5px 5px 5px #888;">
 					<div id="indset_radio"></div>
 				</div>
 				<div class="IW_track_selection">
-					<div class="IW_subtitle">Uploaded Data Tracks</div>
+					<div class="IW_subtitle">Personal Genomes</div>
 					<div id="external_uploaded" style="margin-left:3px;margin-rigth:3px"></div>
 				</div>
 				<div class="IW_track_selection">
-					<div class="IW_subtitle">Built-in 1000 Genome Data Tracks</div>
+					<div class="IW_subtitle">Built-in 1000GP populations</div>
 					<div id="builtin_1000g" style="margin-left:3px;margin-rigth:3px"></div>
-				</div>
-				<div class="IW_track_selection">
-					<div class="IW_subtitle">Other Built-in Data Tracks</div>
-					<div id="builtin_others" style="margin-left:3px;margin-rigth:3px"></div>
 				</div>
 			</div>
 		</div>

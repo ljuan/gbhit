@@ -1,7 +1,7 @@
 div#divTrack {
 	/*the right value is 1100, but the end of the searchScale is hidden, therefore use 1106*/
 	width: 1106px;
-	background-color: #ffffff;
+	background-color: #f1eef6;
 	border-style: solid;
 	border-width: 1px;
 	border-color:#888888;
@@ -194,13 +194,13 @@ span.clb3:hover {
 	border-bottom-color: white;
 }
 #personalPannel {
-	background: none repeat scroll 0 0 #FFFFFF;
+	background: none repeat scroll 0 0 #fef0d9;
 	opacity:0.9;/*for temparary plot figures*/
 	border: 1px solid #797979;
 	color: #000000;
 	display: none;
 	width: 1106px;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	text-align: left;
 	position: fixed;
 	z-index: 50;
@@ -209,15 +209,18 @@ span.clb3:hover {
 	-webkit-box-shadow: 0 -5px 5px #888, 0 5px 5px #888;
 	-moz-user-select: none;
 	-webkit-user-select: none;
+
 }
 #personalPannelTitle {
-	background-color: #E8E8E8;
+	background-color:#fdcc8a;
 	height: 27px;
+	color:#000;
 }
 #ppTitle {
 	float: left;
 	margin-bottom: 1px;
 	padding: 7px 0 5px 10px;
+	font: 16px bold Candara, Arial, Helvetica, sans-serif;
 }
 #ppClose, #ppMin, #ppSet {
 	float: right;
@@ -244,7 +247,7 @@ span.clb3:hover {
 	top: 50%;
 	left: 50%;
 	width: 680px;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	text-align: left;
 	z-index: 802;
 }
@@ -284,7 +287,7 @@ span.clb3:hover {
 	margin-top: 2px;
 }
 #PvarTable, #PfannoTable, #PannoTable, #PclnsTable{
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	text-align: left;
 }
 .overlayStyle {
@@ -306,6 +309,7 @@ img.displayHide {
 	width: 1180px;
 	height: 43px;
 	color: #FFFFFF;
+	font: 16px Candara, Arial, Helvetica;
 }
 #menu-center ul{
 	float: left;
@@ -437,16 +441,16 @@ span#browseJumpIcon:after{
 }
 span#browseJump{
 	color: #74a2cf;
-	font-size: 22px;
+	font:18px Candara, Arial, Helvetica, sans-serif;
 }
 span#browseJump:hover{
 	color: #5BC4BE;
-	font-size: 22px;
+	font:18px Candara, Arial, Helvetica, sans-serif;
 	cursor: pointer;
 }
 span#browseJump:after{
 	color: #74a2cf;
-	font-size: 22px;
+	font:18px Candara, Arial, Helvetica, sans-serif;
 }
 /*span#search:after{
 	font-family: 'ModernPictogramsNormal';
@@ -482,7 +486,7 @@ span#indsetBtn:after{
 	top: 50%;
 	left: 50%;
 	width: 800px;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	text-align: left;
 	z-index: 102;
 }
@@ -515,7 +519,7 @@ span#indsetBtn:after{
 #ts_content label{
 	width: 120px;
 	display: inline-block;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	overflow: hidden;
 }
 #ts_content .group_title_div{
@@ -538,12 +542,12 @@ span#indsetBtn:after{
 #tracksmanageOnmainPannel{
 	clear: both;
 	text-align: left;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 }
 #tracksmanageOnmainPannel label{
 	width: 120px;
 	display: inline-block;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	overflow: hidden;
 }
 #tracksmanageOnmainPannel .group_title_div{
@@ -613,7 +617,7 @@ span#web-name{
 	top: 50%;
 	left: 50%;
 	width: 1200px;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	text-align: left;
 	z-index: 802;
 }
@@ -652,7 +656,7 @@ span#web-name{
 	top: 50%;
 	left: 50%;
 	width: 800px;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	text-align: left;
 	z-index: 802;
 }
@@ -679,12 +683,12 @@ span#web-name{
 	padding-right: 35px;
 	padding-top: 10px;
 	padding-bottom: 20px;
-	height:710px;
+	height:690px;
 	overflow-y: auto;
 }
 #IW_content label{
 	display: inline-block;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	overflow: hidden;
 }
 #IW_content .group_title_div{
@@ -713,7 +717,7 @@ span#web-name{
 	top: 50%;
 	left: 50%;
 	width: 800px;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	text-align: left;
 	z-index: 802;
 }
@@ -744,18 +748,19 @@ span#web-name{
 	overflow-y: auto;
 }
 .IW_track_selection{
-	height:150px;
+	height:170px;
 	width:500px;
 	max-width:500px;
-	max-height:150px;
+	max-height:170px;
 	overflow:auto;
 	float:left;
 	border:1px solid #74a2cf;
 	margin:3px;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 }
 .IW_radio_selection{
-	height:466px;
-	max-height:466px;
+	height:348px;
+	max-height:348px;
 	width:190px;
 	max-width:190px;
 	overflow:auto;
@@ -768,27 +773,28 @@ span#web-name{
 	color:#FFFFFF;
 	background:#74a2cf;
 	border:1px solid #74a2cf;
-	font: 16px Arial, Helvetica, sans-serif bold;
+	font: 16px Candara, Arial, Helvetica, sans-serif bold;
 	padding:2px;
 	margin-bottom:5px;
 }
 .IW_external_upload{
-	height:240px;
-	max-height:240px;
+	height:320px;
+	max-height:320px;
 	border:1px solid #74a2cf;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	overflow:auto;
 	margin:3px;
 }
 .IW_track_btn{
 	background: #74a2cf;
 	color: #FFFFFF;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	margin:3px;
 	padding:7px;
 	float:left;
 }
 .IW_track_btn:hover{
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	background: #bdc9e1;
 	color: #FFFFFF;
 	cursor:pointer;
@@ -796,10 +802,27 @@ span#web-name{
 	padding:7px;
 	float:left;
 }
-.IW_track_close_btn{
-	background: #74a2cf;
+.IW_track_upload_btn{
+	background: #fe9929;
 	color: #FFFFFF;
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
+	margin:3px;
+	padding:7px;
+	float:left;
+}
+.IW_track_upload_btn:hover{
+	font: 12px Candara, Arial, Helvetica, sans-serif;
+	background: #fed98e;
+	color: #FFFFFF;
+	cursor:pointer;
+	margin:3px;
+	padding:7px;
+	float:left;
+}
+.IW_track_close_btn{
+	background: #fe9929;
+	color: #FFFFFF;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	margin-right:3px;
 	margin-top:3px;
 	margin-bottom:3px;
@@ -807,8 +830,8 @@ span#web-name{
 	float:left;
 }
 .IW_track_close_btn:hover{
-	font: 12px Arial, Helvetica, sans-serif;
-	background: #bdc9e1;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
+	background: #fed98e;
 	color: #FFFFFF;
 	cursor:pointer;
 	margin-right:3px;

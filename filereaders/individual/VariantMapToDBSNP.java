@@ -17,12 +17,14 @@ import filereaders.tools.StringSplit;
 public class VariantMapToDBSNP implements Comparable<VariantMapToDBSNP> {
 	Variant variant;
 	DBSnpInfo dbsnp;
+	String dbsnpInfo;
 	String dbsnpId;
 
-	public VariantMapToDBSNP(Variant variant, DBSnpInfo dbsnp, String dbsnpId) {
+	public VariantMapToDBSNP(Variant variant, DBSnpInfo dbsnp, String dbsnpId, String dbsnpInfo) {
 		this.variant = variant;
 		this.dbsnp = dbsnp;
 		this.dbsnpId = dbsnpId;
+		this.dbsnpInfo = dbsnpInfo;
 	}
 	
 	Element write2xml(Document doc, Element parent){
@@ -40,8 +42,10 @@ public class VariantMapToDBSNP implements Comparable<VariantMapToDBSNP> {
 		Element ele = doc.createElement(XML_TAG_VARIANT);
 		if(dbsnp != null){
 			variant.setDbsnpid(dbsnpId);
-			if(isDetail)
-				variant.setDbsnpInfo(dbsnp.toString());
+			if(isDetail){
+//				variant.setDbsnpInfo(dbsnp.toString());//Temporarily replaced by simple all fields of dbsnp info.
+				variant.setDbsnpInfo(dbsnpInfo);
+			}
 		}
 		variant.write2xml(doc, parent);
 		
@@ -96,11 +100,13 @@ public class VariantMapToDBSNP implements Comparable<VariantMapToDBSNP> {
 		Variant variant = null;
 		DBSnpInfo dbsnp = null;
 		String dbsnpId = null;
+		String dbsnpInfo = null;
 		
 		variant = Variant.copy(obj.variant);
 		dbsnp = DBSnpInfo.copy(obj.dbsnp);
 		dbsnpId = obj.dbsnpId;
+		dbsnpInfo = obj.dbsnpInfo;
 		
-		return new VariantMapToDBSNP(variant, dbsnp, dbsnpId);
+		return new VariantMapToDBSNP(variant, dbsnp, dbsnpId, dbsnpInfo);
 	}
 }

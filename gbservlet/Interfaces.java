@@ -246,12 +246,60 @@ public class Interfaces extends HttpServlet{
 					}catch(Exception e){
 						e.printStackTrace();
 					}finally{
-						
 					}
 				}
 			}
 			if(ftemp!=null){
 				ins.load_Stat(filepath);
+			}
+		}
+		else if (action.equals("upExternal")){
+			File tmpdir=new File(System.getProperty("java.io.tmpdir"));
+			File ftemp1=null;
+			File ftemp2=null;
+			String filepath=null;
+			String[] tracks = req.getParameter("tracks").split(",");
+			String[] links = new String[tracks.length];
+			String[] types = req.getParameter("types").split(",");
+			String[] modes = req.getParameter("modes").split(",");
+			if(tmpdir.isDirectory()){
+				int maxFileSize = 20*1024*1024;
+				int maxMemSize = 2000*1024;
+				String contentType=req.getContentType();
+				if(contentType.indexOf("multipart/form-data")>=0){
+					filepath=System.getProperty("java.io.tmpdir")+"/"+session.getId()+"_"+tracks[0]+".vcf.gz";
+					ftemp1=new File(filepath);
+					ftemp2=new File(filepath+".tbi");
+					DiskFileItemFactory factory = new DiskFileItemFactory();
+					factory.setSizeThreshold(maxMemSize);
+					factory.setRepository(tmpdir);
+					ServletFileUpload upload = new ServletFileUpload(factory);
+					upload.setSizeMax(maxFileSize);
+					try{
+						List fileItems = upload.parseRequest(req);
+						java.util.Iterator i = fileItems.iterator();
+						int ii = 0;
+						while(i.hasNext()){
+							FileItem fi = (FileItem)i.next();
+							if(!fi.isFormField() && ii == 0){
+								fi.write(ftemp1);
+								res.setStatus(200);
+							}
+							else if(!fi.isFormField() && ii == 1){
+								fi.write(ftemp2);
+								res.setStatus(200);
+							}
+							ii++;
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+					}finally{
+					}
+				}
+			}
+			if(ftemp1!=null && ftemp2!=null){
+				links[0]=filepath;
+				ins.add_Externals(tracks,links,types,modes);
 			}
 		}
 	}

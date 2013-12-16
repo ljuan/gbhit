@@ -76,6 +76,8 @@ public class VcfReader {
 						if (line_temp.length > 9) {
 							samples = new String[line_temp.length - 9];
 							for (int i = 9; i < line_temp.length; i++) {
+								if(line_temp[i].indexOf("\r")>=0)
+									line_temp[i]=line_temp[i].substring(0, line_temp[i].indexOf("\r"));
 								samples[i - 9] = line_temp[i];
 							}
 						}

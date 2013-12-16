@@ -799,9 +799,8 @@ public class Instance {
 			new BasicAnnosReader(path_temp);
 		else if(type_temp.equals(Consts.FORMAT_BED))
 			new BedReader(path_temp);
-		else if(type_temp.equals(Consts.FORMAT_BIGBED)){
+		else if(type_temp.equals(Consts.FORMAT_BIGBED))
 			new BigBedReader(path_temp);
-		}
 		else if(type_temp.equals(Consts.FORMAT_BEDGRAPH))
 			new BedGraphReader(path_temp);
 		else if(type_temp.equals(Consts.FORMAT_BIGWIG))
@@ -809,15 +808,15 @@ public class Instance {
 		else if(type_temp.equals(Consts.FORMAT_WIG))
 			new WiggleReader(path_temp,false);
 		else if(type_temp.equals(Consts.FORMAT_GRF))
-			 new GRFReader(path_temp);
+			new GRFReader(path_temp);
 		else if(type_temp.equals(Consts.FORMAT_GDF))
 			new GDFReader(path_temp);
 		else if(type_temp.equals(Consts.FORMAT_GFF))
-				new GFFReader(path_temp);
+			new GFFReader(path_temp);
 		else if(type_temp.equals(Consts.FORMAT_GTF))
-				new GTFReader(path_temp);
+			new GTFReader(path_temp);
 		else if(type_temp.equals(Consts.FORMAT_GVF))
-				new GVFReader(path_temp);
+			new GVFReader(path_temp);
 		else if (type_temp.equals(Consts.FORMAT_VCF)){
 			VcfReader vr=new VcfReader(track,"chr1");
 			try{

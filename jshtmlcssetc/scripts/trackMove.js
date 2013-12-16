@@ -2,6 +2,16 @@ var mouseState = false;
 var curTarget = null;
 var mouseOffset = null;
 var isMousedownOnRefCanvas = false;
+
+var RefBG = "#f1eef6";
+var RefBG_rgb = "rgb(247, 238, 246)";
+var RefBGhover = "#bdc9e1";
+var RefBGhover_rgb = "rgb(189, 201, 225)";
+var ppBG = "#fef0d9";
+var ppBG_rgb = "rgb(254, 240, 217)";
+var ppBGhover = "#fdcc8a";
+var ppBGhover_rgb = "rgb(253, 204, 138)";
+
 Number.prototype.NaN0 = function() {
 	return isNaN(this) ? 0 : this;
 }
@@ -47,11 +57,18 @@ function mouseOver(ev) {
 		var target = ev.target || ev.srcElement;
 		target = target.parentNode;
 		var trNode = target.parentNode;
-		trNode.style.background = "#E8E8E8";
 		var tdNodes = trNode.getElementsByTagName("td");
-		tdNodes[0].style.background = "#E8E8E8";
-		tdNodes[1].firstChild.style.background = "#E8E8E8";
-		tdNodes[2].firstChild.style.background = "#E8E8E8";
+		if(tdNodes[1].firstChild.style.background.indexOf(ppBG_rgb)>=0){
+			trNode.style.background = ppBGhover;
+			tdNodes[0].style.background = ppBGhover;
+			tdNodes[1].firstChild.style.background = ppBGhover;
+			tdNodes[2].firstChild.style.background = ppBGhover;
+		}else{
+			trNode.style.background = RefBGhover;
+			tdNodes[0].style.background = RefBGhover;
+			tdNodes[1].firstChild.style.background = RefBGhover;
+			tdNodes[2].firstChild.style.background = RefBGhover;
+		}
 	}
 }
 
@@ -61,11 +78,18 @@ function mouseOut(ev) {
 		var target = ev.target || ev.srcElement;
 		target = target.parentNode;
 		var trNode = target.parentNode;
-		trNode.style.background = "#ffffff";
 		var tdNodes = trNode.getElementsByTagName("td");
-		tdNodes[0].style.background = "#ffffff";
-		tdNodes[1].firstChild.style.background = "#ffffff";
-		tdNodes[2].firstChild.style.background = "#ffffff";
+		if(tdNodes[1].firstChild.style.background.indexOf(ppBGhover_rgb)>=0){
+			trNode.style.background = ppBG;
+			tdNodes[0].style.background = ppBG;
+			tdNodes[1].firstChild.style.background = ppBG;
+			tdNodes[2].firstChild.style.background = ppBG;
+		}else{
+			trNode.style.background = RefBG;
+			tdNodes[0].style.background = RefBG;
+			tdNodes[1].firstChild.style.background = RefBG;
+			tdNodes[2].firstChild.style.background = RefBG;
+		}
 	}
 }
 
@@ -84,10 +108,17 @@ function mouseDown(ev) {
 function mouseUp() {
 	mouseState = false;
 	if(curTarget != null) {
-		curTarget.style.background = "#ffffff";
-		curTarget.getElementsByTagName("td")[0].style.background = "#fff";
-		curTarget.getElementsByTagName("td")[1].firstChild.style.background = "#ffffff";
-		curTarget.getElementsByTagName("td")[2].firstChild.style.background = "#ffffff";
+		if(curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(ppBGhover_rgb)>=0){
+			curTarget.style.background = ppBG;
+			curTarget.getElementsByTagName("td")[0].style.background = ppBG;
+			curTarget.getElementsByTagName("td")[1].firstChild.style.background = ppBG;
+			curTarget.getElementsByTagName("td")[2].firstChild.style.background = ppBG;
+		}else{
+			curTarget.style.background = RefBG;
+			curTarget.getElementsByTagName("td")[0].style.background = RefBG;
+			curTarget.getElementsByTagName("td")[1].firstChild.style.background = RefBG;
+			curTarget.getElementsByTagName("td")[2].firstChild.style.background = RefBG;
+		}
 	}
 	document.body.onselectstart = function() {
 		return true;
@@ -1298,6 +1329,9 @@ function canvasClickForVariantOnPP(evt){
 }
 
 function getVariantDetailHttpRequestOnPP(trackId, id, from, to){
+	if(!(/^_/).test(trackId)){
+		trackId="_"+trackId;
+	}
 	var url = "servlet/test.do?" + "action=getDetail&tracks=" + trackId + "&id=" + id + "&start=" + from + "&end=" + to;
 	XMLHttpReq3.onreadystatechange = handle_getVariantDetailHttpRequestOnPP;
 	XMLHttpReq3.open("GET", url, true);
@@ -1342,6 +1376,12 @@ function handle_getVariantDetailHttpRequestOnPP(){
 				document.getElementById("variantDetailContent_linkOnPP").onclick = function(){
 					window.open("http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?searchType=adhoc_search&type=rs&rs=" + variantId);
 				};
+			}else if(variant_dbSNPID&&(/^rs/).test(variant_dbSNPID)){
+				$("#variantDetailContent_linkOnPP").html("dbSNP" + "<span style=\"font-size:14px\">↗</span>");
+				document.getElementById("variantDetailContent_linkOnPP").onclick = function(){
+					window.open("http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?searchType=adhoc_search&type=rs&rs=" + variant_dbSNPID);
+				};
+
 			}else{
 				$("#variantDetailContent_linkOnPP").html("");
 				document.getElementById("variantDetailContent_linkOnPP").onclick = function(){};
@@ -1553,13 +1593,13 @@ function handle_getRepeatDetailHttpRequest(){
 			}else{
 				$("#repeatMaskDetailContent_direction_trNode").css("display","none");
 			}
-			if(repeatNode.getElementsByTagName(xmlTagColor).length > 0){
-				var repeatColor = repeatNode.getElementsByTagName(xmlTagColor)[0].childNodes[0].nodeValue;
-				$("#repeatMaskDetail_color_trNode").css("display","table-row");
-				$("#repeatMaskDetail_color_content").html(repeatColor);
-			}else{
+//			if(repeatNode.getElementsByTagName(xmlTagColor).length > 0){
+//				var repeatColor = repeatNode.getElementsByTagName(xmlTagColor)[0].childNodes[0].nodeValue;
+//				$("#repeatMaskDetail_color_trNode").css("display","table-row");
+//				$("#repeatMaskDetail_color_content").html(repeatColor);
+//			}else{
 				$("#repeatMaskDetail_color_trNode").css("display","none");
-			}
+//			}
 			if(repeatNode.getElementsByTagName(xmlTagDescription).length > 0){
 				var repeatDes = repeatNode.getElementsByTagName(xmlTagDescription)[0].childNodes[0].nodeValue;
 				$("#repeatMaskDetail_Des_trNode").css("display","table-row");

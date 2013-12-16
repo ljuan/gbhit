@@ -1,0 +1,832 @@
+<?xml version="1.0"?>
+<root>
+	<Assembly id="hg19">
+		<Anno id="Reference" group="Basic">
+			<Path>/home/ljuan/gbdata/hg19/hg19.fa</Path>
+			<Default>dense</Default>
+			<Format>REF</Format>
+		</Anno>
+		<Anno id="cytoBand" group="Basic">
+			<Path>/home/ljuan/gbdata/hg19/cytoBand.hg19.txt</Path>
+			<Default>dense</Default>
+			<Format>CYTO</Format>
+		</Anno>
+		<Anno id="Snp" group="Basic">
+			<Path>/home/ljuan/gbdata/hg19/dbsnp135.hg19.vcf.bgz</Path>
+			<Default>hide</Default>
+			<Format>SNP</Format>
+		</Anno>
+		<Anno id="Genes" group="Basic">
+			<Path>/home/ljuan/gbdata/hg19/hgnc.hg19.sorted.txt</Path>
+			<Default>hide</Default>
+			<Format>HGNC</Format>
+		</Anno>
+		<Anno id="Annovar" group="Basic">
+			<Path>/home/ljuan/gbdata/annovar/</Path>
+			<Default>hide</Default>
+			<Format>ANNOVAR</Format>
+		</Anno>
+		<Anno id="refGene" group="Gene">
+			<Path>/home/ljuan/gbdata/hg19/refGene.hg19.sorted.anno.gz</Path>
+			<Default>pack</Default>
+			<Format>ANNO</Format>
+		</Anno>
+		<Anno id="knownGene" group="Gene">
+			<Path>/home/ljuan/gbdata/hg19/knownGene.hg19.sorted.anno.gz</Path>
+			<Default>dense</Default>
+			<Format>ANNO</Format>
+		</Anno>
+		<Anno id="ensemblGene" group="Gene">
+			<Path>/home/ljuan/gbdata/hg19/ensGene.hg19.sorted.anno.gz</Path>
+			<Default>dense</Default>
+			<Format>ANNO</Format>
+		</Anno>
+		<Anno id="humanMrna" group="RNA">
+			<Path>/home/ljuan/gbdata/hg19/refRNA.hg19.sorted.bed.gz</Path>
+			<Default>hide</Default>
+			<Format>BEDGZ</Format>
+		</Anno>
+		<Anno id="humanEst" group="RNA">
+			<Path>/home/ljuan/gbdata/hg19/humanEst.hg19.sorted.bed.gz</Path>
+			<Default>hide</Default>
+			<Format>BEDGZ</Format>
+		</Anno>
+		<Anno id="altEvent" group="RNA">
+			<Path>/home/ljuan/gbdata/hg19/knownAlt.hg19.sorted.bed.gz</Path>
+			<Default>hide</Default>
+			<Format>BEDGZ</Format>
+		</Anno>
+		<Anno id="lincRNA" group="RNA">
+			<Path>/home/ljuan/gbdata/hg19/lincRNAsTranscripts.hg19.sorted.bed.gz</Path>
+			<Default>hide</Default>
+			<Format>BEDGZ</Format>
+		</Anno>
+		<Anno id="tRNAs" group="RNA">
+			<Path>/home/ljuan/gbdata/hg19/tRNAs.hg19.bed</Path>
+			<Default>hide</Default>
+			<Format>BED</Format>
+		</Anno>
+		<Anno id="sno/miRNAs" group="RNA">
+			<Path>/home/ljuan/gbdata/hg19/wgRna.hg19.bed</Path>
+			<Default>hide</Default>
+			<Format>BED</Format>
+		</Anno>
+		<Anno id="GC_Percent" group="GCcontent">
+			<Path>/home/ljuan/gbdata/hg19/gc5Base.hg19.bw</Path>
+			<Default>dense</Default>
+			<Format>BW</Format>
+		</Anno>
+		<Anno id="ensemblRegulation" group="Regulation">
+			<Path>/home/ljuan/gbdata/hg19/Regulation.hg19.sorted.grf.gz</Path>
+			<Default>hide</Default>
+			<Format>GRF</Format>
+		</Anno>
+		<Anno id="targetScan" group="Regulation">
+			<Path>/home/ljuan/gbdata/hg19/targetScan.hg19.sorted.grf.gz</Path>
+			<Default>dense</Default>
+			<Format>GRF</Format>
+		</Anno>
+		<Anno id="MCF7_DNAseq" group="Data">
+			<Path>/home/ljuan/gbdata/temp/MCF7_DNAseq.hg19.sorted.bam</Path>
+			<Default>hide</Default>
+			<Format>BAM</Format>
+		</Anno>
+		<Anno id="U87_RNAseq" group="Data">
+			<Path>/home/ljuan/gbdata/temp/U87.hg19.sorted.bam</Path>
+			<Default>hide</Default>
+			<Format>BAM</Format>
+		</Anno>
+		<Anno id="NA12716_RNAseq" group="Data">
+			<Path>/home/ljuan/gbdata/temp/NA12716.7.M_120219_6.bam</Path>
+			<Default>hide</Default>
+			<Format>BAM</Format>
+		</Anno>
+		<Anno id="Gm12878Encode" group="Data">
+			<Path>/home/ljuan/gbdata/temp/wgEncodeCaltechRnaSeqGm12878R2x75Il200SplicesRep2V2.bam</Path>
+			<Default>hide</Default>
+			<Format>BAM</Format>
+		</Anno>
+		<Anno id="Disease_causal_example" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/Disease_causal_shortlist.hg19.sorted.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="U87_Genome" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/temp/U87.snv.hg19.sorted.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="simulatedPerson1" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/temp/test1.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="simulatedPerson2" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/temp/test2.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="simulatedPerson3" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/temp/test3.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="simulatedPerson4" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/temp/test4.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="simulatedPerson5" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/temp/test5.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="simulatedPerson6" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/temp/test6.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="simulatedPerson7" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/temp/test7.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="Watson" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/Watson.hg19.sorted.gvf.gz</Path>
+			<Default>hide</Default>
+			<Format>GVF</Format>
+		</Anno>
+		<Anno id="Venter" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/Venter.hg19.sorted.gvf.gz</Path>
+			<Default>hide</Default>
+			<Format>GVF</Format>
+		</Anno>
+		<Anno id="1000genome_ASW" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/ASW.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_CEU" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/CEU.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_CHB" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/CHB.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_CHS" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/CHS.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_CLM" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/CLM.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_FIN" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/FIN.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_GBR" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/GBR.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_IBS" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/IBS.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_JPT" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/JPT.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_LWK" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/LWK.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_MXL" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/MXL.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_PUR" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/PUR.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_TSI" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/TSI.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000genome_YRI" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/1000g_by_population/YRI.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="repeatMask" group="Repeat">
+			<Path>/home/ljuan/gbdata/hg19/rmsk.hg19.sorted.bed.gz</Path>
+			<Default>hide</Default>
+			<Format>BEDGZ</Format>
+		</Anno>
+		<Anno id="simpleRepeat" group="Repeat">
+			<Path>/home/ljuan/gbdata/hg19/SimpleRep.hg19.sorted.bed.gz</Path>
+			<Default>hide</Default>
+			<Format>BEDGZ</Format>
+		</Anno>
+		<Anno id="interuptedRepeat" group="Repeat">
+			<Path>/home/ljuan/gbdata/hg19/NestedRep.hg19.sorted.bed.gz</Path>
+			<Default>hide</Default>
+			<Format>BEDGZ</Format>
+		</Anno>
+		<Anno id="microSatellite" group="Repeat">
+			<Path>/home/ljuan/gbdata/hg19/MicroSatellite.hg19.sorted.bed.gz</Path>
+			<Default>hide</Default>
+			<Format>BEDGZ</Format>
+		</Anno>
+		<Anno id="genomicSuperDups" group="Repeat">
+			<Path>/home/ljuan/gbdata/hg19/genomicSuperDups.hg19.sorted.bed.gz</Path>
+			<Default>hide</Default>
+			<Format>BEDGZ</Format>
+		</Anno>
+		<Anno id="dbSNP135_All" group="dbSNP">
+			<Path>/home/ljuan/gbdata/hg19/dbsnp135.hg19.vcf.bgz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_Common" group="dbSNP">
+			<Path>/home/ljuan/gbdata/hg19/common_all.vcf.gz</Path>
+			<Default>dense</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_ASW" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-12156-ASW.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-12156-ASW.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-12156-ASW.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-12156-ASW.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-12156-ASW.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-12156-ASW.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-12156-ASW.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-12156-ASW.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-12156-ASW.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-12156-ASW.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-12156-ASW.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-12156-ASW.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-12156-ASW.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-12156-ASW.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-12156-ASW.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-12156-ASW.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-12156-ASW.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-12156-ASW.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-12156-ASW.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-12156-ASW.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-12156-ASW.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-12156-ASW.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-12156-ASW.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-12156-ASW.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-12156-ASW.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_CHB" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-12157-CHB.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-12157-CHB.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-12157-CHB.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-12157-CHB.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-12157-CHB.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-12157-CHB.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-12157-CHB.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-12157-CHB.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-12157-CHB.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-12157-CHB.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-12157-CHB.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-12157-CHB.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-12157-CHB.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-12157-CHB.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-12157-CHB.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-12157-CHB.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-12157-CHB.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-12157-CHB.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-12157-CHB.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-12157-CHB.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-12157-CHB.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-12157-CHB.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-12157-CHB.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-12157-CHB.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-12157-CHB.vcf.gz</Path>
+			<Default>pack</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_CHD" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-12158-CHD.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-12158-CHD.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-12158-CHD.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-12158-CHD.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-12158-CHD.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-12158-CHD.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-12158-CHD.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-12158-CHD.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-12158-CHD.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-12158-CHD.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-12158-CHD.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-12158-CHD.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-12158-CHD.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-12158-CHD.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-12158-CHD.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-12158-CHD.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-12158-CHD.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-12158-CHD.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-12158-CHD.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-12158-CHD.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-12158-CHD.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-12158-CHD.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-12158-CHD.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-12158-CHD.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-12158-CHD.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_GIH" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-12159-GIH.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-12159-GIH.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-12159-GIH.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-12159-GIH.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-12159-GIH.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-12159-GIH.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-12159-GIH.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-12159-GIH.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-12159-GIH.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-12159-GIH.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-12159-GIH.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-12159-GIH.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-12159-GIH.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-12159-GIH.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-12159-GIH.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-12159-GIH.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-12159-GIH.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-12159-GIH.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-12159-GIH.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-12159-GIH.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-12159-GIH.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-12159-GIH.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-12159-GIH.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-12159-GIH.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-12159-GIH.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_LWK" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-12160-LWK.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-12160-LWK.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-12160-LWK.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-12160-LWK.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-12160-LWK.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-12160-LWK.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-12160-LWK.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-12160-LWK.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-12160-LWK.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-12160-LWK.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-12160-LWK.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-12160-LWK.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-12160-LWK.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-12160-LWK.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-12160-LWK.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-12160-LWK.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-12160-LWK.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-12160-LWK.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-12160-LWK.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-12160-LWK.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-12160-LWK.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-12160-LWK.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-12160-LWK.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-12160-LWK.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-12160-LWK.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_MEX" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-12161-MEX.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-12161-MEX.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-12161-MEX.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-12161-MEX.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-12161-MEX.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-12161-MEX.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-12161-MEX.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-12161-MEX.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-12161-MEX.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-12161-MEX.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-12161-MEX.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-12161-MEX.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-12161-MEX.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-12161-MEX.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-12161-MEX.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-12161-MEX.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-12161-MEX.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-12161-MEX.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-12161-MEX.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-12161-MEX.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-12161-MEX.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-12161-MEX.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-12161-MEX.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-12161-MEX.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-12161-MEX.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_MKK" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-12162-MKK.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-12162-MKK.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-12162-MKK.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-12162-MKK.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-12162-MKK.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-12162-MKK.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-12162-MKK.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-12162-MKK.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-12162-MKK.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-12162-MKK.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-12162-MKK.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-12162-MKK.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-12162-MKK.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-12162-MKK.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-12162-MKK.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-12162-MKK.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-12162-MKK.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-12162-MKK.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-12162-MKK.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-12162-MKK.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-12162-MKK.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-12162-MKK.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-12162-MKK.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-12162-MKK.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-12162-MKK.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_TSI" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-12163-TSI.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-12163-TSI.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-12163-TSI.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-12163-TSI.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-12163-TSI.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-12163-TSI.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-12163-TSI.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-12163-TSI.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-12163-TSI.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-12163-TSI.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-12163-TSI.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-12163-TSI.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-12163-TSI.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-12163-TSI.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-12163-TSI.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-12163-TSI.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-12163-TSI.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-12163-TSI.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-12163-TSI.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-12163-TSI.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-12163-TSI.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-12163-TSI.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-12163-TSI.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-12163-TSI.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-12163-TSI.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_CEU" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-1409-CEU.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-1409-CEU.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-1409-CEU.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-1409-CEU.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-1409-CEU.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-1409-CEU.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-1409-CEU.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-1409-CEU.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-1409-CEU.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-1409-CEU.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-1409-CEU.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-1409-CEU.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-1409-CEU.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-1409-CEU.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-1409-CEU.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-1409-CEU.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-1409-CEU.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-1409-CEU.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-1409-CEU.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-1409-CEU.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-1409-CEU.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-1409-CEU.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-1409-CEU.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-1409-CEU.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-1409-CEU.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_HCB" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-1410-HCB.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-1410-HCB.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-1410-HCB.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-1410-HCB.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-1410-HCB.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-1410-HCB.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-1410-HCB.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-1410-HCB.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-1410-HCB.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-1410-HCB.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-1410-HCB.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-1410-HCB.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-1410-HCB.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-1410-HCB.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-1410-HCB.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-1410-HCB.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-1410-HCB.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-1410-HCB.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-1410-HCB.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-1410-HCB.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-1410-HCB.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-1410-HCB.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-1410-HCB.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-1410-HCB.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-1410-HCB.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_JPT" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-1411-JPT.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-1411-JPT.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-1411-JPT.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-1411-JPT.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-1411-JPT.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-1411-JPT.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-1411-JPT.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-1411-JPT.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-1411-JPT.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-1411-JPT.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-1411-JPT.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-1411-JPT.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-1411-JPT.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-1411-JPT.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-1411-JPT.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-1411-JPT.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-1411-JPT.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-1411-JPT.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-1411-JPT.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-1411-JPT.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-1411-JPT.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-1411-JPT.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-1411-JPT.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-1411-JPT.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-1411-JPT.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="dbSNP135_YRI" group="dbSNP">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/01-1412-YRI.vcf.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/02-1412-YRI.vcf.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/03-1412-YRI.vcf.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/04-1412-YRI.vcf.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/05-1412-YRI.vcf.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/06-1412-YRI.vcf.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/07-1412-YRI.vcf.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/08-1412-YRI.vcf.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/09-1412-YRI.vcf.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/10-1412-YRI.vcf.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/11-1412-YRI.vcf.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/12-1412-YRI.vcf.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/13-1412-YRI.vcf.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/14-1412-YRI.vcf.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/15-1412-YRI.vcf.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/16-1412-YRI.vcf.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/17-1412-YRI.vcf.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/18-1412-YRI.vcf.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/19-1412-YRI.vcf.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/20-1412-YRI.vcf.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/21-1412-YRI.vcf.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/22-1412-YRI.vcf.gz</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/X-1412-YRI.vcf.gz</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/Y-1412-YRI.vcf.gz</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/dbsnp_bypopulation/MT-1412-YRI.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="phyloP_placental" group="Conservation">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/phyloP/placental/chr1.phyloP46way.placental.bw</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/phyloP/placental/chr2.phyloP46way.placental.bw</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/phyloP/placental/chr3.phyloP46way.placental.bw</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/phyloP/placental/chr4.phyloP46way.placental.bw</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/phyloP/placental/chr5.phyloP46way.placental.bw</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/phyloP/placental/chr6.phyloP46way.placental.bw</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/phyloP/placental/chr7.phyloP46way.placental.bw</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/phyloP/placental/chr8.phyloP46way.placental.bw</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/phyloP/placental/chr9.phyloP46way.placental.bw</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/phyloP/placental/chr10.phyloP46way.placental.bw</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/phyloP/placental/chr11.phyloP46way.placental.bw</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/phyloP/placental/chr12.phyloP46way.placental.bw</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/phyloP/placental/chr13.phyloP46way.placental.bw</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/phyloP/placental/chr14.phyloP46way.placental.bw</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/phyloP/placental/chr15.phyloP46way.placental.bw</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/phyloP/placental/chr16.phyloP46way.placental.bw</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/phyloP/placental/chr17.phyloP46way.placental.bw</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/phyloP/placental/chr18.phyloP46way.placental.bw</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/phyloP/placental/chr19.phyloP46way.placental.bw</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/phyloP/placental/chr20.phyloP46way.placental.bw</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/phyloP/placental/chr21.phyloP46way.placental.bw</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/phyloP/placental/chr22.phyloP46way.placental.bw</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/phyloP/placental/chrX.phyloP46way.placental.bw</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/phyloP/placental/chrY.phyloP46way.placental.bw</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/phyloP/placental/chrM.phyloP46way.placental.bw</Path>
+			<Default>pack</Default>
+			<Format>BW</Format>
+		</Anno>
+		<Anno id="phyloP_primates" group="Conservation">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/phyloP/primates/chr1.phyloP46way.primates.bw</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/phyloP/primates/chr2.phyloP46way.primates.bw</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/phyloP/primates/chr3.phyloP46way.primates.bw</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/phyloP/primates/chr4.phyloP46way.primates.bw</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/phyloP/primates/chr5.phyloP46way.primates.bw</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/phyloP/primates/chr6.phyloP46way.primates.bw</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/phyloP/primates/chr7.phyloP46way.primates.bw</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/phyloP/primates/chr8.phyloP46way.primates.bw</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/phyloP/primates/chr9.phyloP46way.primates.bw</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/phyloP/primates/chr10.phyloP46way.primates.bw</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/phyloP/primates/chr11.phyloP46way.primates.bw</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/phyloP/primates/chr12.phyloP46way.primates.bw</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/phyloP/primates/chr13.phyloP46way.primates.bw</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/phyloP/primates/chr14.phyloP46way.primates.bw</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/phyloP/primates/chr15.phyloP46way.primates.bw</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/phyloP/primates/chr16.phyloP46way.primates.bw</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/phyloP/primates/chr17.phyloP46way.primates.bw</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/phyloP/primates/chr18.phyloP46way.primates.bw</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/phyloP/primates/chr19.phyloP46way.primates.bw</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/phyloP/primates/chr20.phyloP46way.primates.bw</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/phyloP/primates/chr21.phyloP46way.primates.bw</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/phyloP/primates/chr22.phyloP46way.primates.bw</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/phyloP/primates/chrX.phyloP46way.primates.bw</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/phyloP/primates/chrY.phyloP46way.primates.bw</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/phyloP/primates/chrM.phyloP46way.primates.bw</Path>
+			<Default>hide</Default>
+			<Format>BW</Format>
+		</Anno>
+		<Anno id="phyloP_vertebrate" group="Conservation">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr1.phyloP46way.bw</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr2.phyloP46way.bw</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr3.phyloP46way.bw</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr4.phyloP46way.bw</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr5.phyloP46way.bw</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr6.phyloP46way.bw</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr7.phyloP46way.bw</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr8.phyloP46way.bw</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr9.phyloP46way.bw</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr10.phyloP46way.bw</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr11.phyloP46way.bw</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr12.phyloP46way.bw</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr13.phyloP46way.bw</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr14.phyloP46way.bw</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr15.phyloP46way.bw</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr16.phyloP46way.bw</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr17.phyloP46way.bw</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr18.phyloP46way.bw</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr19.phyloP46way.bw</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr20.phyloP46way.bw</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr21.phyloP46way.bw</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chr22.phyloP46way.bw</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chrX.phyloP46way.bw</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chrY.phyloP46way.bw</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/phyloP/vertebrate/chrM.phyloP46way.bw</Path>
+			<Default>hide</Default>
+			<Format>BW</Format>
+		</Anno>
+		<Anno id="phastCons_placental" group="Conservation">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/phastCons/placental/chr1.phastCons46way.placental.bw</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/phastCons/placental/chr2.phastCons46way.placental.bw</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/phastCons/placental/chr3.phastCons46way.placental.bw</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/phastCons/placental/chr4.phastCons46way.placental.bw</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/phastCons/placental/chr5.phastCons46way.placental.bw</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/phastCons/placental/chr6.phastCons46way.placental.bw</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/phastCons/placental/chr7.phastCons46way.placental.bw</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/phastCons/placental/chr8.phastCons46way.placental.bw</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/phastCons/placental/chr9.phastCons46way.placental.bw</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/phastCons/placental/chr10.phastCons46way.placental.bw</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/phastCons/placental/chr11.phastCons46way.placental.bw</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/phastCons/placental/chr12.phastCons46way.placental.bw</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/phastCons/placental/chr13.phastCons46way.placental.bw</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/phastCons/placental/chr14.phastCons46way.placental.bw</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/phastCons/placental/chr15.phastCons46way.placental.bw</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/phastCons/placental/chr16.phastCons46way.placental.bw</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/phastCons/placental/chr17.phastCons46way.placental.bw</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/phastCons/placental/chr18.phastCons46way.placental.bw</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/phastCons/placental/chr19.phastCons46way.placental.bw</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/phastCons/placental/chr20.phastCons46way.placental.bw</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/phastCons/placental/chr21.phastCons46way.placental.bw</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/phastCons/placental/chr22.phastCons46way.placental.bw</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/phastCons/placental/chrX.phastCons46way.placental.bw</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/phastCons/placental/chrY.phastCons46way.placental.bw</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/phastCons/placental/chrM.phastCons46way.placental.bw</Path>
+			<Default>hide</Default>
+			<Format>BW</Format>
+		</Anno>
+		<Anno id="phastCons_primates" group="Conservation">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/phastCons/primates/chr1.phastCons46way.primates.bw</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/phastCons/primates/chr2.phastCons46way.primates.bw</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/phastCons/primates/chr3.phastCons46way.primates.bw</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/phastCons/primates/chr4.phastCons46way.primates.bw</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/phastCons/primates/chr5.phastCons46way.primates.bw</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/phastCons/primates/chr6.phastCons46way.primates.bw</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/phastCons/primates/chr7.phastCons46way.primates.bw</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/phastCons/primates/chr8.phastCons46way.primates.bw</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/phastCons/primates/chr9.phastCons46way.primates.bw</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/phastCons/primates/chr10.phastCons46way.primates.bw</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/phastCons/primates/chr11.phastCons46way.primates.bw</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/phastCons/primates/chr12.phastCons46way.primates.bw</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/phastCons/primates/chr13.phastCons46way.primates.bw</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/phastCons/primates/chr14.phastCons46way.primates.bw</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/phastCons/primates/chr15.phastCons46way.primates.bw</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/phastCons/primates/chr16.phastCons46way.primates.bw</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/phastCons/primates/chr17.phastCons46way.primates.bw</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/phastCons/primates/chr18.phastCons46way.primates.bw</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/phastCons/primates/chr19.phastCons46way.primates.bw</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/phastCons/primates/chr20.phastCons46way.primates.bw</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/phastCons/primates/chr21.phastCons46way.primates.bw</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/phastCons/primates/chr22.phastCons46way.primates.bw</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/phastCons/primates/chrX.phastCons46way.primates.bw</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/phastCons/primates/chrY.phastCons46way.primates.bw</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/phastCons/primates/chrM.phastCons46way.primates.bw</Path>
+			<Default>hide</Default>
+			<Format>BW</Format>
+		</Anno>
+		<Anno id="phastCons_vertebrate" group="Conservation">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr1.phastCons46way.bw</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr2.phastCons46way.bw</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr3.phastCons46way.bw</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr4.phastCons46way.bw</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr5.phastCons46way.bw</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr6.phastCons46way.bw</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr7.phastCons46way.bw</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr8.phastCons46way.bw</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr9.phastCons46way.bw</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr10.phastCons46way.bw</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr11.phastCons46way.bw</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr12.phastCons46way.bw</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr13.phastCons46way.bw</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr14.phastCons46way.bw</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr15.phastCons46way.bw</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr16.phastCons46way.bw</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr17.phastCons46way.bw</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr18.phastCons46way.bw</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr19.phastCons46way.bw</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr20.phastCons46way.bw</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr21.phastCons46way.bw</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chr22.phastCons46way.bw</Path>
+			<Path key="chrX">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chrX.phastCons46way.bw</Path>
+			<Path key="chrY">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chrY.phastCons46way.bw</Path>
+			<Path key="chrM">/home/ljuan/gbdata/hg19/phastCons/vertebrate/chrM.phastCons46way.bw</Path>
+			<Default>hide</Default>
+			<Format>BW</Format>
+		</Anno>
+		<Anno id="GwasCatalog" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/GwasCatalog.hg19.sorted.gdf.gz</Path>
+			<Default>hide</Default>
+			<Format>GDF</Format>
+		</Anno>
+		<Anno id="GWASdb" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/GWASdb.hg19.sorted.gdf.gz</Path>
+			<Default>hide</Default>
+			<Format>GDF</Format>
+		</Anno>
+		<Anno id="GAD" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/GAD.hg19.sorted.gdf.gz</Path>
+			<Default>hide</Default>
+			<Format>GDF</Format>
+		</Anno>
+		<Anno id="LncRNA-Disease" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/LncRNA-Disease.hg19.sorted.gdf.gz</Path>
+			<Default>hide</Default>
+			<Format>GDF</Format>
+		</Anno>
+		<Anno id="miR2Disease" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/miR2Disease.hg19.sorted.gdf.gz</Path>
+			<Default>hide</Default>
+			<Format>GDF</Format>
+		</Anno>
+		<Anno id="OMIM" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/OMIM2Disease.hg19.sorted.gdf.gz</Path>
+			<Default>pack</Default>
+			<Format>GDF</Format>
+		</Anno>
+		<Anno id="PharmGKB" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/PharmGKB.hg19.sorted.gdf.gz</Path>
+			<Default>hide</Default>
+			<Format>GDF</Format>
+		</Anno>
+		<Anno id="SpliceDisease" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/SpliceDisease.hg19.sorted.gdf.gz</Path>
+			<Default>hide</Default>
+			<Format>GDF</Format>
+		</Anno>
+	</Assembly>
+</root>

@@ -52,7 +52,7 @@ public class Individual {
 		int from = 0;
 		for (int i = 0, num = nodeList.getLength(); i < num; i++) {
 			v = Variant.convertElement2Variant((Element) nodeList.item(i));
-			result.put(v, new VariantMapToDBSNP(v, null, null));
+			result.put(v, new VariantMapToDBSNP(v, null, null, null));
 			from = v.getFrom();
 			vs = int2Variants.get(from);
 			if (vs == null) {
@@ -116,6 +116,7 @@ public class Individual {
 							if ((variant = variantInMap(v)) != null) {
 								result.get(variant).dbsnp = vcf.getDBSnpInfo();
 								result.get(variant).dbsnpId = vcf.getID();
+								result.get(variant).dbsnpInfo = vcf.getInfo();
 							}
 						}
 					}

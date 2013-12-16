@@ -36,7 +36,7 @@ var xmlTagDbsnp = "Dbsnp";
 var xmlTagMate = "Mate";
 var xmlTagStatus = "status";
 
-var xmlGroupIG= "PersonalGenome";
+var xmlGroupIG= "Personal Genome";
 var xmlParamSample= "Samples";
 
 var xmlAttributeId = "id";
@@ -142,6 +142,7 @@ personalPannel.personalTrackItems = personalTrackItems;
 var scoremethPvar = "PGB"; // added by Liran for recording current scoring method
 
 var control_scanning=0;//for stop scanning when close BrowseJumpWindow
+var control_upexternal=0;//to prevent indset window close while there is a file uploading
 /*$(function(){
 	window.onunload = function(){
 		window.location.href = window.location.href;
@@ -390,6 +391,7 @@ var XMLHttpReq6 = createXMLHttpRequest();//for individual setting.
 var XMLHttpReq7 = createXMLHttpRequest();//for browse jump
 var XMLHttpReq8 = createXMLHttpRequest();//for BJW_upStat
 var XMLHttpReq10 = createXMLHttpRequest();//for BJW_scan
+var XMLHttpReq11 = createXMLHttpRequest();//for addExIndividual
 var showType;
 
 function updateRequest(url) {
@@ -1312,8 +1314,8 @@ function showRead(canvas1, canvas2, readNode, mode, isShowId) {
 
 											if(searchLength <= trackLength / 10) {
 												if(variantTypes[packReads[i][j]][k] == variantType_INSERTION) {
-													ctx2.fillStyle = "#fff";
-													ctx2.strokeStyle = "#fff";
+													ctx2.fillStyle = "#ffffff";
+													ctx2.strokeStyle = "#ffffff";
 												} else {
 													if(readDireactions[packReads[i][j]] == "+") {
 														ctx2.fillStyle = "#458b74";
@@ -1434,8 +1436,8 @@ function showRead(canvas1, canvas2, readNode, mode, isShowId) {
 
 											if(searchLength <= trackLength / 10) {
 												if(variantTypes[packReads[i][j]][k] == variantType_INSERTION) {
-													ctx2.fillStyle = "#fff";
-													ctx2.strokeStyle = "#fff";
+													ctx2.fillStyle = "#ffffff";
+													ctx2.strokeStyle = "#ffffff";
 												} else {
 													if(readDireactions[packReads[i][j]] == "+") {
 														ctx2.fillStyle = "#458b74";
@@ -5650,7 +5652,7 @@ function createTrack(trackId, mode) {
 		}
 	}
 	//<span class=\"setting thickbox\" title=\"setting\" alt=\"#TB_inline?height=300;width=650;inlineId=tracksettingDIV\"></span>
-	trNode.innerHTML = "<td class=\"trackOperator\"><span class=\"close\"></span>"+ modechangeBtnSpan_str +"</td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: #ffffff\"></canvas></td><td class=\"trackContent\"><canvas width=\""+ trackLength +"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></td>";
+	trNode.innerHTML = "<td class=\"trackOperator\"><span class=\"close\"></span>"+ modechangeBtnSpan_str +"</td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+RefBG+"\"></canvas></td><td class=\"trackContent\"><canvas width=\""+ trackLength +"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></td>";
 	var canvasNodes = trNode.getElementsByTagName("canvas");
 	canvasNodes[0].onmouseover = mouseOver;
 	canvasNodes[0].onmouseout = mouseOut;
@@ -5777,6 +5779,7 @@ function removePvar() {
 	XMLHttpReq.onreadystatechange = function() {
 		personalPannel.Pvar.id="";
 		personalPannel.Pvar.mode="";
+		initPvar_superid="";
 	};
 	XMLHttpReq.open("GET", "servlet/test.do?action=removePvar", true);
 	XMLHttpReq.send(null);
@@ -5906,7 +5909,7 @@ function setPersonalPannel(){
 		tdNode.appendChild(radioObj);
 		labelObj = document.createElement("label");
 		labelObj.setAttribute("for", personalPannel.personalTrackItems.Pfannos[i] + "radio");
-		labelObj.innerHTML = personalPannel.personalTrackItems.Pfannos[i];
+		labelObj.innerHTML = personalPannel.personalTrackItems.Pfannos[i].substring(1);
 		tdNode.appendChild(labelObj);
 		
 		radioObj.onclick = function(event){
@@ -5933,7 +5936,7 @@ function setPersonalPannel(){
 		tdNode.appendChild(radioObj);
 		labelObj = document.createElement("label");
 		labelObj.setAttribute("for", personalPannel.personalTrackItems.Pannos[i] + "radio");
-		labelObj.innerHTML = personalPannel.personalTrackItems.Pannos[i];
+		labelObj.innerHTML = personalPannel.personalTrackItems.Pannos[i].substring(1);
 		tdNode.appendChild(labelObj);
 		
 		radioObj.onclick = function(event){
@@ -5963,7 +5966,7 @@ function setPersonalPannel(){
 		tdNode.appendChild(radioObj);
 		labelObj = document.createElement("label");
 		labelObj.setAttribute("for", personalPannel.personalTrackItems.Pclnss[i] + "chk");
-		labelObj.innerHTML = personalPannel.personalTrackItems.Pclnss[i];
+		labelObj.innerHTML = personalPannel.personalTrackItems.Pclnss[i].substring(1);
 		tdNode.appendChild(labelObj);
 		
 		radioObj.onclick = function(event){
@@ -6604,7 +6607,7 @@ function createPPGTrack(trackId, mode) {
 			modechangeBtnSpan_str = "";
 		}
 	}
-	trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"</div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: #ffffff\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength +"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+	trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"</div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength +"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
 	var canvasNodes = trNode.getElementsByTagName("canvas");
 	canvasNodes[0].onmouseover = mouseOver;
 	canvasNodes[0].onmouseout = mouseOut;
@@ -6656,7 +6659,7 @@ function createPPOtherTrack(trackId, mode) {
 			modechangeBtnSpan_str = "";
 		}
 	}
-	trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"<span class=\"close\"></span></div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: #ffffff\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength+"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+	trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"<span class=\"close\"></span></div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength+"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
 	var canvasNodes = trNode.getElementsByTagName("canvas");
 	canvasNodes[0].onmouseover = mouseOver;
 	canvasNodes[0].onmouseout = mouseOut;
@@ -7576,7 +7579,7 @@ function showCytoband(canvasNode, cytobandsNode) {
 						ctx.fillStyle = "#B22222";
 						break;
 					case "gneg":
-						ctx.fillStyle = "#fff";
+						ctx.fillStyle = "#ffffff";
 						break;
 					case "gpos25":
 						ctx.fillStyle = "#C2C2C2";
@@ -7602,7 +7605,7 @@ function showCytoband(canvasNode, cytobandsNode) {
 				}
 				if(ctx.measureText(cytobands[i].id).width < bandRelativeWidth) {
 					if(cytobands[i].gieStain == "gpos100" || cytobands[i].gieStain == "gpos75") {
-						ctx.fillStyle = "#fff";
+						ctx.fillStyle = "#ffffff";
 					} else {
 						ctx.fillStyle = "#000";
 					}
@@ -7844,7 +7847,7 @@ $(function() {
 			$("#select_info").css("left", left);
 			//$("#select_info").css("width", 200);
 			//$("#select_info").css("height", 200);
-			$("#select_info").css("background-color", "#fff");
+			$("#select_info").css("background-color", "#ffffff");
 			//init the showing panel with waiting image
 			
 			$("#select_info").html("");
@@ -8337,8 +8340,9 @@ function trackItems_setting3(){//individualItems setting
 
 	document.getElementById("indset_radio").innerHTML="";
 	document.getElementById("builtin_1000g").innerHTML="Loading...";
-	document.getElementById("builtin_others").innerHTML="Loading...";
 	document.getElementById("external_uploaded").innerHTML="Loading...";
+	document.getElementById("uprogress").innerHTML="";
+	control_upexternal=0;
 
 	var individuals=[];//includes personal TRACKs, each unit has trackname, samples, samples is also array
 	var exindividuals=[];//includes personal TRACKs, each unit has trackname, samples, samples is also array
@@ -8374,7 +8378,6 @@ function trackItems_setting3(){//individualItems setting
 	}
 
 	document.getElementById("builtin_1000g").innerHTML="";
-	document.getElementById("builtin_others").innerHTML="";
 	document.getElementById("external_uploaded").innerHTML="";
 
 	var group_title_divObj, group_content_divObj;
@@ -8389,7 +8392,7 @@ function trackItems_setting3(){//individualItems setting
 			document.getElementById("builtin_1000g").appendChild(group_title_divObj);
 			group_title_divObj.innerHTML=individuals[i].track.substring(11);
 		}else{
-			document.getElementById("builtin_others").appendChild(group_title_divObj);
+			document.getElementById("external_uploaded").appendChild(group_title_divObj);
 			group_title_divObj.innerHTML=individuals[i].track;
 		}
 
@@ -8448,6 +8451,7 @@ function trackItems_setting3(){//individualItems setting
 				$(document.getElementById("ppMin")).click(miniPersonalPannel);
 				$(document.getElementById("ppSet")).click(setPersonalPannel);
 				addPvarHttpRequest2(Pvar_id[0],Pvar_id[1]); 
+				indsetWindow_close();
 				//to be test whether need closet
 			};
 		}
@@ -8458,7 +8462,7 @@ function trackItems_setting3(){//individualItems setting
 		$(group_title_and_btn).css("float","left");
 		group_title_divObj = document.createElement("span");
 		group_title_divObj.id = exindividuals[i].track + "_group_title";
-		group_title_divObj.className = "IW_track_btn";
+		group_title_divObj.className = "IW_track_upload_btn";
 		group_title_and_btn.appendChild(group_title_divObj);
 		group_title_divObj.innerHTML=exindividuals[i].track;
 		var group_del_btn = document.createElement("span");
@@ -8473,9 +8477,17 @@ function trackItems_setting3(){//individualItems setting
 			if(initPvar_superid != trackId_temp){
 				XMLHttpReq6.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId_temp,false);
 				XMLHttpReq6.send(null);
+				$(document.getElementById(trackId_temp+"_group_content")).css("display","none");
+				$(target.parentNode).css("display","none");
 				target.parentNode.remove();
 			}else{
-				alert("Please remove the user data from personal genome panel first.");
+//				alert("Please remove the user data from personal genome panel first.");
+				removePvar();
+				XMLHttpReq6.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId_temp,false);
+				XMLHttpReq6.send(null);
+				$(document.getElementById(trackId_temp+"_group_content")).css("display","none");
+				$(target.parentNode).css("display","none");
+				target.parentNode.remove();
 			}
 		};
 
@@ -8534,6 +8546,7 @@ function trackItems_setting3(){//individualItems setting
 				$(document.getElementById("ppMin")).click(miniPersonalPannel);
 				$(document.getElementById("ppSet")).click(setPersonalPannel);
 				addPvarHttpRequest2(Pvar_id[0],Pvar_id[1]); 
+				indsetWindow_close();
 				//to be test whether need closet
 			};
 		}
@@ -8621,8 +8634,13 @@ function helpWindow_close(){
 	$("#helpWindow").css("display","none");
 }
 function indsetWindow_close(){
-	$("#indsetWindow_overlayDIV").css("display","none");
-	$("#indsetWindow").css("display","none");
+	if(control_upexternal){
+		alert("There are data in uploading, please wait it complete.");
+		alert("If the upload is failed or unable to response, plase reopen the whole page.");
+	}else{
+		$("#indsetWindow_overlayDIV").css("display","none");
+		$("#indsetWindow").css("display","none");
+	}
 }
 function browseJumpWindow_close(){
 	$("#browseJumpWindow_overlayDIV").css("display","none");
@@ -9728,7 +9746,7 @@ function BJW_getStat() {
 	if(personalPannel.Pvar.id)
 		window.open("servlet/test.do?action=getStat");
 	else
-		document.getElementById("upload_success").innerHTML="Please load personal variants from 'Load Indivdiual' menu";
+		document.getElementById("upload_success").innerHTML="Please load personal variants from 'Load Individual' menu";
 }
 function BJW_upStat() {
 	var fileObj = document.getElementById("file_field").files[0];
@@ -9750,17 +9768,25 @@ function BJW_upStat() {
 	}
 }
 function addExIndividual(){
+	control_upexternal=0;
 	var trackId = document.getElementById("pg_upload_name").value;
 	var trackType = document.getElementById("pg_upload_type").value;
 	var trackURL = document.getElementById("pg_upload_url").value;
+
+	var ifurl = document.getElementById("url_of_url_or_upload").checked;
+	var ifupload = document.getElementById("upload_of_url_or_upload").checked;
+
+	var fileObj = document.getElementById("pg_upload_file").files[0];
+	var fileObj2 = document.getElementById("pg_upload_file2").files[0];
+
 
 	var pattern = /<.*?>/g;
 	var indslist;
 	var inds_temp;
 
-	XMLHttpReq6.open("GET","servlet/test.do?action=getAnnotations",false);
-	XMLHttpReq6.send(null);
-	indslist=XMLHttpReq6.responseText.replace(pattern,"");
+	XMLHttpReq11.open("GET","servlet/test.do?action=getAnnotations",false);
+	XMLHttpReq11.send(null);
+	indslist=XMLHttpReq11.responseText.replace(pattern,"");
 	inds_temp=indslist.split(",");
 	
 	var ifexists = false;
@@ -9773,9 +9799,9 @@ function addExIndividual(){
 		}
 	}
 
-	XMLHttpReq6.open("GET","servlet/test.do?action=getExternals",false);
-	XMLHttpReq6.send(null);
-	indslist=XMLHttpReq6.responseText.replace(pattern,"");
+	XMLHttpReq11.open("GET","servlet/test.do?action=getExternals",false);
+	XMLHttpReq11.send(null);
+	indslist=XMLHttpReq11.responseText.replace(pattern,"");
 	inds_temp=indslist.split(",");
 	if(inds_temp!=null && inds_temp[0]!=""){
 		for(var idx=0;idx<inds_temp.length;idx++){
@@ -9786,21 +9812,76 @@ function addExIndividual(){
 		}
 	}
 	
-	if(trackId!=null && trackType!=null && trackURL!=null && trackId!="" && trackType!="" && trackURL!=""){
-		if(trackId.substring(0,1)=='_'){
-			alert("The track name cannot start with '_'.");
-		}else if(ifexists){
-			alert("The track name exists.");
-		}else if(trackType!="VCF" && trackType!="GVF"){
-			alert("This data type is not supported.");
+	if(ifurl){
+		if(trackId!=null && trackType!=null && trackURL!=null && trackId!="" && trackType!="" && trackURL!=""){
+			if(trackId.substring(0,1)=='_'){
+				alert("The track name cannot start with '_'.");
+			}else if(ifexists){
+				alert("The track name exists.");
+			}else if(trackType!="VCF" && trackType!="GVF"){
+				alert("This data type is not supported.");
+			}else{
+				XMLHttpReq11.open("GET","servlet/test.do?action=addExIndividuals&modes=hide&tracks="+trackId+"&types="+trackType+"&links="+trackURL,false);
+				XMLHttpReq11.send(null);
+				trackItems_setting3()
+			}
 		}else{
-			XMLHttpReq6.open("GET","servlet/test.do?action=addExIndividuals&modes=hide&tracks="+trackId+"&types="+trackType+"&links="+trackURL,false);
-			XMLHttpReq6.send(null);
-			trackItems_setting3()
+			alert("Please fill all required parameters.");
 		}
-	}else{
-		alert("Please fill all required parameters.");
+	}else if(ifupload){
+		if(trackId!=null && trackType!=null && fileObj!=null && fileObj2!=null && trackId!="" && trackType!=""){
+			if(trackId.substring(0,1)=='_'){
+				alert("The track name cannot start with '_'.");
+			}else if(ifexists){
+				alert("The track name exists.");
+			}else if(trackType!="VCF" && trackType!="GVF"){
+				alert("This data type is not supported.");
+			}else if(fileObj.size>20*1000*1000 || fileObj2.size>20*1000*1000){
+				alert("The file is too large.");
+			}else{
+
+				onProgressHandler = function(event) {
+					if(event.lengthComputable) {
+						var howmuch = (event.loaded / event.total) * 100;
+						document.getElementById("uprogress").innerHTML = Math.floor(howmuch)+"% Completed";
+					} else {
+						console.log("Can't determine the size of the file.");
+					}
+				}
+				var onLoadHandler = function() {
+					document.getElementById("uprogress").innerHTML = "100% Completed";
+				}
+				var onErrorHandler = function() {
+					document.getElementById("uprogress").innerHTML = "Upload Failed.";
+				}
+				XMLHttpReq11.upload.addEventListener('progress', onProgressHandler, false);
+				XMLHttpReq11.upload.addEventListener('load', onLoadHandler, false);
+				XMLHttpReq11.upload.addEventListener('error', onErrorHandler, false);
+				var onReadyStateHandlerUprogress = function(event) {
+					if( event.target.readyState == 4 && event.target.status == 200){
+						control_upexternal=0;
+						trackItems_setting3()
+					}
+				}
+
+				var form = new FormData();
+				form.append("file", fileObj);
+				form.append("file", fileObj2);
+				form.append("enctype", "multipart/form-data");
+				XMLHttpReq11.open("POST","servlet/test.do?action=upExternal&modes=hide&tracks="+trackId+"&types="+trackType,true);
+				control_upexternal=1;
+				XMLHttpReq11.onreadystatechange = onReadyStateHandlerUprogress;
+				XMLHttpReq11.send(form);
+			}
+		}else{
+			alert("Please fill all required parameters.");
+		}
 	}
+}
+function fill_example_pg(){
+	document.getElementById("pg_upload_name").value="test_1";
+	document.getElementById("pg_upload_url").value="http://202.118.228.68/gbfiles/CEU.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz";
+	document.getElementById("pg_upload_type").value="VCF";
 }
 /*为解决搜索框与personal gene detail box出现冲突而添加的代码，从根本上解决之后不需要这段代码
 $(document).ready(function() {

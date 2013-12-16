@@ -58,6 +58,8 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					querry="action="+param5+"&chr="+param1+"&start="+param2+"&end="+param3;
 				} else if(param5 == "addExternals" || param5 == "addExIndividuals"){
 					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&links="+param2+"&types="+param1;
+				} else if(param5 == "upExternal"){
+					querry="action="+param5+"&tracks="+param4+"&modes="+param3+"&types="+param1;
 				} else if(param5 == "getDetail"){
 					querry="action="+param5+"&tracks="+param4+"&id="+param1+"&start="+param2+"&end="+param3;
 				} else if(param5 == "update" || param5 == "refresh"){
@@ -75,6 +77,16 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					var fileObj = document.getElementById("uploadfile").files[0];
 					var form = new FormData();
 					form.append("file", fileObj);
+					form.append("enctype", "multipart/form-data");
+				//	req.setRequestHeader("Content-Type","multipart/form-data");
+					req.open("POST","servlet/test.do?"+querry,true);
+					req.send(form);
+				} else if(param5 == "upExternal"){
+					var fileObj = document.getElementById("uploadfile").files[0];
+					var fileObj2 = document.getElementById("uploadfile2").files[0];
+					var form = new FormData();
+					form.append("file", fileObj);
+					form.append("file", fileObj2);
 					form.append("enctype", "multipart/form-data");
 				//	req.setRequestHeader("Content-Type","multipart/form-data");
 					req.open("POST","servlet/test.do?"+querry,true);
@@ -140,7 +152,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<th>Input</th>
 			<th>update<br>refresh</th>
 			<th>getDetail</th>
-			<th>addExternals<br>addExIndividuals</th>
+			<th>addExternals<br>addExIndividuals<br>upExternal</th>
 			<th>setParams</th>
 			<th>overlapGene</th>
 			<th>addPvar<br>modiPvar<br>initPvar</th>
@@ -212,7 +224,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td>action</td>
 		</tr>
 		<tr><td colspan="13"><button id="buttonn" onclick="update()">update</button></td></tr>
-		<tr><td colspan="13"><input type="file" name="uploadfile" id="uploadfile"/></td></tr>
+		<tr><td colspan="13"><input type="file" name="uploadfile" id="uploadfile"/><input type="file" name="uploadfile2" id="uploadfile2"/></td></tr>
 		<tr><td colspan="13" style="word-break:break-all"><div id="divv"></div></td></tr>
 	</table>
 	
