@@ -817,8 +817,26 @@ function handle_getPersonalGeneDetailRequest(){
 					}
 				}
 			}
+
+			var trackId = XMLDoc.getElementsByTagName(xmlTagElements)[0].getAttribute(xmlAttributeId);
+			var geneType,url;
+			if(trackId == "knownGene"){
+				geneType = "UCSC";
+				url = "http://genome.ucsc.edu/cgi-bin/hgGene?hgg_type=knownGene&hgg_gene=" + geneId;
+			}else if(trackId == "ensemblGene"){
+				geneType = "Ensembl";
+				url = "http://asia.ensembl.org/Homo_sapiens/Gene/Summary?g=" + geneId;
+			}else if(trackId == "refGene"){
+				geneType = "RefSeq";
+				url = "http://www.ncbi.nlm.nih.gov/nuccore/" + geneId;
+			}
+
 			document.getElementById("personalGeneDetailSymbol").innerHTML = geneSymbol;
 			document.getElementById("personalGeneDetail-ID").innerHTML = geneId;
+			document.getElementById("personalGeneDetail-Type").innerHTML = geneType + "<span style=\"font-size:14px\">↗<\/span>";
+			document.getElementById("personalGeneDetail-Type").onclick = function(){
+				window.open(url);
+			};
 			document.getElementById("personalGeneDetailScale").innerHTML = chrNum + ":" + geneFrom + "-" + geneTo + " " + geneDirection;
 			
 			var structureDetails1 = "", structureDetails2 = "";

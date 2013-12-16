@@ -138,13 +138,13 @@
 		<div id="myOnPageContent" style="display: none">
 			<div id="tabContentDiv">
 				<ul>
-					<li>
+					<li style="font:12px Candara,Arial,Helvetica">
 						<a href="#one_track_tab">Add One Track</a>
 					</li>
-					<li>
+					<li style="font:12px Candara,Arial,Helvetica">
 						<a href="#more_track_tab">Add Multiple Tracks</a>
 					</li>
-					<li id="removeexternals_li">
+					<li id="removeexternals_li" style="font:12px Candara,Arial,Helvetica">
 						<a href="#remove_track_tab">Remove Custom Tracks</a>
 					</li>
 				</ul>
@@ -231,7 +231,7 @@
 					</center>
 				</div>
 				<div id="more_track_tab">
-					Paste<span id="customtrackconfigformat" style="cursor:default" title="The format of the configuration text is:&#13 tracks=track1,track2&modes=mode1,mode2&types=type1,type2&links=link1,chr1:link2-1;chr2:link2-1;chr3:link2-2;chr4:link2-3;"><I> configuration text:</I></span>
+					Paste<span id="customtrackconfigformat" style="cursor:default" title="The format of the configuration text is:&#13 tracks=track1,track2&modes=mode1,mode2&types=type1,type2&links=link1,chr1:link2-1;chr2:link2-1;chr3:link2-2;chr4:link2-3;"><I> Configuration Text:</I></span>
 					<div style="margin-top: 5px; margin-bottom: 20px;">
 						<textarea id="uploadfile_configureText" style="width: 100%; height: 168; resize: none" 
 						placeholder="In this box,you can upload more than one track at a time by inputting file URLs. You need to set the four parameters:tracks, modes, types and links. The format of the configure text is:&#13 tracks=track1,track2&modes=mode1,mode2&types=type1,type2&links=link1,chr1:link2-1;chr2:link2-1;chr3:link2-2;chr4:link2-3;"></textarea>
@@ -444,7 +444,7 @@
 										INFO:
 									</td>
 									<td valign="top">
-										<div id="variantDetailContent_INFO_Content" style="width: 300px; height: 45px; overflow: auto">
+										<div id="variantDetailContent_INFO_Content" style="width: 300px; word-break:break-all">
 											RSPOS=33031822;GMAF=0.0046;dbSNPBuildID=124;SSR=0;SAO=0;VP=050000020001040116000100;GENEINFO=SOD1:6647;WGT=1;VC=SNV;R5;VLD;GNO;KGPhase1;KGPROD;OTHERKG;POPFREQ=693(176/88):0.00568181818181818(1/1),15085(122/61):0(0/0),15086(170/85):0(0/0),15087(194/97):0(0/0),15088(200/100):0(0/0),15089(186/93):0(0/0),15090(178/89):0(0/0),15091(178/89):0(0/0),15092(188/94):0.0425531914893617(8/8),15093(128/64):0(0/0),15094(110/55):0(0/0),15095(196/98):0(0/0),15096(176/88):0.0113636363636364(2/2),15147(2174/1087):0.00459981600735971(10/10),15152(120/60):0(0/0),15153(28/14):0(0/0)
 										</div>
 									</td>
@@ -689,7 +689,10 @@ shadow:5px 5px 5px #888;">
 							<tbody>
 								<tr>
 									<td id="personalGeneDetailSymbol" style="color:white;padding-left:10px;padding-right:10px;font:italic bold 18px Georgia;">KIAA1217</td>
-									<td id="personalGeneDetail-ID" align="right" style="color:white;padding-right:10px;font-size: 12px">12345</td>
+									<td>
+										<span id="personalGeneDetail-Type" class="clb3" style="float:right;margin-right:10px"></span>
+										<span id="personalGeneDetail-ID" style="float:right;color:white;font-size: 12px">12345</span>
+									</td>
 								</tr>
 								<tr>
 									<td id="personalGeneDetailScale" style="color:white;padding:10px;padding-top:0px;font-size: 12px" colspan="2">chr10:24497719-24836772 forward</td>
@@ -774,10 +777,10 @@ shadow:5px 5px 5px #888;">
 		<div id="personalPannelSetting">
 			<div id="personalPannelSettingTitle">
 				<div id="ppsTitle">
-					personal tracks setting
+					Personal Tracks Setting
 				</div>
 				<div id="ppsClose">
-					<span id="ppsCloseBtn">close</span>
+					<span id="ppsCloseBtn">Close</span>
 				</div>
 			</div>
 			<div id="ppsContent">
@@ -827,10 +830,10 @@ shadow:5px 5px 5px #888;">
 		<div id="trackItems_setting">
 			<div id="trackItems_setting_title">
 				<div id="ts_title">
-					tracks setting
+					Tracks Setting
 				</div>
 				<div id="ts_close">
-					<span id="ts_closeBtn">close</span>
+					<span id="ts_closeBtn">Close</span>
 				</div>
 			</div>
 			<div id="ts_content">

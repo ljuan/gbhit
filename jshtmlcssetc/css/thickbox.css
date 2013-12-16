@@ -7,12 +7,12 @@
 /* ---------->>> thickbox specific link and font settings <<<------------------------------------------------------*/
 /* ----------------------------------------------------------------------------------------------------------------*/
 #TB_window {
-	font: 12px Arial, Helvetica, sans-serif;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	color: #333333;
 }
 
 #TB_secondLine {
-	font: 10px Arial, Helvetica, sans-serif;
+	font: 10px Candara, Arial, Helvetica, sans-serif;
 	color:#666666;
 }
 
