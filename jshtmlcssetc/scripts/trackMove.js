@@ -888,7 +888,7 @@ function handle_getPersonalGeneDetailRequest(){
 			var statusDetails1 = "", statusDetails2 = "";
 			if(statuses.length > 0){
 				$("#personalGeneDetailStatusTrnode").css("display","table-row");
-				statusDetails1 = statusDetails1 + statuses.length + " statuses";
+				statusDetails1 = statusDetails1 + statuses.length + " effects";
 				statusDetails2 = statusDetails2 + "<div style=\"color:#D6B8CE;height:40px;overflow-y:scroll; font-size: 12px\">" + "<ol>";
 				for(k = 0; k < statuses.length; k++){
 					statusDetails2 = statusDetails2 + "<li>";
@@ -933,10 +933,10 @@ function toggle39() {
 	var bait = document.getElementById('bait39');
 	if(bait.style.display == 'none') {
 		bait.style.display = 'block';
-		hook.innerHTML = '&#8863; hide';
+		hook.innerHTML = '&#8863; Hide';
 	} else {
 		bait.style.display = 'none';
-		hook.innerHTML = '&#8862; show gene structure';
+		hook.innerHTML = '&#8862; Show Gene Structure';
 	}
 }
 
@@ -945,10 +945,10 @@ function personalGeneStructureShow() {
 	var bait = document.getElementById('personalGeneDetail-geneStruct');
 	if(bait.style.display == 'none') {
 		bait.style.display = 'block';
-		hook.innerHTML = '&#8863; hide';
+		hook.innerHTML = '&#8863; Hide';
 	} else {
 		bait.style.display = 'none';
-		hook.innerHTML = '&#8862; show gene structure';
+		hook.innerHTML = '&#8862; Show Gene Structure';
 	}
 }
 
@@ -957,10 +957,10 @@ function personalGeneVariantShow() {
 	var bait = document.getElementById('personalGeneDetail-variants');
 	if(bait.style.display == 'none') {
 		bait.style.display = 'block';
-		hook.innerHTML = '&#8863; hide';
+		hook.innerHTML = '&#8863; Hide';
 	} else {
 		bait.style.display = 'none';
-		hook.innerHTML = '&#8862; show variants';
+		hook.innerHTML = '&#8862; Show AA Variants';
 	}
 }
 
@@ -969,10 +969,10 @@ function personalGeneStatusShow() {
 	var bait = document.getElementById('personalGeneDetail-status');
 	if(bait.style.display == 'none') {
 		bait.style.display = 'block';
-		hook.innerHTML = '&#8863; hide';
+		hook.innerHTML = '&#8863; Hide';
 	} else {
 		bait.style.display = 'none';
-		hook.innerHTML = '&#8862; show statuses';
+		hook.innerHTML = '&#8862; Show Other Effects';
 	}
 }
 
