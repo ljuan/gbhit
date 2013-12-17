@@ -58,7 +58,7 @@ function mouseOver(ev) {
 		target = target.parentNode;
 		var trNode = target.parentNode;
 		var tdNodes = trNode.getElementsByTagName("td");
-		if(tdNodes[1].firstChild.style.background.indexOf(ppBG_rgb)>=0){
+		if((/^_/).test(trNode.getAttribute(xmlAttributeId))){
 			trNode.style.background = ppBGhover;
 			tdNodes[0].style.background = ppBGhover;
 			tdNodes[1].firstChild.style.background = ppBGhover;
@@ -79,7 +79,7 @@ function mouseOut(ev) {
 		target = target.parentNode;
 		var trNode = target.parentNode;
 		var tdNodes = trNode.getElementsByTagName("td");
-		if(tdNodes[1].firstChild.style.background.indexOf(ppBGhover_rgb)>=0){
+		if((/^_/).test(trNode.getAttribute(xmlAttributeId))){
 			trNode.style.background = ppBG;
 			tdNodes[0].style.background = ppBG;
 			tdNodes[1].firstChild.style.background = ppBG;
@@ -179,10 +179,17 @@ function mouseMove(ev) {
 	ev = ev || window.event;
 	var mousePos = mouseCoords(ev);
 	if(curTarget != null) {
-		curTarget.style.background = "#d3d3d3";
-		curTarget.getElementsByTagName("td")[0].style.background = "#d3d3d3";
-		curTarget.getElementsByTagName("td")[1].firstChild.style.background = "#d3d3d3";
-		curTarget.getElementsByTagName("td")[2].firstChild.style.background = "#d3d3d3";
+		if(curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(ppBG_rgb)>=0){
+			curTarget.style.background = ppBGhover;
+			curTarget.getElementsByTagName("td")[0].style.background = ppBGhover;
+			curTarget.getElementsByTagName("td")[1].firstChild.style.background = ppBGhover;
+			curTarget.getElementsByTagName("td")[2].firstChild.style.background = ppBGhover;
+		}else{
+			curTarget.style.background = RefBGhover;
+			curTarget.getElementsByTagName("td")[0].style.background = RefBGhover;
+			curTarget.getElementsByTagName("td")[1].firstChild.style.background = RefBGhover;
+			curTarget.getElementsByTagName("td")[2].firstChild.style.background = RefBGhover;
+		}
 
 		var container = document.getElementById("tableTrack").childNodes[1];
 		var trNodes = container.getElementsByTagName("tr");
