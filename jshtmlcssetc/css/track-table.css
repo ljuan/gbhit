@@ -786,12 +786,13 @@ span#web-name{
 	margin:3px;
 }
 .IW_track_btn{
-	background: #74a2cf;
+	background: #2b8cbe;
 	color: #FFFFFF;
 	font: 12px Candara, Arial, Helvetica, sans-serif;
 	margin:3px;
 	padding:7px;
 	float:left;
+	border-radius:5px;
 }
 .IW_track_btn:hover{
 	font: 12px Candara, Arial, Helvetica, sans-serif;
@@ -801,14 +802,16 @@ span#web-name{
 	margin:3px;
 	padding:7px;
 	float:left;
+	border-radius:5px;
 }
 .IW_track_upload_btn{
-	background: #fe9929;
+	background: #d95f0e;
 	color: #FFFFFF;
 	font: 12px Candara, Arial, Helvetica, sans-serif;
 	margin:3px;
 	padding:7px;
 	float:left;
+	border-radius:5px;
 }
 .IW_track_upload_btn:hover{
 	font: 12px Candara, Arial, Helvetica, sans-serif;
@@ -818,9 +821,10 @@ span#web-name{
 	margin:3px;
 	padding:7px;
 	float:left;
+	border-radius:5px;
 }
 .IW_track_close_btn{
-	background: #fe9929;
+	background: #d95f0e;
 	color: #FFFFFF;
 	font: 12px Candara, Arial, Helvetica, sans-serif;
 	margin-right:3px;
@@ -828,6 +832,7 @@ span#web-name{
 	margin-bottom:3px;
 	padding:7px;
 	float:left;
+	border-radius:5px;
 }
 .IW_track_close_btn:hover{
 	font: 12px Candara, Arial, Helvetica, sans-serif;
@@ -839,4 +844,5 @@ span#web-name{
 	margin-bottom:3px;
 	padding:7px;
 	float:left;
+	border-radius:5px;
 }

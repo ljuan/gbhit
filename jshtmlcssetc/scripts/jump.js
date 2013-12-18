@@ -8390,6 +8390,8 @@ function trackItems_setting3(){//individualItems setting
 		group_title_divObj.id = individuals[i].track + "_group_title";
 		group_title_divObj.className = "IW_track_btn";
 		if(individuals[i].track.substring(0,11)=="1000genome_"){
+			$(group_title_divObj).css("width","50px");
+			$(group_title_divObj).css("text-align","center");
 			document.getElementById("builtin_1000g").appendChild(group_title_divObj);
 			group_title_divObj.innerHTML=individuals[i].track.substring(11);
 		}else{
