@@ -1,5 +1,6 @@
 package filereaders.individual.vcf;
 
+
 /* The MIT License
 
  Copyright (c) 2010 Broad Institute.
@@ -28,6 +29,7 @@ package filereaders.individual.vcf;
 /* Contact: Heng Li <hengli@broadinstitute.org> */
 
 import net.sf.samtools.util.BlockCompressedInputStream;
+import java.util.regex.Pattern;
 
 import java.io.*;
 import java.net.URL;
@@ -107,6 +109,14 @@ public class TabixReaderForVCF {
 	public boolean hasChromPrefix() {
 		for (String chrom : mChr2tid.keySet()) {
 			if (chrom.startsWith("chr")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public boolean hasRegularChr() {
+		for (String chrom : mChr2tid.keySet()) {
+			if (Pattern.matches("(chr)?([0-9]?[0-9]|X|Y|x|y|MT|mt|m|M)",chrom)) {
 				return true;
 			}
 		}

@@ -16,6 +16,7 @@ class Annotations implements Serializable{
 	private String Type;
 	private String Mode;
 	private String Group=null;
+	private String Check=null;
 	private HashMap<String,String> Paths;
 	private HashMap<String,Object> Parameter;
 	private HashMap<String,String> ParameterType;
@@ -43,6 +44,9 @@ class Annotations implements Serializable{
 		this.Mode=Mode;
 		if(Mode.equals(Consts.MODE_HIDE))
 			Parameter.clear();
+	}
+	void set_Check(String Check){
+		this.Check=Check;
 	}
 	void set_Parameters(String params, String values){
 		String[] ParameterList=params.split(";");
@@ -166,5 +170,8 @@ class Annotations implements Serializable{
 	}
 	String get_Mode(){
 		return Mode;
+	}
+	String get_Check(){
+		return Check;
 	}
 }

@@ -78,6 +78,8 @@ public class GVFReader {
 		Element variant = null;
 		vs = gvf.getVariants();
 		for (String[] strs : vs) {
+			if(strs[1]!=null&&!strs[1].equals("")&&gvf.ref.equals(strs[1]))
+				continue;
 			variant = doc.createElement(Consts.XML_TAG_VARIANT);
 			variant.setAttribute(Consts.XML_TAG_ID, gvf.id);
 			if (gvf.homo != null && !gvf.homo.equals("")) {
@@ -86,9 +88,8 @@ public class GVFReader {
 			variant.setAttribute(Consts.XML_TAG_TYPE, strs[0]);
 			XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_FROM, gvf.start + "");
 			XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_TO, gvf.end + "");
-			if (strs[1] != null) {
+			if (strs[1] != null) 
 				XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_LETTER, strs[1]);
-			}
 			XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_DESCRIPTION, 
 					"Source:" + gvf.source + ";Feature:" + gvf.feature + ";Score:" + gvf.score + 
 					";Attributes:" + gvf.getAttributesInString());
@@ -152,6 +153,8 @@ public class GVFReader {
 				gvf.homo.replace(':', equals ? '|' : '/');
 			}
 			for (String[] strs : vs) {
+				if(strs[1]!=null&&!strs[1].equals("")&&gvf.ref.equals(strs[1]))
+					continue;
 				variant = doc.createElement(Consts.XML_TAG_VARIANT);
 				variant.setAttribute(Consts.XML_TAG_ID, gvf.id);
 				if (!"".equals(gvf.homo)) {
@@ -160,9 +163,8 @@ public class GVFReader {
 				variant.setAttribute(Consts.XML_TAG_TYPE, strs[0]);
 				XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_FROM, gvf.start + "");
 				XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_TO, gvf.end + "");
-				if (strs[1] != null) {
+				if (strs[1] != null) 
 					XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_LETTER, strs[1]);
-				}
 				variants.appendChild(variant);
 			}
 		}

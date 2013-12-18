@@ -392,6 +392,7 @@ var XMLHttpReq7 = createXMLHttpRequest();//for browse jump
 var XMLHttpReq8 = createXMLHttpRequest();//for BJW_upStat
 var XMLHttpReq10 = createXMLHttpRequest();//for BJW_scan
 var XMLHttpReq11 = createXMLHttpRequest();//for addExIndividual
+var XMLHttpReq12 = createXMLHttpRequest();//for getCheck 
 var showType;
 
 function updateRequest(url) {
@@ -9823,7 +9824,17 @@ function addExIndividual(){
 			}else{
 				XMLHttpReq11.open("GET","servlet/test.do?action=addExIndividuals&modes=hide&tracks="+trackId+"&types="+trackType+"&links="+trackURL,false);
 				XMLHttpReq11.send(null);
-				trackItems_setting3()
+
+				XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks="+trackId,false);
+				XMLHttpReq12.send(null);
+				var err_text=XMLHttpReq12.responseText.replace(pattern,"");
+				if(err_text==null||err_text==""){
+					trackItems_setting3()
+				}else{
+					XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
+					XMLHttpReq12.send(null);
+					alert(err_text);
+				}
 			}
 		}else{
 			alert("Please fill all required parameters.");
@@ -9858,10 +9869,28 @@ function addExIndividual(){
 				XMLHttpReq11.upload.addEventListener('load', onLoadHandler, false);
 				XMLHttpReq11.upload.addEventListener('error', onErrorHandler, false);
 				var onReadyStateHandlerUprogress = function(event) {
+					control_upexternal=0;
+					XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks="+trackId,false);
+					XMLHttpReq12.send(null);
+					var err_text=XMLHttpReq12.responseText.replace(pattern,"");
 					if( event.target.readyState == 4 && event.target.status == 200){
-						control_upexternal=0;
-						trackItems_setting3()
+						if(err_text==null||err_text==""){
+							trackItems_setting3()
+						}else{
+							XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
+							XMLHttpReq12.send(null);
+							alert(err_text);
+						}
+					}else if( event.target.readyState == 4 ) {
+						XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
+						XMLHttpReq12.send(null);
+						if(err_text==null||err_text==""){
+							alert("Unknown error");
+						}else{
+							alert(err_text);
+						}
 					}
+
 				}
 
 				var form = new FormData();

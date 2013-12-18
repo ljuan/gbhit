@@ -2,6 +2,7 @@ package filereaders;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 //import org.broad.tribble.readers.TabixReader;
 
 import org.w3c.dom.Document;
@@ -44,6 +45,7 @@ public class VcfReader {
 
 	public VcfReader(Annotations track, String Chr) {
 		this.bppLimit = 0.5;
+		String check = null;
 		try {
 			vcf_tb = new TabixReaderForVCF(track.get_Path(Chr));
 			if (track.get_Parameter(VCF_CHROM_PREFIX) == null) {
@@ -51,10 +53,10 @@ public class VcfReader {
 				Map<String, String[]> info_header = new HashMap<String, String[]>();
 				Map<String, String[]> format_header = new HashMap<String, String[]>();
 				String[] samples = null;
-				String line = "";
+				String line = null;
 				filter_header.put("PASS", false);
 				String str = null;
-				while ((line = vcf_tb.readLine()).startsWith("#")) {
+				while ((line = vcf_tb.readLine())!=null&&line.startsWith("#")) {
 					str = line.substring(2, 8);
 					if (str.equalsIgnoreCase("FILTER")) {
 						int left = line.indexOf('<');
@@ -71,7 +73,7 @@ public class VcfReader {
 						int right = line.lastIndexOf('>');
 						String[] line_temp = line.substring(left + 1, right).split("ID=|,Number=|,Type=|,Description=");
 						format_header.put(line_temp[1], Arrays.copyOfRange(line_temp, 2, 5));
-					} else if (line.startsWith("#CHROM")) {
+					} else if (line.startsWith("#CHROM") || line.substring(0,6).equalsIgnoreCase("#CHROM")) {
 						String[] line_temp = line.split("\t");
 						if (line_temp.length > 9) {
 							samples = new String[line_temp.length - 9];
@@ -83,6 +85,30 @@ public class VcfReader {
 						}
 					}
 				}
+				if(line!=null) {
+					String[] line_temp = line.split("\t");
+					if(line_temp.length<8)
+						check = "Parsing file failed!";
+					else if(!vcf_tb.hasRegularChr())
+						check = "No valid contig name exists (such as chr20, X, chrY... case sensitive)!";
+					else if(!Pattern.matches("[0-9]+", line_temp[1]))
+						check = "Illegal non-numeric position!";
+					else if(samples!=null&&line_temp.length!=9+samples.length)
+						check = "Incorrect data field number!";
+//Temporarily do not check errors in FORMAT and SAMPLE fields
+//					else if(samples!=null&&line_temp[8].startsWith("GT")&&!(Pattern.matches("^GT(:.*|$)",line_temp[8])))
+//						check = "Illegal seperator in FORMAT field!";
+//					else if(samples!=null&&Pattern.matches("^GT(:.*|$)",line_temp[8]))
+//						for(int i = 0;i < samples.length;i++){
+//							if(line_temp[i+9].indexOf("\r")>=0)
+//								line_temp[i+9]=line_temp[i+9].substring(0, line_temp[i+9].indexOf("\r"));
+//							if(!Pattern.matches("^[|/0-9]+(:.*|$)",line_temp[9+i]))
+//								check = "Illegal seperator or inappropriate characters in "+samples[i]+" field!";
+//						}
+				}
+				else
+					check = "No data record!";
+				track.set_Check(check);
 				if (samples != null){
 					track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(samples), PARAMETER_TYPE_VCFSAMPLE);
 				/* This is for automatically select THE sample when load single sample VCF file, 
@@ -104,6 +130,12 @@ public class VcfReader {
 			}
 			this.track = track;
 		} catch (IOException e) {
+			check = "Cannot access the data/index file!";
+			track.set_Check(check);
+			e.printStackTrace();
+		} catch(Exception e){
+			check = "Invalid data!";
+			track.set_Check(check);
 			e.printStackTrace();
 		}
 	}
@@ -185,8 +217,7 @@ public class VcfReader {
 	
 	public Element write_vcf2variants(Document doc, String track, String mode,
 			double bpp/* bases per pixel */, String chr, long start, long end) {
-		float qualLimit = Float.parseFloat((String) (this.track
-				.get_Parameter(VCF_QUAL_LIMIT)));
+		float qualLimit = Float.parseFloat((String) (this.track.get_Parameter(VCF_QUAL_LIMIT)));
 		String[] filterLimit = getFilterLimit();
 
 		int samplesNum = 0;

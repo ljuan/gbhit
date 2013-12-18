@@ -610,6 +610,21 @@ public class Instance {
 		CfgReader.write_metalist(doc,externals_names, "AnnotationList");
 		return XmlWriter.xml2string(doc);
 	}
+	public String get_Check(String trackname){
+		Annotations track=null;
+		if(Annos.containsKey(trackname))
+			track=Annos.get(trackname);
+		else if(Externals.containsKey(trackname))
+			track=Externals.get(trackname);
+		String[] check=new String[1];
+		if(track!=null)
+			check[0]=track.get_Check();
+		else
+			check[0]=null;
+		Document doc=XmlWriter.init(Consts.META_ROOT);
+		CfgReader.write_metalist(doc,check, "ErrorList");
+		return XmlWriter.xml2string(doc);
+	}
 	public String get_Individuals(){
 		ArrayList<String> individuals = new ArrayList<String>();
 		int i=0;
