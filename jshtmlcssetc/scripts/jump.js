@@ -6106,7 +6106,7 @@ function addPvarHttpRequest(trackId) {
 	}
 	
 	if(P_mode == "hide"){
-		P_mode = "dense";
+		P_mode = "pack";
 	}
 	
 	url = url + P_track + "&modes=" + P_mode + "&id=" + P_id;
@@ -6125,7 +6125,7 @@ function addPvarHttpRequest2(PvarID,trackId) {//for add individual directly
 	initPvar_superid = trackId;
 	P_mode=personalPannel.Pvar.mode;
 	if(P_mode == "hide" || P_mode == ""){
-		P_mode = "dense";
+		P_mode = "pack";
 	}
 	
 	url = url + trackId + "&modes=" + P_mode + "&id=" + PvarID;
@@ -6211,6 +6211,18 @@ function handle_addPvar_Request() {
 			ppTop = ppTop > 50 ? ppTop : 50;
 			$("#personalPannel").animate({top:ppTop});
 			$("#ppTrackTable tbody").sortable({axis:"y" ,cancel:".cannotSortable"});
+		}else{
+			var pattern = /<.*?>/g;
+			XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks=_"+initPvar_superid,false);
+			XMLHttpReq12.send(null);
+			var err_text=XMLHttpReq12.responseText.replace(pattern,"");
+//			XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
+//			XMLHttpReq12.send(null);
+			if(err_text==null||err_text==""){
+				alert("An error occurred while executing the query!\nPlease check the data format and data index.");
+			}else{
+				alert(err_text);
+			}
 		}
 	}
 }
@@ -9871,25 +9883,27 @@ function addExIndividual(){
 				XMLHttpReq11.upload.addEventListener('load', onLoadHandler, false);
 				XMLHttpReq11.upload.addEventListener('error', onErrorHandler, false);
 				var onReadyStateHandlerUprogress = function(event) {
-					control_upexternal=0;
-					XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks="+trackId,false);
-					XMLHttpReq12.send(null);
-					var err_text=XMLHttpReq12.responseText.replace(pattern,"");
-					if( event.target.readyState == 4 && event.target.status == 200){
-						if(err_text==null||err_text==""){
-							trackItems_setting3()
+					if(event.target.readyState == 4){
+						control_upexternal=0;
+						XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks="+trackId,false);
+						XMLHttpReq12.send(null);
+						var err_text=XMLHttpReq12.responseText.replace(pattern,"");
+						if(event.target.status == 200){
+							if(err_text==null||err_text==""){
+								trackItems_setting3()
+							}else{
+								XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
+								XMLHttpReq12.send(null);
+								alert(err_text);
+							}
 						}else{
 							XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
 							XMLHttpReq12.send(null);
-							alert(err_text);
-						}
-					}else if( event.target.readyState == 4 ) {
-						XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
-						XMLHttpReq12.send(null);
-						if(err_text==null||err_text==""){
-							alert("Unknown error");
-						}else{
-							alert(err_text);
+							if(err_text==null||err_text==""){
+								alert("Unknown error");
+							}else{
+								alert(err_text);
+							}
 						}
 					}
 

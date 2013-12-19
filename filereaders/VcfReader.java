@@ -90,7 +90,7 @@ public class VcfReader {
 					if(line_temp.length<8)
 						check = "Parsing file failed!";
 					else if(!vcf_tb.hasRegularChr())
-						check = "No valid contig name exists (such as chr20, X, chrY... case sensitive)!";
+						check = "No valid contig name exists!\n(such as chr20, X, chrY... case sensitive)";
 					else if(!Pattern.matches("[0-9]+", line_temp[1]))
 						check = "Illegal non-numeric position!";
 					else if(samples!=null&&line_temp.length!=9+samples.length)
@@ -105,6 +105,11 @@ public class VcfReader {
 //							if(!Pattern.matches("^[|/0-9]+(:.*|$)",line_temp[9+i]))
 //								check = "Illegal seperator or inappropriate characters in "+samples[i]+" field!";
 //						}
+//					else{
+//						TabixReaderForVCF.Iterator Query= vcf_tb.query(line_temp[0] + ":" + line_temp[1] + "-" + line_temp[1]);
+//						if(Query!=null)
+//							Query.next();
+//					}
 				}
 				else
 					check = "No data record!";
@@ -130,7 +135,7 @@ public class VcfReader {
 			}
 			this.track = track;
 		} catch (IOException e) {
-			check = "Cannot access the data/index file!";
+			check = "Cannot access to the data/index file!";
 			track.set_Check(check);
 			e.printStackTrace();
 		} catch(Exception e){
@@ -201,7 +206,11 @@ public class VcfReader {
 			}
 			vcf_tb.TabixReaderClose();
 		} catch (IOException e) {
+			this.track.set_Check("Cannot access to the data/index file!");
 			e.printStackTrace();
+//		} catch (Exception e) {
+//			this.track.set_Check("Invalid data!");
+//			e.printStackTrace();
 		} finally{
 			if(vcf_tb != null){
 				try {
@@ -283,7 +292,11 @@ public class VcfReader {
 				}
 			}
 		} catch (IOException e) {
+			this.track.set_Check("Cannot access to the data/index file!");
 			e.printStackTrace();
+//		} catch (Exception e) {
+//			this.track.set_Check("Invalid data!");
+//			e.printStackTrace();
 		} finally{
 			if(vcf_tb != null){
 				try {

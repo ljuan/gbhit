@@ -616,6 +616,8 @@ public class Instance {
 			track=Annos.get(trackname);
 		else if(Externals.containsKey(trackname))
 			track=Externals.get(trackname);
+		else if(trackname.startsWith("_")&&Pvar.get_ID().equals(trackname.substring(1)))
+			track=Pvar;
 		String[] check=new String[1];
 		if(track!=null)
 			check[0]=track.get_Check();
