@@ -3,14 +3,14 @@ var curTarget = null;
 var mouseOffset = null;
 var isMousedownOnRefCanvas = false;
 
-var RefBG = "#f1eef6";
-var RefBG_rgb = "rgb(247, 238, 246)";
-var RefBGhover = "#bdc9e1";
-var RefBGhover_rgb = "rgb(189, 201, 225)";
-var ppBG = "#fef0d9";
-var ppBG_rgb = "rgb(254, 240, 217)";
-var ppBGhover = "#fdcc8a";
-var ppBGhover_rgb = "rgb(253, 204, 138)";
+var RefBG = "#eff3ff";
+var RefBG_rgb = "rgb(239, 243, 255)";
+var RefBGhover = "#bdd7e7";
+var RefBGhover_rgb = "rgb(189, 215, 231)";
+var ppBG = "#ffffd4";
+var ppBG_rgb = "rgb(255, 255, 212)";
+var ppBGhover = "#fed98e";
+var ppBGhover_rgb = "rgb(254, 217, 142)";
 
 Number.prototype.NaN0 = function() {
 	return isNaN(this) ? 0 : this;

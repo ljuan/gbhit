@@ -73,7 +73,7 @@
 						</li>
 						<li id="helpWindow-li" style="line-height: 42px;" title="help" class="help-li">
 							<span id="helpBtn"></span>
-							<span style="font-size: 18px;">Help</span>	
+							<span style="font-size: 18px;" onclick="window.open('help.html')">Help</span>
 						</li>
 					</ul>
 				</div>
@@ -109,11 +109,11 @@
 					</table>
 					
 					<div style="width: 1108px;height: 13px;">
-						<div id="userIndex" style="width: 951px;float: right; border-left: solid 1px #aaa; border-right: solid 1px #aaa;height: 10px;padding-bottom: 3px;">
-							<span id="start_user_label" style="float: left; font-size: 10px;color:#aaa;">33,031,597</span>
-							<span id="end_user_label" style=" float: right; font-size: 10px;color:#aaa;">33,041,570</span>
+						<div id="userIndex" style="width: 951px;float: right; border-left: solid 1px #666; border-right: solid 1px #aaa;height: 10px;padding-bottom: 3px;">
+							<span id="start_user_label" style="float: left; font-size: 10px;color:#666;">33,031,597</span>
+							<span id="end_user_label" style=" float: right; font-size: 10px;color:#666;">33,041,570</span>
 							<center>
-								<span id="searchLength_user_label" style="font-size: 10px;color:#aaa;">9,974bp</span>
+								<span id="searchLength_user_label" style="font-size: 10px;color:#666;">9,974bp</span>
 							</center>
 						</div>
 					</div>
@@ -123,7 +123,7 @@
 								<td class="trackOperator">
 									<div class="trackOperatorDIV"></div>
 								</td>
-								<td class="trackName"><canvas id="thRefTrack1" width="100" height="50" style="background: #f1eef6"></canvas></td>
+								<td class="trackName"><canvas id="thRefTrack1" width="100" height="50" style="background: #eff3ff"></canvas></td>
 								<td class="trackContent"><canvas id="refTrack1" width="2850" height="50" class="canvasTrackcontent" title="shift+click and drag to zoom in"></canvas></td>
 							</tr>
 						</table>
@@ -189,9 +189,9 @@
 										<td>
 										<table id="urlInfo" style="text-align: center;max-height: 20px; font: 14px Candara, Arial,Helvetica,sans-serif">
 											<tr>
-												<td style="background: #74a2cf;width: 250px;color:#FFFFFF;">URL</td>
-												<td style="background: #74a2cf;width: 150px;color:#FFFFFF;">Chr</td>
-												<td style="background: #74a2cf;width: 50px;color:#FFFFFF;">Del</td>
+												<td style="background: #6baed6;width: 250px;color:#FFFFFF;">URL</td>
+												<td style="background: #6baed6;width: 150px;color:#FFFFFF;">Chr</td>
+												<td style="background: #6baed6;width: 50px;color:#FFFFFF;">Del</td>
 											</tr>
 											<tr>
 												<td>
@@ -1018,20 +1018,6 @@ shadow:5px 5px 5px #888;">
 		<img id="bkgImg_shift" class="displayHide" src="./image/bkgImg_shift.png" alt="pic" />
 		<img id="bkgImg_pshift" class="displayHide" src="./image/bkgImg_pshift.png" alt="pic" />
 		<img id="imgStatus" class="displayHide" src="./image/imgStatus.png" alt="pic" />
-		<div id="helpWindow">
-			<div id="helpWindow_title">
-				<div id="HW_title">
-					Help
-				</div>
-				<div id="HW_close">
-					<span id="HW_closeBtn">Close</span>
-				</div>
-			</div>
-			<div id="HW_content">
-				<img src="./image/help.jpg" alt="pic" />
-			</div>
-		</div>
-		<div id="helpWindow_overlayDIV" class="overlayStyle"></div>
 		<div id="select_info" class="ui-front ui-corner-all" style="display:none; position: absolute; border: 1px #ccc solid"> </div>
 		<script language="JavaScript" type="text/javascript" src="./scripts/raphael-min.js"></script>
 	</body>

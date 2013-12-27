@@ -8601,23 +8601,23 @@ function trackItems_setting3(){//individualItems setting
 }
 
 $(document).ready(function(){
-	document.getElementById("helpWindow-li").onclick = helpWindow_alert;
+//	document.getElementById("helpWindow-li").onclick = helpWindow_alert;
 	document.getElementById("indsetWindow-li").onclick = indsetWindow_alert;
 	document.getElementById("browseJump").onclick = browseJumpWindow_alert;
 	document.getElementById("browseJumpIcon2").onclick = browseJumpWindow_alert;
 });
 
-function helpWindow_alert(){
-	var overlayDIV = document.getElementById("helpWindow_overlayDIV");
-	$(overlayDIV).css("display","block");
-	var tsLeft = (document.body.clientWidth - $("#helpWindow").width())/2;
-	var tsTop = (document.body.clientHeight - $("#helpWindow").height())/2;
-	$("#helpWindow").css("left", tsLeft);
-	$("#helpWindow").css("top", tsTop);
-	$("#helpWindow").css("display","block");
-	document.getElementById("HW_closeBtn").onclick = helpWindow_close;
-	overlayDIV.onclick = helpWindow_close;
-}
+//function helpWindow_alert(){
+//	var overlayDIV = document.getElementById("helpWindow_overlayDIV");
+//	$(overlayDIV).css("display","block");
+//	var tsLeft = (document.body.clientWidth - $("#helpWindow").width())/2;
+//	var tsTop = (document.body.clientHeight - $("#helpWindow").height())/2;
+//	$("#helpWindow").css("left", tsLeft);
+//	$("#helpWindow").css("top", tsTop);
+//	$("#helpWindow").css("display","block");
+//	document.getElementById("HW_closeBtn").onclick = helpWindow_close;
+//	overlayDIV.onclick = helpWindow_close;
+//}
 function indsetWindow_alert(){
 	var overlayDIV = document.getElementById("indsetWindow_overlayDIV");
 	$(overlayDIV).css("display","block");
@@ -8644,10 +8644,10 @@ function browseJumpWindow_alert(){
 	//to be set reactions
 }
 
-function helpWindow_close(){
-	$("#helpWindow_overlayDIV").css("display","none");
-	$("#helpWindow").css("display","none");
-}
+//function helpWindow_close(){
+//	$("#helpWindow_overlayDIV").css("display","none");
+//	$("#helpWindow").css("display","none");
+//}
 function indsetWindow_close(){
 	if(control_upexternal){
 		alert("There are data in uploading, please wait it complete.");
@@ -9292,7 +9292,7 @@ function loadChrBand(){
 				getSingleCytoAsync(0,0,2);
 			}
 			else {
-				error_warn=R.text(0,30,"Please load personal variants from 'Load Individual' menu").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+				error_warn=R.text(0,30,"Please load personal variants from 'Select Individual' menu").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
 			}
 		};
 		scang_button[0].onmouseout = function(){
@@ -9314,7 +9314,7 @@ function loadChrBand(){
 				getSingleCytoAsync(click,0,1);
 			}
 			else {
-				error_warn=R.text(0,30,"Please load personal variants from 'Load Individual' menu and select a chromosome").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+				error_warn=R.text(0,30,"Please load personal variants from 'Select Individual' menu and select a chromosome").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
 			}
 		};
 		scanc_button[0].onmouseout = function(){
@@ -9336,7 +9336,7 @@ function loadChrBand(){
 				getSingleCytoAsync(click,blick,0);
 			}
 			else {
-				error_warn=R.text(0,30,"Please load personal variants from 'Load Individual' menu and select a cytoband").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+				error_warn=R.text(0,30,"Please load personal variants from 'Select Individual' menu and select a cytoband").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
 			}
 		};
 		scanb_button[0].onmouseout = function(){
@@ -9761,7 +9761,7 @@ function BJW_getStat() {
 	if(personalPannel.Pvar.id)
 		window.open("servlet/test.do?action=getStat");
 	else
-		document.getElementById("upload_success").innerHTML="Please load personal variants from 'Load Individual' menu";
+		document.getElementById("upload_success").innerHTML="Please load personal variants from 'Select Individual' menu";
 }
 function BJW_upStat() {
 	var fileObj = document.getElementById("file_field").files[0];
@@ -9925,7 +9925,7 @@ function addExIndividual(){
 }
 function fill_example_pg(){
 	document.getElementById("pg_upload_name").value="test_1";
-	document.getElementById("pg_upload_url").value="http://202.118.228.68/gbfiles/CEU.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz";
+	document.getElementById("pg_upload_url").value="http://www.pgbrowser.org/Example.vcf.gz";
 	document.getElementById("pg_upload_type").value="VCF";
 }
 /*为解决搜索框与personal gene detail box出现冲突而添加的代码，从根本上解决之后不需要这段代码

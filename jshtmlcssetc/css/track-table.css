@@ -1,7 +1,7 @@
 div#divTrack {
 	/*the right value is 1100, but the end of the searchScale is hidden, therefore use 1106*/
 	width: 1106px;
-	background-color: #f1eef6;
+	background-color: #eff3ff;
 	border-style: solid;
 	border-width: 1px;
 	border-color:#888888;
@@ -11,7 +11,7 @@ div#divTrack {
 	overflow: hidden;
 }
 #menu-container{
-	background: #74a2cf;
+	background: #6baed6;
 	width: 100%;
 	position: fixed;
 	top: 0;
@@ -194,7 +194,7 @@ span.clb3:hover {
 	border-bottom-color: white;
 }
 #personalPannel {
-	background: none repeat scroll 0 0 #fef0d9;
+	background: none repeat scroll 0 0 #ffffd4;
 	opacity:0.9;/*for temparary plot figures*/
 	border: 1px solid #797979;
 	color: #000000;
@@ -212,7 +212,7 @@ span.clb3:hover {
 
 }
 #personalPannelTitle {
-	background-color:#fdcc8a;
+	background-color:#fed98e;
 	height: 27px;
 	color:#000;
 }
@@ -276,7 +276,7 @@ span.clb3:hover {
 #PvarSetTitle, #PfannoSetTitle, #PannoSetTitle, #PclnsSetTitle {
 	width: 520px;
 	height: 20px;
-	background: #74a2cf;
+	background: #6baed6;
 	color:white;
 	padding-top: 6px;
 }
@@ -333,7 +333,7 @@ img.displayHide {
 }
 #menu-center ul li:hover{
 	background: #FFFFFF;
-	color: #74a2cf;
+	color: #6baed6;
 }
 #track-manage-li,.custom-track-li,.help-li:hover{
 	cursor: pointer;
@@ -427,20 +427,20 @@ span#zoomin:hover{
 	cursor: pointer;
 }
 div#search{
-	color: #74a2cf;
+	color: #6baed6;
 }
 div#search:hover{
 	color: #5BC4BE;
 	cursor: pointer;
 }
 span#browseJumpIcon:after{
-	color: #74a2cf;
+	color: #6baed6;
 	font-family: 'HeydingsCommonIconsRegular';
 	font-size: 24px;
 	content: "M";
 }
 span#browseJump{
-	color: #74a2cf;
+	color: #6baed6;
 	font:18px Candara, Arial, Helvetica, sans-serif;
 }
 span#browseJump:hover{
@@ -449,7 +449,7 @@ span#browseJump:hover{
 	cursor: pointer;
 }
 span#browseJump:after{
-	color: #74a2cf;
+	color: #6baed6;
 	font:18px Candara, Arial, Helvetica, sans-serif;
 }
 /*span#search:after{
@@ -554,7 +554,7 @@ span#indsetBtn:after{
 	color:white;
 	width:720px;
 	height: 20px;
-	background: #74a2cf;
+	background: #6baed6;
 	padding-top: 6px;
 	cursor: pointer;
 }
@@ -593,7 +593,7 @@ span.group_content_hiddenBtn:hover{
 	color: #777;
 }
 span#web-icon{
-	color: #74a2cf;
+	color: #6baed6;
 	float: left;
 }
 span#web-icon:after{
@@ -602,7 +602,7 @@ span#web-icon:after{
 	content: "M";
 }
 span#web-name{
-	color: #74a2cf;
+	color: #6baed6;
 	float: left;
 	font-family: 'SortsMillGoudyItalic';
 	font-size: 30px;
@@ -694,7 +694,7 @@ span#web-name{
 #IW_content .group_title_div{
 	width:75px;
 	height: 20px;
-	background: #74a2cf;
+	background: #6baed6;
 	padding-top: 6px;
 	color: #FFF;
 	cursor: pointer;
@@ -754,7 +754,7 @@ span#web-name{
 	max-height:170px;
 	overflow:auto;
 	float:left;
-	border:1px solid #74a2cf;
+	border:1px solid #6baed6;
 	margin:3px;
 	font: 12px Candara, Arial, Helvetica, sans-serif;
 }
@@ -765,14 +765,14 @@ span#web-name{
 	max-width:190px;
 	overflow:auto;
 	float:right;
-	border:1px solid #74a2cf;
+	border:1px solid #6baed6;
 	margin:3px;
 }
 .IW_subtitle{
 	height:20px;
 	color:#FFFFFF;
-	background:#74a2cf;
-	border:1px solid #74a2cf;
+	background:#6baed6;
+	border:1px solid #6baed6;
 	font: 16px Candara, Arial, Helvetica, sans-serif bold;
 	padding:2px;
 	margin-bottom:5px;
@@ -780,13 +780,13 @@ span#web-name{
 .IW_external_upload{
 	height:320px;
 	max-height:320px;
-	border:1px solid #74a2cf;
+	border:1px solid #6baed6;
 	font: 12px Candara, Arial, Helvetica, sans-serif;
 	overflow:auto;
 	margin:3px;
 }
 .IW_track_btn{
-	background: #2b8cbe;
+	background: #3182bd;
 	color: #FFFFFF;
 	font: 12px Candara, Arial, Helvetica, sans-serif;
 	margin:3px;
@@ -796,7 +796,7 @@ span#web-name{
 }
 .IW_track_btn:hover{
 	font: 12px Candara, Arial, Helvetica, sans-serif;
-	background: #bdc9e1;
+	background: #bdd7e7;
 	color: #FFFFFF;
 	cursor:pointer;
 	margin:3px;

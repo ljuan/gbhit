@@ -1,0 +1,555 @@
+<html>
+	<head>
+		<title>PGB Help</title>
+		<style type="text/css">
+			a:link {
+				color: #0092E8;
+				text-decoration: none;
+			}
+			a:visited {
+				color: #0092E8;
+				text-decoration: none;
+			}
+			a:hover {
+				color: #0092E8;
+				text-decoration: underline;
+			}
+			body, td, th {
+				font: 12px consolas,andale mono,courier,mono;
+			}
+			body {
+				background: none repeat scroll 0 0 #FFFFFF;
+				color: #000000;
+				margin: 0;
+				padding: 0;
+			}
+			table {
+				border: 0 solid #CCCCCC;
+			}
+			td {
+				padding: 0.2em;
+				vertical-align: top;
+			}
+			th {
+				font-weight: bold;
+				padding: 0.2em;
+				text-align: left;
+			}
+			#tbl table {
+				border: 1px solid #CCCCCC;
+			}
+			#tbl td {
+				border: 1px solid #CCCCCC;
+				padding: 0.3em;
+			}
+			#wrap {
+				margin: 0 auto;
+				text-align: left;
+				width: 1000px;
+			}
+			hr {
+				background: none repeat scroll 0 0 #C7C7C7;
+				border-color: #C7C7C7;
+				border-style: none;
+				color: #C7C7C7;
+				height: 1px;
+				margin: 1em 0;
+			}
+			h1, h2, h3, h4, h5, h6 {
+				font-family: "Trebuchet MS",arial,sans-serif;
+				font-weight: bold;
+			}
+			.block {
+				padding:3px;
+				text-align: justify;
+				width:450px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="wrap">
+			<a name="top"></a>
+			<center>
+				<h1>
+					<hr>
+					<i>Tutorial - </i>
+					<nobr>Personal Genome Browser</nobr>
+					<hr>
+				</h1>
+			</center>
+			<a name="contents"></a>
+			<h3>CONTENTS</h3>
+			<blockquote>
+				<a href="#1">Basic interface and operations</a>
+				<br>
+				<a href="#2">Data input</a>
+				<br>
+				<a href="#3">Interpetation of output results</a>
+				<br>
+				<a href="#4">Processing method</a>
+				<br>
+				<a href="#5">Settings</a>
+				<br>
+				<a href="#6">Authors</a>
+				<br>
+				<a href="#7">References</a>
+				<br>
+			</blockquote>
+			<div style="clear:both">
+				<a name="8">
+					<h3>BASIC INTERFACE AND OPERATIONS</h3>
+				</a>
+			</div>
+			<div>
+				<img src="image/interface.png" width="800px"/>
+			</div>
+			<div class="block" style="float:right;width:500px">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td width="5%" nowrap="">
+								<b>7.</b>
+							</td>
+							<td valign="bottom">
+								<i>Using whole genome bird's eye view to select a region</i>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2"><img src="image/scan.png" width="450"/></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="block" style="float:left;">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td width="5%" nowrap="">
+								<b>1.</b>
+							</td>
+							<td valign="bottom" colspan="3">
+								<i>Navigation</i>
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="5%" nowrap=""/>
+							<td valign="bottom" width="5%">
+								&bull;
+							</td>
+							<td valign="bottom" colspan="2">
+								Navigation by chromosome coordinates
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="5%" nowrap=""/>
+							<td valign="bottom" width="5%"/>
+							<td valign="bottom" nowrap="">
+								Accept inputs:
+							</td>
+							<td valign="bottom">
+								chr1:1234-5678&nbsp;&nbsp;&nbsp;&nbsp;<font color="4daf4a">&radic;</font>
+								<br>
+								chr1:1,234-5,678&nbsp;&nbsp;<font color="4daf4a">&radic;</font>
+								<br>
+								Chr1:1234-5678&nbsp;&nbsp;&nbsp;&nbsp;<font color="e41a1c">x</font>
+								<br>
+								chr1&nbsp;1234&nbsp;5678&nbsp;&nbsp;&nbsp;&nbsp;<font color="e41a1c">x</font>
+								<br>
+								&nbsp;&nbsp;&nbsp;1:1234-5678&nbsp;&nbsp;&nbsp;&nbsp;<font color="e41a1c">x</font>
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="5%" nowrap=""/>
+							<td valign="bottom" width="5%">
+								&bull;
+							</td>
+							<td valign="bottom" colspan="2">
+								Navigation by gene symbol
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="5%" nowrap=""/>
+							<td valign="bottom" width="5%"/>
+							<td valign="bottom"/>
+							<td valign="bottom">
+								Auto-complete&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="4daf4a">&radic;</font>
+								<br>
+								Case-insensitive&nbsp;&nbsp;<font color="4daf4a">&radic;</font>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="block" style="float:left;">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td width="5%" nowrap="">
+								<b>2.</b>
+							</td>
+							<td valign="bottom" colspan="3">
+								<i>Zooming</i>
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="5%" nowrap=""/>
+							<td valign="bottom" width="5%">
+								&bull;
+							</td>
+							<td valign="bottom" colspan="2">
+								Zooming by '+' or '-' buttons
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="5%" nowrap=""/>
+							<td valign="bottom" width="5%"/>
+							<td valign="bottom" nowrap="" colspan="2">
+								<b>'+'</b>: Zoom in; <b>'-'</b>: Zoom out
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="5%" nowrap=""/>
+							<td valign="bottom" width="5%">
+								&bull;
+							</td>
+							<td valign="bottom" colspan="2">
+								Zooming by slider
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="5%" nowrap=""/>
+							<td valign="bottom" width="5%"/>
+							<td valign="bottom" colspan=2>
+								<b>Left</b>: Zoom out; <b>Right</b>: Zoom in
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="block" style="float:left;">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td width="5%" nowrap="">
+								<b>3.</b>
+							</td>
+							<td valign="bottom">
+								<i>Select a region on ideogram</i>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p/>
+			<div class="block" style="float:left;">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td>
+								<b>Move the mouse on visualization area, when the mouse icon change to</b>'<img src="image/panIcon.gif"/>'<b>, then,</b>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p/>
+			<div class="block" style="float:left;">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td width="5%" nowrap="">
+								<b>4.</b>
+							</td>
+							<td>
+								<i>Dragging the visualization area in either direction to move left or right within the current zoom level</i>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p/>
+			<div class="block" style="float:left;clear:both;">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td width="5%" nowrap="">
+								<b>5.</b>
+							</td>
+							<td>
+								<i>Holding the </i><b>'z'</b><i> key and scrolling the mouse wheel to zoom out/in</i><sup>*</sup>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p/>
+			<div class="block" style="float:left;">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td>
+								<sup>*</sup>These operations may be invalid if the hotkey is occupied by browser plugins or other programs.
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p/>
+			<div class="block" style="float:left;clear:both;">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td width="5%" nowrap="">
+								<b>6.</b>
+							</td>
+							<td>
+								<i>Holding the </i><b>'shift'</b><i> and using cursor to select a region to zoom in</i><sup>*</sup>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div style="clear:both;padding-top:6px;padding-bottom:0px">
+				<a name="2">
+					<h3>DATA INPUT</h3>
+				</a>
+			</div>
+			<div style="float:right;position:relative;top:-20px">
+				<img src="image/input.png" width="540px" />
+			</div>
+			<div class="block" style="float:left;padding-top:0px;position:relative;top:-10px">
+				<p>
+				The input of the PGB is personal genome variants file. The PGB accepts <a href=http://samtools.sourceforge.net/tabix.shtml>Tabix</a> (1) compressed/indexed <a href=http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41>VCF</a> (2) and <a href=http://www.sequenceontology.org/resources/gvf.html>GVF</a> (3) files. User can either provide accessible data ULR link or locally upload data and index files. Using URL link is recommended. Because the volume of files can be locally uploaded is limited up to 20MB due to network condition and server storage. The PGB guaranty input data can only be accessed and view by the owner. The PGB will <b>NOT</b> record any information of user data. The uploaded files will be automatically deleted as soon as the session expired.
+				</p>
+				<p>
+				Users can also browse built-in genomes for comparison. We currently hold over a thousand individual genomes in the PGB server. Most of them are downloaded from 1000 genome project website (4).
+				</p>
+			</div>
+			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;top:-180px">
+				<a name="3">
+					<h3>INTERPRETATION OF OUTPUT RESULTS</h3>
+				</a>
+			</div>
+			<div class="block" style="float:left;padding-top:0px;position:relative;top:-190px">
+				<p>&bull;&nbsp;<b>Bird's eye view</b></p>
+				<p>
+				Functional variants distribution is shown by heatmap in which color gradients reflect number of functional significance of the variants in the region. User can scan functional variants in whole genome or selected chromosome/cytoband region. Typically it may take several seconds to scan a cytoband. However, the scanning time varies due to the network condition and length of region.	
+				</p>
+			</div>
+			<div>
+				<img src="image/output.png" width="800px" style="position:relative;top:-190px"/>
+			</div>
+			<div class="block" style="float:left;width:420px;padding-top:0px;position:relative;top:-730px;right:-540px">
+				<p>&bull;&nbsp;<b>Detail view</b></p>
+				<p>
+				User can click on displayed objects (variants, genes, ...) to open the detail view of them.
+				<br>
+				For personal genome variants, the PGB query dbSNP database based on variant position, and merge dbSNP (5) record into the original information of the variants files.
+				<br>
+				For 'personal genes', the PGB highlights amino acid changes and neighborhood broken TF binding motifs caused by personal genome variants.
+				<br>
+				Clicking on top-right corner link will redirect to the annotation source.
+				</p>
+			</div>
+			<div class="block" style="clear:both;padding-top:0px;width:900px;position:relative;top:-420px;">
+				<p>&bull;&nbsp;<b>Browser view</b></p>
+				<p>
+				Personal genome panel displays the input genome variants and their functional consequences. As long as the variant icons are displayed, functional variants are highlighted by purple variant icons. The amino acid changes caused by the personal genome variants are real-timely analyzed and annotated based on gene annotations. Disease and phenotypes that related to personal genome variants or changed genes are displayed below.
+				</p>
+			</div>
+			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;top:-420px">
+				<a name="4">
+					<h3>PROCESSING METHOD</h3>
+				</a>
+			</div>
+			<div class="block" style="float:left;padding-top:0px;width:550px;position:relative;top:-420px;">
+				<p>
+				Basically the PGB map personal genome variants to genes and functional elements, and then map those to diseases, phenotypes and drug interactions, which is the standard approach of variant annotation (6). Various annotations and knowledge bases, such as dbSNP , RefSeq Gene, UCSC knownGene, ensembl Gene, OMIM, GwasCatalog, PharmGKB, etc., are integrated in the PGB for personal genome variant analysis and annotation (5, 7-11).
+				</p>
+				<p>
+				Particularly, we developed a fast, rule-based approach for annotating transcriptional and translational implications of personal genome variants based on the variant position/type and gene annotations. The PGB also integrates SIFT (12) and PolyPhen2 (13) scores for functional variants evaluation. The scores of personal genome variants are real-timely retrieved from dbNSFP (14) databses by ANNOVAR (15) tool.
+				</p>
+			</div>
+			<div>
+				<img src="image/method.png" width="400px" style="float:right;position:relative;top:-450px"/>
+			</div>
+			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;top:-470px">
+				<a name="5">
+					<h3>SETTINGS</h3>
+				</a>
+			</div>
+			<div>
+				<img src="image/settings.png" width="800px" style="float:left;position:relative;top:-450px"/>
+			</div>
+			<div class="block" style="clear:both;padding-top:0px;width:900px;position:relative;top:-420px;">
+				<p>
+				&bull;&nbsp;Tracks in reference genome panel can be managed by checkboxes below the reference genome panel.
+				</p>
+				<p>
+				&bull;&nbsp;To manage tracks displayed in personal genome panel, click the <b>'Setting'</b> button on personal genome panel controls.
+				</p>
+				<p>
+				&bull;&nbsp;User can upload custom tracks to reference genome panel via the <b>'Upload Custom Track'</b> window. Only URL accessible data can be linked into the PGB.
+				</p>
+			</div>
+			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;top:-420px">
+				<a name="6">
+					<h3>AUTHORS</h3>
+				</a>
+			</div>
+			<div class="block" style="clear:both;padding-top:0px;width:900px;position:relative;top:-420px;">
+				<p>
+				Liran Juan, Mingxiang Teng, Tianyi Zang, Yafeng Hao, Chengwu Yan, Zhenxing Wang, Yongzhuang Liu, Jie Li, Tianjiao Zhang and Yadong Wang<sup>*</sup>
+				</p>
+				<p>
+				Center for Bioinformatics, Harbin Institute of Technology, Harbin, Heilongjiang 150001, China.
+				</p>
+				<p>
+				Please do not hesitate to address comments/questions/suggestions regarding this webpage to: <a href="mailto:pgbrowser@gmail.com">pgbrowser@gmail.com</a>.
+				</p>
+			</div>
+			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;top:-420px">
+				<a name="7">
+					<h3>REFERECES</h3>
+				</a>
+			</div>
+			<div class="block" style="clear:both;padding-top:0px;width:900px;position:relative;top:-420px;">
+				<table cellpadding="3">
+					<tbody>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>1.</b>
+							</td>
+							<td valign="bottom">
+								Li, H. (2011) Tabix: fast retrieval of sequence features from generic TAB-delimited files. <i>Bioinformatics</i>, <b>27</b>, 718-719.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>2.</b>
+							</td>
+							<td valign="bottom">
+								Danecek, P., Auton, A., Abecasis, G., Albers, C.A., Banks, E., DePristo, M.A., Handsaker, R.E., Lunter, G., Marth, G.T., Sherry, S.T. et al. (2011) The variant call format and VCFtools. <i>Bioinformatics</i>, <b>27</b>, 2156-2158.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>3.</b>
+							</td>
+							<td valign="bottom">
+								Reese, M.G., Moore, B., Batchelor, C., Salas, F., Cunningham, F., Marth, G.T., Stein, L., Flicek, P., Yandell, M. and Eilbeck, K. (2010) A standard variation file format for human genome sequences. <i>Genome Biol</i>, <b>11</b>, R88.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>4.</b>
+							</td>
+							<td valign="bottom">
+								Genomes Project, C., Abecasis, G.R., Auton, A., Brooks, L.D., DePristo, M.A., Durbin, R.M., Handsaker, R.E., Kang, H.M., Marth, G.T. and McVean, G.A. (2012) An integrated map of genetic variation from 1,092 human genomes. <i>Nature</i>, <b>491</b>, 56-65.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>5.</b>
+							</td>
+							<td valign="bottom">
+								Coordinators, N.R. (2013) Database resources of the National Center for Biotechnology Information. <i>Nucleic Acids Res</i>, <b>41</b>, D8-D20.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>6.</b>
+							</td>
+							<td valign="bottom">
+								Ashley, E.A., Butte, A.J., Wheeler, M.T., Chen, R., Klein, T.E., Dewey, F.E., Dudley, J.T., Ormond, K.E., Pavlovic, A. and Morgan, A.A. (2010) Clinical assessment incorporating a personal genome. <i>The Lancet</i>, <b>375</b>, 1525-1535.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>7.</b>
+							</td>
+							<td valign="bottom">
+								Meyer, L.R., Zweig, A.S., Hinrichs, A.S., Karolchik, D., Kuhn, R.M., Wong, M., Sloan, C.A., Rosenbloom, K.R., Roe, G., Rhead, B. et al. (2013) The UCSC Genome Browser database: extensions and updates 2013. <i>Nucleic Acids Res</i>, <b>41</b>, D64-69.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>8.</b>
+							</td>
+							<td valign="bottom">
+								Flicek, P., Ahmed, I., Amode, M.R., Barrell, D., Beal, K., Brent, S., Carvalho-Silva, D., Clapham, P., Coates, G., Fairley, S. et al. (2013) Ensembl 2013. <i>Nucleic Acids Res</i>, <b>41</b>, D48-55.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>9.</b>
+							</td>
+							<td valign="bottom">
+								Hamosh, A., Scott, A.F., Amberger, J.S., Bocchini, C.A. and McKusick, V.A. (2005) Online Mendelian Inheritance in Man (OMIM), a knowledgebase of human genes and genetic disorders. <i>Nucleic Acids Res</i>, <b>33</b>, D514-517.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>10.</b>
+							</td>
+							<td valign="bottom">
+								Hindorff, L.A., Sethupathy, P., Junkins, H.A., Ramos, E.M., Mehta, J.P., Collins, F.S. and Manolio, T.A. (2009) Potential etiologic and functional implications of genome-wide association loci for human diseases and traits. <i>Proc Natl Acad Sci U S A</i>, <b>106</b>, 9362-9367.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>11.</b>
+							</td>
+							<td valign="bottom">
+								Whirl-Carrillo, M., McDonagh, E.M., Hebert, J.M., Gong, L., Sangkuhl, K., Thorn, C.F., Altman, R.B. and Klein, T.E. (2012) Pharmacogenomics knowledge for personalized medicine. <i>Clinical pharmacology and therapeutics</i>, <b>92</b>, 414-417.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>12.</b>
+							</td>
+							<td valign="bottom">
+								Ng, P.C. and Henikoff, S. (2003) SIFT: Predicting amino acid changes that affect protein function. <i>Nucleic Acids Res</i>, <b>31</b>, 3812-3814.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>13.</b>
+							</td>
+							<td valign="bottom">
+								Adzhubei, I.A., Schmidt, S., Peshkin, L., Ramensky, V.E., Gerasimova, A., Bork, P., Kondrashov, A.S. and Sunyaev, S.R. (2010) A method and server for predicting damaging missense mutations. <i>Nat Methods</i>, <b>7</b>, 248-249.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>14.</b>
+							</td>
+							<td valign="bottom">
+								Liu, X., Jian, X. and Boerwinkle, E. (2013) dbNSFP v2.0: A Database of Human Non-synonymous SNVs and Their Functional Predictions and Annotations. <i>Hum Mutat</i>, <b>34</b>, E2393-2402.
+							</td>
+						</tr>
+						<tr valign="top">
+							<td width="30px" nowrap="">
+								<b>15.</b>
+							</td>
+							<td valign="bottom">
+								Wang, K., Li, M. and Hakonarson, H. (2010) ANNOVAR: functional annotation of genetic variants from high-throughput sequencing data. <i>Nucleic Acids Res</i>, <b>38</b>, e164.
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p style="position:relative;margin-top:-420px"/>
+			<hr>
+			<table width="100%">
+				<tbody>
+					<tr>
+						<td width="33%"><i>pgb-0.97beta</i></td>
+						<td width="33%" align="center">Personal Genome Browser</td>
+						<td width="33%" align="right"><i>27 December 2013</i></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>
