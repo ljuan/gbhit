@@ -45,7 +45,7 @@
 			#wrap {
 				margin: 0 auto;
 				text-align: left;
-				width: 1000px;
+				width: 800px;
 			}
 			hr {
 				background: none repeat scroll 0 0 #C7C7C7;
@@ -58,6 +58,9 @@
 			h1, h2, h3, h4, h5, h6 {
 				font-family: "Trebuchet MS",arial,sans-serif;
 				font-weight: bold;
+			}
+			p {
+				text-align: justify;
 			}
 			.block {
 				padding:3px;
@@ -95,32 +98,12 @@
 				<a href="#7">References</a>
 				<br>
 			</blockquote>
-			<div style="clear:both">
-				<a name="8">
-					<h3>BASIC OPERATIONS</h3>
-				</a>
-			</div>
-			<div>
-				<img src="image/interface.png" width="800px"/>
-			</div>
-			<div class="block" style="float:right;width:500px">
-				<table cellpadding="3">
-					<tbody>
-						<tr valign="top">
-							<td width="20px" nowrap="">
-								<b>4.</b>
-							</td>
-							<td valign="bottom">
-								Using whole genome bird's eye view to select a region
-							</td>
-						</tr>
-						<tr>
-							<td colspan="2"><img src="image/scan.png" width="450"/></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="block" style="float:left;">
+			<a name="8">
+				<h3>BASIC OPERATIONS</h3>
+			</a>
+			<blockquote>
+				<img src="image/interface.png" width="700px"/>
+				<p>
 				<table cellpadding="3">
 					<tbody>
 						<tr valign="top">
@@ -143,9 +126,6 @@
 						<tr valign="top">
 							<td width="20px" nowrap=""/>
 							<td valign="bottom" width="20px"/>
-							<td valign="bottom" nowrap="">
-								Accept inputs:
-							</td>
 							<td valign="bottom">
 								chr1:1234-5678&nbsp;&nbsp;&nbsp;&nbsp;<font color="4daf4a">&radic;</font>
 								<br>
@@ -170,24 +150,17 @@
 						<tr valign="top">
 							<td width="20px" nowrap=""/>
 							<td valign="bottom" width="20px"/>
-							<td valign="bottom"/>
 							<td valign="bottom">
 								Auto-complete&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="4daf4a">&radic;</font>
 								<br>
 								Case-insensitive&nbsp;&nbsp;<font color="4daf4a">&radic;</font>
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="block" style="float:left;">
-				<table cellpadding="3">
-					<tbody>
 						<tr valign="top">
 							<td width="20px" nowrap="">
 								<b>2.</b>
 							</td>
-							<td valign="bottom" colspan="3">
+							<td valign="bottom" colspan="2">
 								Zooming
 							</td>
 						</tr>
@@ -196,14 +169,14 @@
 							<td valign="bottom" width="20px">
 								&bull;
 							</td>
-							<td valign="bottom" colspan="2">
+							<td valign="bottom">
 								Zooming by '+' or '-' buttons
 							</td>
 						</tr>
 						<tr valign="top">
 							<td width="20px" nowrap=""/>
 							<td valign="bottom" width="20px"/>
-							<td valign="bottom" nowrap="" colspan="2">
+							<td valign="bottom">
 								<b>'+'</b>: Zoom in; <b>'-'</b>: Zoom out
 							</td>
 						</tr>
@@ -212,130 +185,97 @@
 							<td valign="bottom" width="20px">
 								&bull;
 							</td>
-							<td valign="bottom" colspan="2">
+							<td valign="bottom">
 								Zooming by slider
 							</td>
 						</tr>
 						<tr valign="top">
 							<td width="20px" nowrap=""/>
 							<td valign="bottom" width="20px"/>
-							<td valign="bottom" colspan=2>
+							<td valign="bottom">
 								<b>Left</b>: Zoom out; <b>Right</b>: Zoom in
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="block" style="float:left;">
-				<table cellpadding="3">
-					<tbody>
 						<tr valign="top">
 							<td width="20px" nowrap="">
 								<b>3.</b>
 							</td>
-							<td valign="bottom">
+							<td valign="bottom" colspan="2">
 								Select a region on ideogram
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-			<p></p>
-			<div class="block" style="float:left;padding-top:25px;">
-				<table cellpadding="3">
-					<tbody>
 						<tr valign="top">
-							<td>
+							<td width="20px" nowrap="">
+								<b>4.</b>
+							</td>
+							<td valign="bottom" colspan="2">
+								Using whole genome bird's eye view to select a region
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3"><img src="image/scan.png" width="450"/></td>
+						</tr>
+						<tr valign="top">
+							<td colspan="3">
 								<b>Move the mouse on visualization area, when the mouse icon change to</b>'<img src="image/panIcon.gif"/>'<b>, then,</b>
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-			<p></p>
-			<div class="block" style="float:left;">
-				<table cellpadding="3">
-					<tbody>
 						<tr valign="top">
 							<td width="20px" nowrap="">
 								<b>5.</b>
 							</td>
-							<td>
+							<td valign="bottom" colspan="2">
 							Holding the <b>'shift'</b> and using cursor to select a region to zoom in<sup>*</sup>
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="block" style="float:left;clear:both">
-				<table cellpadding="3">
-					<tbody>
 						<tr valign="top">
 							<td width="20px" nowrap="">
 								<b>6.</b>
 							</td>
-							<td>
-								Holding the <b>'z'</b> key and scrolling the mouse wheel to zoom out/in<sup>*</sup>
+							<td valign="bottom" colspan="2">
+							Holding the <b>'z'</b> key and scrolling the mouse wheel to zoom out/in<sup>*</sup>
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="block" style="float:left;">
-				<table cellpadding="3">
-					<tbody>
 						<tr valign="top">
-							<td>
+							<td colspan="3">
 								<sup>*</sup><i>These operations may be invalid if the hotkey is occupied by browser plugins or other programs.</i>
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="block" style="float:left;clear:both">
-				<table cellpadding="3">
-					<tbody>
 						<tr valign="top">
 							<td width="20px" nowrap="">
 								<b>7.</b>
 							</td>
-							<td>
+							<td valign="bottom" colspan="2">
 							Dragging the visualization area in either direction to move left or right within the current zoom level
 							</td>
 						</tr>
 					</tbody>
 				</table>
-			</div>
-			<div style="clear:both;padding-top:6px;padding-bottom:0px">
-				<a name="2">
-					<h3>INPUT PERSONAL GENOMES</h3>
-				</a>
-			</div>
-			<div style="float:right;position:relative;top:-20px">
-				<img src="image/input.png" width="540px" />
-			</div>
-			<div class="block" style="float:left;padding-top:0px;position:relative;top:-10px">
+				</p>
+			</blockquote>
+			<a name="2">
+				<h3>INPUT PERSONAL GENOMES</h3>
+			</a>
+			<blockquote>
+				<img src="image/input.png" width="600px" />
 				<p>
 				The input of the PGB is personal genome variants file. The PGB accepts <a href=http://samtools.sourceforge.net/tabix.shtml>Bgzip/Tabix</a> (1) compressed/indexed <a href=http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41>VCF</a> (2) and <a href=http://www.sequenceontology.org/resources/gvf.html>GVF</a> (3) files. User can either provide accessible data ULR link or locally upload data and index files. Using URL link is recommended. Because the volume of files can be locally uploaded is limited up to 20MB due to network condition and server storage. The PGB guaranty input data can only be accessed and view by the owner. The PGB will <b>NOT</b> record any information of user data. The uploaded files will be automatically deleted as soon as the session expired.
 				</p>
 				<p>
 				Users can also browse built-in genomes for comparison. We currently hold over a thousand individual genomes in the PGB server. Most of them are downloaded from 1000 genome project website (4).
 				</p>
-			</div>
-			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;top:-180px">
-				<a name="3">
-					<h3>INTERPRETATION OF OUTPUT RESULTS</h3>
-				</a>
-			</div>
-			<div class="block" style="float:left;padding-top:0px;position:relative;top:-190px">
-				<p>&bull;&nbsp;<b>Bird's eye view</b></p>
-				<p>
+			</blockquote>
+			<a name="3">
+				<h3>INTERPRETATION OF OUTPUT RESULTS</h3>
+			</a>
+			<blockquote>
+				<img src="image/output.png" width="700px"/>
+				<p>&bull;&nbsp;<b>Bird's eye view</b>
+				<br>
 				Functional variants distribution is shown by heatmap in which color gradients reflect number of functional significance of the variants in the region. User can scan functional variants in whole genome or selected chromosome/cytoband region. Typically it may take several seconds to scan a cytoband. However, the scanning time varies due to the network condition and length of region.	
 				</p>
-			</div>
-			<div class="block" style="float:left;width:420px;padding-top:0px;position:relative;top:-45px;right:-85px">
-				<p>&bull;&nbsp;<b>Detail view</b></p>
-				<p>
+				<p>&bull;&nbsp;<b>Detail view</b>
+				<br>
 				User can click on displayed objects (variants, genes, ...) to open the detail view of them.
 				<br>
 				For personal genome variants, the PGB query dbSNP database based on variant position, and merge dbSNP (5) record into the original information of the variants files.
@@ -344,41 +284,28 @@
 				<br>
 				Clicking on top-right corner link will redirect to the annotation source.
 				</p>
-			</div>
-			<div>
-				<img src="image/output.png" width="800px" style="position:relative;top:-235px"/>
-			</div>
-			<div class="block" style="clear:both;padding-top:0px;width:900px;position:relative;margin-top:-250px;">
-				<p>&bull;&nbsp;<b>Browser view</b></p>
-				<p>
+				<p>&bull;&nbsp;<b>Browser view</b>
+				<br>
 				Personal genome panel displays the input genome variants and their functional consequences. As long as the variant icons are displayed, functional variants are highlighted by purple variant icons. The amino acid changes caused by the personal genome variants are real-timely analyzed and annotated based on gene annotations. Disease and phenotypes that related to personal genome variants or changed genes are displayed below.
 				</p>
-			</div>
-			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;">
-				<a name="4">
-					<h3>PROCESSING METHOD</h3>
-				</a>
-			</div>
-			<div class="block" style="float:left;padding-top:0px;width:550px;position:relative;">
+			</blockquote>
+			<a name="4">
+				<h3>PROCESSING METHOD</h3>
+			</a>
+			<blockquote>
+				<img src="image/method.png" width="400px"/>
 				<p>
 				Basically the PGB map personal genome variants to genes and functional elements, and then map those to diseases, phenotypes and drug interactions, which is the standard approach of variant annotation (6). Various annotations and knowledge bases, such as dbSNP , RefSeq Gene, UCSC knownGene, ensembl Gene, OMIM, GwasCatalog, PharmGKB, etc., are integrated in the PGB for personal genome variant analysis and annotation (5, 7-11).
 				</p>
 				<p>
 				Particularly, we developed a fast, rule-based approach for annotating transcriptional and translational implications of personal genome variants based on the variant position/type and gene annotations. The PGB also integrates SIFT (12) and PolyPhen2 (13) scores for functional variants evaluation. The scores of personal genome variants are real-timely retrieved from dbNSFP (14) databses by ANNOVAR (15) tool.
 				</p>
-			</div>
-			<div>
-				<img src="image/method.png" width="400px" style="float:right;position:relative;top:-30px"/>
-			</div>
-			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;top:-60px">
-				<a name="5">
-					<h3>SETTINGS</h3>
-				</a>
-			</div>
-			<div>
-				<img src="image/settings.png" width="800px" style="float:left;position:relative;top:-40px"/>
-			</div>
-			<div class="block" style="clear:both;padding-top:0px;width:900px;position:relative;">
+			</blockquote>
+			<a name="5">
+				<h3>SETTINGS</h3>
+			</a>
+			<blockquote>
+				<img src="image/settings.png" width="700px"/>
 				<p>
 				&bull;&nbsp;Tracks in reference genome panel can be managed by checkboxes below the reference genome panel.
 				</p>
@@ -388,13 +315,11 @@
 				<p>
 				&bull;&nbsp;User can upload custom tracks to reference genome panel via the <b>'Upload Custom Track'</b> window. Only URL accessible data can be linked into the PGB.
 				</p>
-			</div>
-			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;">
-				<a name="6">
-					<h3>AUTHORS</h3>
-				</a>
-			</div>
-			<div class="block" style="clear:both;padding-top:0px;width:900px;position:relative;">
+			</blockquote>
+			<a name="6">
+				<h3>AUTHORS</h3>
+			</a>
+			<blockquote>
 				<p>
 				Liran Juan, Mingxiang Teng, Tianyi Zang, Yafeng Hao, Chengwu Yan, Zhenxing Wang, Yongzhuang Liu, Jie Li, Tianjiao Zhang and Yadong Wang<sup>*</sup>
 				</p>
@@ -404,13 +329,11 @@
 				<p>
 				Please do not hesitate to address comments/questions/suggestions regarding this webpage to: <a href="mailto:pgbrowser@gmail.com">pgbrowser@gmail.com</a>.
 				</p>
-			</div>
-			<div style="clear:both;padding-top:6px;padding-bottom:0px;position:relative;">
-				<a name="7">
-					<h3>REFERECES</h3>
-				</a>
-			</div>
-			<div class="block" style="clear:both;padding-top:0px;width:900px;position:relative;">
+			</blockquote>
+			<a name="7">
+				<h3>REFERECES</h3>
+			</a>
+			<blockquote>
 				<table cellpadding="3">
 					<tbody>
 						<tr valign="top">
@@ -535,8 +458,8 @@
 						</tr>
 					</tbody>
 				</table>
-			</div>
-			<p/>
+			</blockquote>
+			<p></p>
 			<hr>
 			<table width="100%">
 				<tbody>
