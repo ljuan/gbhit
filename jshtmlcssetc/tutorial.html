@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>PGB Help</title>
+		<title>Tutorial</title>
 		<style type="text/css">
 			a:link {
 				color: #0092E8;
@@ -80,6 +80,17 @@
 					<hr>
 				</h1>
 			</center>
+			<a name="0">
+				<h3>DESCRIPTION</h3>
+			</a>
+			<blockquote>
+				<p>
+				The <a href="http://www.pgbrowser.org"><b>Personal Genome Browser (PGB)</b></a> is developed to provide comprehensive functional annotation and visualization for individual genomes. The PGB leverages the <i>genetic-molecular-phenotypic</i> framework (1) for personal genome annotation and visualization. It allows investigators to easily view individual genetic variants, diverse related genomic features, and phenotypes based on bioinformatics knowledge. The PGB can especially highlight individual genetic variants that have potential functional implications, and report the potential functional variants distribution of the input personal genome based on PGB built-in method and integrated ANNOVAR (2) tool. 
+				</p>
+				<p>
+				The PGB is best accessed using Google Chrome, and works smoothly as well with other web-browsers, including Mozilla Firefox, Safari, Microsoft Internet Explorer (Version 10 or later), Opera, etc. HTML5 Canvas is used as the graphic engine to plot the visual elements, thus some earlier versions of web-browsers that do not support HTML5, such as IE6-9, are not capatible with the PGB.
+				</p>
+			</blockquote>
 			<a name="contents"></a>
 			<h3>CONTENTS</h3>
 			<blockquote>
@@ -259,10 +270,10 @@
 			<blockquote>
 				<img src="image/input.png" width="600px" />
 				<p>
-				The input of the PGB is personal genome variants file. The PGB accepts <a href=http://samtools.sourceforge.net/tabix.shtml>Bgzip/Tabix</a> (1) compressed/indexed <a href=http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41>VCF</a> (2) and <a href=http://www.sequenceontology.org/resources/gvf.html>GVF</a> (3) files. User can either provide accessible data ULR link or locally upload data and index files. Using URL link is recommended. Because the volume of files can be locally uploaded is limited up to 20MB due to network condition and server storage. The PGB guaranty input data can only be accessed and view by the owner. The PGB will <b>NOT</b> record any information of user data. The uploaded files will be automatically deleted as soon as the session expired.
+				The input of the PGB is personal genome variants file. The PGB accepts <a href=http://samtools.sourceforge.net/tabix.shtml>Bgzip/Tabix</a> (3) compressed/indexed <a href=http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41>VCF</a> (4) and <a href=http://www.sequenceontology.org/resources/gvf.html>GVF</a> (5) files. User can either provide accessible data ULR link or locally upload data and index files. Using URL link is recommended. Because the volume of files can be locally uploaded is limited up to 20MB due to network condition and server storage. The PGB guarantee input data can only be accessed and viewed by the owner. The PGB will <b>NOT</b> record any information of user data. The uploaded files will be automatically deleted as soon as the session expired.
 				</p>
 				<p>
-				Users can also browse built-in genomes for comparison. We currently hold over a thousand individual genomes in the PGB server. Most of them are downloaded from 1000 genome project website (4).
+				Users can also browse built-in genomes for comparison. We currently hold over a thousand individual genomes in the PGB server. Most of them are downloaded from 1000 genome project website (6).
 				</p>
 			</blockquote>
 			<a name="3">
@@ -272,21 +283,21 @@
 				<img src="image/output.png" width="700px"/>
 				<p>&bull;&nbsp;<b>Bird's eye view</b>
 				<br>
-				Functional variants distribution is shown by heatmap in which color gradients reflect number of functional significance of the variants in the region. User can scan functional variants in whole genome or selected chromosome/cytoband region. Typically it may take several seconds to scan a cytoband. However, the scanning time varies due to the network condition and length of region.	
+				Bird's eye view is a clock-like personal genome view. Inner circle indicates chromosomes. When a chromosome is selected, the cytobands of selected chromosome are displayed in outer circle. Functional variants distribution is shown by circular heatmap in which color gradients reflect number and functional significance of the variants in the region. User can scan functional variants in whole genome or selected chromosome/cytoband region. Typically it may take several seconds to scan a cytoband. However, the scanning time varies due to the network condition and length of region.	
+				</p>
+				<p>&bull;&nbsp;<b>Browser view</b>
+				<br>
+				Personal genome panel displays the input genome variants and their functional consequences. As long as the variant icons are displayed, functional variants are highlighted by purple variant icons. The amino acid changes caused by the personal genome variants are real-timely analyzed and annotated based on gene annotations. Disease and phenotypes that related to personal genome variants or changed genes are displayed below. <b>Please notice that the browser view of personal genome panel does not show variants and annotations when the region is larger than 1,000,000 bases due to performance and legibility considerations.</b>
 				</p>
 				<p>&bull;&nbsp;<b>Detail view</b>
 				<br>
 				User can click on displayed objects (variants, genes, ...) to open the detail view of them.
 				<br>
-				For personal genome variants, the PGB query dbSNP database based on variant position, and merge dbSNP (5) record into the original information of the variants files.
+				For personal genome variants, the PGB query dbSNP database based on variant position, and merge dbSNP (7) record into the original information of the variants files.
 				<br>
 				For 'personal genes', the PGB highlights amino acid changes and neighborhood broken TF binding motifs caused by personal genome variants.
 				<br>
 				Clicking on top-right corner link will redirect to the annotation source.
-				</p>
-				<p>&bull;&nbsp;<b>Browser view</b>
-				<br>
-				Personal genome panel displays the input genome variants and their functional consequences. As long as the variant icons are displayed, functional variants are highlighted by purple variant icons. The amino acid changes caused by the personal genome variants are real-timely analyzed and annotated based on gene annotations. Disease and phenotypes that related to personal genome variants or changed genes are displayed below.
 				</p>
 			</blockquote>
 			<a name="4">
@@ -295,10 +306,10 @@
 			<blockquote>
 				<img src="image/method.png" width="400px"/>
 				<p>
-				Basically the PGB map personal genome variants to genes and functional elements, and then map those to diseases, phenotypes and drug interactions, which is the standard approach of variant annotation (6). Various annotations and knowledge bases, such as dbSNP , RefSeq Gene, UCSC knownGene, ensembl Gene, OMIM, GwasCatalog, PharmGKB, etc., are integrated in the PGB for personal genome variant analysis and annotation (5, 7-11).
+				Basically the PGB map personal genome variants to genes and functional elements, and then map those to diseases, phenotypes and drug interactions, which is the standard approach of variant annotation (1). Various annotations and knowledge bases, such as dbSNP , RefSeq Gene, UCSC knownGene, ensembl Gene, OMIM, GwasCatalog, PharmGKB, etc., are integrated in the PGB for personal genome variant analysis and annotation (7-12).
 				</p>
 				<p>
-				Particularly, we developed a fast, rule-based approach for annotating transcriptional and translational implications of personal genome variants based on the variant position/type and gene annotations. The PGB also integrates SIFT (12) and PolyPhen2 (13) scores for functional variants evaluation. The scores of personal genome variants are real-timely retrieved from dbNSFP (14) databses by ANNOVAR (15) tool.
+				Particularly, we developed a fast, rule-based approach for annotating transcriptional and translational implications of personal genome variants based on the variant position/type and gene annotations. The PGB also integrates SIFT (13) and PolyPhen2 (14) scores for functional variants evaluation. The scores of personal genome variants are real-timely retrieved from dbNSFP (15) databses by ANNOVAR (2) tool.
 				</p>
 			</blockquote>
 			<a name="5">
@@ -341,7 +352,7 @@
 								<b>1.</b>
 							</td>
 							<td valign="bottom">
-								Li, H. (2011) Tabix: fast retrieval of sequence features from generic TAB-delimited files. <i>Bioinformatics</i>, <b>27</b>, 718-719.
+								Ashley, E.A., Butte, A.J., Wheeler, M.T., Chen, R., Klein, T.E., Dewey, F.E., Dudley, J.T., Ormond, K.E., Pavlovic, A. and Morgan, A.A. (2010) Clinical assessment incorporating a personal genome. <i>The Lancet</i>, <b>375</b>, 1525-1535.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -349,7 +360,7 @@
 								<b>2.</b>
 							</td>
 							<td valign="bottom">
-								Danecek, P., Auton, A., Abecasis, G., Albers, C.A., Banks, E., DePristo, M.A., Handsaker, R.E., Lunter, G., Marth, G.T., Sherry, S.T. et al. (2011) The variant call format and VCFtools. <i>Bioinformatics</i>, <b>27</b>, 2156-2158.
+								Wang, K., Li, M. and Hakonarson, H. (2010) ANNOVAR: functional annotation of genetic variants from high-throughput sequencing data. <i>Nucleic Acids Res</i>, <b>38</b>, e164.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -357,7 +368,7 @@
 								<b>3.</b>
 							</td>
 							<td valign="bottom">
-								Reese, M.G., Moore, B., Batchelor, C., Salas, F., Cunningham, F., Marth, G.T., Stein, L., Flicek, P., Yandell, M. and Eilbeck, K. (2010) A standard variation file format for human genome sequences. <i>Genome Biol</i>, <b>11</b>, R88.
+								Li, H. (2011) Tabix: fast retrieval of sequence features from generic TAB-delimited files. <i>Bioinformatics</i>, <b>27</b>, 718-719.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -365,7 +376,7 @@
 								<b>4.</b>
 							</td>
 							<td valign="bottom">
-								Genomes Project, C., Abecasis, G.R., Auton, A., Brooks, L.D., DePristo, M.A., Durbin, R.M., Handsaker, R.E., Kang, H.M., Marth, G.T. and McVean, G.A. (2012) An integrated map of genetic variation from 1,092 human genomes. <i>Nature</i>, <b>491</b>, 56-65.
+								Danecek, P., Auton, A., Abecasis, G., Albers, C.A., Banks, E., DePristo, M.A., Handsaker, R.E., Lunter, G., Marth, G.T., Sherry, S.T. et al. (2011) The variant call format and VCFtools. <i>Bioinformatics</i>, <b>27</b>, 2156-2158.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -373,7 +384,7 @@
 								<b>5.</b>
 							</td>
 							<td valign="bottom">
-								Coordinators, N.R. (2013) Database resources of the National Center for Biotechnology Information. <i>Nucleic Acids Res</i>, <b>41</b>, D8-D20.
+								Reese, M.G., Moore, B., Batchelor, C., Salas, F., Cunningham, F., Marth, G.T., Stein, L., Flicek, P., Yandell, M. and Eilbeck, K. (2010) A standard variation file format for human genome sequences. <i>Genome Biol</i>, <b>11</b>, R88.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -381,7 +392,7 @@
 								<b>6.</b>
 							</td>
 							<td valign="bottom">
-								Ashley, E.A., Butte, A.J., Wheeler, M.T., Chen, R., Klein, T.E., Dewey, F.E., Dudley, J.T., Ormond, K.E., Pavlovic, A. and Morgan, A.A. (2010) Clinical assessment incorporating a personal genome. <i>The Lancet</i>, <b>375</b>, 1525-1535.
+								Genomes Project, C., Abecasis, G.R., Auton, A., Brooks, L.D., DePristo, M.A., Durbin, R.M., Handsaker, R.E., Kang, H.M., Marth, G.T. and McVean, G.A. (2012) An integrated map of genetic variation from 1,092 human genomes. <i>Nature</i>, <b>491</b>, 56-65.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -389,7 +400,7 @@
 								<b>7.</b>
 							</td>
 							<td valign="bottom">
-								Meyer, L.R., Zweig, A.S., Hinrichs, A.S., Karolchik, D., Kuhn, R.M., Wong, M., Sloan, C.A., Rosenbloom, K.R., Roe, G., Rhead, B. et al. (2013) The UCSC Genome Browser database: extensions and updates 2013. <i>Nucleic Acids Res</i>, <b>41</b>, D64-69.
+								Coordinators, N.R. (2013) Database resources of the National Center for Biotechnology Information. <i>Nucleic Acids Res</i>, <b>41</b>, D8-D20.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -397,7 +408,7 @@
 								<b>8.</b>
 							</td>
 							<td valign="bottom">
-								Flicek, P., Ahmed, I., Amode, M.R., Barrell, D., Beal, K., Brent, S., Carvalho-Silva, D., Clapham, P., Coates, G., Fairley, S. et al. (2013) Ensembl 2013. <i>Nucleic Acids Res</i>, <b>41</b>, D48-55.
+								Meyer, L.R., Zweig, A.S., Hinrichs, A.S., Karolchik, D., Kuhn, R.M., Wong, M., Sloan, C.A., Rosenbloom, K.R., Roe, G., Rhead, B. et al. (2013) The UCSC Genome Browser database: extensions and updates 2013. <i>Nucleic Acids Res</i>, <b>41</b>, D64-69.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -405,7 +416,7 @@
 								<b>9.</b>
 							</td>
 							<td valign="bottom">
-								Hamosh, A., Scott, A.F., Amberger, J.S., Bocchini, C.A. and McKusick, V.A. (2005) Online Mendelian Inheritance in Man (OMIM), a knowledgebase of human genes and genetic disorders. <i>Nucleic Acids Res</i>, <b>33</b>, D514-517.
+								Flicek, P., Ahmed, I., Amode, M.R., Barrell, D., Beal, K., Brent, S., Carvalho-Silva, D., Clapham, P., Coates, G., Fairley, S. et al. (2013) Ensembl 2013. <i>Nucleic Acids Res</i>, <b>41</b>, D48-55.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -413,7 +424,7 @@
 								<b>10.</b>
 							</td>
 							<td valign="bottom">
-								Hindorff, L.A., Sethupathy, P., Junkins, H.A., Ramos, E.M., Mehta, J.P., Collins, F.S. and Manolio, T.A. (2009) Potential etiologic and functional implications of genome-wide association loci for human diseases and traits. <i>Proc Natl Acad Sci U S A</i>, <b>106</b>, 9362-9367.
+								Hamosh, A., Scott, A.F., Amberger, J.S., Bocchini, C.A. and McKusick, V.A. (2005) Online Mendelian Inheritance in Man (OMIM), a knowledgebase of human genes and genetic disorders. <i>Nucleic Acids Res</i>, <b>33</b>, D514-517.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -421,7 +432,7 @@
 								<b>11.</b>
 							</td>
 							<td valign="bottom">
-								Whirl-Carrillo, M., McDonagh, E.M., Hebert, J.M., Gong, L., Sangkuhl, K., Thorn, C.F., Altman, R.B. and Klein, T.E. (2012) Pharmacogenomics knowledge for personalized medicine. <i>Clinical pharmacology and therapeutics</i>, <b>92</b>, 414-417.
+								Hindorff, L.A., Sethupathy, P., Junkins, H.A., Ramos, E.M., Mehta, J.P., Collins, F.S. and Manolio, T.A. (2009) Potential etiologic and functional implications of genome-wide association loci for human diseases and traits. <i>Proc Natl Acad Sci U S A</i>, <b>106</b>, 9362-9367.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -429,7 +440,7 @@
 								<b>12.</b>
 							</td>
 							<td valign="bottom">
-								Ng, P.C. and Henikoff, S. (2003) SIFT: Predicting amino acid changes that affect protein function. <i>Nucleic Acids Res</i>, <b>31</b>, 3812-3814.
+								Whirl-Carrillo, M., McDonagh, E.M., Hebert, J.M., Gong, L., Sangkuhl, K., Thorn, C.F., Altman, R.B. and Klein, T.E. (2012) Pharmacogenomics knowledge for personalized medicine. <i>Clinical pharmacology and therapeutics</i>, <b>92</b>, 414-417.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -437,7 +448,7 @@
 								<b>13.</b>
 							</td>
 							<td valign="bottom">
-								Adzhubei, I.A., Schmidt, S., Peshkin, L., Ramensky, V.E., Gerasimova, A., Bork, P., Kondrashov, A.S. and Sunyaev, S.R. (2010) A method and server for predicting damaging missense mutations. <i>Nat Methods</i>, <b>7</b>, 248-249.
+								Ng, P.C. and Henikoff, S. (2003) SIFT: Predicting amino acid changes that affect protein function. <i>Nucleic Acids Res</i>, <b>31</b>, 3812-3814.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -445,7 +456,7 @@
 								<b>14.</b>
 							</td>
 							<td valign="bottom">
-								Liu, X., Jian, X. and Boerwinkle, E. (2013) dbNSFP v2.0: A Database of Human Non-synonymous SNVs and Their Functional Predictions and Annotations. <i>Hum Mutat</i>, <b>34</b>, E2393-2402.
+								Adzhubei, I.A., Schmidt, S., Peshkin, L., Ramensky, V.E., Gerasimova, A., Bork, P., Kondrashov, A.S. and Sunyaev, S.R. (2010) A method and server for predicting damaging missense mutations. <i>Nat Methods</i>, <b>7</b>, 248-249.
 							</td>
 						</tr>
 						<tr valign="top">
@@ -453,7 +464,7 @@
 								<b>15.</b>
 							</td>
 							<td valign="bottom">
-								Wang, K., Li, M. and Hakonarson, H. (2010) ANNOVAR: functional annotation of genetic variants from high-throughput sequencing data. <i>Nucleic Acids Res</i>, <b>38</b>, e164.
+								Liu, X., Jian, X. and Boerwinkle, E. (2013) dbNSFP v2.0: A Database of Human Non-synonymous SNVs and Their Functional Predictions and Annotations. <i>Hum Mutat</i>, <b>34</b>, E2393-2402.
 							</td>
 						</tr>
 					</tbody>
