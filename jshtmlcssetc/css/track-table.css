@@ -440,17 +440,17 @@ span#browseJumpIcon:after{
 	content: "M";
 }
 span#browseJump{
-	color: #6baed6;
-	font:18px Candara, Arial, Helvetica, sans-serif;
+	color: #3182bd;
+	font:22px Candara, Arial, Helvetica, sans-serif;
 }
 span#browseJump:hover{
-	color: #5BC4BE;
-	font:18px Candara, Arial, Helvetica, sans-serif;
+	color: #6baed6;
+	font:22px Candara, Arial, Helvetica, sans-serif;
 	cursor: pointer;
 }
 span#browseJump:after{
 	color: #6baed6;
-	font:18px Candara, Arial, Helvetica, sans-serif;
+	font:22px Candara, Arial, Helvetica, sans-serif;
 }
 /*span#search:after{
 	font-family: 'ModernPictogramsNormal';
