@@ -38,7 +38,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 				 req.onreadystatechange = getReadyStateHandler;
 				 if(param5 == "getAssemblies" || param5 == "getAnnotations" || param5 == "getChromosomes" || param5 == "removePvar" || param5 == "removePanno" || param5 == "removePfanno" || param5 == "getSession"|| param5== "getStat" || param5 == "upStat" || param5 == "getScoreMethods" || param5 == "getAllCytobands" || param5 == "getIndividuals" || param5 == "getExternals" || param5 == "getExIndividuals" || param5 == "getScoreMethod"){
 					querry="action="+param5;
-				} else if(param5 == "removeTracks" || param5 == "removeExternals" || param5 == "getParams" || param5 == "removePclns" || param5 == "getCheck"){
+				} else if(param5 == "removeTracks" || param5 == "removeExternals" || param5 == "getParams" || param5 == "removePclns" || param5 == "getCheck" || param5 == "getPedigree" || param5 == "removePedigree" || param5 == "addPedigree" || param5 == "upPedigree" || param5 == "downloadIndex"){
 					querry="action="+param5+"&tracks="+param4;
 				} else if(param5 == "setAssembly"){
 					querry="action="+param5+"&assembly="+param4;
@@ -46,6 +46,8 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					querry="action="+param5+"&gene="+param4;
 				} else if(param5 == "findGene"){
 					querry="action="+param5+"&prefix="+param4;
+				} else if(param5 == "rankGene"){
+					querry="action="+param5+"&topnumber="+param4;
 				} else if(param5 == "getCytobands"){
 					querry="action="+param5+"&chr="+param4;
 				} else if(param5 == "modiTracks" || param5 == "addTracks" || param5 == "modiPanno" || param5 == "modiPfanno" || param5 == "addPanno" || param5 == "addPfanno" || param5 == "addPclns" || param5 == "modiPclns"){
@@ -70,15 +72,39 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					querry="action="+param5+"&chr="+param4+"&id="+param3;
 				} else if(param5 == "setScoreMethod"){
 					querry="action="+param5+"&scoremeth="+param4;
+				} else if(param5 == "getIntersection" || param5 == "getDifference"){
+					querry="action="+param5+"&tracks="+param4+"&chr="+param1+"&start="+param2+"&end="+param3;
+				} else if(param5 == "searchIndividual"){
+					querry="action="+param5+"&tracks="+param4;
 				}
 				if(param5 == "getStat"){
 					window.open("servlet/test.do?"+querry);
-				} else if(param5 == "upStat"){
+				} else if(param5 == "upStat" || param5 == "upPedigree"){
 					var fileObj = document.getElementById("uploadfile").files[0];
 					var form = new FormData();
 					form.append("file", fileObj);
 					form.append("enctype", "multipart/form-data");
-				//	req.setRequestHeader("Content-Type","multipart/form-data");
+					req.open("POST","servlet/test.do?"+querry,true);
+					req.send(form);
+				} else if(param5 == "addPedigree"){
+					var pedtext = document.getElementById("moretext").value;
+					var form = new FormData();
+					form.append("pedigree", pedtext);
+					form.append("enctype", "multipart/form-data");
+					req.open("POST","servlet/test.do?"+querry,true);
+					req.send(form);
+				} else if(param5 == "searchIndividual"){
+					var vartext = document.getElementById("moretext").value;
+					var form = new FormData();
+					form.append("variants", vartext);
+					form.append("enctype", "multipart/form-data");
+					req.open("POST","servlet/test.do?"+querry,true);
+					req.send(form);
+				} else if(param5 == "getIntersection" || param5 == "getDifference"){
+					var settext = document.getElementById("moretext").value;
+					var form = new FormData();
+					form.append("sets", settext);
+					form.append("enctype", "multipart/form-data");
 					req.open("POST","servlet/test.do?"+querry,true);
 					req.send(form);
 				} else if(param5 == "upExternal"){
@@ -88,7 +114,6 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					form.append("file", fileObj);
 					form.append("file", fileObj2);
 					form.append("enctype", "multipart/form-data");
-				//	req.setRequestHeader("Content-Type","multipart/form-data");
 					req.open("POST","servlet/test.do?"+querry,true);
 					req.send(form);
 				}
@@ -150,7 +175,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 	<table width=80% border=1 valign="middle" align="center">
 		<tr>
 			<th>Input</th>
-			<th>update<br>refresh</th>
+			<th>update<br>refresh<br>getIntersection<br>getDifference</th>
 			<th>getDetail</th>
 			<th>addExternals<br>addExIndividuals<br>upExternal</th>
 			<th>setParams</th>
@@ -158,8 +183,8 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<th>addPvar<br>modiPvar<br>initPvar</th>
 			<th>addTracks/modiTracks<br>addPanno/modiPanno<br>addPfanno/modiPfanno<br>addPclns/modiPclns</th>
 			<th>getCytoband</th>
-			<th>removeTracks<br>removeExternals<br>removePclns<br>getParams<br>getCheck</th>
-			<th>getGene<br>findGene</th>
+			<th>removeTracks<br>removeExternals<br>removePclns<br>getParams<br>getCheck<br>addPedigree<br>getPedigree<br>upPedigree<br>removePedigree<br>searchIndividual<br>downloadIndex</th>
+			<th>getGene<br>findGene<br>rankGene</th>
 			<th>setAssembly<br>getCytobands<br>setScoreMethod</th>
 			<th>removePvar<br>removePanno<br>removePfanno<br>getAssemblies<br>getSession<br>getAnnotations<br>getExternals<br>getChromosomes<br>getScoreMethod<br>getScoreMethods<br>getStat<br>upStat<br>getAllCytobands<br>getIndividuals<br>getExIndividuals</th>
 		<tr align="center">
@@ -195,7 +220,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 		</tr>
 		<tr align="center">
 			<td><input id="p4" type="text"/></td>
-			<td>WindowWidth</td>
+			<td>width/tracks</td>
 			<td>tracks</td>
 			<td>tracks</td>
 			<td>tracks</td>
@@ -204,7 +229,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 			<td>tracks</td>
 			<td>chr</td>
 			<td>tracks</td>
-			<td>prefix/gene</td>
+			<td>prefix/gene/topnumber</td>
 			<td>assembly/chr/scoremeth</td>
 			<td></td>
 		</tr>
@@ -225,6 +250,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 		</tr>
 		<tr><td colspan="13"><button id="buttonn" onclick="update()">update</button></td></tr>
 		<tr><td colspan="13"><input type="file" name="uploadfile" id="uploadfile"/><input type="file" name="uploadfile2" id="uploadfile2"/></td></tr>
+		<tr><td colspan="13"><textarea name="moretext" id="moretext"></textarea></td></tr>
 		<tr><td colspan="13" style="word-break:break-all"><div id="divv"></div></td></tr>
 	</table>
 	

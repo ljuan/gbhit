@@ -88,7 +88,7 @@
 				The <a href="http://www.pgbrowser.org"><b>Personal Genome Browser (PGB)</b></a> is developed to provide comprehensive functional annotation and visualization for individual genomes. The PGB leverages the <i>genetic-molecular-phenotypic</i> framework (1). It allows investigators to easily view individual genetic variants, as well as diverse genomic features and phenotypes associated to the individual genetic variants. The PGB can especially highlight individual genetic variants that have potential functional implications, and report the potential functional variants distribution of the input personal genome based on PGB built-in method and integrated ANNOVAR (2) tool. 
 				</p>
 				<p>
-				The PGB is best accessed using Google Chrome, and works smoothly as well with other web-browsers, including Mozilla Firefox, Safari, Microsoft Internet Explorer (Version 10 or later), Opera, etc. HTML5 Canvas is used as the graphic engine to plot the visual elements, thus some earlier versions of web-browsers that do not support HTML5, such as IE6-9, are not capatible with the PGB.
+				The PGB is best accessed using Google Chrome, and works smoothly as well with other web-browsers, including Mozilla Firefox, Safari, Microsoft Internet Explorer (Version 10 or later), Opera, etc. HTML5 Canvas is used as the graphic engine to plot the visual elements, thus some earlier versions of web-browsers that do not support HTML5, such as IE6-9, are not compatible with the PGB.
 				</p>
 			</blockquote>
 			<a name="contents"></a>
@@ -96,20 +96,22 @@
 			<blockquote>
 				<a href="#1">Basic operations</a>
 				<br>
-				<a href="#2">Input personal genomes</a>
+				<a href="#2">Visualization elements of five types of tracks</a>
 				<br>
-				<a href="#3">Interpetation of output results</a>
+				<a href="#3">Input personal genomes</a>
 				<br>
-				<a href="#4">Processing method</a>
+				<a href="#4">Interpetation of output results</a>
 				<br>
-				<a href="#5">Settings</a>
+				<a href="#5">Processing method</a>
 				<br>
-				<a href="#6">Authors</a>
+				<a href="#6">Settings</a>
 				<br>
-				<a href="#7">References</a>
+				<a href="#7">Authors</a>
+				<br>
+				<a href="#8">References</a>
 				<br>
 			</blockquote>
-			<a name="8">
+			<a name="9">
 				<h3>BASIC OPERATIONS</h3>
 			</a>
 			<blockquote>
@@ -212,7 +214,7 @@
 								<b>3.</b>
 							</td>
 							<td valign="bottom" colspan="2">
-								Select a region on ideogram
+								Navigating to interested browsing region by clicking and dragging the cursor on chromosome ideogram
 							</td>
 						</tr>
 						<tr valign="top">
@@ -260,34 +262,67 @@
 							Dragging the visualization area in either direction to move left or right within the current zoom level
 							</td>
 						</tr>
+						<tr valign="top">
+							<td width="20px" nowrap="">
+								<b>8.</b>
+							</td>
+							<td valign="bottom" colspan="2">
+							Clicking <b>'x'</b> button to hide a track. Clicking <b>'right/down triangle buttons'</b> to change track display mode (dense/pack)
+							</td>
+						</tr>
 					</tbody>
 				</table>
 				</p>
 			</blockquote>
 			<a name="2">
+				<h3>VISUALIZATION ELEMENTS OF THE FIVE TYPES OF TRACKS</h3>
+			</a>
+			<blockquote>
+				<img src="image/visualization.png" width="600px" />
+				<p>
+				Genomic data in different formats are displayed by five track types in PGB, including sequence, variants, elements, values, and reads. Sequence type has one display mode. Other four types have two display modes: dense and pack.
+				</p>
+				<p>
+				In sequence track, the reference genome is a sequence of bases, which are denoted by different colours and letters.
+				</p>
+				<p>
+				In variants tracks, genomic location and alleles are fundamental information about genetic variants. In individual genome panel, differently coloured symbols with labels are used to indicate the location and alleles of variant. Symbols in red indicate non-functional variants, and purple ones indicate functional variants. Symbols of large scale SVs are placed in the middle of the SV region. Similar with the UCSC Genome Browser, when there are large number of variants within the browsing region, the symbols are replaced by short vertical lines (or bands if the variants cover large regions). Different types of variants are denoted by different colours: SNVs are black, insertions are red, deletions are green, and SVs are blue. Users can then get an overall view of browsing region. Variants tracks in dense mode are also displayed in this colour scheme.
+				</p>
+				<p>
+				Elements tracks describe the genomic features in discrete regions. The attributes of the features, such as exon, intron, coding region, direction, etc., are denoted by different shapes.
+				</p>
+				<p>
+				Values tracks describe features of genomic position/region, including conservation, gene expression level, reads enrichment, DNA methylation, Histone modification, and GC content. Heatmap and histogram are adopted to display the values of these features.
+				</p>
+				<p>
+				In reads tracks, high-throughput sequencing (HITS) reads data are displayed in two different views. If each read is legible, all reads are shown separately in the browser. If reads are illegible, reads coverage are shown using headman or histogram.
+				</p>
+			</blockquote>
+			<a name="3">
 				<h3>INPUT PERSONAL GENOMES</h3>
 			</a>
 			<blockquote>
 				<img src="image/input.png" width="600px" />
 				<p>
-				The input of the PGB is personal genome variants file. The PGB accepts <a href=http://samtools.sourceforge.net/tabix.shtml>Bgzip/Tabix</a> (3) compressed/indexed <a href=http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41>VCF</a> (4) and <a href=http://www.sequenceontology.org/resources/gvf.html>GVF</a> (5) files. User can either provide accessible data ULR link or locally upload data and index files. Using URL link is recommended. Because the volume of files can be locally uploaded is limited up to 20MB due to network condition and server storage. The PGB guarantee input data can only be accessed and viewed by the owner. The PGB will <b>NOT</b> record any information of user data. The uploaded files will be automatically deleted as soon as the session expired.
+				User can click the 'Select Individual' button on the menu bar to submit input data to the PGB. The input of the PGB is personal genome variants file. The PGB accepts <a href=http://samtools.sourceforge.net/tabix.shtml>Bgzip/Tabix</a> (3) compressed/indexed <a href=http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41>VCF</a> (4) and <a href=http://www.sequenceontology.org/resources/gvf.html>GVF</a> (5) files. User can either provide accessible data ULR link or upload data and index files from local. Using URL link is recommended. The volume of files can be locally uploaded is limited to 20MB. The PGB guarantee input data can only be accessed and viewed by the owner. The PGB will <b>NOT</b> record any information of user data. The uploaded files will be automatically deleted as soon as the session expired.
 				</p>
 				<p>
 				Users can also browse built-in genomes for comparison. We currently hold over a thousand individual genomes in the PGB server. Most of them are downloaded from 1000 genome project website (6).
 				</p>
 			</blockquote>
-			<a name="3">
+			<a name="4">
 				<h3>INTERPRETATION OF OUTPUT RESULTS</h3>
 			</a>
 			<blockquote>
 				<img src="image/output.png" width="700px"/>
+				<p>The input personal genome and functional analysis results are visualized in three scales: bird's eye view, browser view, and detail view.</p>
 				<p>&bull;&nbsp;<b>Bird's eye view</b>
 				<br>
 				Bird's eye view is a clock-like personal genome view. Inner circle indicates chromosomes. When a chromosome is selected, the cytobands of selected chromosome are displayed in outer circle. Functional variants distribution is shown by circular heatmap in which color gradients reflect number and functional significance of the variants in the region. User can scan functional variants in whole genome or selected chromosome/cytoband region. Typically it may take several seconds to scan a cytoband. However, the scanning time varies due to the network condition and length of region.	
 				</p>
 				<p>&bull;&nbsp;<b>Browser view</b>
 				<br>
-				Personal genome panel displays the input genome variants and their functional consequences. As long as the variant icons are displayed, functional variants are highlighted by purple variant icons. The amino acid changes caused by the personal genome variants are real-timely analyzed and annotated based on gene annotations. Disease and phenotypes that related to personal genome variants or changed genes are displayed below. <b>Please notice that the browser view of personal genome panel does not show variants and annotations when the region is larger than 1,000,000 bases due to performance and legibility considerations.</b>
+				Personal genome panel displays the input genome variants and their functional consequences. As long as the variant icons are displayed, functional variants are highlighted by purple variant icons. The amino acid changes caused by the personal genome variants are real-timely analyzed and annotated based on gene annotations. Disease and phenotypes that related to personal genome variants or changed genes are displayed at the bottom. <b>Please notice that the browser view of personal genome panel does not show variants and annotations when the region is larger than 1,000,000 bases due to performance and legibility considerations.</b>
 				</p>
 				<p>&bull;&nbsp;<b>Detail view</b>
 				<br>
@@ -300,7 +335,7 @@
 				Clicking on top-right corner link will redirect to the annotation source.
 				</p>
 			</blockquote>
-			<a name="4">
+			<a name="5">
 				<h3>PROCESSING METHOD</h3>
 			</a>
 			<blockquote>
@@ -309,10 +344,10 @@
 				Basically the PGB map personal genome variants to genes and functional elements, and then map those to diseases, phenotypes and drug interactions, which is the standard approach of variant annotation (1). Various annotations and knowledge bases, such as dbSNP , RefSeq Gene, UCSC knownGene, ensembl Gene, OMIM, GwasCatalog, PharmGKB, etc., are integrated in the PGB for personal genome variant analysis and annotation (7-12).
 				</p>
 				<p>
-				Particularly, we developed a fast, rule-based approach for annotating transcriptional and translational implications of personal genome variants based on the variant position/type and gene annotations. Different functional role of variants, such as synonymous, non-synonymous, frame-shifting, terminator gain/loss, splicing donor/accetpter loss, etc., will contribute different 'functional risk scores' to the gene they located in. This approach enable the PGB to real-timely evaluate functional implications from a single variant to a gene covers multiple variants. The PGB also supports using integrated SIFT (13) and PolyPhen2 (14) scores for functional variants evaluation. The SIFT/PolyPhen2 scores are real-timely retrieved from dbNSFP (15) databses by ANNOVAR (2) tool.
+				Particularly, we developed a fast, rule-based approach for annotating transcriptional and translational implications of personal genome variants based on the variant position/type and gene annotations. Different functional role of variants, such as synonymous, non-synonymous, frame-shifting, stop gain/loss, splicing donor/accetpter loss, etc., contribute different 'functional risk scores' to the gene they located in. This approach enable the PGB to evaluate functional risk of a gene on-the-fly by the risk scores of the individual genetic variants it covers. The PGB also supports using integrated SIFT (13) and PolyPhen2 (14) scores for functional variants evaluation. The SIFT/PolyPhen2 scores are real-timely retrieved from dbNSFP (15) databses by ANNOVAR (2) tool.
 				</p>
 			</blockquote>
-			<a name="5">
+			<a name="6">
 				<h3>SETTINGS</h3>
 			</a>
 			<blockquote>
@@ -324,10 +359,10 @@
 				&bull;&nbsp;To manage tracks displayed in personal genome panel, click the <b>'Setting'</b> button on personal genome panel controls.
 				</p>
 				<p>
-				&bull;&nbsp;User can upload custom tracks to reference genome panel via the <b>'Upload Custom Track'</b> window. Only URL accessible data can be linked into the PGB.
+				&bull;&nbsp;User can add custom tracks to reference genome panel via the <b>'Add Custom Tracks'</b> window. Only URL accessible data can be linked into the PGB.
 				</p>
 			</blockquote>
-			<a name="6">
+			<a name="7">
 				<h3>AUTHORS</h3>
 			</a>
 			<blockquote>
@@ -341,7 +376,7 @@
 				Please do not hesitate to address comments/questions/suggestions regarding this webpage to: <a href="mailto:pgbrowser@gmail.com">pgbrowser@gmail.com</a>.
 				</p>
 			</blockquote>
-			<a name="7">
+			<a name="8">
 				<h3>REFERECES</h3>
 			</a>
 			<blockquote>

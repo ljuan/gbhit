@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,6 +23,7 @@ import filereaders.individual.vcf.Variant;
 public class IndividualStat {
 	float[] CytoScores;
 	float[] GeneScores;
+	Integer[] Sorted_Order;
 	String[][] Cytobands;
 	public final static int A_LEVEL=100;
 	public final static int B_LEVEL=10;
@@ -33,12 +36,14 @@ public class IndividualStat {
 		Cytobands=new String[cytobands.length][];
 		CytoScores=new float[cytobands.length];
 		GeneScores=new float[Genes.geneNum()];
+		Sorted_Order=new Integer[Genes.geneNum()];
 		for(int i=0;i<cytobands.length;i++){
 			Cytobands[i]=cytobands[i].split("\t");
 			CytoScores[i]=-1;
 		}
 		for(int i=0;i<GeneScores.length;i++){
 			GeneScores[i]=-1;
+			Sorted_Order[i]=i;
 		}
 		this.annos=annos;
 	}
@@ -69,6 +74,19 @@ public class IndividualStat {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	void sort_Stat(){
+		for(int i=0;i<Sorted_Order.length;i++)
+			Sorted_Order[i]=i;
+		Arrays.sort(Sorted_Order, new Comparator<Integer>(){
+			@Override public int compare(Integer o1, Integer o2){
+				return Float.compare(GeneScores[o1], GeneScores[o2]);
+			}
+		});
+	}
+	public Integer[] get_Order(){
+		sort_Stat();
+		return Sorted_Order;
 	}
 	public File save_Stat(String session){
 		File ftemp=null;

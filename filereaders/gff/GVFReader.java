@@ -90,9 +90,12 @@ public class GVFReader {
 			XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_TO, gvf.end + "");
 			if (strs[1] != null) 
 				XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_LETTER, strs[1]);
-			XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_DESCRIPTION, 
-					"Source:" + gvf.source + ";Feature:" + gvf.feature + ";Score:" + gvf.score + 
-					";Attributes:" + gvf.getAttributesInString());
+			
+//			XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_DESCRIPTION, 
+//					"Source:" + gvf.source + ";Feature:" + gvf.feature + ";Score:" + gvf.score + 
+//					";Attributes:" + gvf.getAttributesInString());
+			XmlWriter.append_text_element(doc, variant, Consts.XML_TAG_DESCRIPTION, gvf.getAttributesInString());
+					
 			variants.appendChild(variant);
 		}
 		return variants;

@@ -134,6 +134,9 @@ public class VCFRecordSamples {
 	public String getFormat() {
 		return format;
 	}
+	public String getSample(int SelectedIndex) {
+		return samples[SelectedIndex];
+	}
 
 	@Override
 	public String toString() {

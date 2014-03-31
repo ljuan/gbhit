@@ -165,6 +165,28 @@ public class Genes{
 		}
 		return genes;
 	}
+	public static Element ranking_Genes(Document doc, IndividualStat is, int number){
+		Element genes = doc.createElement(Consts.XML_TAG_GENES);
+		doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(genes); 
+		float[] scores=null;
+		Integer[] index;
+		if(number > Symbols.length)
+			number = Symbols.length;
+		if(is!=null){
+			index=is.get_Order();
+			scores=is.get_GeneScores(Symbols.length-1,0);
+			for(int i=Symbols.length-1;i>=Symbols.length-number;i--){
+				Element gene=doc.createElement(Consts.XML_TAG_GENE);
+				gene.setAttribute(Consts.XML_TAG_ID, Symbols[index[i]]);
+				XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_CHROMOSOME, ChrList[Chrs[index[i]]]);
+				XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_FROM, Integer.toString(Starts[index[i]]+1));
+				XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_TO, Integer.toString(Ends[index[i]]));
+				XmlWriter.append_text_element(doc, gene, Consts.XML_TAG_SCORE, Float.toString(Math.round(scores[index[i]]*10)/10));
+				genes.appendChild(gene);
+			}
+		}
+		return genes;
+	}
 	public static String get_Gene(int idx){
 		return ChrList[Chrs[idx]]+"\t"+Starts[idx]+"\t"+Ends[idx]+"\t"+Symbols[idx];
 	}

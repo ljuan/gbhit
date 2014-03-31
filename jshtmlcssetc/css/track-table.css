@@ -13,7 +13,7 @@ div#divTrack {
 #menu-container{
 	background: #6baed6;
 	width: 100%;
-	position: fixed;
+	position: absolute;
 	top: 0;
 	left: 0;
 	z-index: 800;
@@ -195,14 +195,14 @@ span.clb3:hover {
 }
 #personalPannel {
 	background: none repeat scroll 0 0 #ffffd4;
-	opacity:0.9;/*for temparary plot figures*/
+	opacity:1;/*for temparary plot figures*/
 	border: 1px solid #797979;
 	color: #000000;
 	display: none;
 	width: 1106px;
 	font: 12px Candara, Arial, Helvetica, sans-serif;
 	text-align: left;
-	position: fixed;
+	position: absolute;
 	z-index: 50;
 	box-shadow: 0 -5px 5px #888, 0 5px 5px #888;
 	-moz-box-shadow: 0 -5px 5px #888, 0 5px 5px #888;
@@ -222,7 +222,7 @@ span.clb3:hover {
 	padding: 7px 0 5px 10px;
 	font: 16px Candara, Arial, Helvetica, sans-serif;
 }
-#ppClose, #ppMin, #ppSet {
+#ppClose, #ppMin, #ppSet, #ppPin {
 	float: right;
 	margin-bottom: 1px;
 	padding: 7px 10px 5px 0;
@@ -235,8 +235,7 @@ span.clb3:hover {
 	text-align: left;
 	width: 1106px;
 	overflow-x: hidden;
-	max-height: 600px;
-	overflow-y: auto;
+	overflow-y: hidden;
 }
 #personalPannelSetting {
 	background: none repeat scroll 0 0 #FFFFFF;
@@ -711,7 +710,7 @@ span#web-name{
 	border: 4px solid #525252;
 	color: #000000;
 	background:#FFF;
-	opacity:0.9;
+	opacity:1;
 	display: none;
 	position: fixed;
 	top: 50%;
@@ -845,4 +844,35 @@ span#web-name{
 	padding:7px;
 	float:left;
 	border-radius:5px;
+}
+.BJW_gene_table_score{
+	font: 14px Candara, Arial, Helvetica, sans-serif;
+	padding: 2px;
+	float:left;
+	margin: 1px;
+	text-align: left;
+	width: 65px;
+	max-width: 65px;
+}
+.BJW_gene_table_id{
+	font: 14px Candara, Arial, Helvetica, sans-serif;
+	padding: 2px;
+	float:left;
+	margin: 1px;
+	text-align: left;
+	width: 155px;
+	cursor: pointer;
+	max-width: 155px;
+}
+.BJW_gene_table_title_id{
+	font:14px Candara, Arial, Helvetica, sans-serif;
+	float:left;
+	text-align:left;
+	width:160px;
+}
+.BJW_gene_table_title_score{
+	font:14px Candara, Arial, Helvetica, sans-serif;
+	float:left;
+	text-align:left;
+	width:75px;
 }

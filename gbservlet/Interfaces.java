@@ -64,6 +64,12 @@ public class Interfaces extends HttpServlet{
 		else if (action.equals("getCytoband")){
 			a=ins.get_SingleCytoScore(req.getParameter("chr"),req.getParameter("id"));
 		}
+		else if (action.equals("getPedigree")){
+			a=ins.get_Ped(req.getParameter("tracks"));
+		}
+		else if (action.equals("removePedigree")){
+			ins.remove_Ped(req.getParameter("tracks"));
+		}
 		else if (action.equals("setAssembly")){
 			ins=new Instance(req.getParameter("assembly"));
 			session.setAttribute("Instance", ins);
@@ -105,6 +111,9 @@ public class Interfaces extends HttpServlet{
 			ins.set_Params(req.getParameter("tracks").split(","), req.getParameter("params").split(","), req.getParameter("values").split(","));
 			a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 		}
+		else if (action.equals("downloadIndex")){
+			ins.save_Index(req.getParameter("tracks"),session.getId());
+		}
 		else if (action.equals("setScoreMethod")){
 			a=ins.set_ScoreMethod(req.getParameter("scoremeth"));
 		}
@@ -125,6 +134,9 @@ public class Interfaces extends HttpServlet{
 		}
 		else if (action.equals("overlapGene")){
 			a=ins.get_OverlapGenes(req.getParameter("chr"), Integer.parseInt(req.getParameter("start")), Integer.parseInt(req.getParameter("end")));
+		}
+		else if (action.equals("rankGene")){
+			a=ins.get_RankingGenes(Integer.parseInt(req.getParameter("topnumber")));
 		}
 		else if (action.equals("getParams")){
 			a=ins.get_Parameters(req.getParameter("tracks").split(","));
@@ -219,6 +231,7 @@ public class Interfaces extends HttpServlet{
 		}
 		Instance ins=(Instance) session.getAttribute("Instance");
 		String action=req.getParameter("action");
+		String a = null;
 		if (action.equals("upStat")){
 			File tmpdir=new File(System.getProperty("java.io.tmpdir"));
 			File ftemp=null;
@@ -255,6 +268,140 @@ public class Interfaces extends HttpServlet{
 				ins.load_Stat(filepath);
 			}
 		}
+		else if (action.equals("addPedigree")){
+			String track = req.getParameter("tracks");
+			String contentType=req.getContentType();
+			if(contentType.indexOf("multipart/form-data")>=0){
+				DiskFileItemFactory factory = new DiskFileItemFactory();
+				ServletFileUpload upload = new ServletFileUpload(factory);
+				try{
+					List fileItems = upload.parseRequest(req);
+					java.util.Iterator i = fileItems.iterator();
+					while(i.hasNext()){
+						FileItem fi = (FileItem)i.next();
+						if(fi.isFormField()&&fi.getFieldName().equals("pedigree")){
+							ins.add_Ped(track, fi.getString());
+							res.setStatus(200);
+						}
+					}
+				}catch(Exception e){
+					e.printStackTrace();
+				}finally{
+				}
+			}
+		}
+		else if (action.equals("searchIndividual")){
+			String track = req.getParameter("tracks");
+			String contentType=req.getContentType();
+			if(contentType.indexOf("multipart/form-data")>=0){
+				DiskFileItemFactory factory = new DiskFileItemFactory();
+				ServletFileUpload upload = new ServletFileUpload(factory);
+				try{
+					List fileItems = upload.parseRequest(req);
+					java.util.Iterator i = fileItems.iterator();
+					while(i.hasNext()){
+						FileItem fi = (FileItem)i.next();
+						if(fi.isFormField()&&fi.getFieldName().equals("variants")){
+							a = ins.prioritize_Individuals(track, fi.getString());
+							res.setStatus(200);
+						}
+					}
+				}catch(Exception e){
+					e.printStackTrace();
+				}finally{
+				}
+			}
+		}
+		else if (action.equals("getIntersection")){
+			String track = req.getParameter("tracks");
+			String chr=req.getParameter("chr");
+			long start=Long.parseLong(req.getParameter("start"));
+			long end=Long.parseLong(req.getParameter("end"));
+
+			String contentType=req.getContentType();
+			if(contentType.indexOf("multipart/form-data")>=0){
+				DiskFileItemFactory factory = new DiskFileItemFactory();
+				ServletFileUpload upload = new ServletFileUpload(factory);
+				try{
+					List fileItems = upload.parseRequest(req);
+					java.util.Iterator i = fileItems.iterator();
+					while(i.hasNext()){
+						FileItem fi = (FileItem)i.next();
+						if(fi.isFormField()&&fi.getFieldName().equals("sets")){
+							a=ins.get_Intersection(track, fi.getString(), chr, start, end);
+							res.setStatus(200);
+						}
+					}
+				}catch(Exception e){
+					e.printStackTrace();
+				}finally{
+				}
+			}
+		}
+		else if (action.equals("getDifference")){
+			String track = req.getParameter("tracks");
+			String chr=req.getParameter("chr");
+			long start=Long.parseLong(req.getParameter("start"));
+			long end=Long.parseLong(req.getParameter("end"));
+
+			String contentType=req.getContentType();
+			if(contentType.indexOf("multipart/form-data")>=0){
+				DiskFileItemFactory factory = new DiskFileItemFactory();
+				ServletFileUpload upload = new ServletFileUpload(factory);
+				try{
+					List fileItems = upload.parseRequest(req);
+					java.util.Iterator i = fileItems.iterator();
+					while(i.hasNext()){
+						FileItem fi = (FileItem)i.next();
+						if(fi.isFormField()&&fi.getFieldName().equals("sets")){
+							String[] sets = fi.getString().split(",");
+							a=ins.get_Difference(track, sets[0], sets[1], chr, start, end);
+							res.setStatus(200);
+						}
+					}
+				}catch(Exception e){
+					e.printStackTrace();
+				}finally{
+				}
+			}
+		}
+		else if (action.equals("upPedigree")){
+			File tmpdir=new File(System.getProperty("java.io.tmpdir"));
+			File ftemp=null;
+			String track = req.getParameter("tracks");
+			String filepath=null;
+			if(tmpdir.isDirectory()){
+				int maxFileSize = 20*1024*1024;
+				int maxMemSize = 2000*1024;
+				String contentType=req.getContentType();
+				if(contentType.indexOf("multipart/form-data")>=0){
+					filepath=System.getProperty("java.io.tmpdir")+"/"+session.getId()+"_"+track+".ped";
+					ftemp=new File(filepath);
+					DiskFileItemFactory factory = new DiskFileItemFactory();
+					factory.setSizeThreshold(maxMemSize);
+					factory.setRepository(tmpdir);
+					ServletFileUpload upload = new ServletFileUpload(factory);
+					upload.setSizeMax(maxFileSize);
+					try{
+						List fileItems = upload.parseRequest(req);
+						java.util.Iterator i = fileItems.iterator();
+						while(i.hasNext()){
+							FileItem fi = (FileItem)i.next();
+							if(!fi.isFormField()){
+								fi.write(ftemp);
+								res.setStatus(200);
+							}
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+					}finally{
+					}
+				}
+			}
+			if(ftemp!=null){
+				ins.load_Ped(track, filepath);
+			}
+		}
 		else if (action.equals("upExternal")){
 			File tmpdir=new File(System.getProperty("java.io.tmpdir"));
 			File ftemp1=null;
@@ -269,7 +416,8 @@ public class Interfaces extends HttpServlet{
 				int maxMemSize = 2000*1024;
 				String contentType=req.getContentType();
 				if(contentType.indexOf("multipart/form-data")>=0){
-					filepath=System.getProperty("java.io.tmpdir")+"/"+session.getId()+"_"+tracks[0]+".vcf.gz";
+//					filepath=System.getProperty("java.io.tmpdir")+"/"+session.getId()+"_"+tracks[0]+".vcf.gz";
+					filepath=System.getProperty("java.io.tmpdir")+"/"+Instance.md5(session.getId()+"_"+tracks[0])+".vcf.gz";
 					ftemp1=new File(filepath);
 					ftemp2=new File(filepath+".tbi");
 					DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -303,6 +451,17 @@ public class Interfaces extends HttpServlet{
 				links[0]=filepath;
 				ins.add_Externals(tracks,links,types,modes);
 			}
+		}
+		PrintWriter out;
+		if(a!=null){
+			if (GzipUtils.isGzipSupported(req) && !GzipUtils.isGzipDisabled(req) && a.length()>1024*16){
+				out = GzipUtils.getGzipWriter(res);
+				res.setHeader("Content-Encoding", "gzip");
+			}
+			else
+				out = res.getWriter();
+			out.print(a);
+			out.close();
 		}
 	}
 /*	private <T extends Enum<T>> EnumSet<T> decode_annos(Class<T> annoSet, long elements){

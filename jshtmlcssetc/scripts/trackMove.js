@@ -179,7 +179,8 @@ function mouseMove(ev) {
 	ev = ev || window.event;
 	var mousePos = mouseCoords(ev);
 	if(curTarget != null) {
-		if(curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(ppBG_rgb)>=0){
+		if(curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(ppBG_rgb)>=0
+		|| curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(ppBGhover_rgb)>=0){
 			curTarget.style.background = ppBGhover;
 			curTarget.getElementsByTagName("td")[0].style.background = ppBGhover;
 			curTarget.getElementsByTagName("td")[1].firstChild.style.background = ppBGhover;
@@ -425,8 +426,10 @@ function canvasMousemove(evt) {
 			}
 		}
 
-		evtCanvasX = evtCanvasX - $("#personalPannel").position().left;
-		evtCanvasY = evtCanvasY - $("#personalPannel").position().top;
+		if(!personalPinned){
+			evtCanvasX = evtCanvasX - $("#personalPannel").position().left;
+			evtCanvasY = evtCanvasY - $("#personalPannel").position().top;
+		}
 	}
 	//add by Liran for Pfanno and Pclns track details
 
@@ -499,10 +502,10 @@ function canvasClick(evt) {
 		}
 		if(j < trackItems[i].details.length) {
 			//draw the pointer
-			drawDecoriteminfopointer("decoriteminfopointer");
+//			drawDecoriteminfopointer("decoriteminfopointer");
 			//set the position & display
-			$(document.getElementById("decoriteminfo")).css("top", evtMouseCoods.y);
-			$(document.getElementById("decoriteminfo")).css("left", evtMouseCoods.x - 10);
+			$(document.getElementById("decoriteminfo")).css("top", evtMouseCoods.y+380>document.body.clientHeight+document.body.scrollTop?document.body.clientHeight+document.body.scrollTop-380:evtMouseCoods.y);
+			$(document.getElementById("decoriteminfo")).css("left", evtMouseCoods.x+310>document.body.clientWidth+document.body.scrollLeft?document.body.clientWidth+document.body.scrollLeft-320:evtMouseCoods.x-10);
 			$(document.getElementById("decoriteminfo")).css("display", "block");
 			//set the cursor style & event handler
 			$(eventTarget).css("cursor", "auto");
@@ -584,7 +587,7 @@ function handle_getDetailHttpRequest(){
 			var geneType,url;
 			if(trackId == "knownGene"){
 				geneType = "UCSC";
-				url = "http://genome.ucsc.edu/cgi-bin/hgGene?hgg_type=knownGene&hgg_gene=" + geneId;
+				url = "http://genome.ucsc.edu/cgi-bin/hgGene?hgg_type=knownGene&db=hg19&hgg_gene=" + geneId;
 			}else if(trackId == "ensemblGene"){
 				geneType = "Ensembl";
 				url = "http://asia.ensembl.org/Homo_sapiens/Gene/Summary?g=" + geneId;
@@ -606,7 +609,7 @@ function handle_getDetailHttpRequest(){
 			var structureDetails1 = "", structureDetails2 = "";
 			structureDetails1 = structureDetails1 + exons.length +" exons"+"<br>" + intros.length + " introns";
 			//structureDetails1 = structureDetails1 + exons.length +" exons"+"<br>" + intros.length + " intros" + "<br>" + UTRs.length + " UTRs";
-			structureDetails2 = structureDetails2 + "<div style=\"color:#D6B8CE;height:140px;overflow-y:scroll; font-size: 12px\">";
+			structureDetails2 = structureDetails2 + "<div style=\"color:#D6B8CE;height:260px;overflow-y:scroll; font-size: 12px\">";
 			if(exons.length>0){
 				structureDetails2 = structureDetails2 + "exons:"+"<ol>";
 				for(k=0; k < exons.length; k++){
@@ -653,8 +656,13 @@ function canvasClickForPersonalGene(evt) {
 	var trackId = trNode.id;
 	var j;
 	
-	evtCanvasX = evtMouseCoods.x - $("#personalPannel").position().left - $(eventTarget).position().left;
-	evtCanvasY = evtMouseCoods.y - $("#personalPannel").position().top - $(eventTarget).position().top;
+	if(personalPinned){
+		evtCanvasX = evtMouseCoods.x - $(eventTarget).position().left;
+		evtCanvasY = evtMouseCoods.y - $(eventTarget).position().top;
+	}else{
+		evtCanvasX = evtMouseCoods.x - $("#personalPannel").position().left - $(eventTarget).position().left;
+		evtCanvasY = evtMouseCoods.y - $("#personalPannel").position().top - $(eventTarget).position().top;
+	}
 	
 	if(trackId == personalPannel.Panno.id){
 		for( j = 0; j < personalPannel.Panno.details.length; j++) {
@@ -664,10 +672,20 @@ function canvasClickForPersonalGene(evt) {
 		}
 		if(j < personalPannel.Panno.details.length){
 			//draw the pointer
-			drawDecoriteminfopointer("personalGeneDetailPointer");
+		//	drawDecoriteminfopointer("personalGeneDetailPointer");
 			//set the position & display
-			$(document.getElementById("personalGeneDetail")).css("top", evtCanvasY + $(eventTarget).position().top - 3);
-			$(document.getElementById("personalGeneDetail")).css("left", evtCanvasX + $(eventTarget).position().left - 15);
+		//	var orginal_position_y = evtCanvasY + $(eventTarget).position().top - 3;
+		//	var orginal_position_x = evtCanvasX + $(eventTarget).position().left - 15;
+		//	if(orginal_position_y+$("#personalPannel").position().top + 380 > document.body.clientHeight+document.body.scrollTop){
+		//		orginal_position_y = document.body.clientHeight+document.body.scrollTop-$("#personalPannel").position().top - 380
+		//	} 
+		//	if(orginal_position_x+$("#personalPannel").position().left + 310 > document.body.clientWidth+document.body.scrollLeft){
+		//		orginal_position_x = document.body.clientWidth+document.body.scrollLeft-$("#personalPannel").position().left - 310
+		//	}
+		//	$(document.getElementById("personalGeneDetail")).css("top", orginal_position_y);
+		//	$(document.getElementById("personalGeneDetail")).css("left", orginal_position_x);
+			$(document.getElementById("personalGeneDetail")).css("top", evtMouseCoods.y+380>document.body.clientHeight+document.body.scrollTop?document.body.clientHeight+document.body.scrollTop-380:evtMouseCoods.y);
+			$(document.getElementById("personalGeneDetail")).css("left", evtMouseCoods.x+310>document.body.clientWidth+document.body.scrollLeft?document.body.clientWidth+document.body.scrollLeft-320:evtMouseCoods.x-10);
 			$(document.getElementById("personalGeneDetail")).css("display", "block");
 			//set the cursor style & event handler
 			$(eventTarget).css("cursor", "auto");
@@ -829,7 +847,7 @@ function handle_getPersonalGeneDetailRequest(){
 			var geneType,url;
 			if(trackId == "knownGene"){
 				geneType = "UCSC";
-				url = "http://genome.ucsc.edu/cgi-bin/hgGene?hgg_type=knownGene&hgg_gene=" + geneId;
+				url = "http://genome.ucsc.edu/cgi-bin/hgGene?hgg_type=knownGene&db=hg19&hgg_gene=" + geneId;
 			}else if(trackId == "ensemblGene"){
 				geneType = "Ensembl";
 				url = "http://asia.ensembl.org/Homo_sapiens/Gene/Summary?g=" + geneId;
@@ -848,7 +866,7 @@ function handle_getPersonalGeneDetailRequest(){
 			
 			var structureDetails1 = "", structureDetails2 = "";
 			structureDetails1 = structureDetails1 + exons.length +" exons"+"<br>" + introns.length + " introns";
-			structureDetails2 = structureDetails2 + "<div style=\"color:#D6B8CE;height:140px;overflow-y:scroll; font-size: 12px\">";
+			structureDetails2 = structureDetails2 + "<div style=\"color:#D6B8CE; font-size: 12px\">";
 			if(exons.length>0){
 				structureDetails2 = structureDetails2 + "exons:"+"<ol>";
 				for(k=0; k < exons.length; k++){
@@ -874,7 +892,7 @@ function handle_getPersonalGeneDetailRequest(){
 			if(variants.length > 0){
 				$("#personalGeneDetailVariantTrnode").css("display","table-row");
 				variantDetails1 = variantDetails1 + variants.length + " variants";
-				variantDetails2 = variantDetails2 + "<div style=\"color:#D6B8CE;height:40px;overflow-y:scroll; font-size: 12px\">" + "<ol>";
+				variantDetails2 = variantDetails2 + "<div style=\"color:#D6B8CE; font-size: 12px\">" + "<ol>";
 				for(k = 0; k < variants.length; k++){
 					variantDetails2 = variantDetails2 + "<li>";
 					variantDetails2 = variantDetails2 + variants[k].type + "<br\/>" + variants[k].from + "-" + variants[k].to + "<\/li>";
@@ -889,7 +907,7 @@ function handle_getPersonalGeneDetailRequest(){
 			if(statuses.length > 0){
 				$("#personalGeneDetailStatusTrnode").css("display","table-row");
 				statusDetails1 = statusDetails1 + statuses.length + " effects";
-				statusDetails2 = statusDetails2 + "<div style=\"color:#D6B8CE;height:40px;overflow-y:scroll; font-size: 12px\">" + "<ol>";
+				statusDetails2 = statusDetails2 + "<div style=\"color:#D6B8CE; font-size: 12px\">" + "<ol>";
 				for(k = 0; k < statuses.length; k++){
 					statusDetails2 = statusDetails2 + "<li>";
 					statusDetails2 = statusDetails2 + statuses[k] + "<\/li>";
@@ -1026,10 +1044,10 @@ function canvasClickForVariant(evt){
 			//alert(""+trackId + trackItems[i].details[j].id + trackItems[i].details[j].from + trackItems[i].details[j].to);
 			
 			//draw the pointer
-			drawDecoriteminfopointer("variantDetailTooltipPointer");
+	//		drawDecoriteminfopointer("variantDetailTooltipPointer");
 			//set the position & display
-			$(document.getElementById("variantDetailTooltip")).css("top", evtMouseCoods.y);
-			$(document.getElementById("variantDetailTooltip")).css("left", evtMouseCoods.x - 10);
+			$(document.getElementById("variantDetailTooltip")).css("top", evtMouseCoods.y+380>document.body.clientHeight+document.body.scrollTop?document.body.clientHeight+document.body.scrollTop-380:evtMouseCoods.y);
+			$(document.getElementById("variantDetailTooltip")).css("left", evtMouseCoods.x+310>document.body.clientWidth+document.body.scrollLeft?document.body.clientWidth+document.body.scrollLeft-320:evtMouseCoods.x-10);
 			$(document.getElementById("variantDetailTooltip")).css("display", "block");
 			//set the cursor style & event handler
 			$(eventTarget).css("cursor", "auto");
@@ -1042,7 +1060,11 @@ function canvasClickForVariant(evt){
 			$(document).bind("mousedown", mousedownOutsideVariantTooltip);
 						
 			//Ajax to get the gene details
-			getVariantDetailHttpRequest(trackSuperId, trackItems[i].details[j].id, trackItems[i].details[j].from, trackItems[i].details[j].to);
+			var requestId = trackId;
+			if (trackId!=trackSuperId){
+				requestId+="@"+trackSuperId;
+			}
+			getVariantDetailHttpRequest(requestId, trackItems[i].details[j].id, trackItems[i].details[j].from, trackItems[i].details[j].to);
 			
 		}
 	}
@@ -1065,16 +1087,11 @@ function handle_getVariantDetailHttpRequest(){
 			var variantFrom = variantNode.getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue;
 			var variantTo = variantNode.getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
 			var variantLetter = null;
+
 			if(variantNode.getElementsByTagName(xmlTagLetter).length > 0){
 				variantLetter = variantNode.getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
 			}
 			var variantDescription = variantNode.getElementsByTagName(xmlTagDescription)[0].childNodes[0].nodeValue + "";
-			var variantQUAL, variantFILTER, variantINFO, variantFILTERIndex, variantINFOIndex;
-			variantFILTERIndex = variantDescription.indexOf("FILTER");
-			variantINFOIndex = variantDescription.indexOf("INFO");
-			variantQUAL = (variantDescription.substring(0, variantFILTERIndex - 1)).split(":")[1];
-			variantFILTER = variantDescription.substring(variantFILTERIndex, variantINFOIndex - 1).split(":")[1];
-			variantINFO = (variantDescription.substring(variantINFOIndex)).substring(variantDescription.substring(variantINFOIndex).indexOf(":") + 1);
 			$("#variantDetailContent_id").html(variantId);
 			if(variantId!="."&&(/^rs/).test(variantId)){
 				$("#variantDetailContent_link").html("dbSNP" + "<span style=\"font-size:14px\">↗</span>");
@@ -1087,21 +1104,166 @@ function handle_getVariantDetailHttpRequest(){
 			}
 			$("#variantDetailContent_scale").html(chrNum + ":" + variantFrom + "-" + variantTo);
 			$("#variantDetailContent_Type_Content").html(variantType);
-			$("#variantDetailContent_QUAL_Content").html(variantQUAL);
-			$("#variantDetailContent_FILTER_Content").html(variantFILTER);
-			$("#variantDetailContent_INFO_Content").html(variantINFO);
 			if(variantLetter){
 				$("#variantDetailContent_Letter_trNode").css("display","table-row");
 				$("#variantDetailContent_Letter_Content").html(variantLetter);
 			}else{
 				$("#variantDetailContent_Letter_trNode").css("display","none");
 			}
+			var infohtml = "";
+			var variantInfos = variantDescription.split(";");
+			infohtml+="<tr><td colspan=\"2\"><b>Detail in VCF/GVF Fields:</b></td></tr>";
+			for(var infoidx = 0;infoidx < variantInfos.length;infoidx++){
+				infohtml+=vcfTag2meaning(variantInfos[infoidx]);
+			}
+			if(variantNode.getElementsByTagName("SampleInfo").length > 0){
+				infohtml+="<tr><td colspan=\"2\"><b>Detail in Sample Field:</b></td></tr>";
+				var variantFormat = variantNode.getElementsByTagName("SampleInfo")[0].childNodes[0].nodeValue + "";
+				var variantSinfos= variantFormat.split(";");
+				for(var infoidx = 0;infoidx < variantSinfos.length;infoidx++){
+					infohtml+=vcfTag2meaning(variantSinfos[infoidx]);
+				}
+			}
+			if(variantNode.getElementsByTagName("Dbsnp").length > 0){
+				infohtml+="<tr><td colspan=\"2\"><b>Detail in Dbsnp:</b></td></tr>";
+				var variantDbsnp = variantNode.getElementsByTagName("Dbsnp")[0].childNodes[0].nodeValue + "";
+				var variantDinfos= variantDbsnp.split(";");
+				for(var infoidx = 0;infoidx < variantDinfos.length;infoidx++){
+					infohtml+=vcfTag2meaning(variantDinfos[infoidx]);
+				}
+			}
+			$("#variantDetailContent_INFO_table").html(infohtml);
+
 			$("#variantDetailLoading").css("display","none");
 			$("#variantDetailContent").css("display","block");
 		}
 	}
 }
 
+function vcfTag2meaning(tag_value){
+	var tag = "";
+	var value = "";
+	if(tag_value.indexOf("=")>0){
+		tag = tag_value.split("=")[0];
+		value = tag_value.split("=")[1];
+	} else if(tag_value.indexOf(":")>0){
+		tag = tag_value.split(":")[0];
+		value = tag_value.split(":")[1];
+	} else {
+		tag = tag_value;
+		value = null;
+	}
+	if(tag == "QUAL"){
+		tag = "Quality";
+	} else if(tag == "FILTER"){
+		tag = "Filter";
+	} else if(tag == "AA"){
+		tag = "Ancestral Allele";
+	} else if(tag == "AC"){
+		tag = "Allele Count";
+	} else if(tag == "AF"){
+		tag = "Allele Frequency";
+	} else if(tag == "AN"){
+		tag = "Allele Number";
+	} else if(tag == "BQ"){
+		tag = "Base Quality";
+	} else if(tag == "CIGAR"){
+		tag = "CIGAR";
+	} else if(tag == "H2"){
+		tag = "HapMap2";
+	} else if(tag == "H3"){
+		tag = "HapMap3";
+	} else if(tag == "MQ"){
+		tag = "Mapping Quality";
+	} else if(tag == "SB"){
+		tag = "Strand Bias";
+	} else if(tag == "SOMATIC"){
+		tag = "Somatic Mutation";
+	} else if(tag == "GMAF"){
+		tag = "GMAF";
+	} else if(tag == "GENEINFO"){
+		tag = "Located Gene";
+	} else if(tag == "dbSNPBuildID"){
+		tag = "First dbSNP Build";
+	} else if(tag == "NSF"){
+		tag = "Non-synonymous Frameshift Allele";
+	} else if(tag == "NSM"){
+		tag = "Non-synonymous Missense Allele";
+	} else if(tag == "NSN"){
+		tag = "Non-synonymous Nonsense Allele";
+	} else if(tag == "SYN"){
+		tag = "Synonymous Allele";
+	} else if(tag == "U3"){
+		tag = "In 3'UTR Location";
+	} else if(tag == "U5"){
+		tag = "In 5'UTR Location";
+	} else if(tag == "ASS"){
+		tag = "In Acceptor Splice Site";
+	} else if(tag == "DSS"){
+		tag = "In Donor Splice Site";
+	} else if(tag == "INT"){
+		tag = "In Intron";
+	} else if(tag == "R3"){
+		tag = "In 3'Gene Region";
+	} else if(tag == "R5"){
+		tag = "In 5'Gene Region";
+	} else if(tag == "MUT"){
+		tag = "Mutation (Low Frequency)";
+	} else if(tag == "G5A"){
+		tag = "> 5% MAF In All Population";
+	} else if(tag == "G5"){
+		tag = "> 5% MAF In 1+ Population";
+	} else if(tag == "GT"){
+		tag = "Genotype";
+	} else if(tag == "DP"){
+		tag = "Read Depth";
+	} else if(tag == "DS"){
+		tag = "Genotype Dosage from MaCH/Thunder";
+	} else if(tag == "FT"){
+		tag = "Sample Genotype Filter";
+	} else if(tag == "GL"){
+		tag = "Genotype Likelihoods";
+	} else if(tag == "GLE"){
+		tag = "Genotype Likelihoods of Heterogenerous Ploidy";
+	} else if(tag == "PL"){
+		tag = "Phred-scaled Genotype Likelihoods";
+	} else if(tag == "GP"){
+		tag = "Phred-scaled Genotype Posterior Probabilities";
+	} else if(tag == "GQ"){
+		tag = "Conditional Genotype Quality";
+	} else if(tag == "HQ"){
+		tag = "Haplotype Qualities";
+	} else if(tag == "PS"){
+		tag = "Phase Set";
+	} else if(tag == "PQ"){
+		tag = "Phasing Quality";
+	} else if(tag == "EC"){
+		tag = "Expected Alternative Allele Counts";
+	} else if(tag == "ID"){
+		tag = "ID";
+	} else if(tag == "Variant_seq"){
+		tag = "Variant_seq";
+	} else if(tag == "Genotype"){
+		tag = "Genotype";
+	} else if(tag == "Zygosity"){
+		tag = "Zygosity";
+	} else if(tag == "Dbxref"){
+		tag = "Dbxref";
+	} else if(tag == "Reference_seq"){
+		tag = "Reference_seq";
+	} else if(tag.indexOf("_AF")>0){
+		tag = tag;
+	} else {
+		tag = null;
+	}
+	var infohtml = "";
+	if(tag != null && value !=null){
+		infohtml = "<tr width=\"280px\"><td width=\"50%\">"+tag+":</td><td width=\"50%\">"+value+"</td></tr>";
+	} else if (tag != null){
+		infohtml = "<tr><td colspan=\"2\">"+tag+"</td></tr>";
+	}
+	return infohtml;
+}
 function mousedownOutsideVariantTooltip(evt){
 	evt = evt || window.event;
 	var eventTarget = evt.target || evt.srcElement;
@@ -1148,10 +1310,10 @@ function canvasClickForRead(evt){
 		}
 		if(j < trackItems[i].details.length) {
 			//draw the pointer
-			drawDecoriteminfopointer("readDetailTooltipPointer");
+		//	drawDecoriteminfopointer("readDetailTooltipPointer");
 			//set the position & display
-			$(document.getElementById("readDetailTooltip")).css("top", evtMouseCoods.y);
-			$(document.getElementById("readDetailTooltip")).css("left", evtMouseCoods.x - 10);
+			$(document.getElementById("readDetailTooltip")).css("top", evtMouseCoods.y+285>document.body.clientHeight+document.body.scrollTop?document.body.clientHeight+document.body.scrollTop-285:evtMouseCoods.y);
+			$(document.getElementById("readDetailTooltip")).css("left", evtMouseCoods.x+290>document.body.clientWidth+document.body.scrollLeft?document.body.clientWidth+document.body.scrollLeft-300:evtMouseCoods.x-10);
 			$(document.getElementById("readDetailTooltip")).css("display", "block");
 			//set the cursor style & event handler
 			$(eventTarget).css("cursor", "auto");
@@ -1231,8 +1393,13 @@ function canvasMousemoveOnPP(evt) {
 			break;
 		}
 	}
-	evtCanvasX = evtMouseCoods.x - $("#personalPannel").position().left - $(eventTarget).position().left;
-	evtCanvasY = evtMouseCoods.y - $("#personalPannel").position().top - $(eventTarget).position().top;
+	if(personalPinned){
+		evtCanvasX = evtMouseCoods.x - $(eventTarget).position().left;
+		evtCanvasY = evtMouseCoods.y - $(eventTarget).position().top;
+	}else{
+		evtCanvasX = evtMouseCoods.x - $("#personalPannel").position().left - $(eventTarget).position().left;
+		evtCanvasY = evtMouseCoods.y - $("#personalPannel").position().top - $(eventTarget).position().top;
+	}
 
 	if(i < trackItems.length) {
 		for( j = 0; j < trackItems[i].details.length; j++) {
@@ -1291,8 +1458,13 @@ function canvasClickForVariantOnPP(evt){
 	var trackId = trNode.id, trackSuperId;
 	var i, j, k;
 	
-	evtCanvasX = evtMouseCoods.x - $("#personalPannel").position().left - $(eventTarget).position().left;
-	evtCanvasY = evtMouseCoods.y - $("#personalPannel").position().top - $(eventTarget).position().top;
+	if(personalPinned){
+		evtCanvasX = evtMouseCoods.x - $(eventTarget).position().left;
+		evtCanvasY = evtMouseCoods.y - $(eventTarget).position().top;
+	}else{
+		evtCanvasX = evtMouseCoods.x - $("#personalPannel").position().left - $(eventTarget).position().left;
+		evtCanvasY = evtMouseCoods.y - $("#personalPannel").position().top - $(eventTarget).position().top;
+	}
 
 	for( i = 0; i < trackItems.length; i++) {
 		if(trackItems[i].id == trackId) {
@@ -1328,10 +1500,22 @@ function canvasClickForVariantOnPP(evt){
 		
 		if((i < trackItems.length && j < trackItems[i].details.length )|| (personalPannel.Pvar.details.length && j < personalPannel.Pvar.details.length)) {
 			//draw the pointer
-			drawDecoriteminfopointer("variantDetailTooltipPointerOnPP");
+		//	drawDecoriteminfopointer("variantDetailTooltipPointerOnPP");
 			//set the position & display
-			$(document.getElementById("variantDetailTooltipOnPP")).css("top", evtCanvasY + $(eventTarget).position().top - 3);
-			$(document.getElementById("variantDetailTooltipOnPP")).css("left", evtCanvasX + $(eventTarget).position().left - 15);
+
+		//	var orginal_position_y = evtCanvasY + $(eventTarget).position().top - 3;
+		//	var orginal_position_x = evtCanvasX + $(eventTarget).position().left - 15;
+		//	if(orginal_position_y+$("#personalPannel").position().top + 380 > document.body.clientHeight+document.body.scrollTop){
+		//		orginal_position_y = document.body.clientHeight+document.body.scrollTop-$("#personalPannel").position().top - 380
+		//	} 
+		//	if(orginal_position_x+$("#personalPannel").position().left + 320 > document.body.clientWidth+document.body.scrollLeft){
+		//		orginal_position_x = document.body.clientWidth+document.body.scrollLeft-$("#personalPannel").position().left - 320
+		//	}
+		//	$(document.getElementById("variantDetailTooltipOnPP")).css("top", orginal_position_y);
+		//	$(document.getElementById("variantDetailTooltipOnPP")).css("left", orginal_position_x);
+			$(document.getElementById("variantDetailTooltipOnPP")).css("top", evtMouseCoods.y+380>document.body.clientHeight+document.body.scrollTop?document.body.clientHeight+document.body.scrollTop-380:evtMouseCoods.y);
+			$(document.getElementById("variantDetailTooltipOnPP")).css("left", evtMouseCoods.x+310>document.body.clientWidth+document.body.scrollLeft?document.body.clientWidth+document.body.scrollLeft-320:evtMouseCoods.x-10);
+
 			$(document.getElementById("variantDetailTooltipOnPP")).css("display", "block");
 			//set the cursor style & event handler
 			$(eventTarget).css("cursor", "auto");
@@ -1344,10 +1528,13 @@ function canvasClickForVariantOnPP(evt){
 			$(document).bind("mousedown", mousedownOutsideVariantTooltipOnPP);
 			
 			//Ajax to get the gene details
+			if(/^_/.test(trackSuperId)){
+				trackSuperId = trackSuperId.substring(1);
+			}
 			if(i < trackItems.length){
-				getVariantDetailHttpRequest(trackSuperId, trackItems[i].details[j].id, trackItems[i].details[j].from, trackItems[i].details[j].to);
+				getVariantDetailHttpRequest(trackId+"@"+trackSuperId, trackItems[i].details[j].id, trackItems[i].details[j].from, trackItems[i].details[j].to);
 			}else{
-				getVariantDetailHttpRequestOnPP(trackSuperId, personalPannel.Pvar.details[j].id, personalPannel.Pvar.details[j].from, personalPannel.Pvar.details[j].to);
+				getVariantDetailHttpRequestOnPP(trackId+"@"+trackSuperId, personalPannel.Pvar.details[j].id, personalPannel.Pvar.details[j].from, personalPannel.Pvar.details[j].to);
 			}
 		}
 	}
@@ -1374,11 +1561,8 @@ function handle_getVariantDetailHttpRequestOnPP(){
 			var variantTo = variantNode.getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
 			var variantLetter = null;
 			var variant_dbSNPID = null;
-			var variantdbSNPAnno = null;
 			var variant_BLS_mate = null;
-			if(variantNode.getElementsByTagName(xmlTagDbsnp).length > 0){
-				variantdbSNPAnno = variantNode.getElementsByTagName(xmlTagDbsnp)[0].childNodes[0].nodeValue;
-			}
+
 			if(variantNode.getElementsByTagName(xmlTagLetter).length > 0){
 				variantLetter = variantNode.getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
 			}
@@ -1389,12 +1573,7 @@ function handle_getVariantDetailHttpRequestOnPP(){
 				variant_BLS_mate = variantNode.getElementsByTagName(xmlTagMate)[0].childNodes[0].nodeValue;
 			}
 			var variantDescription = variantNode.getElementsByTagName(xmlTagDescription)[0].childNodes[0].nodeValue + "";
-			var variantQUAL, variantFILTER, variantINFO, variantFILTERIndex, variantINFOIndex;
-			variantFILTERIndex = variantDescription.indexOf("FILTER");
-			variantINFOIndex = variantDescription.indexOf("INFO");
-			variantQUAL = (variantDescription.substring(0, variantFILTERIndex - 1)).split(":")[1];
-			variantFILTER = variantDescription.substring(variantFILTERIndex, variantINFOIndex - 1).split(":")[1];
-			variantINFO = (variantDescription.substring(variantINFOIndex)).substring(variantDescription.substring(variantINFOIndex).indexOf(":") + 1);
+
 			$("#variantDetailContent_idOnPP").html(variantId);
 			if(variantId!="."&&(/^rs/).test(variantId)){
 				$("#variantDetailContent_linkOnPP").html("dbSNP" + "<span style=\"font-size:14px\">↗</span>");
@@ -1413,20 +1592,11 @@ function handle_getVariantDetailHttpRequestOnPP(){
 			}
 			$("#variantDetailContent_scaleOnPP").html(chrNum + ":" + variantFrom + "-" + variantTo);
 			$("#variantDetailContent_Type_ContentOnPP").html(variantType);
-			$("#variantDetailContent_QUAL_ContentOnPP").html(variantQUAL);
-			$("#variantDetailContent_FILTER_ContentOnPP").html(variantFILTER);
-			$("#variantDetailContent_INFO_ContentOnPP").html(variantINFO);
 			if(variantLetter){
 				$("#variantDetailContent_Letter_trNodeOnPP").css("display","table-row");
 				$("#variantDetailContent_Letter_ContentOnPP").html(variantLetter);
 			}else{
 				$("#variantDetailContent_Letter_trNodeOnPP").css("display","none");
-			}
-			if(variantdbSNPAnno){
-				$("#variantDetailContent_dbSNPAnno_trNodeOnPP").css("display","table-row");
-				$("#variantDetailContent_dbSNPAnno_ContentOnPP").html(variantdbSNPAnno);
-			}else{
-				$("#variantDetailContent_dbSNPAnno_trNodeOnPP").css("display","none");
 			}
 			if(variant_dbSNPID){
 				$("#variantDetailContent_dbSNPID_trNodeOnPP").css("display","table-row");
@@ -1440,6 +1610,32 @@ function handle_getVariantDetailHttpRequestOnPP(){
 			}else{
 				$("#variantDetailContent_Mate_trNodeOnPP").css("display","none");
 			}
+
+			var infohtml = "";
+			var variantInfos = variantDescription.split(";");
+			infohtml+="<tr><td colspan=\"2\"><b>Detail in VCF/GVF fields:</b></td></tr>";
+			for(var infoidx = 0;infoidx < variantInfos.length;infoidx++){
+				infohtml+=vcfTag2meaning(variantInfos[infoidx]);
+			}
+			if(variantNode.getElementsByTagName("SampleInfo").length > 0){
+				infohtml+="<tr><td colspan=\"2\"><b>Detail in Sample field:</b></td></tr>";
+				var variantFormat = variantNode.getElementsByTagName("SampleInfo")[0].childNodes[0].nodeValue + "";
+				var variantSinfos= variantFormat.split(";");
+				for(var infoidx = 0;infoidx < variantSinfos.length;infoidx++){
+					infohtml+=vcfTag2meaning(variantSinfos[infoidx]);
+				}
+			}
+			if(variantNode.getElementsByTagName("Dbsnp").length > 0){
+				infohtml+="<tr><td colspan=\"2\"><b>Detail in Dbsnp:</b></td></tr>";
+				var variantDbsnp = variantNode.getElementsByTagName("Dbsnp")[0].childNodes[0].nodeValue + "";
+				var variantDinfos= variantDbsnp.split(";");
+				for(var infoidx = 0;infoidx < variantDinfos.length;infoidx++){
+					infohtml+=vcfTag2meaning(variantDinfos[infoidx]);
+				}
+			}
+
+			$("#variantDetailContent_INFO_ContentOnPP").html(infohtml);
+				
 			$("#variantDetailLoadingOnPP").css("display","none");
 			$("#variantDetailContentOnPP").css("display","block");
 		}
@@ -1500,8 +1696,10 @@ function canvasClickForRepeat(evt) {
 			}
 		}
 
-		evtCanvasX = evtCanvasX - $("#personalPannel").position().left;
-		evtCanvasY = evtCanvasY - $("#personalPannel").position().top;
+		if(!personalPinned){
+			evtCanvasX = evtCanvasX - $("#personalPannel").position().left;
+			evtCanvasY = evtCanvasY - $("#personalPannel").position().top;
+		}
 	}
 	//add by Liran for Pfanno and Pclns track details
 
@@ -1515,10 +1713,12 @@ function canvasClickForRepeat(evt) {
 		}
 		if(j < trackItems[i].details.length) {
 			//draw the pointer
-			drawDecoriteminfopointer("repeatMaskDetailTooltipPointer");
+		//	drawDecoriteminfopointer("repeatMaskDetailTooltipPointer");
 			//set the position & display
-			$(document.getElementById("repeatMaskDetailTooltip")).css("top", evtMouseCoods.y);
-			$(document.getElementById("repeatMaskDetailTooltip")).css("left", evtMouseCoods.x - 10);
+			//
+			$(document.getElementById("repeatMaskDetailTooltip")).css("top", evtMouseCoods.y+150>document.body.clientHeight+document.body.scrollTop?document.body.clientHeight+document.body.scrollTop-150:evtMouseCoods.y);
+			$(document.getElementById("repeatMaskDetailTooltip")).css("left", evtMouseCoods.x+310>document.body.clientWidth+document.body.scrollLeft?document.body.clientWidth+document.body.scrollLeft-320:evtMouseCoods.x-10);
+
 			$(document.getElementById("repeatMaskDetailTooltip")).css("display", "block");
 			//set the cursor style & event handler
 			$(eventTarget).css("cursor", "auto");
@@ -1543,10 +1743,12 @@ function canvasClickForRepeat(evt) {
 		}
 		if(j < personalPannel.Pfanno.details.length) {
 			//draw the pointer
-			drawDecoriteminfopointer("repeatMaskDetailTooltipPointer");
+		//	drawDecoriteminfopointer("repeatMaskDetailTooltipPointer");
 			//set the position & display
-			$(document.getElementById("repeatMaskDetailTooltip")).css("top", evtMouseCoods.y);
-			$(document.getElementById("repeatMaskDetailTooltip")).css("left", evtMouseCoods.x - 10);
+			//
+			$(document.getElementById("repeatMaskDetailTooltip")).css("top", evtMouseCoods.y+150>document.body.clientHeight+document.body.scrollTop?document.body.clientHeight+document.body.scrollTop-150:evtMouseCoods.y);
+			$(document.getElementById("repeatMaskDetailTooltip")).css("left", evtMouseCoods.x+310>document.body.clientWidth+document.body.scrollLeft?document.body.clientWidth+document.body.scrollLeft-320:evtMouseCoods.x-10);
+
 			$(document.getElementById("repeatMaskDetailTooltip")).css("display", "block");
 			//set the cursor style & event handler
 			$(eventTarget).css("cursor", "auto");
@@ -1570,10 +1772,12 @@ function canvasClickForRepeat(evt) {
 		}
 		if(j < personalPannel.Pclns[Pfanno_Pclns_Node].details.length) {
 			//draw the pointer
-			drawDecoriteminfopointer("repeatMaskDetailTooltipPointer");
+		//	drawDecoriteminfopointer("repeatMaskDetailTooltipPointer");
 			//set the position & display
-			$(document.getElementById("repeatMaskDetailTooltip")).css("top", evtMouseCoods.y);
-			$(document.getElementById("repeatMaskDetailTooltip")).css("left", evtMouseCoods.x - 10);
+			//
+			$(document.getElementById("repeatMaskDetailTooltip")).css("top", evtMouseCoods.y+150>document.body.clientHeight+document.body.scrollTop?document.body.clientHeight+document.body.scrollTop-150:evtMouseCoods.y);
+			$(document.getElementById("repeatMaskDetailTooltip")).css("left", evtMouseCoods.x+310>document.body.clientWidth+document.body.scrollLeft?document.body.clientWidth+document.body.scrollLeft-320:evtMouseCoods.x-10);
+
 			$(document.getElementById("repeatMaskDetailTooltip")).css("display", "block");
 			//set the cursor style & event handler
 			$(eventTarget).css("cursor", "auto");

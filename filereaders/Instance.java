@@ -4,8 +4,14 @@ import static filereaders.Consts.DATA_ROOT;
 import static filereaders.Consts.VCF_HEADER_SAMPLE;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.security.MessageDigest;
 import java.util.*;
 
 import org.w3c.dom.Document;
@@ -170,8 +176,15 @@ public class Instance {
 	}
 	public void remove_Externals(String[] tracks){
 		for(int i=0;i<tracks.length;i++)
-			if(Externals.containsKey(tracks[i]))
+			if(Externals.containsKey(tracks[i])){
+				String path = ((Annotations)Externals.get(tracks[i])).get_Path();
+				if(path != null && !path.startsWith("http://") && !path.startsWith("https://") && !path.startsWith("ftp://")){
+					File file = new File(path);
+					if(file.exists())
+						file.delete();
+				}
 				Externals.remove(tracks[i]);
+			}
 	}
 	public void init_Pvar(String track,String PvarID){
 		if(Annos.containsKey(track)){
@@ -223,6 +236,10 @@ public class Instance {
 	}
 	public String add_Pvar(String track,String mode,String PvarID){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		String old_PvarID = this.PvarID;
+		String old_Pvar = null;
+		if(Pvar!=null)
+			old_Pvar = Pvar.get_ID();
 		if(Externals.containsKey(track)){
 			if(PvarID.equals(track)
 					||(Externals.get(track).has_Parameter(Consts.VCF_HEADER_SAMPLE)
@@ -247,7 +264,8 @@ public class Instance {
 						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
 					}
 				}
-				init_IndividualStat();
+				if(old_PvarID==null || old_Pvar==null || !old_Pvar.equals(track) || !old_PvarID.equals(PvarID))
+					init_IndividualStat();
 			}
 		}
 		else if(Annos.containsKey(track)){
@@ -272,7 +290,8 @@ public class Instance {
 						append_Ptrack(pclns_temp,doc,pclns_temp.get_Mode(),Consts.PTRACK_CLASS_CLN);
 					}
 				}
-				init_IndividualStat();
+				if(old_PvarID==null || old_Pvar==null || !old_Pvar.equals(track) || !old_PvarID.equals(PvarID))
+					init_IndividualStat();
 			}
 		}
 		return XmlWriter.xml2string(doc);
@@ -375,15 +394,27 @@ public class Instance {
 			if(Pclns.containsKey(tracks[i]))
 				Pclns.remove(tracks[i]);
 	}
-	public String get_Detail(String trackname, String id,int start,int end){
+	public String get_Detail(String trackname_in, String id, int start,int end){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		Annotations track=null;
 		boolean personal=false;
-		if(trackname.startsWith("_")){
-			trackname=trackname.substring(1);
+		if(trackname_in.startsWith("_")){
+			trackname_in=trackname_in.substring(1);
 			personal=true;
 		}
-		if(Annos.containsKey(trackname))
+		String trackname = "";
+		String sample_id = null;
+		if(trackname_in.indexOf("@")<0)
+			trackname = trackname_in;
+		else{
+			String[] trackname_temp = trackname_in.split("@");
+			sample_id = trackname_temp[0];
+			trackname = trackname_temp[1];
+		}
+
+		if(personal && Pvar!=null && Pvar.get_ID().equals(trackname))
+			track=Pvar;
+		else if(Annos.containsKey(trackname))
 			track=Annos.get(trackname);
 		else if(Externals.containsKey(trackname))
 			track=Externals.get(trackname);
@@ -460,7 +491,7 @@ public class Instance {
 			}
 			else if (type_temp.equals(Consts.FORMAT_VCF)){
 				VcfReader vr=new VcfReader(track,Chr);
-				ele_temp=vr.get_detail(doc, track, id, Chr, start, end);
+				ele_temp=vr.get_detail(doc, track, sample_id, id, Chr, start, end);
 				if(personal){
 					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, start, end, doc);
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
@@ -493,6 +524,11 @@ public class Instance {
 	public String get_OverlapGenes(String chr,int start,int end){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		Genes.overlap_Genes(doc, chr,start,end,is);
+		return XmlWriter.xml2string(doc);
+	}
+	public String get_RankingGenes(int top_number){
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		Genes.ranking_Genes(doc, is, top_number);
 		return XmlWriter.xml2string(doc);
 	}
 	public String get_Assemblies(){
@@ -530,6 +566,96 @@ public class Instance {
 		Element ele_temp=cbr.write_cytoband(doc, chr, id, is, rr, Pvar,scoremeth);
 		return XmlWriter.xml2string(doc);
 	}
+	public String get_Ped(String track){
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		Annotations vt = null;
+		if (Externals.containsKey(track))
+			vt = Externals.get(track);
+		else if(Annos.containsKey(track))
+			vt = Annos.get(track);
+		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
+			Element ele_temp = ((VcfSample)vt.get_Parameter(VCF_HEADER_SAMPLE)).write_family2pedigree(doc, track);
+		}
+		return XmlWriter.xml2string(doc);
+	}
+	public String prioritize_Individuals(String track, String vcfs){
+		Annotations vt = null;
+		String[] indord = null;
+		if (Externals.containsKey(track))
+			vt = Externals.get(track);
+		else if(Annos.containsKey(track))
+			vt = Annos.get(track);
+		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)){
+			VcfReader vr = new VcfReader(vt, "chr1");
+			indord = vr.write_individuals(track, vcfs);
+		}
+		Document doc=XmlWriter.init(Consts.META_ROOT);
+		CfgReader.write_metalist(doc, indord, "IndividualOrder");
+		return XmlWriter.xml2string(doc);
+	}
+	public String get_Intersection(String track, String set_a, String chr, long start, long end){
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		int chrid=check_chromosome(chr);
+		if(chrid>=0){
+			Chr=chr;
+			Coordinate=check_coordinate(chrid,start,end);
+			Annotations vt = null;
+			if (Externals.containsKey(track))
+				vt = Externals.get(track);
+			else if(Annos.containsKey(track))
+				vt = Annos.get(track);
+			if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
+				VcfReader vr = new VcfReader(vt, chr);
+				Element ele_temp = vr.write_intersection(doc, track, set_a, chr, start, end);
+			}
+		}
+		return XmlWriter.xml2string(doc);
+	}
+	public String get_Difference(String track, String set_a, String set_b, String chr, long start, long end){
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		int chrid=check_chromosome(chr);
+		if(chrid>=0){
+			Chr=chr;
+			Coordinate=check_coordinate(chrid,start,end);
+			Annotations vt = null;
+			if (Externals.containsKey(track))
+				vt = Externals.get(track);
+			else if(Annos.containsKey(track))
+				vt = Annos.get(track);
+			if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
+				VcfReader vr = new VcfReader(vt, chr);
+				Element ele_temp = vr.write_difference(doc, track, set_a, set_b, chr, start, end);
+			}
+		}
+		return XmlWriter.xml2string(doc);
+	}
+	public void remove_Ped(String track){
+		Annotations vt = null;
+		if (Externals.containsKey(track))
+			vt = Externals.get(track);
+		else if(Annos.containsKey(track))
+			vt = Annos.get(track);
+		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE))
+			((VcfSample)vt.get_Parameter(VCF_HEADER_SAMPLE)).removePedigree();
+	}
+	public void add_Ped(String track,String ped){
+		Annotations vt = null;
+		if (Externals.containsKey(track))
+			vt = Externals.get(track);
+		else if(Annos.containsKey(track))
+			vt = Annos.get(track);
+		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE))
+			((VcfSample)vt.get_Parameter(VCF_HEADER_SAMPLE)).initPedigree(ped);
+	}
+	public void load_Ped(String track,String filepath){
+		Annotations vt = null;
+		if (Externals.containsKey(track))
+			vt = Externals.get(track);
+		else if(Annos.containsKey(track))
+			vt = Annos.get(track);
+		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE))
+			((VcfSample)vt.get_Parameter(VCF_HEADER_SAMPLE)).loadPedigree(filepath);
+	}
 	public void load_Stat(String filepath){
 		if(is!=null)
 			is.load_Stat(filepath);
@@ -557,7 +683,12 @@ public class Instance {
 		Document doc=XmlWriter.init(Consts.META_ROOT);
 		String[] scoremethlist=new String[1];
 		if(this.scoremeth!=null)
-			scoremethlist[0]=scoremeth;
+			if(scoremeth.equals("ljb_sift"))
+				scoremethlist[0]="SIFT";
+			else if(scoremeth.equals("ljb_pp2"))
+				scoremethlist[0]="PolyPhen2";
+			else
+				scoremethlist[0]="PGB";
 		else
 			scoremethlist[0]="PGB";
 		CfgReader.write_metalist(doc, scoremethlist ,"ScoreMethList");
@@ -616,7 +747,7 @@ public class Instance {
 			track=Annos.get(trackname);
 		else if(Externals.containsKey(trackname))
 			track=Externals.get(trackname);
-		else if(trackname.startsWith("_")&&Pvar.get_ID().equals(trackname.substring(1)))
+		else if(trackname.startsWith("_")&&Pvar!=null&&Pvar.get_ID().equals(trackname.substring(1)))
 			track=Pvar;
 		String[] check=new String[1];
 		if(track!=null)
@@ -710,6 +841,38 @@ public class Instance {
 				Externals.get(tracks[i]).set_Parameters(params[i], values[i]);
 			else if(tracks[i].startsWith("_")&&tracks[i].substring(1).equals(Pvar.get_ID()))
 				Pvar.set_Parameters(params[i], values[i]);
+		}
+	}
+	
+	public void save_Index(String trackname, String session){
+		Annotations track = null;
+		if (Pvar!=null && trackname.startsWith("_") && Pvar.get_ID().equals(trackname.substring(1)))
+			track = Pvar;
+		else if(Externals.containsKey(trackname))
+			track = Externals.get(trackname);
+		
+		if (track!=null && track.get_Path()!=null && track.get_Type().equals(Consts.FORMAT_VCF) 
+				&& (track.get_Path().startsWith("http://") || track.get_Path().startsWith("https://") || track.get_Path().startsWith("ftp://"))
+				&& !track.has_Parameter(Consts.VCF_INDEX_LOCAL)){
+			try {
+				URL index = new URL(track.get_Path()+".tbi");
+				ReadableByteChannel rbc = Channels.newChannel(index.openStream());
+//				String filepath = System.getProperty("java.io.tmpdir")+"/"+session+"_"+trackname+".tbi";
+				String filepath = System.getProperty("java.io.tmpdir")+"/"+md5(track.get_Path()+".tbi")+".tbi";
+				File temp=new File(filepath);
+				if(!temp.exists())
+					temp.delete();
+				FileOutputStream fos = new FileOutputStream(temp);
+				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+				
+				track.initialize_Parameter(Consts.VCF_INDEX_LOCAL, filepath, Consts.PARAMETER_TYPE_INVISABLE);
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	void set_mode(String track,String mode){
@@ -851,7 +1014,7 @@ public class Instance {
 				e.printStackTrace();
 			}
 		}
-		else if (type_temp.equals(Consts.FORMAT_FASTA)&&bpp<0.5){
+		else if (type_temp.equals(Consts.FORMAT_FASTA)){
 			try{
 				new FastaReader(path_temp);
 			} catch (IOException e){
@@ -978,10 +1141,10 @@ public class Instance {
 					e.printStackTrace();
 				}
 			}
-			else if (type_temp.equals(Consts.FORMAT_FASTA)&&bpp<0.5){
+			else if (type_temp.equals(Consts.FORMAT_FASTA)){
 				try{
 					FastaReader fr=new FastaReader(path_temp);
-					ele_temp=fr.write_sequence(doc, Chr, Coordinate[0], Coordinate[1], track.get_ID());
+					ele_temp=fr.write_fasta2sequence(doc, Chr, Coordinate[0], Coordinate[1], track.get_ID(), bpp);
 				} catch (IOException e){
 					e.printStackTrace();
 				}
@@ -1063,5 +1226,25 @@ public class Instance {
 		Annotations[] annos=new Annotations[annolist.size()];
 		annolist.toArray(annos);
 		return annos;
+	}
+	public static String md5 (String s){
+		char hexDigits[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+		try{
+			byte[] bytes = s.getBytes();
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(bytes);
+			byte[] updateBytes = md.digest();
+			int len = updateBytes.length;
+			char myChar[] = new char[len*2];
+			int k = 0;
+			for(int i=0;i<len;i++){
+				byte byte0 = updateBytes[i];
+				myChar[k++] = hexDigits[byte0>>>4 & 0x0f];
+				myChar[k++] = hexDigits[byte0 & 0x0f];
+			}
+			return new String(myChar);
+		} catch (Exception e){
+			return null;
+		}
 	}
 }

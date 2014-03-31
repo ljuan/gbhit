@@ -96,7 +96,7 @@ public class Individual {
 		if(isDetail || (result.size() > 0 && result.size() <= variantNumLimit)){
 			TabixReaderForVCF tabix = null;
 			try {
-				tabix = new TabixReaderForVCF(dbsnpURI);
+				tabix = new TabixReaderForVCF(dbsnpURI,null);
 				String chrom = tabix.hasChromPrefix() ? chr : chr.substring(3);
 				if ("M".equalsIgnoreCase(chrom)) {
 					chrom = "MT";

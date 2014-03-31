@@ -8,6 +8,7 @@ var xmlTagChrLength = "Length";
 var xmlTagChrStart = "Start";
 var xmlTagChrEnd = "End";
 var xmlTagSequence = "Sequence";
+var xmlTagSeq = "Seq";
 var xmlTagCytobands = "Cbs";
 var xmlTagElements = "Es";
 var xmlTagReads = "Rs";
@@ -33,6 +34,7 @@ var xmlTagParameters = "Parameters";
 var xmlTagParameter = "Parameter"
 var xmlTagOptions = "Options";
 var xmlTagDbsnp = "Dbsnp";
+var xmlTagSampleInfo = "SampleInfo";
 var xmlTagMate = "Mate";
 var xmlTagStatus = "status";
 
@@ -139,7 +141,13 @@ personalTrackItems.Pannos = [];
 personalTrackItems.Pfannos = [];
 personalTrackItems.Pclnss = [];
 personalPannel.personalTrackItems = personalTrackItems;
+
+var personalPinned = false;
+
+
 var scoremethPvar = "PGB"; // added by Liran for recording current scoring method
+var score_filter = 0;
+var score_filter_ceil = 0;
 
 var control_scanning=0;//for stop scanning when close BrowseJumpWindow
 var control_upexternal=0;//to prevent indset window close while there is a file uploading
@@ -264,7 +272,7 @@ function jump() {
 	str = str.replace(/chry/,"chrY");
 	str = str.replace(/chrm/,"chrM");
 	if(!searchItemPattern.exec(str)) {
-		alert("Please input correct form of your search item!");
+		alert("Please input correct format of your search item.\nIf you are navigating by gene symbol, please input \nthe prefix/full name (case independent) of it and \nclick one of the candidates.");
 		searchInputNode.value = "";
 	} else {
 		var strArray = str.split(/-|:/);
@@ -382,8 +390,7 @@ function createXMLHttpRequest() {
 }
 
 var XMLHttpReq = createXMLHttpRequest();
-var XMLHttpReq2 = createXMLHttpRequest();
-//for getDetail
+var XMLHttpReq2 = createXMLHttpRequest();//for getDetail
 var XMLHttpReq3 = createXMLHttpRequest();
 var XMLHttpReq4 = createXMLHttpRequest();
 var XMLHttpReq5 = createXMLHttpRequest();
@@ -393,6 +400,7 @@ var XMLHttpReq8 = createXMLHttpRequest();//for BJW_upStat
 var XMLHttpReq10 = createXMLHttpRequest();//for BJW_scan
 var XMLHttpReq11 = createXMLHttpRequest();//for addExIndividual
 var XMLHttpReq12 = createXMLHttpRequest();//for getCheck 
+var XMLHttpReq13 = createXMLHttpRequest();//for getScoreMethod
 var showType;
 
 function updateRequest(url) {
@@ -412,6 +420,11 @@ function updateRequest(url) {
 		$(arrayele).width(trackLength);
 		$(arrayele).css("left", - trackLength_user);
 	});*/
+
+	XMLHttpReq13.open("GET","servlet/test.do?action=getScoreMethod",false);
+	XMLHttpReq13.send(null);
+	var pattern = /<.*?>/g;
+	scoremethPvar = XMLHttpReq13.responseText.replace(pattern,""); // added by Liran for restoring current scoring method when the whole page reload
 
 	XMLHttpReq4.onreadystatechange = handleUpdateStateChange;
 	XMLHttpReq4.open("GET", url, false);
@@ -499,7 +512,26 @@ function handleUpdateStateChange() {
 				var trackItem_i;
 				for( trackItem_i = 0; trackItem_i < trackItems.length; trackItem_i++) {
 					if(trackItems[trackItem_i].mode != "hide") {
-						if(trackItems[trackItem_i].dataType == "BAM") {
+						if(trackItems[trackItem_i].dataType == "FASTA"){
+							var fastaNodes = XMLDoc.getElementsByTagName(xmlTagSeq);
+							var fastaId;
+							var fastaNode;
+							var fastaTrackNode = document.getElementById(trackItems[trackItem_i].id);
+							var fastaCanvasNode = fastaTrackNode.getElementsByTagName("canvas");
+							var i;
+							for(i=0;i<fastaNodes.length;i++){
+								fastaId = fastaNodes[i].getAttribute("id");
+								if(fastaId == trackItems[trackItem_i].id){
+									fastaNode = fastaNodes[i];
+									break;
+								}
+							}
+							var fastaSeq = "";
+							if(fastaNode.childNodes[0]){
+								fastaSeq = fastaNode.childNodes[0].nodeValue;
+							}
+							showFastaSeq(fastaCanvasNode[1],fastaCanvasNode[0],widthOfOneBase,fastaSeq,fastaId);
+						} else if(trackItems[trackItem_i].dataType == "BAM") {
 							var readNodes = XMLDoc.getElementsByTagName(xmlTagReads);
 							var readsNode;
 							var readsId;
@@ -693,10 +725,10 @@ function handleUpdateStateChange() {
 							}
 						}
 					}
-					var ppTop = (document.body.clientHeight - $("#personalPannel").height() - 10);
-					ppTop = ppTop > 50 ? ppTop : 50;
+//					var ppTop = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height() - 10);
+//					ppTop = ppTop > 50 ? ppTop : 50;
 					$(window).resize();
-					$("#personalPannel").animate({top:ppTop});
+//					$("#personalPannel").animate({top:ppTop});
 					$("#ppTrackTable tbody").sortable({axis:"y" ,cancel:".cannotSortable"});
 				}
 				
@@ -816,6 +848,53 @@ function drawRefSeq(widthOfOneBase, refSeq) {
 			ctx.fillStyle = "#000";
 			ctx.textAlign = "center";
 			ctx.fillText(refSeq[i], x + length_beforeCoordinate, y);
+		}
+	}
+}
+
+function showFastaSeq(canvas, canvas2, widthOfOneBase, fastaSeq, fastaId) {
+	var startIndex_axis, endIndex_axis;
+	if(startIndex<1){
+		startIndex_axis = 1;
+	}else{
+		startIndex_axis = startIndex;
+	}
+	if(endIndex> chrLength){
+		endIndex_axis = chrLength;
+	}else{
+		endIndex_axis = endIndex;
+	}
+	if(canvas.getContext && canvas2.getContext) {
+		canvas.height = 10;
+		canvas.style.height = 10;
+		canvas2.height = 10;
+		canvas2.style.height = 10;
+		var ctx2 = canvas2.getContext('2d');
+		ctx2.clearRect(0, 0, canvas.width, canvas.height);
+		ctx2.strokeStyle = "#000";
+		ctx2.fillStyle = "#000";
+		ctx2.fillText(fastaId, canvas2.width - ctx2.measureText(fastaId).width, 8);
+
+		var ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.fillStyle = "#000000";
+
+		ctx.font = "12px Consolas,andale mono,courier,mono";
+		ctx.textBaseline = "alphabetic";
+		//y is the base coordinate in y axis,textBaseline is bootom(default)
+		//bg_y is the y coordinate of the base_background
+		//coordinate_y and coordiante_tag_y are the y coordinate of the coordinate
+		var i, x, y = 10, bg_x, bg_x_next, bg_y = 1;
+		var length_beforeCoordinate = (startIndex_axis - startIndex)/ searchLength * trackLength;
+		if(searchLength <= trackLength/10) {
+			for( i = 0; i < fastaSeq.length; i++) {
+				bg_x = Math.round(i * widthOfOneBase);
+				bg_x_next = Math.round((i + 1) * widthOfOneBase);
+				x = Math.round((bg_x_next + bg_x) / 2);
+				ctx.fillStyle = "#000";
+				ctx.textAlign = "center";
+				ctx.fillText(fastaSeq[i], x + length_beforeCoordinate, y);
+			}
 		}
 	}
 }
@@ -2282,7 +2361,7 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 			}
 		}else {
 			var packVariants = [], squishVariants = [];
-			if((mode == "pack") && (variantNodes.length <= parseInt(trackLength / 60) * 10)) {
+			if((mode == "pack") && (variantNodes.length <= parseInt(trackLength / 60) * 20)) {
 				if(variantNodes.length > 0) {//the situation: not contain the variant
 					packVariants[packVariants.length] = [];
 					packVariants[0][0] = 0;
@@ -2299,7 +2378,7 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 						packVariants[j][0] = i;
 					}
 				}
-				if(packVariants.length <= 10) {
+				if(packVariants.length <= 20) {
 					canvas1.height = imgHeight * packVariants.length + 3*(packVariants.length - 1) > 10 ? imgHeight * packVariants.length + 3*(packVariants.length - 1) : 10;
 					canvas1.style.height = imgHeight * packVariants.length + 3*(packVariants.length - 1) > 10 ? imgHeight * packVariants.length + 3*(packVariants.length - 1) : 10;
 					canvas2.height = imgHeight * packVariants.length + 3*(packVariants.length - 1) > 10 ? imgHeight * packVariants.length + 3*(packVariants.length - 1) : 10;
@@ -2401,7 +2480,7 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 					canvas2.addEventListener("click", canvasClickForVariantOnPP, false);
 				}
 			}
-			if(mode == "squish" || ( mode == "pack" && (packVariants.length > 10 || variantNodes.length > parseInt(trackLength / 60) * 10))) {
+			if(mode == "squish" || ( mode == "pack" && (packVariants.length > 20 || variantNodes.length > parseInt(trackLength / 60) * 20))) {
 				if(variantNodes.length > 0) {
 					squishVariants[squishVariants.length] = [];
 					squishVariants[0][0] = 0;
@@ -5319,7 +5398,9 @@ function handleGetgetAnnotationsStateChange() {
 					createPPOtherTrack(personalPannel.Pclns[i].id, personalPannel.Pclns[i].mode);
 				}
 				
-				var PP_top = (document.body.clientHeight - $("#personalPannel").height())/2;
+				var PP_top = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height() - 10);
+			//	var PP_top = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height())/2;
+				PP_top = PP_top > 100 ? PP_top : 100;//added by Liran
 				var PP_left = $("#divTrack").position().left;
 				$(document.getElementById("personalPannel")).css("display", "block");
 				$(document.getElementById("personalPannel")).css("top", PP_top);
@@ -5328,9 +5409,11 @@ function handleGetgetAnnotationsStateChange() {
 				$(document.getElementById("ppCloseBtn")).unbind();
 				$(document.getElementById("ppMin")).unbind();
 				$(document.getElementById("ppSet")).unbind();
+				$(document.getElementById("ppPin")).unbind();
 				$(document.getElementById("ppCloseBtn")).click(removePvar);
 				$(document.getElementById("ppMin")).click(miniPersonalPannel);
 				$(document.getElementById("ppSet")).click(setPersonalPannel);
+				$(document.getElementById("ppPin")).click(pinPersonalPannel);
 			}
 			//custom track initialize
 			if($.cookie("customTrackList")) {
@@ -5653,6 +5736,7 @@ function createTrack(trackId, mode) {
 		}
 	}
 	//<span class=\"setting thickbox\" title=\"setting\" alt=\"#TB_inline?height=300;width=650;inlineId=tracksettingDIV\"></span>
+	trNode.style.background = RefBG;
 	trNode.innerHTML = "<td class=\"trackOperator\"><span class=\"close\"></span>"+ modechangeBtnSpan_str +"</td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+RefBG+"\"></canvas></td><td class=\"trackContent\"><canvas width=\""+ trackLength +"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></td>";
 	var canvasNodes = trNode.getElementsByTagName("canvas");
 	canvasNodes[0].onmouseover = mouseOver;
@@ -5702,25 +5786,30 @@ function createTrack(trackId, mode) {
 					var target = event.target || event.srcElement;
 					var trParentNode = target.parentNode.parentNode;
 					var trackId = trParentNode.getAttribute("id");
-					var trTop = $(trParentNode).position().top - document.body.scrollTop;
-					var trLeft = $(trParentNode).position().left;
-					if(isMini_personalpannel == 1){
-						// if the personal pannel is mini
-						var trackTable_width = $("#divTrack").width();
-						$(document.getElementById("personalPannel")).css("height", "auto");
-						$(document.getElementById("personalPannel")).css("width", trackTable_width);
-						$('#showWindowBtn').remove();
+					if(personalPinned){
+					}else{
+						var trTop = $(trParentNode).position().top - document.body.scrollTop;
+						var trLeft = $(trParentNode).position().left;
+						if(isMini_personalpannel == 1){
+							// if the personal pannel is mini
+							var trackTable_width = $("#divTrack").width();
+							$(document.getElementById("personalPannel")).css("height", "auto");
+							$(document.getElementById("personalPannel")).css("width", trackTable_width);
+							$('#showWindowBtn').remove();
+						}
+						$(document.getElementById("personalPannel")).css("display", "block");
+						$(document.getElementById("personalPannel")).css("top", trTop);
+						$(document.getElementById("personalPannel")).css("left", trLeft - 1);
+						document.getElementById("ppTrackTable").innerHTML = "";
+						$(document.getElementById("ppCloseBtn")).unbind();
+						$(document.getElementById("ppMin")).unbind();
+						$(document.getElementById("ppPin")).unbind();
+						$(document.getElementById("ppSet")).unbind();
+						$(document.getElementById("ppCloseBtn")).click(removePvar);
+						$(document.getElementById("ppMin")).click(miniPersonalPannel);
+						$(document.getElementById("ppPin")).click(pinPersonalPannel);
+						$(document.getElementById("ppSet")).click(setPersonalPannel);
 					}
-					$(document.getElementById("personalPannel")).css("display", "block");
-					$(document.getElementById("personalPannel")).css("top", trTop);
-					$(document.getElementById("personalPannel")).css("left", trLeft - 1);
-					document.getElementById("ppTrackTable").innerHTML = "";
-					$(document.getElementById("ppCloseBtn")).unbind();
-					$(document.getElementById("ppMin")).unbind();
-					$(document.getElementById("ppSet")).unbind();
-					$(document.getElementById("ppCloseBtn")).click(removePvar);
-					$(document.getElementById("ppMin")).click(miniPersonalPannel);
-					$(document.getElementById("ppSet")).click(setPersonalPannel);
 					addPvarHttpRequest(trackId);
 				});
 			}
@@ -5764,8 +5853,8 @@ function mousemove_for_personalpannel(ev){
 function mouseCoords_in_clientWindow(ev) {
 	if(ev.clientX || ev.clientY) {
 		return {
-			x : ev.clientX,
-			y : ev.clientY
+			x : ev.clientX + document.body.scrollLeft,
+			y : ev.clientY + document.body.scrollTop
 		};
 	}
 	return {
@@ -5776,17 +5865,38 @@ function mouseCoords_in_clientWindow(ev) {
 /**************************************************************************************/
 
 function removePvar() {
-	$(document.getElementById("personalPannel")).css("display", "none");
+	if(personalPinned){
+		var ppTrackTable = document.getElementById("tableTrack");
+		var ptracks=[];
+		var j=0;
+		for(var i = 0; i<ppTrackTable.rows.length; i++){
+			if(ppTrackTable.rows[i].id && ppTrackTable.rows[i].id.substring(0,1)=="_"){
+				ptracks[j]=ppTrackTable.rows[i].id;
+				j++;
+			}
+		}
+		if(j>0){
+			for(j=0;j<ptracks.length;j++){
+				removeTrack(ptracks[j]);
+			}
+		}
+		$('#ppBtns').remove();
+		isPpBtns=false;
+	}else{
+		$(document.getElementById("personalPannel")).css("display", "none");
+		$(document.getElementById("ppCloseBtn")).unbind();
+		$(document.getElementById("ppMin")).unbind();
+		$(document.getElementById("ppPin")).unbind();
+		$(document.getElementById("ppSet")).unbind();
+	}
 	XMLHttpReq.onreadystatechange = function() {
 		personalPannel.Pvar.id="";
 		personalPannel.Pvar.mode="";
 		initPvar_superid="";
 	};
-	XMLHttpReq.open("GET", "servlet/test.do?action=removePvar", true);
+	document.getElementById("ppTrackTable").innerHTML="";
+	XMLHttpReq.open("GET", "servlet/test.do?action=removePvar", false);
 	XMLHttpReq.send(null);
-	$(document.getElementById("ppCloseBtn")).unbind();
-	$(document.getElementById("ppMin")).unbind();
-	$(document.getElementById("ppSet")).unbind();
 }
 var isMini_personalpannel = 0;
 function miniPersonalPannel() {
@@ -5802,14 +5912,14 @@ function miniPersonalPannel() {
 			{ 
             width: 0, 
             height: 0,
-            top: $(window).height() / 2,
-            left: $(window).width(),
+            top: $(window).height() / 3,
+            left: ($("#divTrack").position().left+1110>$(window).width()-32?$(window).width()-32:$("#divTrack").position().left+1110),
       },
 			{
 				complete: function(){
 						$('body').append('<input type="button" id="showWindowBtn"'
 							+ ' style="height:31px; width:32px; border-style:none; background: url(image/mouse-out-32.png); top:'
-							+ ($(window).height() / 2 - 16) + 'px; left:' + ($(window).width() - 32) 
+							+ ($(window).height() / 3 - 16) + 'px; left:' + ($("#divTrack").position().left+1110>$(window).width()-32?$(window).width()-32:$("#divTrack").position().left+1110)
 							+ 'px; position:fixed;" />');
 						showWindowBtn = $('#showWindowBtn');
 						showWindowBtn.mousemove(function(e){
@@ -6009,7 +6119,12 @@ function remove_pfanno(){
 	if(personalPannel.Pfanno.id){
 		if(personalPannel.Pclns.length == 0){
 			$(document.getElementById(personalPannel.Pfanno.id + "radio")).attr("checked",false);
-			var ppTrackTable = document.getElementById("ppTrackTable");
+			var ppTrackTable;
+			if(personalPinned){
+				ppTrackTable = document.getElementById("tableTrack");
+			}else{
+				ppTrackTable = document.getElementById("ppTrackTable");
+			}
 			var trNode = document.getElementById(personalPannel.Pfanno.id);
 			var rowIndex = trNode.rowIndex;
 			ppTrackTable.deleteRow(rowIndex);
@@ -6028,7 +6143,12 @@ function remove_panno(){
 	if(personalPannel.Panno.id){
 		if(personalPannel.Pclns.length == 0){
 			$(document.getElementById(personalPannel.Panno.id + "radio")).attr("checked", false);
-			var ppTrackTable = document.getElementById("ppTrackTable");
+			var ppTrackTable;
+			if(personalPinned){
+				ppTrackTable = document.getElementById("tableTrack");
+			}else{
+				ppTrackTable = document.getElementById("ppTrackTable");
+			}
 			var trNode = document.getElementById(personalPannel.Panno.id);
 			var rowIndex = trNode.rowIndex;
 			ppTrackTable.deleteRow(rowIndex);
@@ -6053,9 +6173,9 @@ function removeTrackByCloseBtn_in_personalpannel(trackId){
 		}else{
 			removePclnsHttpRequest((trackId+"").replace(/^_/,""));
 		}
-		var ppTop = (document.body.clientHeight - $("#personalPannel").height() - 10);
-		ppTop = ppTop > 50 ? ppTop : 50;
-		$("#personalPannel").animate({top:ppTop});
+//		var ppTop = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height() - 10);
+//		ppTop = ppTop > 50 ? ppTop : 50;
+//		$("#personalPannel").animate({top:ppTop});
 		$("#ppTrackTable tbody").sortable({axis:"y" ,cancel:".cannotSortable"});
 	};
 }
@@ -6105,7 +6225,8 @@ function addPvarHttpRequest(trackId) {
 		}
 	}
 	
-	if(P_mode == "hide"){
+	initPvar_superid = P_track;
+	if(P_mode == "hide" || P_mode == ""){
 		P_mode = "pack";
 	}
 	
@@ -6114,6 +6235,12 @@ function addPvarHttpRequest(trackId) {
 	personalPannel.Pvar.id = "_" + trackId;
 	personalPannel.Pvar.mode = P_mode;
 
+	if(personalPinned){
+		loadingId = showLoadingImage("tableTrack", "body");
+		if(!isPpBtns){
+			generate_ppBtns();
+		}
+	}
 	XMLHttpReq.onreadystatechange = handle_addPvar_Request;
 	XMLHttpReq.open("GET", url, true);
 	XMLHttpReq.send(null);
@@ -6133,6 +6260,12 @@ function addPvarHttpRequest2(PvarID,trackId) {//for add individual directly
 	personalPannel.Pvar.id = "_" + PvarID;
 	personalPannel.Pvar.mode = P_mode;
 
+	if(personalPinned){
+		loadingId = showLoadingImage("tableTrack", "body");
+		if(!isPpBtns){
+			generate_ppBtns();
+		}
+	}
 	XMLHttpReq.onreadystatechange = handle_addPvar_Request;
 	XMLHttpReq.open("GET", url, true);
 	XMLHttpReq.send(null);
@@ -6207,10 +6340,19 @@ function handle_addPvar_Request() {
 				}
 			}
 			
-			var ppTop = (document.body.clientHeight - $("#personalPannel").height() - 10);
-			ppTop = ppTop > 50 ? ppTop : 50;
-			$("#personalPannel").animate({top:ppTop});
-			$("#ppTrackTable tbody").sortable({axis:"y" ,cancel:".cannotSortable"});
+			if(personalPinned){
+				if(document.getElementById(loadingId)) {
+					hideLoadingImage(loadingId);
+				}
+			}else{
+				if(document.getElementById(ppLoadingId)){
+					hideLoadingImage(ppLoadingId);
+				}
+				var ppTop = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height() - 10);
+				ppTop = ppTop > 100 ? ppTop : 100;
+				$("#personalPannel").animate({top:ppTop});
+				$("#ppTrackTable tbody").sortable({axis:"y" ,cancel:".cannotSortable"});
+			}
 		}else{
 			var pattern = /<.*?>/g;
 			XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks=_"+initPvar_superid,false);
@@ -6260,7 +6402,12 @@ function handle_addPfanno_Request(){
 			var elementNodes = XMLDoc.getElementsByTagName(xmlTagElements);
 			var i, j;
 			
-			var ppTrackTable = document.getElementById("ppTrackTable");
+			var ppTrackTable;
+			if(personalPinned){
+				ppTrackTable = document.getElementById("tableTrack");
+			}else{
+				ppTrackTable = document.getElementById("ppTrackTable");
+			}
 			
 			for( j = 0; j < personalPannel.personalTrackItems.Pfannos.length; j++) {
 				var trNode_Pfanno = document.getElementById(personalPannel.personalTrackItems.Pfannos[j]);
@@ -6330,9 +6477,9 @@ function handle_addPfanno_Request(){
 					}
 				}
 			}
-			var ppTop = (document.body.clientHeight - $("#personalPannel").height() - 10);
-			ppTop = ppTop > 50 ? ppTop : 50;
-			$("#personalPannel").animate({top:ppTop});
+//			var ppTop = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height() - 10);
+//			ppTop = ppTop > 50 ? ppTop : 50;
+//			$("#personalPannel").animate({top:ppTop});
 		}
 	}
 }
@@ -6370,7 +6517,12 @@ function handle_addPanno_Request(){
 			var elementNodes = XMLDoc.getElementsByTagName(xmlTagElements);
 			var i, j;
 			
-			var ppTrackTable = document.getElementById("ppTrackTable");
+			var ppTrackTable;
+			if(personalPinned){
+				ppTrackTable = document.getElementById("tableTrack");
+			}else{
+				ppTrackTable = document.getElementById("ppTrackTable");
+			}
 			for( j = 0; j < personalPannel.personalTrackItems.Pannos.length; j++) {
 				var trNode_Panno = document.getElementById(personalPannel.personalTrackItems.Pannos[j]);
 				if(trNode_Panno) {
@@ -6415,9 +6567,9 @@ function handle_addPanno_Request(){
 					}
 				}
 			}
-			var ppTop = (document.body.clientHeight - $("#personalPannel").height() - 10);
-			ppTop = ppTop > 50 ? ppTop : 50;
-			$("#personalPannel").animate({top:ppTop});
+//			var ppTop = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height() - 10);
+//			ppTop = ppTop > 50 ? ppTop : 50;
+//			$("#personalPannel").animate({top:ppTop});
 		}
 	}
 }
@@ -6459,9 +6611,9 @@ function handle_addPclns_Request(){
 			canvasNodes = document.getElementById(personalPannel.Pclns[personalPannel.Pclns.length - 1].id).getElementsByTagName("canvas");
 			showGene(canvasNodes[0], canvasNodes[1], elementNode, personalPannel.Pclns[personalPannel.Pclns.length - 1].mode);
 			
-			var ppTop = (document.body.clientHeight - $("#personalPannel").height() - 10);
-			ppTop = ppTop > 50 ? ppTop : 50;
-			$("#personalPannel").animate({top:ppTop});
+//			var ppTop = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height() - 10);
+//			ppTop = ppTop > 50 ? ppTop : 50;
+//			$("#personalPannel").animate({top:ppTop});
 		}
 	}
 }
@@ -6475,7 +6627,12 @@ function removePclnsHttpRequest(trackId){
 		}
 	}
 	
-	var ppTrackTable = document.getElementById("ppTrackTable");
+	var ppTrackTable;
+	if(personalPinned){
+		ppTrackTable = document.getElementById("tableTrack");
+	}else{
+		ppTrackTable = document.getElementById("ppTrackTable");
+	}
 	var trNode = document.getElementById("_" + trackId);
 	var rowIndex = trNode.rowIndex;
 	ppTrackTable.deleteRow(rowIndex);
@@ -6581,9 +6738,9 @@ function handle_ppTrackModeChangeRequest(){
 					}
 				}
 			}
-			var ppTop = (document.body.clientHeight - $("#personalPannel").height() - 10);
-			ppTop = ppTop > 50 ? ppTop : 50;
-			$("#personalPannel").animate({top:ppTop});
+//			var ppTop = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height() - 10);
+//			ppTop = ppTop > 50 ? ppTop : 50;
+//			$("#personalPannel").animate({top:ppTop});
 			$("#ppTrackTable tbody").sortable({axis:"y" ,cancel:".cannotSortable"});
 		}
 	}
@@ -6606,9 +6763,30 @@ function changePPTrackModeByBtn(trackId){
 }
 
 function createPPGTrack(trackId, mode) {
-	var ppTrackTable = document.getElementById("ppTrackTable");
-	document.getElementById("ppTrackTable").innerHTML = "";
-	var trNode = ppTrackTable.insertRow(-1);
+
+	var ppTrackTable;
+	var trNode;
+	if(personalPinned){
+		ppTrackTable = document.getElementById("tableTrack");
+		var ptracks=[];
+		var j=0;
+		for(var i = 0; i<ppTrackTable.rows.length; i++){
+			if(ppTrackTable.rows[i].id && ppTrackTable.rows[i].id.substring(0,1)=="_"){
+				ptracks[j]=ppTrackTable.rows[i].id;
+				j++;
+			}
+		}
+		if(j>0){
+			for(j=0;j<ptracks.length;j++){
+				removeTrack(ptracks[j]);
+			}
+		}
+		trNode = ppTrackTable.insertRow(1);
+	}else{
+		ppTrackTable = document.getElementById("ppTrackTable");
+		document.getElementById("ppTrackTable").innerHTML = "";
+		trNode = ppTrackTable.insertRow(-1);
+	}
 	trNode.id = trackId;
 	var modechangeBtnSpan_str = "";
 	if(mode){
@@ -6620,12 +6798,22 @@ function createPPGTrack(trackId, mode) {
 			modechangeBtnSpan_str = "";
 		}
 	}
-	trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"</div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength +"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+	trNode.style.background = ppBG;
+	if(personalPinned){
+		trNode.innerHTML = "<td class=\"trackOperator\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"</div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength +"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+	}else{
+		trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"</div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength +"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+	}
 	var canvasNodes = trNode.getElementsByTagName("canvas");
 	canvasNodes[0].onmouseover = mouseOver;
 	canvasNodes[0].onmouseout = mouseOut;
 
-	canvasNodes[1].onmousedown =  mouseDownRightCanvasInPP;
+	if(personalPinned){
+		canvasNodes[0].onmousedown =  mouseDown;
+		canvasNodes[1].onmousedown =  mouseDownRightCanvas;
+	}else{
+		canvasNodes[1].onmousedown =  mouseDownRightCanvasInPP;
+	}
 	//$(canvasNodes[1]).bind("mousedown", mouseDownRightCanvasInPP);
 	
 	addMousewheelEvent(canvasNodes[1], mousewheelHandler);
@@ -6659,8 +6847,26 @@ function createPPGTrack(trackId, mode) {
 }
 
 function createPPOtherTrack(trackId, mode) {
-	var ppTrackTable = document.getElementById("ppTrackTable");
-	var trNode = ppTrackTable.insertRow(-1);
+	var ppTrackTable;
+	var trNode;
+	if(personalPinned){
+		ppTrackTable = document.getElementById("tableTrack");
+		var roww = 2;
+		if(personalPannel.Pfanno.id && personalPannel.Pfanno.id == trackId){
+			roww = 2;
+		} else if (personalPannel.Panno.id && trackId == personalPannel.Panno.id){
+			roww = 3;
+		} else {
+			roww = 4;
+		}
+		if(personalPannel.Pfanno.id == null){
+			roww --;
+		}
+		trNode = ppTrackTable.insertRow(roww);
+	}else{
+		ppTrackTable = document.getElementById("ppTrackTable");
+		trNode = ppTrackTable.insertRow(-1);
+	}
 	trNode.id = trackId;
 	var modechangeBtnSpan_str = "";
 	if(mode){
@@ -6672,11 +6878,22 @@ function createPPOtherTrack(trackId, mode) {
 			modechangeBtnSpan_str = "";
 		}
 	}
-	trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"<span class=\"close\"></span></div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength+"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+	trNode.style.background = ppBG;
+	if(personalPinned){
+		trNode.innerHTML = "<td class=\"trackOperator\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"<span class=\"close\"></span></div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength+"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+	}else{
+		trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"<span class=\"close\"></span></div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength+"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+	}
 	var canvasNodes = trNode.getElementsByTagName("canvas");
 	canvasNodes[0].onmouseover = mouseOver;
 	canvasNodes[0].onmouseout = mouseOut;
-	canvasNodes[1].onmousedown =  mouseDownRightCanvasInPP;
+
+	if(personalPinned){
+		canvasNodes[0].onmousedown =  mouseDown;
+		canvasNodes[1].onmousedown =  mouseDownRightCanvas;
+	}else{
+		canvasNodes[1].onmousedown =  mouseDownRightCanvasInPP;
+	}
 	//$(canvasNodes[1]).bind("mousedown", mouseDownRightCanvasInPP);
 	
 	addMousewheelEvent(canvasNodes[1], mousewheelHandler);
@@ -6777,7 +6994,29 @@ function handleOnchange(currentTrackItem) {
 		if(XMLHttpReq.status == 200) {
 			var XMLDoc = XMLHttpReq.responseXML;
 			if(currentTrackItem.mode != "hide") {
-				if(currentTrackItem.dataType == "BAM") {
+				if(currentTrackItem.dataType == "FASTA"){
+					var widthOfOneBase = trackLength / searchLength;
+					var fastaNodes = XMLDoc.getElementsByTagName(xmlTagSeq);
+					var fastaId;
+					var fastaNode;
+					var fastaTrackNode = document.getElementById(currentTrackItem.id);
+					var fastaCanvasNode = fastaTrackNode.getElementsByTagName("canvas");
+					var i;
+					for(i=0;i<fastaNodes.length;i++){
+						fastaId = fastaNodes[i].getAttribute("id");
+						if(fastaId == currentTrackItem.id){
+							fastaNode = fastaNodes[i];
+							break;
+						}
+					}
+
+					if(searchLength <= trackLength/10) {
+						showFastaSeq(fastaCanvasNode[1],fastaCanvasNode[0],widthOfOneBase, fastaNode.childNodes[0].nodeValue,fastaId);
+					}
+					else{
+						overScaleShow(fastaId);
+					}
+				}else if(currentTrackItem.dataType == "BAM") {
 					var readNodes = XMLDoc.getElementsByTagName(xmlTagReads);
 					var readsNode;
 					var readsId;
@@ -7957,14 +8196,14 @@ function trackItems_setting2(){
 			}
 		}else{
 			for(j = 0; j < trackGroups.length; j ++){
-				if(trackGroups[j].name == "custom tracks"){
+				if(trackGroups[j].name == "Custom Tracks"){
 					trackGroups[j].trackList.push(i);
 					break;
 				}
 			}
 			if(j == trackGroups.length){
 				trackGroups[trackGroups.length] = [];
-				trackGroups[j].name = "custom tracks";
+				trackGroups[j].name = "Custom Tracks";
 				trackGroups[j].trackList = [];
 				trackGroups[j].trackList.push(i);
 			}
@@ -8080,7 +8319,7 @@ function trackItems_setting2(){
 								if(trackItems[k].group){
 									temp_group = trackItems[k].group;
 								}else{
-									temp_group = "custom tracks";
+									temp_group = "Custom Tracks";
 								}
 							}
 							break;
@@ -8164,14 +8403,14 @@ function trackItems_setting(){
 			}
 		}else{
 			for(j = 0; j < trackGroups.length; j ++){
-				if(trackGroups[j].name == "custom tracks"){
+				if(trackGroups[j].name == "Custom Tracks"){
 					trackGroups[j].trackList.push(i);
 					break;
 				}
 			}
 			if(j == trackGroups.length){
 				trackGroups[trackGroups.length] = [];
-				trackGroups[j].name = "custom tracks";
+				trackGroups[j].name = "Custom Tracks";
 				trackGroups[j].trackList = [];
 				trackGroups[j].trackList.push(i);
 			}
@@ -8262,7 +8501,7 @@ function trackItems_setting(){
 								if(trackItems[k].group){
 									temp_group = trackItems[k].group;
 								}else{
-									temp_group = "custom tracks";
+									temp_group = "Custom Tracks";
 								}
 							}
 							break;
@@ -8445,26 +8684,32 @@ function trackItems_setting3(){//individualItems setting
 			radioboxObj.onclick = function(event){
 				var target = event.target || event.srcElement;
 				var Pvar_id = target.getAttribute("value").split('@');
-				var trParentNode = document.getElementById("divTrack");
-				var trTop = $(trParentNode).position().top - document.body.scrollTop;
-				var trLeft = $(trParentNode).position().left;
-				if(isMini_personalpannel == 1){
-					// if the personal pannel is mini
-					var trackTable_width = $("#divTrack").width();
-					$(document.getElementById("personalPannel")).css("height", "auto");
-					$(document.getElementById("personalPannel")).css("width", trackTable_width);
-					$('#showWindowBtn').remove();
+				if(personalPinned){
+				}else{
+					var trParentNode = document.getElementById("divTrack");
+				//	var trTop = $(trParentNode).position().top - document.body.scrollTop;
+					var trTop = (document.body.clientHeight + document.body.scrollTop - $("#personalPannel").height() - 10);
+					var trLeft = $(trParentNode).position().left;
+					if(isMini_personalpannel == 1){
+						// if the personal pannel is mini
+						var trackTable_width = $("#divTrack").width();
+						$(document.getElementById("personalPannel")).css("height", "auto");
+						$(document.getElementById("personalPannel")).css("width", trackTable_width);
+						$('#showWindowBtn').remove();
+					}
+					$(document.getElementById("personalPannel")).css("display", "block");
+					$(document.getElementById("personalPannel")).css("top", trTop);
+					$(document.getElementById("personalPannel")).css("left", trLeft - 1);
+					document.getElementById("ppTrackTable").innerHTML = "";
+					$(document.getElementById("ppCloseBtn")).unbind();
+					$(document.getElementById("ppMin")).unbind();
+					$(document.getElementById("ppPin")).unbind();
+					$(document.getElementById("ppSet")).unbind();
+					$(document.getElementById("ppCloseBtn")).click(removePvar);
+					$(document.getElementById("ppMin")).click(miniPersonalPannel);
+					$(document.getElementById("ppPin")).click(pinPersonalPannel);
+					$(document.getElementById("ppSet")).click(setPersonalPannel);
 				}
-				$(document.getElementById("personalPannel")).css("display", "block");
-				$(document.getElementById("personalPannel")).css("top", trTop);
-				$(document.getElementById("personalPannel")).css("left", trLeft - 1);
-				document.getElementById("ppTrackTable").innerHTML = "";
-				$(document.getElementById("ppCloseBtn")).unbind();
-				$(document.getElementById("ppMin")).unbind();
-				$(document.getElementById("ppSet")).unbind();
-				$(document.getElementById("ppCloseBtn")).click(removePvar);
-				$(document.getElementById("ppMin")).click(miniPersonalPannel);
-				$(document.getElementById("ppSet")).click(setPersonalPannel);
 				addPvarHttpRequest2(Pvar_id[0],Pvar_id[1]); 
 				indsetWindow_close();
 				//to be test whether need closet
@@ -8489,21 +8734,54 @@ function trackItems_setting3(){//individualItems setting
 		group_del_btn.onclick = function(event){
 			var target = event.target || event.srcElement;
 			var trackId_temp = target.id.substring(0,target.id.length-8);
-			if(initPvar_superid != trackId_temp){
-				XMLHttpReq6.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId_temp,false);
-				XMLHttpReq6.send(null);
-				$(document.getElementById(trackId_temp+"_group_content")).css("display","none");
-				$(target.parentNode).css("display","none");
-				target.parentNode.remove();
-			}else{
-//				alert("Please remove the user data from personal genome panel first.");
+			if(initPvar_superid == trackId_temp){
 				removePvar();
-				XMLHttpReq6.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId_temp,false);
-				XMLHttpReq6.send(null);
-				$(document.getElementById(trackId_temp+"_group_content")).css("display","none");
-				$(target.parentNode).css("display","none");
-				target.parentNode.remove();
 			}
+			XMLHttpReq6.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId_temp,false);
+			XMLHttpReq6.send(null);
+			$(document.getElementById(trackId_temp+"_group_content")).css("display","none");
+			$(target.parentNode).css("display","none");
+//			target.parentNode.remove(); //sometimes appears error in firefox
+
+			var cookieStr;
+			if($.cookie("customTrackList")){
+				cookieStr = $.cookie("customTrackList");
+			}else{
+				return;
+			}
+			var customtrackList = [];
+			var customtrackCookieList = cookieStr.split(",");
+			for(var i = 0; i < customtrackCookieList.length; i++){
+				customtrackList[i] = [];
+				customtrackList[i].id = customtrackCookieList[i].split(":")[0];
+				customtrackList[i].mode = customtrackCookieList[i].split(":")[1];
+				customtrackList[i].dataType = customtrackCookieList[i].split(":")[2];
+			}
+			var external_trackids_str = trackId_temp;
+			for(var j = 0; j < trackItems.length; j++){
+				if(trackItems[j].isServer == 0 && trackItems[j].id == trackId_temp){
+					$("#" + trackItems[j].id).remove();
+					trackItems.splice(j, 1);
+					j--;
+				}
+			}
+			for(var k = 0; k < customtrackList.length; k++){
+				if(customtrackList[k].id == trackId_temp){
+					customtrackList.splice(k, 1);
+					k--;
+				}
+			}
+			if(customtrackList.length == 0){
+				$.cookie("customTrackList", null);
+			}else{
+				cookieStr = "";
+				for(var i = 0; i < customtrackList.length; i++){
+					cookieStr = cookieStr + customtrackList[i].id + ":" + customtrackList[i].mode + ":" + customtrackList[i].dataType + ",";
+				}
+				cookieStr = cookieStr.replace(/,$/gi,"");
+				$.cookie("customTrackList", cookieStr);
+			}
+			trackItems_setting2();
 		};
 
 		group_content_divObj = document.createElement("div");
@@ -8540,26 +8818,31 @@ function trackItems_setting3(){//individualItems setting
 			radioboxObj.onclick = function(event){
 				var target = event.target || event.srcElement;
 				var Pvar_id = target.getAttribute("value").split('@');
-				var trParentNode = document.getElementById("divTrack");
-				var trTop = $(trParentNode).position().top - document.body.scrollTop;
-				var trLeft = $(trParentNode).position().left;
-				if(isMini_personalpannel == 1){
-					// if the personal pannel is mini
-					var trackTable_width = $("#divTrack").width();
-					$(document.getElementById("personalPannel")).css("height", "auto");
-					$(document.getElementById("personalPannel")).css("width", trackTable_width);
-					$('#showWindowBtn').remove();
+				if(personalPinned){
+				}else{
+					var trParentNode = document.getElementById("divTrack");
+					var trTop = $(trParentNode).position().top - document.body.scrollTop;
+					var trLeft = $(trParentNode).position().left;
+					if(isMini_personalpannel == 1){
+						// if the personal pannel is mini
+						var trackTable_width = $("#divTrack").width();
+						$(document.getElementById("personalPannel")).css("height", "auto");
+						$(document.getElementById("personalPannel")).css("width", trackTable_width);
+						$('#showWindowBtn').remove();
+					}
+					$(document.getElementById("personalPannel")).css("display", "block");
+					$(document.getElementById("personalPannel")).css("top", trTop);
+					$(document.getElementById("personalPannel")).css("left", trLeft - 1);
+					document.getElementById("ppTrackTable").innerHTML = "";
+					$(document.getElementById("ppCloseBtn")).unbind();
+					$(document.getElementById("ppMin")).unbind();
+					$(document.getElementById("ppPin")).unbind();
+					$(document.getElementById("ppSet")).unbind();
+					$(document.getElementById("ppCloseBtn")).click(removePvar);
+					$(document.getElementById("ppMin")).click(miniPersonalPannel);
+					$(document.getElementById("ppPin")).click(pinPersonalPannel);
+					$(document.getElementById("ppSet")).click(setPersonalPannel);
 				}
-				$(document.getElementById("personalPannel")).css("display", "block");
-				$(document.getElementById("personalPannel")).css("top", trTop);
-				$(document.getElementById("personalPannel")).css("left", trLeft - 1);
-				document.getElementById("ppTrackTable").innerHTML = "";
-				$(document.getElementById("ppCloseBtn")).unbind();
-				$(document.getElementById("ppMin")).unbind();
-				$(document.getElementById("ppSet")).unbind();
-				$(document.getElementById("ppCloseBtn")).click(removePvar);
-				$(document.getElementById("ppMin")).click(miniPersonalPannel);
-				$(document.getElementById("ppSet")).click(setPersonalPannel);
 				addPvarHttpRequest2(Pvar_id[0],Pvar_id[1]); 
 				indsetWindow_close();
 				//to be test whether need closet
@@ -8640,6 +8923,7 @@ function browseJumpWindow_alert(){
 	$("#browseJumpWindow").css("display","block");
 	document.getElementById("BJW_closeBtn").onclick = browseJumpWindow_close;
 	overlayDIV.onclick = browseJumpWindow_close;
+	BJW_closeRank();
 	loadChrBand();
 	//to be set reactions
 }
@@ -8681,6 +8965,35 @@ function init_removeExternals_pannel(){
 	externals_container_divObj.appendChild(externals_tableObj);
 	var checkboxObj, labelObj, trNode, tdNode;
 	external_num = 0;
+
+//	var XMLHttpReq14 = createXMLHttpRequest();//for getExternals
+//	XMLHttpReq14.open("GET","servlet/test.do?action=getExternals",false);
+//	XMLHttpReq14.send(null);
+//	var pattern = /<.*?>/g;
+//	var external_trackItems = XMLHttpReq14.responseText.replace(pattern,"").split(","); 
+//
+//	for(i = 0; i < external_trackItems.length; i++){
+//		if(external_trackItems[i] != null && external_trackItems[i] != ""){
+//			var external_trackItem_id = external_trackItems[i].split(":")[1];
+//			if(external_num%3 == 0){
+//				trNode = externals_tableObj.insertRow(-1);
+//			}
+//			tdNode = trNode.insertCell(-1);
+//			$(tdNode).attr("style","width: 217px;");
+//			checkboxObj = document.createElement("input");
+//			checkboxObj.type = "checkbox";
+//			checkboxObj.id = external_trackItem_id + "externals" + "chk";
+//			checkboxObj.value = external_trackItem_id;
+//			checkboxObj.name = "remove_externals_chk";
+//			tdNode.appendChild(checkboxObj);
+//			labelObj = document.createElement("label");
+//			labelObj.setAttribute("for", external_trackItem_id + "externals" + "chk");
+//			$(labelObj).attr("style","font-size: 12px;");
+//			labelObj.innerHTML = external_trackItem_id;
+//			tdNode.appendChild(labelObj);
+//			external_num++;
+//		}
+//	}
 	for(i = 0; i < trackItems.length; i++){
 		if(trackItems[i].isServer == 0){
 			if(external_num%3 == 0){
@@ -8739,6 +9052,9 @@ function removeExternals(){
 	for(var i=0; i < externalCheckList.length; i++){
 		if($(externalCheckList[i]).attr("checked")){
 			external_trackids_str = external_trackids_str + $(externalCheckList[i]).attr("value") + ",";
+			if(initPvar_superid == $(externalCheckList[i]).attr("value")){
+				removePvar();
+			}
 			for(var j = 0; j < trackItems.length; j++){
 				if(trackItems[j].isServer == 0 && trackItems[j].id == $(externalCheckList[i]).attr("value")){
 					$("#" + trackItems[j].id).remove();
@@ -9071,7 +9387,8 @@ $(function(){
 	$(window).resize(function(){
 		var tracktableLeft = $("#divTrack").position().left;
 		$(document.getElementById("personalPannel")).css("left", tracktableLeft);
-		$('#showWindowBtn').css("left", $(window).width() - 32);
+		$('#showWindowBtn').css("left", $("#divTrack").position().left+1110>$(window).width()-32?$(window).width()-32:$("#divTrack").position().left+1110);
+		$('#ppBtns').css("left", $("#divTrack").position().left+1110>$(window).width()-32?$(window).width()-32:$("#divTrack").position().left+1110);
 	});
 })
 
@@ -9079,6 +9396,9 @@ function loadChrBand(){
 	document.getElementById("BJW_genome").innerHTML="";
 	document.getElementById("BJW_genelist").innerHTML="";
 	document.getElementById("upload_success").innerHTML="Loading Individual Genome...";
+	document.getElementById("filter_value").value=score_filter;
+	score_filter_ceil = 0;
+
 	var xmlAttribute_gieStain = "gS";
 	var xmlTagScore="Score";
 	var pattern = /<.*?>/g;
@@ -9289,6 +9609,10 @@ function loadChrBand(){
 		scang_button[0].onclick = function(){
 			error_warn.remove();
 			if(personalPannel.Pvar.id){
+
+				XMLHttpReq7.open("GET","servlet/test.do?action=downloadIndex&tracks=_"+initPvar_superid,false);
+				XMLHttpReq7.send(null);
+
 				getSingleCytoAsync(0,0,2);
 			}
 			else {
@@ -9311,6 +9635,8 @@ function loadChrBand(){
 		scanc_button[0].onclick = function(){
 			error_warn.remove();
 			if(click!=null && personalPannel.Pvar.id){
+				XMLHttpReq7.open("GET","servlet/test.do?action=downloadIndex&tracks=_"+initPvar_superid,false);
+				XMLHttpReq7.send(null);
 				getSingleCytoAsync(click,0,1);
 			}
 			else {
@@ -9333,6 +9659,8 @@ function loadChrBand(){
 		scanb_button[0].onclick = function(){
 			error_warn.remove();
 			if(click!=null && blick!=null && personalPannel.Pvar.id){
+				XMLHttpReq7.open("GET","servlet/test.do?action=downloadIndex&tracks=_"+initPvar_superid,false);
+				XMLHttpReq7.send(null);
 				getSingleCytoAsync(click,blick,0);
 			}
 			else {
@@ -9533,18 +9861,19 @@ function loadChrBand(){
 
 								ogeneso[gidx]= {};
 								ogeneso[gidx].text=G.text(10,(gidx*20+10),ogenes[gidx].id).attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
-								if(ogenes[gidx].score>=100){
-									ogenes[gidx].score=0;
-								} else{
-									if(ogenes[gidx].score<=0){
-										ogenes[gidx].score=255;
-									} else{
-										ogenes[gidx].score=200-ogenes[gidx].score*2;
-									}
-								}
-								var rgbparam="rgb(255,"+ogenes[gidx].score+","+ogenes[gidx].score+")";
-								
-								ogeneso[gidx].flag=G.rect(0,(gidx*20),8,20).attr({fill:Raphael.getRGB(rgbparam).hex,"stroke-width":0});
+//								if(ogenes[gidx].score>=100){
+//									ogenes[gidx].score=0;
+//								} else{
+//									if(ogenes[gidx].score<=0){
+//										ogenes[gidx].score=255;
+//									} else{
+//										ogenes[gidx].score=200-ogenes[gidx].score*2;
+//									}
+//								}
+//								var rgbparam="rgb(255,"+ogenes[gidx].score+","+ogenes[gidx].score+")";
+//								
+//								ogeneso[gidx].flag=G.rect(0,(gidx*20),8,20).attr({fill:Raphael.getRGB(rgbparam).hex,"stroke-width":0});
+								ogeneso[gidx].flag=G.rect(0,(gidx*20),8,20).attr({fill:cytoscore2color(ogenes[gidx].score),"stroke-width":0});
 								var gup=ogenes[gidx].from-chrs[click].bands[blick].from;
 								var gdown=ogenes[gidx].to-chrs[click].bands[blick].from;
 								var bandlen=chrs[click].bands[blick].to-chrs[click].bands[blick].from;
@@ -9609,6 +9938,7 @@ function loadChrBand(){
 			};
 		})(genome[chrom],chrom);
 	}
+	document.getElementById("filter_range").innerHTML="(0~"+score_filter_ceil+")";
 
 	function getSingleCytoAsync(c,b,mode) {
 		control_scanning=1;
@@ -9668,9 +9998,17 @@ function loadChrBand(){
 		}
 	}
 	function cytoscore2color(score){
-		if(score>=100){
+		if(score_filter_ceil < score){
+			score_filter_ceil = score;
+			document.getElementById("filter_range").innerHTML="(0~"+score_filter_ceil+")";
+		}
+		if(score < score_filter){
+			score = 255;
+		}
+		else if(score>=100){
 			score=0;
-		} else{
+		} 
+		else{
 			if(score<=0){
 				score=255;
 			} else{
@@ -9755,7 +10093,6 @@ function loadChrBand(){
 			 //R.remove();
 		 }; 
 	}
-
 }
 function BJW_getStat() {
 	if(personalPannel.Pvar.id)
@@ -9781,6 +10118,86 @@ function BJW_upStat() {
 			}
 		}
 	}
+}
+function BJW_filterStat() {
+	score_filter=document.getElementById("filter_value").value;
+	loadChrBand();
+}
+function BJW_rankGene() {
+	$(document.getElementById("BJW_stat")).css("display", "none");
+	$(document.getElementById("BJW_content")).css("display", "none");
+	$(document.getElementById("BJW_rank")).css("display", "block");
+	document.getElementById("gene_table").innerHTML="";
+
+	var topnumber=document.getElementById("top_number").value;
+	var pattern = /^[0-9]+$/;
+	if(!pattern.exec(topnumber)) {
+		topnumber=100;
+	}
+
+	var XMLHttpReq14 = createXMLHttpRequest();
+	XMLHttpReq14.open("GET","servlet/test.do?action=rankGene&topnumber="+topnumber,false);
+	XMLHttpReq14.send(null);
+
+	var xmlTagScore="Score";
+	var ogenesNode = XMLHttpReq14.responseXML.getElementsByTagName("Genes")[0];
+	var ogeneNodes = ogenesNode.getElementsByTagName("Gene");
+	var ogenes=[];
+
+	var gene_table_html = "";
+	var gene_div_lines = Math.ceil(ogeneNodes.length/3);
+	var line_num = 0;
+	for(var gidx=0;gidx<ogeneNodes.length;gidx++){
+		if(gidx%gene_div_lines == 0){
+			if(gidx!=0){
+				gene_table_html+="</div>";
+			}
+			gene_table_html+="<div style=\"width:235px;float:left\">";
+			line_num = 0;
+		}
+		ogenes[gidx] = {};
+		ogenes[gidx].id = ogeneNodes[gidx].getAttribute(xmlAttributeId);
+		ogenes[gidx].chr = ogeneNodes[gidx].getElementsByTagName(xmlTagChrNum)[0].childNodes[0].nodeValue;
+		ogenes[gidx].from = parseInt(ogeneNodes[gidx].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue);
+		ogenes[gidx].to = parseInt(ogeneNodes[gidx].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue);
+		if(ogeneNodes[gidx].getElementsByTagName(xmlTagScore).length>0){
+			ogenes[gidx].score = parseFloat(ogeneNodes[gidx].getElementsByTagName(xmlTagScore)[0].childNodes[0].nodeValue);
+		}
+		else{
+			ogenes[gidx].score = "NA";
+		}
+		if(ogenes[gidx].score == -1){
+			ogenes[gidx].score = "NA";
+		}
+		var line_color = "#d9d9d9";
+		if(line_num%2==0){
+			line_color = "#c6dbef";
+		}
+		line_num++;
+
+		gene_table_html+="<span id=\"gene_table_"+ogenes[gidx].id+"\" class=\"BJW_gene_table_id\" style=\"background:"+line_color+"\">"+ogenes[gidx].id+"</span><span class=\"BJW_gene_table_score\" style=\"background:"+line_color+"\">"+ogenes[gidx].score+"</span><br>";
+
+	}
+	gene_table_html+="</div>";
+	
+	document.getElementById("gene_table").innerHTML=gene_table_html;
+	for(var gidx=0;gidx<ogeneNodes.length;gidx++){
+		(function (gen, gidx){
+			gen.onclick = function() {
+				var inputchr = ogenes[gidx].chr;
+				var inputsf = ogenes[gidx].from;
+				var inputet = ogenes[gidx].to;
+				document.getElementById("search_field").value=inputchr+":"+inputsf.toLocaleString().replace(/\.0+$/,"")+"-"+inputet.toLocaleString().replace(/\.0+$/,"");
+				browseJumpWindow_close();
+				jump();
+			};
+		})(document.getElementById("gene_table_"+ogenes[gidx].id),gidx);
+	}
+}
+function BJW_closeRank() {
+	$(document.getElementById("BJW_rank")).css("display", "none");
+	$(document.getElementById("BJW_stat")).css("display", "block");
+	$(document.getElementById("BJW_content")).css("display", "block");
 }
 function addExIndividual(){
 	control_upexternal=0;
@@ -9826,6 +10243,7 @@ function addExIndividual(){
 			}
 		}
 	}
+	var sucess = false;
 	
 	if(ifurl){
 		if(trackId!=null && trackType!=null && trackURL!=null && trackId!="" && trackType!="" && trackURL!=""){
@@ -9843,7 +10261,8 @@ function addExIndividual(){
 				XMLHttpReq12.send(null);
 				var err_text=XMLHttpReq12.responseText.replace(pattern,"");
 				if(err_text==null||err_text==""){
-					trackItems_setting3()
+					sucess = true;
+					trackItems_setting3();
 				}else{
 					XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
 					XMLHttpReq12.send(null);
@@ -9890,7 +10309,8 @@ function addExIndividual(){
 						var err_text=XMLHttpReq12.responseText.replace(pattern,"");
 						if(event.target.status == 200){
 							if(err_text==null||err_text==""){
-								trackItems_setting3()
+								sucess = true;
+								trackItems_setting3();
 							}else{
 								XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
 								XMLHttpReq12.send(null);
@@ -9922,11 +10342,164 @@ function addExIndividual(){
 			alert("Please fill all required parameters.");
 		}
 	}
+	///////////////////
+	if(sucess){ //to add ExIndividual from 'select individual in trackItems array
+		var customTrackId = trackId;
+		var customTrackDisplayMode = "hide";
+		var customTrackDataType = trackType;
+
+		var temp_trackItemsLength = trackItems.length;
+		trackItems[temp_trackItemsLength] = [];
+		trackItems[temp_trackItemsLength].id = customTrackId;
+		trackItems[temp_trackItemsLength].mode = customTrackDisplayMode;
+		trackItems[temp_trackItemsLength].dataType = customTrackDataType;
+		trackItems[temp_trackItemsLength].isServer = 0;
+	
+		var cookieStr;
+		if($.cookie("customTrackList")) {
+			cookieStr = $.cookie("customTrackList") + ",";
+		} else {
+			cookieStr = "";
+		}
+		cookieStr = cookieStr + customTrackId;
+		cookieStr = cookieStr + ":";
+		cookieStr = cookieStr + customTrackDisplayMode;
+		cookieStr = cookieStr + ":";
+		cookieStr = cookieStr + customTrackDataType;
+		$.cookie("customTrackList", cookieStr, {
+			expires : 10 / 24
+		});
+	
+		if(trackItems[temp_trackItemsLength].mode != "hide") {
+			createTrack(trackItems[temp_trackItemsLength].id, trackItems[temp_trackItemsLength].mode);
+		}
+		currentTrackItem = trackItems[temp_trackItemsLength];
+		trackItems_setting2();
+	}
+	////////////////////////////
 }
 function fill_example_pg(){
 	document.getElementById("pg_upload_name").value="test_1";
 	document.getElementById("pg_upload_url").value="http://www.pgbrowser.org/Example.vcf.gz";
 	document.getElementById("pg_upload_type").value="VCF";
+}
+function pinPersonalPannel(){
+	personalPinned = true;
+//	$(document.getElementById("personalPannel")).css("display", "none");
+	var _personalPanel = $('#personalPannel');
+	var _width = _personalPanel.css('width');
+	var _height = _personalPanel.css('height');
+	var _top = _personalPanel.css('top');
+	var _left = _personalPanel.css('left');
+	var left_value = $("#divTrack").position().left+1110>$(window).width()-32?$(window).width()-32:$("#divTrack").position().left+1110
+	
+	_personalPanel.animate({ 
+		width: 0, 
+		height: 0,
+		top: $(window).height() / 3,
+		left: left_value,
+	},
+	{
+		complete: function(){
+			generate_ppBtns();
+			_personalPanel.css("display","none");
+		}
+	});
+	document.getElementById("ppTrackTable").innerHTML = "";
+
+	addPvarHttpRequest2(personalPannel.Pvar.id.substring(1),initPvar_superid);
+}
+var isPpBtns= false;
+function generate_ppBtns(){
+	if(isPpBtns){
+		return;
+	}
+
+	var _personalPanel = $('#personalPannel');
+	var _width = $("#divTrack").css('width');
+	var _top =  document.body.scrollTop + $(window).height()/2;
+	_top = _top > 100 ? _top:100;
+	var _left = $("#divTrack").position().left;
+	var left_value = $("#divTrack").position().left+1110>$(window).width()-32?$(window).width()-32:$("#divTrack").position().left+1110
+
+	$('body').append(
+	'<div id="ppBtns" style="height:100px;width:35px;top:'+ ($(window).height() / 3 - 48) + 'px; left:' + left_value + 'px; position:fixed;">'
+	+ '<input type="button" id="unpinWindowBtn"'
+	+ ' style="height:31px; width:32px; border-style:none; background: url(image/mouse-out-32.png); margin:1px"/>'
+	+ '<input type="button" id="setWindowBtn"'
+	+ ' style="height:32px; width:32px; border-style:none; background: url(image/setting-out-32.png); margin:1px"/>'
+	+ '<input type="button" id="closeWindowBtn"'
+	+ ' style="height:32px; width:32px; border-style:none; background: url(image/close-out-32.png); margin:1px"/></div>'
+	);
+					
+	ppBtns = $('#ppBtns');
+
+	unpinWindowBtn = $('#unpinWindowBtn');
+	unpinWindowBtn.mousemove(function(e){
+		unpinWindowBtn.css('background', 'url(image/mouse-over-32.png)');
+	});
+	unpinWindowBtn.mouseout(function(e){
+		unpinWindowBtn.css('background', 'url(image/mouse-out-32.png)');
+	});
+	unpinWindowBtn.click(function(e){
+		_left = $("#divTrack").position().left;
+		ppBtns.remove();
+		isPpBtns = false;
+		_personalPanel.css("display","block");
+		_personalPanel.animate({ 
+			width: _width, 
+			height: "auto",
+			top: _top,
+			left: _left,
+		});
+		_personalPanel.css("height","auto");
+		unpinPersonalPannel();
+		//$(window).resize();
+	});
+
+	setWindowBtn = $('#setWindowBtn');
+	setWindowBtn.mousemove(function(e){
+		setWindowBtn.css('background', 'url(image/setting-over-32.png)');
+	});
+	setWindowBtn.mouseout(function(e){
+		setWindowBtn.css('background', 'url(image/setting-out-32.png)');
+	});
+	setWindowBtn.click(function(e){
+		setPersonalPannel();
+	});
+
+	closeWindowBtn = $('#closeWindowBtn');
+	closeWindowBtn.mousemove(function(e){
+		closeWindowBtn.css('background', 'url(image/close-over-32.png)');
+	});
+	closeWindowBtn.mouseout(function(e){
+		closeWindowBtn.css('background', 'url(image/close-out-32.png)');
+	});
+	closeWindowBtn.click(function(e){
+		removePvar();
+	});
+	isPpBtns = true;
+}
+function unpinPersonalPannel(){
+	personalPinned = false;
+	var ppTrackTable = document.getElementById("tableTrack");
+	var ptracks=[];
+	var j=0;
+	for(var i = 0; i<ppTrackTable.rows.length; i++){
+		if(ppTrackTable.rows[i].id && ppTrackTable.rows[i].id.substring(0,1)=="_"){
+			ptracks[j]=ppTrackTable.rows[i].id;
+			j++;
+		}
+	}
+	if(j>0){
+		for(j=0;j<ptracks.length;j++){
+			removeTrack(ptracks[j]);
+		}
+	}
+	if($("#personalPannel").css("display") != "none"){
+		ppLoadingId = showLoadingImage("ppContent", "#personalPannel");
+	}
+	addPvarHttpRequest2(personalPannel.Pvar.id.substring(1),initPvar_superid);
 }
 /*为解决搜索框与personal gene detail box出现冲突而添加的代码，从根本上解决之后不需要这段代码
 $(document).ready(function() {

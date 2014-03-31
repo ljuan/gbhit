@@ -95,7 +95,7 @@ public class TabixReaderForVCF {
 	 * @param fn
 	 *            File name of the data file
 	 */
-	public TabixReaderForVCF(final String fn) throws IOException {
+	public TabixReaderForVCF(final String fn, final String idxn) throws IOException {
 		mFn = fn;
 		if (fn.startsWith("http:") || fn.startsWith("https:")
 				|| fn.startsWith("ftp:")) // Liran added
@@ -103,7 +103,7 @@ public class TabixReaderForVCF {
 		else
 			// Liran added
 			mFp = new BlockCompressedInputStream(new File(fn));
-		readIndex();
+		readIndex(idxn);
 	}
 
 	public boolean hasChromPrefix() {
@@ -264,14 +264,17 @@ public class TabixReaderForVCF {
 	/**
 	 * Read the Tabix index from the default file.
 	 */
-	public void readIndex() throws IOException {
+	public void readIndex(final String idxn) throws IOException {
 		BlockCompressedInputStream is;
-		if (mFn.startsWith("http:") || mFn.startsWith("https:")
-				|| mFn.startsWith("ftp:")) // Liran added
-			is = new BlockCompressedInputStream(new URL(mFn + ".tbi"));
+		if(idxn == null || !new File(idxn).exists())
+			if (mFn.startsWith("http:") || mFn.startsWith("https:")
+					|| mFn.startsWith("ftp:")) // Liran added
+				is = new BlockCompressedInputStream(new URL(mFn + ".tbi"));
+			else
+				// Liran added
+				is = new BlockCompressedInputStream(new File(mFn + ".tbi"));
 		else
-			// Liran added
-			is = new BlockCompressedInputStream(new File(mFn + ".tbi"));
+			is = new BlockCompressedInputStream(new File(idxn));
 		readIndex(is);
 	}
 

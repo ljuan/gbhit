@@ -37,6 +37,7 @@ public class Variant implements Comparable<Variant> {
 	private String description;// Tag
 	private String homo;// //Attribute
 	private String dbsnpInfo;// Tag
+	private String sampleInfo;
 	
 	private int effect = 0;//Attribute --added by Liran for record variant which has effect
 	/*
@@ -120,6 +121,9 @@ public class Variant implements Comparable<Variant> {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	public void setSampleInfo(String sampleInfo) {
+		this.sampleInfo= sampleInfo;
+	}
 
 	public void setId(String id) {
 		this.id = id;
@@ -159,6 +163,9 @@ public class Variant implements Comparable<Variant> {
 
 	public String getDescription() {
 		return description;
+	}
+	public String getSampleInfo() {
+		return sampleInfo;
 	}
 
 	public String getId() {
@@ -230,6 +237,8 @@ public class Variant implements Comparable<Variant> {
 			XmlWriter.append_text_element(doc, v, XML_TAG_DESCRIPTION, description);
 		if (dbsnpInfo != null)
 			XmlWriter.append_text_element(doc, v, XML_TAG_DBSNP, dbsnpInfo);
+		if (sampleInfo!= null)
+			XmlWriter.append_text_element(doc, v, XML_TAG_SAMPLEINFO, sampleInfo);
 	}
 	
 	public static Variant convertElement2Variant(Element ele){
@@ -256,6 +265,8 @@ public class Variant implements Comparable<Variant> {
 				v.setDescription(e.getTextContent());
 			else if (e.getTagName().equals(XML_TAG_DBSNP))
 				v.setDbsnpInfo(e.getTextContent());
+			else if (e.getTagName().equals(XML_TAG_SAMPLEINFO))
+				v.setSampleInfo(e.getTextContent());
 		}
 		
 		return v;
@@ -278,6 +289,11 @@ public class Variant implements Comparable<Variant> {
 		newObj.direction = obj.direction;
 		newObj.description = obj.description;
 		newObj.homo = obj.homo;
+		newObj.dbsnpid = obj.dbsnpid;
+		newObj.effect = obj.effect;
+		newObj.dbsnpInfo = obj.dbsnpInfo;
+		newObj.sampleInfo = obj.sampleInfo;
+		
 		return newObj;
 	}
 }

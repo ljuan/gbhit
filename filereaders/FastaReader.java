@@ -149,4 +149,15 @@ public class FastaReader {
 		sequence.setAttribute(Consts.XML_TAG_ID, id);
 		return sequence;
 	}
+	public Element write_fasta2sequence(Document doc, String chr, long start,
+			long end, String id, double bpp) throws IOException {
+		String seq = "";
+		if(bpp<=0.5)
+			seq = extract_seq(chr, start, end);
+		Element sequence = XmlWriter.append_text_element(doc, doc
+				.getElementsByTagName(Consts.DATA_ROOT).item(0),
+				Consts.XML_TAG_SEQ, seq);
+		sequence.setAttribute(Consts.XML_TAG_ID, id);
+		return sequence;
+	}
 }

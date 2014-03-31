@@ -1,8 +1,10 @@
 package filereaders;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.w3c.dom.Document;
@@ -19,6 +21,7 @@ class VcfSample implements Serializable{
 	private String[] SampleNames;
 	private int[] selectedIndexes;
 	private String[] selectedNames=null;
+	private Family Pedigree=null;
 
 	/**
 	 * Add all samples
@@ -59,6 +62,23 @@ class VcfSample implements Serializable{
 			bi.selected = true;
 			selectedIndexes[i] = bi.index;
 		}
+	}
+	public void loadPedigree(String filepath){
+		File ped = new File(filepath);
+		ByteBufferChannel bbc = new ByteBufferChannel(ped, 0, ped.length());
+		initPedigree(bbc.ToString(Consts.DEFAULT_ENCODE));
+	}
+	public void initPedigree(String ped){
+		this.Pedigree = new Family(ped);
+	}
+	public void removePedigree(){
+		this.Pedigree = null;
+	}
+	public Element write_family2pedigree(Document doc, String track){
+		if(Pedigree!=null)
+			return Pedigree.write_family2pedigree(doc, track);
+		else
+			return null;
 	}
 
 	Element appendXMLcontent(Document doc, Element Param) {
@@ -120,6 +140,11 @@ class VcfSample implements Serializable{
 		}
 		return -1;
 	}
+	public int getIndex(String SampleName){
+		if(ifExists(SampleName))
+			return Samples.get(SampleName).index;
+		return -1;
+	}
 
 	public int getSamplesNum() {
 		return SampleNames == null ? 0 : SampleNames.length;
@@ -139,6 +164,121 @@ class VcfSample implements Serializable{
 		BooleanIndex(boolean selected, int index) {
 			this.selected = selected;
 			this.index = index;
+		}
+	}
+	private class Family {
+//		Map<String, FamilyMember> Roots;
+		Map<String, FamilyMember> Members;
+		Family(String ped){
+//			this.Roots = new HashMap<String, FamilyMember>();
+			this.Members = new HashMap<String, FamilyMember>();
+			String[] temp = ped.split("[\n\r]+");
+			for(int i=0;i<temp.length;i++)
+				addFamilyMember(temp[i]);
+			for(int i=0;i<SampleNames.length;i++)
+				if(!Members.containsKey(SampleNames[i]))
+					addFamilyMember(SampleNames[i],0);
+		}
+		void addFamilyMember(String ped){
+			String[] temp = ped.split("\\s+|,|;");
+			FamilyMember fm = new FamilyMember(temp);
+			Members.put(fm.getID(), fm);
+		}
+		void addFamilyMember(String id,int sex){
+			FamilyMember fm = new FamilyMember("",id,sex);
+			Members.put(fm.getID(), fm);
+		}
+		Element write_family2pedigree(Document doc,String track){
+			Element ped=doc.createElement(Consts.XML_TAG_PEDIGREE);
+			ped.setAttribute(Consts.XML_TAG_ID, track);
+			Iterator member = Members.values().iterator();
+			while(member.hasNext())
+				ped.appendChild(((FamilyMember)member.next()).toXml(doc));
+			doc.getElementsByTagName(Consts.DATA_ROOT).item(0).appendChild(ped);
+			return ped;
+		}
+		
+	}
+	private class FamilyMember {
+		String Family;
+		String id;
+		String Fid;
+		String Mid;
+		int Sex;
+		int Affected;
+		String Info = null;
+		boolean IfSample = false;
+		
+//		String LeftMostOffspring;
+//		String Spouse;
+//		String RightBrother;
+		FamilyMember(String[] ped){
+			this.Family = ped[0];
+			this.id = ped[1];
+			this.Fid = ped[2];
+			this.Mid = ped[3];
+			if(ped[4].equals("1"))
+				this.Sex = 1;
+			else if(ped[4].equals("2"))
+				this.Sex = 2;
+			else
+				this.Sex = 0;
+			if(ped[5].equals("1"))
+				this.Affected = 1;
+			else if (ped[5].equals("2"))
+				this.Affected = 2;
+			else
+				this.Affected = 0;
+			if(ped.length>6){
+				this.Info = "";
+				for(int i=6;i<ped.length;i++)
+					Info = Info+ped[i]+",";
+			}
+			if(Samples.containsKey(id))
+				IfSample = true;
+		}
+		FamilyMember(String family, String id, int sex){
+			this.Family = family;
+			this.id = id;
+			this.Fid = "0";
+			this.Mid = "0";
+			this.Sex = sex;
+			this.Affected = 0;
+			if(Samples.containsKey(id))
+				IfSample = true;
+		}
+		
+		public String getFamily(){
+			return Family;
+		}
+		public int getSex(){
+			return Sex;
+		}
+		public String getFather(){
+			return Fid;
+		}
+		public String getMother(){
+			return Mid;
+		}
+		public String getID(){
+			return id;
+		}
+		public boolean ifSample(){
+			return IfSample;
+		}
+		
+		public Element toXml(Document doc){
+			Element member = doc.createElement(Consts.XML_TAG_MEMBER);
+			member.setAttribute(Consts.XML_TAG_ID, id);
+			member.setAttribute(Consts.XML_TAG_IFS, String.valueOf(IfSample));
+			XmlWriter.append_text_element(doc, member, Consts.XML_TAG_FAMILY, Family);
+			XmlWriter.append_text_element(doc, member, Consts.XML_TAG_FATHER, Fid);
+			XmlWriter.append_text_element(doc, member, Consts.XML_TAG_MOTHER, Mid);
+			XmlWriter.append_text_element(doc, member, Consts.XML_TAG_SEX, String.valueOf(Sex));
+			XmlWriter.append_text_element(doc, member, Consts.XML_TAG_AFFECTED, String.valueOf(Affected));
+			if(Info!=null)
+				XmlWriter.append_text_element(doc, member, Consts.XML_TAG_DESCRIPTION, Info);
+			return member;
 		}
 	}
 }

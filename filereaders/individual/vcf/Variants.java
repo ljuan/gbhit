@@ -79,12 +79,14 @@ public class Variants {
 	 * @param index
 	 *            Index of SAMPLEs selected. For DBSnp, it doesn't work
 	 */
-	public void addVariant(Vcf vcf, Variant[] vs) {
+	public void addVariant(Vcf vcf, int selectedIndex, Variant[] vs) {
 		for (Variant v : vs) {
 			if (isModeDENSE && v.getTo() - lastpos < bpp)
 				continue;
 			if (isModeDETAIL) {
 				v.setDescription(vcf.getDetail());
+				if(selectedIndex >= 0 )
+					v.setSampleInfo(vcf.getSampleInfo(selectedIndex));
 			}
 			v.write2xml(doc, ele, outputLetter);
 			lastpos = v.getTo();

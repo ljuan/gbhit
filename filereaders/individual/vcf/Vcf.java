@@ -618,7 +618,6 @@ public class Vcf {
 		if (!samples.containGT())
 			return variants;
 		int[] vIndexes = samples.getVariantIndexes(index);
-
 		if (vIndexes == null)
 			return null;
 		Variant[] vs = new Variant[variants.length];
@@ -631,6 +630,110 @@ public class Vcf {
 		if (len > 1) {
 			Arrays.sort(vs);
 		}
+
+		return vs;
+	}
+	public Variant[][] getVariants_intersection(int indexlen) {
+		if (!samples.containGT()){
+			Variant[][] vs=new Variant[1][];
+			vs[0]=variants;
+			return vs;
+		}
+		int[] votes={0,0,0,0,0,0,0,0,0,0};
+		
+		for(int i=0;i<indexlen;i++){
+			int[] variantIndexes = samples.getVariantIndexes(i);
+			if(variantIndexes == null)
+				continue;
+			for(int j : variantIndexes)
+				votes[j]++;
+		}
+		
+		int num=0;
+		for(int i=0;i<10;i++)
+			if(votes[i]==indexlen)
+				num++;
+		if (num==0)
+			return null;
+		int[] vIndexes = new int[num];
+		num=0;
+		for(int i=0;i<10;i++)
+			if(votes[i]==indexlen)
+				vIndexes[num++]=i;
+		Variant[][] vs = new Variant[indexlen][];
+		for(int i=0;i<indexlen;i++)
+			vs[i]=new Variant[variants.length];
+		
+		int len = 0;
+
+		for (int vIndex : vIndexes) {
+			for(int i=0;i<indexlen;i++){
+				vs[i][len] = Variant.copy(variants[vIndex - 1]);
+				vs[i][len].setHomo(samples.getHome(i));
+			}
+			len++;
+		}
+		if (len > 1) 
+			for(int i=0;i<indexlen;i++)
+				Arrays.sort(vs[i]);
+
+		return vs;
+	}
+	public Variant[][] getVariants_difference(int[] indexes_a,int[] indexes_b) {
+		if (!samples.containGT()){
+			Variant[][] vs=new Variant[1][];
+			vs[0]=variants;
+			return vs;
+		}
+		boolean[] votes_a={true,true,true,true,true,true,true,true,true,true};
+		int[] votes_b={0,0,0,0,0,0,0,0,0,0};
+		
+		for(int i=0;i<indexes_a.length;i++){
+			int[] variantIndexes = samples.getVariantIndexes(indexes_a[i]);
+			if(variantIndexes == null)
+				continue;
+			for(int j : variantIndexes)
+				votes_a[j]=false;
+		}
+		for(int i=0;i<indexes_b.length;i++){
+			int[] variantIndexes = samples.getVariantIndexes(indexes_b[i]);
+			if(variantIndexes == null)
+				continue;
+			for(int j : variantIndexes)
+				votes_b[j]++;
+		}
+		int num=0;
+		for(int i=0;i<10;i++)
+			if(votes_a[i]&&votes_b[i]==indexes_b.length)
+				num++;
+		if (num==0)
+			return null;
+		int[] vIndexes = new int[num];
+		num=0;
+		for(int i=0;i<10;i++)
+			if(votes_a[i]&&votes_b[i]==indexes_b.length)
+				vIndexes[num++]=i;
+		
+		int[] indexes = new int[indexes_a.length+indexes_b.length];
+		System.arraycopy(indexes_a, 0, indexes, 0, indexes_a.length);
+		System.arraycopy(indexes_b, 0, indexes, indexes_a.length, indexes_b.length);
+		
+		Variant[][] vs = new Variant[indexes.length][];
+		for(int i=0;i<indexes.length;i++)
+			vs[i]=new Variant[variants.length];
+		
+		int len = 0;
+
+		for (int vIndex : vIndexes) {
+			for(int i=0;i<indexes.length;i++){
+				vs[i][len] = Variant.copy(variants[vIndex - 1]);
+				vs[i][len].setHomo(samples.getHome(indexes[i]));
+			}
+			len++;
+		}
+		if (len > 1) 
+			for(int i=0;i<indexes.length;i++)
+				Arrays.sort(vs[i]);
 
 		return vs;
 	}
@@ -651,13 +754,18 @@ public class Vcf {
 	public String getDetail() {
 		StringBuilder description = new StringBuilder();
 //		description.append("REF:").append(this.Ref).append(";QUAL:").append(this.Qual).append(";FILTER:")
-		description.append(";QUAL:").append(this.Qual).append(";FILTER:")
-				.append(this.Filter).append(";INFO:").append(this.Info);
-		if (samples != null) {
-			description.append(";FORMAT:").append(samples.getFormat())
-					.append(";SAMPLES:").append(samples.toString());
-		}
+		description.append("QUAL:").append(this.Qual).append(";FILTER:")
+				.append(this.Filter).append(";").append(this.Info);
 
 		return description.toString();
+	}
+	public String getSampleInfo(int selectedIndex){
+		String[] sampleFormat = samples.getFormat().split(":");
+		String[] sampleContent = samples.getSample(selectedIndex).split(":");
+		StringBuilder sampleInfo = new StringBuilder();
+		for(int i=0;i<sampleFormat.length;i++)
+			sampleInfo.append(sampleFormat[i]+":"+sampleContent[i]+";");
+		
+		return sampleInfo.toString();
 	}
 }

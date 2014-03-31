@@ -23,6 +23,7 @@ public interface Consts{
 	public static final String VCF_HEADER_SAMPLE="Samples";
 	public static final String VCF_QUAL_LIMIT="QualityThreshold";
 	public static final String VCF_CHROM_PREFIX="chromprefix";
+	public static final String VCF_INDEX_LOCAL="indexpath";
 	
 	public static final String GDF_SNPID="SNPid";
 	public static final String GDF_MUTID="MUTID";
@@ -80,6 +81,7 @@ public interface Consts{
 	public static final String XML_TAG_END="End";
 	public static final String XML_TAG_LENGTH="Length";
 	public static final String XML_TAG_SEQUENCE="Sequence";
+	public static final String XML_TAG_SEQ="Seq";
 	public static final String XML_TAG_ERROR="Error";
 	
 	public static final String XML_TAG_ID="id";
@@ -99,6 +101,7 @@ public interface Consts{
 	public static final String XML_TAG_TOCHR="Mate";
 	public static final String XML_TAG_LETTER="B";
 	public static final String XML_TAG_DESCRIPTION="Des";
+	public static final String XML_TAG_SAMPLEINFO="SampleInfo";
 	public static final String XML_TAG_HOMO="h";
 	public static final String XML_TAG_DBSNP="Dbsnp";
 	public static final String XML_TAG_SOURCE="Source";
@@ -118,6 +121,15 @@ public interface Consts{
 	public static final String XML_TAG_PARAMETER="Parameter";
 	public static final String XML_TAG_PARAMETERS="Parameters";
 	public static final String XML_TAG_OPTIONS="Options";
+	
+	public static final String XML_TAG_PEDIGREE="Pedigree";
+	public static final String XML_TAG_MEMBER="Member";
+	public static final String XML_TAG_FAMILY="Family";
+	public static final String XML_TAG_FATHER="Father";
+	public static final String XML_TAG_MOTHER="Mother";
+	public static final String XML_TAG_SEX="Sex";
+	public static final String XML_TAG_AFFECTED="Affected";
+	public static final String XML_TAG_IFS="ifSample";
 	
 	public static final String XML_TAG_MODE="Mode";
 	public static final String XML_TAG_STEP="Step";

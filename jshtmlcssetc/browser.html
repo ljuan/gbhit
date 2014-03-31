@@ -28,9 +28,9 @@
 		<title id="browserTitle">Personal Genome Browser</title>
 	</head>
 	<body>
-		<div id="menu-container">
+		<div id="menu-container" style="background: #6baed6">
 			<center>
-				<div id="menu-center">
+				<div id="menu-center" style="background: #6baed6">
 					<span style="float:left;margin:3px"><img src="image/logo3.png" width="80" height="40"></img></span>
 					<ul>
 						<li id="indsetWindow-li" style="line-height: 42px;" title="individual" class="help-li">
@@ -69,11 +69,11 @@
 						</li>-->
 						<li style="line-height: 42px;" title="Custom Track" alt="#TB_inline?height=315;width=700;inlineId=myOnPageContent" class="thickbox custom-track-li">
 							<span id="customtrack"></span>
-							<span style="font-size: 18px;">Upload Custom Track</span>	
+							<span style="font-size: 18px;">Add Custom Tracks</span>	
 						</li>
 						<li id="helpWindow-li" style="line-height: 42px;" title="help" class="help-li" onclick="window.open('tutorial.html')">
 							<span id="helpBtn"></span>
-							<span style="font-size: 18px;">Help</span>
+							<span style="font-size: 18px;">Tutorial</span>
 						</li>
 					</ul>
 				</div>
@@ -161,24 +161,24 @@
 								<td style="text-align: right;">Display Mode</td>
 								<td>
 								<select id="customTrackDisplayMode" style="border: solid 1px #A3A3A3">
-									<option>hide</option>
+									<option selected="selected">pack</option>
 									<option>dense</option>
-									<option>pack</option>
+									<option>hide</option>
 								</select></td>
 							</tr>
 							<tr>
 								<td style="text-align: right;">Data Type</td>
 								<td>
 								<select id="customTrackDataType" style="border: solid 1px #A3A3A3">
-									<option>ANNO</option>
+									<option>VCF</option>
+									<option>GVF</option>
 									<option>BAM</option>
+									<option>BW</option>
 									<option>BB</option>
 									<option>BEDGZ</option>
-									<option>BW</option>
+									<option>ANNO</option>
 									<option>GDF</option>
 									<option>GRF</option>
-									<option>GVF</option>
-									<option>VCF</option>
 								</select></td>
 							</tr>
 							<tr style="vertical-align:top">
@@ -277,8 +277,7 @@
 		</div>
 		<div id="tracksettingDIV" style="display: none"></div>
 		<table id="decoriteminfo" cellspacing="0" cellpadding="0" border="0" onmouseout="document.body.addEventListener('mousedown', decorCanvasLeftclickHide, false);"
-		onmouseover="document.body.removeEventListener('mousedown', decorCanvasLeftclickHide, false);" style="display: none; position: absolute; z-index: 5; left: 1005px; top:
-		611px;">
+		onmouseover="document.body.removeEventListener('mousedown', decorCanvasLeftclickHide, false);" style="display: none; position: absolute; z-index: 5; left: 1005px; top:	611px;font:12px Candara,Arial,Helvetica,sans-serif">
 			<tbody>
 				<tr>
 					<td align="left"><canvas id="decoriteminfopointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
@@ -315,35 +314,8 @@
 										3' UTR: 1519 bp, 24835253-24836772
 										<br>
 										17 exons
-										<div style="color:#D6B8CE;height:140px;overflow-y:scroll; font-size: 12px">
+										<div style="color:#D6B8CE;height:300px;overflow-y:scroll; font-size: 12px">
 											<ol>
-												<li>
-													70 bp, 24498122-24498192
-												</li>
-												<li>
-													284 bp, 24508554-24508838
-												</li>
-												<li>
-													199 bp, 24669797-24669996
-												</li>
-												<li>
-													199 bp, 24721923-24722122
-												</li>
-												<li>
-													94 bp, 24727314-24727408
-												</li>
-												<li>
-													833 bp, 24762156-24762989
-												</li>
-												<li>
-													50 bp, 24784075-24784125
-												</li>
-												<li>
-													167 bp, 24790307-24790474
-												</li>
-												<li>
-													176 bp, 24802187-24802363
-												</li>
 												<li>
 													131 bp, 24809051-24809182
 												</li>
@@ -379,7 +351,7 @@
 			</tbody>
 		</table>
 
-		<table id="variantDetailTooltip" cellspacing="0" cellpadding="0" border="0" style="position:absolute;display:none;z-index:51;border-collapse: collapse;">
+		<table id="variantDetailTooltip" cellspacing="0" cellpadding="0" border="0" style="position:absolute;display:none;z-index:51;border-collapse: collapse;font:12px Candara,Arial,Helvetica,sans-serif;">
 			<tbody>
 				<tr>
 					<td align="left"><canvas id="variantDetailTooltipPointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
@@ -391,16 +363,16 @@
 								<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
 							</center>
 						</div>
-						<div id="variantDetailContent" style="padding: 10px; display: none;">
+						<div id="variantDetailContent" style="padding: 10px; display: none;width:300px;height:350px;overflow-y:auto">
 							<table id="variantDetailContentTable" style="color: #FFFFFF;border-collapse: collapse;">
 								<tr>
-									<td  colspan="2">
+									<td colspan="2" width="280px">
 										<span id="variantDetailContent_id" style="color:white;font:italic bold 18px Georgia;">rs17883296</span>
 										<span id="variantDetailContent_link" class="clb3" style="float:right; margin-left:30px;">dbSNP</span>
 									</td>
 								</tr>
 								<tr style="color:white;font-size: 12px">
-									<td valign="top">
+									<td valign="top" >
 										Scale:
 									</td>
 									<td id="variantDetailContent_scale" valign="top">
@@ -408,47 +380,22 @@
 									</td>
 								</tr>
 								<tr style="color:white;font-size: 12px;">
-									<td valign="top" id="variantDetailContent_Type">
+									<td valign="top" id="variantDetailContent_Type" >
 										Type:
 									</td>
-									<td valign="top" id="variantDetailContent_Type_Content">
+									<td valign="top" id="variantDetailContent_Type_Content" >
 										SNV
 									</td>
 								</tr>
 								<tr id="variantDetailContent_Letter_trNode" style="color:white;font-size: 12px;">
-									<td valign="top">
+									<td valign="top" >
 										Letter:
 									</td>
-									<td valign="top" id="variantDetailContent_Letter_Content">
+									<td valign="top" id="variantDetailContent_Letter_Content" >
 										T
 									</td>
 								</tr>
-								<tr style="color:white;font-size: 12px">
-									<td valign="top">
-										QUAL:
-									</td>
-									<td valign="top" id="variantDetailContent_QUAL_Content">
-										-1.0
-									</td>
-								</tr>
-								<tr style="color:white;font-size: 12px">
-									<td valign="top">
-										FILTER:
-									</td>
-									<td valign="top" id="variantDetailContent_FILTER_Content">
-										.
-									</td>
-								</tr>
-								<tr style="color:white;font-size: 12px">
-									<td valign="top">
-										INFO:
-									</td>
-									<td valign="top">
-										<div id="variantDetailContent_INFO_Content" style="width: 300px; word-break:break-all">
-											RSPOS=33031822;GMAF=0.0046;dbSNPBuildID=124;SSR=0;SAO=0;VP=050000020001040116000100;GENEINFO=SOD1:6647;WGT=1;VC=SNV;R5;VLD;GNO;KGPhase1;KGPROD;OTHERKG;POPFREQ=693(176/88):0.00568181818181818(1/1),15085(122/61):0(0/0),15086(170/85):0(0/0),15087(194/97):0(0/0),15088(200/100):0(0/0),15089(186/93):0(0/0),15090(178/89):0(0/0),15091(178/89):0(0/0),15092(188/94):0.0425531914893617(8/8),15093(128/64):0(0/0),15094(110/55):0(0/0),15095(196/98):0(0/0),15096(176/88):0.0113636363636364(2/2),15147(2174/1087):0.00459981600735971(10/10),15152(120/60):0(0/0),15153(28/14):0(0/0)
-										</div>
-									</td>
-								</tr>
+								<tr style="color:white;font-size:12px;"><td id="variantDetailContent_INFO_table" width=100% colspan=2></td></tr>
 							</table>
 						</div>
 					</td>
@@ -456,7 +403,7 @@
 			</tbody>
 		</table>
 
-		<table id="readDetailTooltip" cellspacing="0" cellpadding="0" border="0" style="position: absolute; display: none; border-collapse: collapse;">
+		<table id="readDetailTooltip" cellspacing="0" cellpadding="0" border="0" style="position: absolute; display: none; border-collapse: collapse;width:300px;height:300px;overflow-y:auto;font:12px Candara,Arial,Helvetica,sans-serif">
 			<tbody>
 				<tr>
 					<td align="left"><canvas id="readDetailTooltipPointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
@@ -490,7 +437,7 @@
 			</tbody>
 		</table>
 
-		<table id="repeatMaskDetailTooltip" cellspacing="0" cellpadding="0" border="0" style="position:absolute;display:none;z-index:51;border-collapse: collapse;">
+		<table id="repeatMaskDetailTooltip" cellspacing="0" cellpadding="0" border="0" style="position:absolute;display:none;z-index:51;border-collapse: collapse;font: 12px Candara, Arial,Helvetica,sans-serif">
 			<tbody>
 				<tr>
 					<td align="left"><canvas id="repeatMaskDetailTooltipPointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
@@ -502,7 +449,7 @@
 								<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
 							</center>
 						</div>
-						<div id="repeatMaskDetailContent" style="padding: 10px; display: none;">
+						<div id="repeatMaskDetailContent" style="padding: 10px; display: none;width:300px;height:120px;overflow-y:auto">
 							<table id="repeatMaskDetailContentTable" style="color: #FFFFFF;border-collapse: collapse;">
 								<tr>
 									<td colspan=2 >
@@ -538,7 +485,7 @@
 									<td valign="top" style="width:50px;">
 										Description:
 									</td>
-									<td valign="top" id="repeatMaskDetail_Des_content" style="width:400px;word-break:break-all;">
+									<td valign="top" id="repeatMaskDetail_Des_content" style="width:300px;word-break:break-all;">
 										0,0,0
 									</td>
 								</tr>
@@ -563,11 +510,15 @@
 				<div id="ppSet">
 					<span id="ppSetBtn">Setting</span>
 				</div>
+				<div id="ppPin">
+					<span id="ppPinBtn">Merge</span>
+				</div>
 			</div>
 			<div id="ppContent">
 				<table id="ppTrackTable"></table>
 			</div>
-			<table id="variantDetailTooltipOnPP" cellspacing="0" cellpadding="0" border="0" style="position:absolute;display:none;z-index:51;border-collapse: collapse;">
+		</div>
+		<table id="variantDetailTooltipOnPP" cellspacing="0" cellpadding="0" border="0" style="position:absolute;display:none;z-index:51;border-collapse: collapse;font:12px Candara,Arial,Helvetica">
 			<tbody>
 				<tr>
 					<td align="left"><canvas id="variantDetailTooltipPointerOnPP" style="margin-left:4px;" height="9" width="17"></canvas></td>
@@ -581,7 +532,7 @@ shadow:5px 5px 5px #888;">
 								<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
 							</center>
 						</div>
-						<div id="variantDetailContentOnPP" style="padding: 10px; display: none;">
+						<div id="variantDetailContentOnPP" style="padding: 10px; display: none;width:300px;height:350px;overflow-y:auto">
 							<table id="variantDetailContentTableOnPP" style="color: #FFFFFF;border-collapse: collapse;">
 								<tr>
 									<td  colspan="2">
@@ -630,37 +581,7 @@ shadow:5px 5px 5px #888;">
 									</td>
 								</tr>
 								<tr style="color:white;font-size: 12px">
-									<td valign="top">
-										QUAL:
-									</td>
-									<td valign="top" id="variantDetailContent_QUAL_ContentOnPP">
-										-1.0
-									</td>
-								</tr>
-								<tr style="color:white;font-size: 12px">
-									<td valign="top">
-										FILTER:
-									</td>
-									<td valign="top" id="variantDetailContent_FILTER_ContentOnPP">
-										.
-									</td>
-								</tr>
-								<tr style="color:white;font-size: 12px">
-									<td valign="top">
-										INFO:
-									</td>
-									<td valign="top">
-										<div id="variantDetailContent_INFO_ContentOnPP" style="width: 300px; word-break:break-all">
-											RSPOS=33031822;GMAF=0.0046;dbSNPBuildID=124;SSR=0;SAO=0;VP=050000020001040116000100
-										</div>
-									</td>
-								</tr>
-								<tr id="variantDetailContent_dbSNPAnno_trNodeOnPP" style="color:white;font-size: 12px">
-									<td valign="top">
-										dbSNP INFO:
-									</td>
-									<td valign="top" id="variantDetailContent_dbSNPAnno_ContentOnPP" style="width:300px; word-break: break-all;">
-										RSPOS=33031822;GMAF=0.0046;dbSNPBuildID=124;SSR=0;SAO=0;VP=050000020001040116000100
+									<td valign="top" id="variantDetailContent_INFO_ContentOnPP" colspan="2">
 									</td>
 								</tr>
 							</table>
@@ -669,8 +590,7 @@ shadow:5px 5px 5px #888;">
 				</tr>
 			</tbody>
 		</table>
-		<table id="personalGeneDetail" cellspacing="0" cellpadding="0" border="0"  style="display: none; position: absolute; z-index: 51; left: 1005px; top:
-		611px;">
+		<table id="personalGeneDetail" cellspacing="0" cellpadding="0" border="0" style="display: none; position: absolute; z-index: 51; left: 1005px; top:611px;font:12px Candara,Arial,Helvetica">
 			<tbody>
 				<tr>
 					<td align="left"><canvas id="personalGeneDetailPointer" style="margin-left:4px;" height="9" width="17"></canvas></td>
@@ -684,7 +604,7 @@ shadow:5px 5px 5px #888;">
 							<img src="./image/detailInforLoadingImg.gif" alt="pic"/>
 						</center>
 					</div>
-					<div id="personalGeneDetailInfor" style="color:white;font-size:12px;display:none;">
+					<div id="personalGeneDetailInfor" style="color:white;font-size:12px;display:none;width:300px;height:360px;overflow-y:auto">
 						<table cellspacing="0" cellpadding="0" style="width:100%;margin-top:10px;margin-bottom:10px;">
 							<tbody>
 								<tr>
@@ -708,7 +628,7 @@ shadow:5px 5px 5px #888;">
 										3' UTR: 1519 bp, 24835253-24836772
 										<br>
 										17 exons
-										<div style="color:#D6B8CE;height:140px;overflow-y:scroll; font-size: 12px">
+										<div style="color:#D6B8CE; font-size: 12px">
 											<ol>
 												<li>
 													70 bp, 24498122-24498192
@@ -730,7 +650,7 @@ shadow:5px 5px 5px #888;">
 										</div>
 										<div id="personalGeneDetail-variants" style="color:#D6B8CE;display:none;padding-left:20px;padding-right:10px;font-size: 12px">
 											5 variants
-											<div style="color:#D6B8CE;height:50px;overflow-y:scroll; font-size: 12px">
+											<div style="color:#D6B8CE; font-size: 12px">
 												<ol>
 													<li>
 														70 bp, 24498122-24498192
@@ -753,7 +673,7 @@ shadow:5px 5px 5px #888;">
 										</div>
 										<div id="personalGeneDetail-status" style="color:#D6B8CE;display:none;padding-left:20px;padding-right:10px;font-size: 12px">
 											2 effects
-											<div style="color:#D6B8CE;height:50px;overflow-y:scroll; font-size: 12px">
+											<div style="color:#D6B8CE; font-size: 12px">
 												<ol>
 													<li>
 														70 bp, 24498122-24498192
@@ -769,11 +689,9 @@ shadow:5px 5px 5px #888;">
 							</tbody>
 						</table>
 					</div>
-					<div style="margin: 10px; color: white; font-size: 12px; width: 300px;"></div></td>
 				</tr>
 			</tbody>
 		</table>
-		</div>
 		<div id="personalPannelSetting">
 			<div id="personalPannelSettingTitle">
 				<div id="ppsTitle">
@@ -923,11 +841,29 @@ shadow:5px 5px 5px #888;">
 					<span id="BJW_closeBtn">Close</span>
 				</div>
 			</div>
-			<div id="BJW_stat" style="width:790px;float:left;">
+			<div id="BJW_rank" style="padding:5px;width:790px;height:620px;clear:both;display:none">
+				<span class="BJW_gene_table_title_id">Gene Symbol</span>
+				<span class="BJW_gene_table_title_score">Score</span>
+				<span class="BJW_gene_table_title_id">Gene Symbol</span>
+				<span class="BJW_gene_table_title_score">Score</span>
+				<span class="BJW_gene_table_title_id">Gene Symbol</span>
+				<span class="BJW_gene_table_title_score">Score</span>
+				<span style="float:right"><input id="recover_stat" type = "submit" onclick="BJW_closeRank()" value="Go back"/></span><br>
+				<div id="gene_table" style="width:770px;max-height:600px;overflow:auto"></div>
+			</div>
+
+			<div id="BJW_stat" style="width:790px;float:left;clear:both">
 				<input id="get_stat" type="submit" onclick="BJW_getStat()" value="Save scan result"/>
 				<input id="up_stat" type="submit" onclick="BJW_upStat()" value="Upload scan result"/>
 				<input id="file_field" type="file" placeholder="upload stat file"/>
 				<span id="upload_success"></span>
+				<br>
+				<input id="filter_stat" type="submit" onclick="BJW_filterStat()" value="Filter scan result"/>&nbsp;
+				<input id="filter_value" type="text" size="5"/>&nbsp;
+				<span id="filter_range">(0~0)</span>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input id="rank_gene" type="submit" onclick="BJW_rankGene()" value="Rank"/>&nbsp;Top
+				<input id="top_number" type="text" size="5" value="100"/>&nbsp;Score Genes
 			</div>
 			<div id="BJW_content">
 				<div id="BJW_genome" style="width:600px; float:left"></div>
