@@ -73,7 +73,7 @@
 		</Anno>
 		<Anno id="GC_Percent" group="GCcontent">
 			<Path>/home/ljuan/gbdata/hg19/gc5Base.hg19.bw</Path>
-			<Default>dense</Default>
+			<Default>pack</Default>
 			<Format>BW</Format>
 		</Anno>
 		<Anno id="ensemblRegulation" group="Regulation">
@@ -105,51 +105,6 @@
 			<Path>/home/ljuan/gbdata/temp/wgEncodeCaltechRnaSeqGm12878R2x75Il200SplicesRep2V2.bam</Path>
 			<Default>hide</Default>
 			<Format>BAM</Format>
-		</Anno>
-		<Anno id="Disease_causal_example" group="Personal Genome">
-			<Path>/home/ljuan/gbdata/hg19/Disease_causal_shortlist.hg19.sorted.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
-		</Anno>
-		<Anno id="U87_Genome" group="Personal Genome">
-			<Path>/home/ljuan/gbdata/temp/U87.snv.hg19.sorted.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
-		</Anno>
-		<Anno id="simulatedPerson1" group="Personal Genome">
-			<Path>/home/ljuan/gbdata/temp/test1.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
-		</Anno>
-		<Anno id="simulatedPerson2" group="Personal Genome">
-			<Path>/home/ljuan/gbdata/temp/test2.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
-		</Anno>
-		<Anno id="simulatedPerson3" group="Personal Genome">
-			<Path>/home/ljuan/gbdata/temp/test3.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
-		</Anno>
-		<Anno id="simulatedPerson4" group="Personal Genome">
-			<Path>/home/ljuan/gbdata/temp/test4.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
-		</Anno>
-		<Anno id="simulatedPerson5" group="Personal Genome">
-			<Path>/home/ljuan/gbdata/temp/test5.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
-		</Anno>
-		<Anno id="simulatedPerson6" group="Personal Genome">
-			<Path>/home/ljuan/gbdata/temp/test6.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
-		</Anno>
-		<Anno id="simulatedPerson7" group="Personal Genome">
-			<Path>/home/ljuan/gbdata/temp/test7.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
 		</Anno>
 		<Anno id="Watson" group="Personal Genome">
 			<Path>/home/ljuan/gbdata/hg19/Watson.hg19.sorted.gvf.gz</Path>
@@ -827,6 +782,96 @@
 			<Path>/home/ljuan/gbdata/hg19/SpliceDisease.hg19.sorted.gdf.gz</Path>
 			<Default>hide</Default>
 			<Format>GDF</Format>
+		</Anno>
+		<Anno id="Chimp" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/panTro4.fa</Path>
+			<Default>dense</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Gorilla" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/gorGor3.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Orangutan" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/ponAbe2.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Gibbon" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/nomLeu1.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Rhesus" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/rheMac3.fa</Path>
+			<Default>dense</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Baboon" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/papHam1.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Marmoset" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/calJac3.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Tarsier" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/tarSyr1.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Bushbaby" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/otoGar1.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Mouse" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/mm10.fa</Path>
+			<Default>dense</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Rat" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/rn4.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Dog" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/canFam3.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Elephant" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/loxAfr3.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Chicken" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/galGal3.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="X_tropicalis" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/xenTro3.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Zebrafish" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/danRer7.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Lamprey" group="Pairwise Alignment">
+			<Path>/home/ljuan/gbdata/hg19/pairwise_alignment/petMar2.fa</Path>
+			<Default>hide</Default>
+			<Format>FASTA</Format>
+		</Anno>
+		<Anno id="Disease_causal_example" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/Disease_causal_shortlist.hg19.sorted.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
 		</Anno>
 	</Assembly>
 </root>

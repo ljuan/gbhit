@@ -7,10 +7,24 @@ var RefBG = "#eff3ff";
 var RefBG_rgb = "rgb(239, 243, 255)";
 var RefBGhover = "#bdd7e7";
 var RefBGhover_rgb = "rgb(189, 215, 231)";
+
+// Variants background
 var ppBG = "#ffffd4";
 var ppBG_rgb = "rgb(255, 255, 212)";
 var ppBGhover = "#fed98e";
 var ppBGhover_rgb = "rgb(254, 217, 142)";
+
+// Molecular traits background 
+var pmBG = "#fee5d9";
+var pmBG_rgb = "rgb(254, 229, 217)";
+var pmBGhover = "#fcae91";
+var pmBGhover_rgb = "rgb(252, 174, 145)";
+
+// Phenotype background 
+var pdBG = "#c7e9c0";
+var pdBG_rgb = "rgb(199, 233, 192)";
+var pdBGhover = "#a1d99b";
+var pdBGhover_rgb = "rgb(161, 217, 155)";
 
 Number.prototype.NaN0 = function() {
 	return isNaN(this) ? 0 : this;
@@ -59,10 +73,22 @@ function mouseOver(ev) {
 		var trNode = target.parentNode;
 		var tdNodes = trNode.getElementsByTagName("td");
 		if((/^_/).test(trNode.getAttribute(xmlAttributeId))){
-			trNode.style.background = ppBGhover;
-			tdNodes[0].style.background = ppBGhover;
-			tdNodes[1].firstChild.style.background = ppBGhover;
-			tdNodes[2].firstChild.style.background = ppBGhover;
+			if(trNode.getAttribute(xmlAttributeId) == personalPannel.Pvar.id){
+				trNode.style.background = ppBGhover;
+				tdNodes[0].style.background = ppBGhover;
+				tdNodes[1].firstChild.style.background = ppBGhover;
+				tdNodes[2].firstChild.style.background = ppBGhover;
+			}else if(personalPannel.Pfanno.id && trNode.getAttribute(xmlAttributeId) == personalPannel.Pfanno.id || personalPannel.Panno.id && trNode.getAttribute(xmlAttributeId) == personalPannel.Panno.id){
+				trNode.style.background = pmBGhover;
+				tdNodes[0].style.background = pmBGhover;
+				tdNodes[1].firstChild.style.background = pmBGhover;
+				tdNodes[2].firstChild.style.background = pmBGhover;
+			}else{
+				trNode.style.background = pdBGhover;
+				tdNodes[0].style.background = pdBGhover;
+				tdNodes[1].firstChild.style.background = pdBGhover;
+				tdNodes[2].firstChild.style.background = pdBGhover;
+			}
 		}else{
 			trNode.style.background = RefBGhover;
 			tdNodes[0].style.background = RefBGhover;
@@ -80,10 +106,22 @@ function mouseOut(ev) {
 		var trNode = target.parentNode;
 		var tdNodes = trNode.getElementsByTagName("td");
 		if((/^_/).test(trNode.getAttribute(xmlAttributeId))){
-			trNode.style.background = ppBG;
-			tdNodes[0].style.background = ppBG;
-			tdNodes[1].firstChild.style.background = ppBG;
-			tdNodes[2].firstChild.style.background = ppBG;
+			if(trNode.getAttribute(xmlAttributeId) == personalPannel.Pvar.id){
+				trNode.style.background = ppBG;
+				tdNodes[0].style.background = ppBG;
+				tdNodes[1].firstChild.style.background = ppBG;
+				tdNodes[2].firstChild.style.background = ppBG;
+			}else if(personalPannel.Pfanno.id && trNode.getAttribute(xmlAttributeId) == personalPannel.Pfanno.id || personalPannel.Panno.id && trNode.getAttribute(xmlAttributeId) == personalPannel.Panno.id){
+				trNode.style.background = pmBG;
+				tdNodes[0].style.background = pmBG;
+				tdNodes[1].firstChild.style.background = pmBG;
+				tdNodes[2].firstChild.style.background = pmBG;
+			}else{
+				trNode.style.background = pdBG;
+				tdNodes[0].style.background = pdBG;
+				tdNodes[1].firstChild.style.background = pdBG;
+				tdNodes[2].firstChild.style.background = pdBG;
+			}
 		}else{
 			trNode.style.background = RefBG;
 			tdNodes[0].style.background = RefBG;
@@ -113,6 +151,16 @@ function mouseUp() {
 			curTarget.getElementsByTagName("td")[0].style.background = ppBG;
 			curTarget.getElementsByTagName("td")[1].firstChild.style.background = ppBG;
 			curTarget.getElementsByTagName("td")[2].firstChild.style.background = ppBG;
+		}else if(curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(pmBGhover_rgb)>=0){
+			curTarget.style.background = pmBG;
+			curTarget.getElementsByTagName("td")[0].style.background = pmBG;
+			curTarget.getElementsByTagName("td")[1].firstChild.style.background = pmBG;
+			curTarget.getElementsByTagName("td")[2].firstChild.style.background = pmBG;
+		}else if(curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(pdBGhover_rgb)>=0){
+			curTarget.style.background = pdBG;
+			curTarget.getElementsByTagName("td")[0].style.background = pdBG;
+			curTarget.getElementsByTagName("td")[1].firstChild.style.background = pdBG;
+			curTarget.getElementsByTagName("td")[2].firstChild.style.background = pdBG;
 		}else{
 			curTarget.style.background = RefBG;
 			curTarget.getElementsByTagName("td")[0].style.background = RefBG;
@@ -185,6 +233,18 @@ function mouseMove(ev) {
 			curTarget.getElementsByTagName("td")[0].style.background = ppBGhover;
 			curTarget.getElementsByTagName("td")[1].firstChild.style.background = ppBGhover;
 			curTarget.getElementsByTagName("td")[2].firstChild.style.background = ppBGhover;
+		}else if(curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(pmBG_rgb)>=0
+		|| curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(pmBGhover_rgb)>=0){
+			curTarget.style.background = pmBGhover;
+			curTarget.getElementsByTagName("td")[0].style.background = pmBGhover;
+			curTarget.getElementsByTagName("td")[1].firstChild.style.background = pmBGhover;
+			curTarget.getElementsByTagName("td")[2].firstChild.style.background = pmBGhover;
+		}else if(curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(pdBG_rgb)>=0
+		|| curTarget.getElementsByTagName("td")[1].firstChild.style.background.indexOf(pdBGhover_rgb)>=0){
+			curTarget.style.background = pdBGhover;
+			curTarget.getElementsByTagName("td")[0].style.background = pdBGhover;
+			curTarget.getElementsByTagName("td")[1].firstChild.style.background = pdBGhover;
+			curTarget.getElementsByTagName("td")[2].firstChild.style.background = pdBGhover;
 		}else{
 			curTarget.style.background = RefBGhover;
 			curTarget.getElementsByTagName("td")[0].style.background = RefBGhover;

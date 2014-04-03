@@ -174,6 +174,26 @@ public class Instance {
 					init_track(Externals.get(tracks[i])); 
 			}
 	}
+	public void add_ExIndividuals(String[] tracks,String[] links,String[] types,String[] modes){
+		for(int i=0;i<tracks.length;i++)
+			if(!Externals.containsKey(tracks[i])){
+				if(links[i].indexOf(";")>0){
+					String[] links_temp=links[i].split(";");
+					String[][] links_table=new String[links_temp.length][2];
+					for(int j=0;j<links_temp.length;j++){
+						int colon=links_temp[j].indexOf(":");
+						links_table[j][0]=links_temp[j].substring(0, colon);
+						links_table[j][1]=links_temp[j].substring(colon+1);
+					}
+					Externals.put(tracks[i], new Annotations(tracks[i],links_table,types[i],modes[i],Consts.GROUP_CLASS_EXI));
+				}
+				else{
+					Externals.put(tracks[i], new Annotations(tracks[i],links[i],types[i],modes[i],Consts.GROUP_CLASS_EXI));
+				}
+				if(types[i].equals(Consts.FORMAT_VCF))
+					init_track(Externals.get(tracks[i])); 
+			}
+	}
 	public void remove_Externals(String[] tracks){
 		for(int i=0;i<tracks.length;i++)
 			if(Externals.containsKey(tracks[i])){
@@ -796,7 +816,8 @@ public class Instance {
 		Enumeration<Annotations> externals_enum=Externals.elements();
 		for(i=0;i<Externals.size();i++){
 			Annotations temp=externals_enum.nextElement();
-			if(temp.get_Type().equals(Consts.FORMAT_VCF)||temp.get_Type().equals(Consts.FORMAT_GVF)){
+			if((temp.get_Type().equals(Consts.FORMAT_VCF)||temp.get_Type().equals(Consts.FORMAT_GVF))
+				&& temp.get_Group().equals(Consts.GROUP_CLASS_EXI)){
 				StringBuffer individual=new StringBuffer();
 				individual.append(temp.get_ID());
 				individual.append(":");

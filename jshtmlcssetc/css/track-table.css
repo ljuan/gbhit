@@ -194,8 +194,8 @@ span.clb3:hover {
 	border-bottom-color: white;
 }
 #personalPannel {
-	background: none repeat scroll 0 0 #ffffd4;
-	opacity:1;/*for temparary plot figures*/
+	background: none repeat scroll 0 0 #ffffd4;/*#fed98e ;*/
+	opacity:0.85;/*for temparary plot figures*/
 	border: 1px solid #797979;
 	color: #000000;
 	display: none;
@@ -823,27 +823,31 @@ span#web-name{
 	border-radius:5px;
 }
 .IW_track_close_btn{
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	background: #d95f0e;
 	color: #FFFFFF;
-	font: 12px Candara, Arial, Helvetica, sans-serif;
 	margin-right:3px;
 	margin-top:3px;
 	margin-bottom:3px;
-	padding:7px;
+	padding-left:2px;
+	padding-right:2px;
 	float:left;
-	border-radius:5px;
+	border-radius:3px;
+	height:15px;
 }
 .IW_track_close_btn:hover{
-	font: 12px Candara, Arial, Helvetica, sans-serif;
-	background: #fed98e;
-	color: #FFFFFF;
-	cursor:pointer;
 	margin-right:3px;
+	background: #fed98e;
+	cursor:pointer;
+	color: #FFFFFF;
+	font: 12px Candara, Arial, Helvetica, sans-serif;
 	margin-top:3px;
 	margin-bottom:3px;
-	padding:7px;
+	padding-left:2px;
+	padding-right:2px;
 	float:left;
-	border-radius:5px;
+	border-radius:3px;
+	height:15px;
 }
 .BJW_gene_table_score{
 	font: 14px Candara, Arial, Helvetica, sans-serif;

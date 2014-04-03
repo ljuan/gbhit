@@ -2361,7 +2361,7 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 			}
 		}else {
 			var packVariants = [], squishVariants = [];
-			if((mode == "pack") && (variantNodes.length <= parseInt(trackLength / 60) * 20)) {
+			if((mode == "pack") && (variantNodes.length <= parseInt(trackLength / 60) * 10)) {
 				if(variantNodes.length > 0) {//the situation: not contain the variant
 					packVariants[packVariants.length] = [];
 					packVariants[0][0] = 0;
@@ -2378,7 +2378,7 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 						packVariants[j][0] = i;
 					}
 				}
-				if(packVariants.length <= 20) {
+				if(packVariants.length <= 10) {
 					canvas1.height = imgHeight * packVariants.length + 3*(packVariants.length - 1) > 10 ? imgHeight * packVariants.length + 3*(packVariants.length - 1) : 10;
 					canvas1.style.height = imgHeight * packVariants.length + 3*(packVariants.length - 1) > 10 ? imgHeight * packVariants.length + 3*(packVariants.length - 1) : 10;
 					canvas2.height = imgHeight * packVariants.length + 3*(packVariants.length - 1) > 10 ? imgHeight * packVariants.length + 3*(packVariants.length - 1) : 10;
@@ -2480,7 +2480,7 @@ function showVariantByImg(canvas1, canvas2, variantNode, mode) {
 					canvas2.addEventListener("click", canvasClickForVariantOnPP, false);
 				}
 			}
-			if(mode == "squish" || ( mode == "pack" && (packVariants.length > 20 || variantNodes.length > parseInt(trackLength / 60) * 20))) {
+			if(mode == "squish" || ( mode == "pack" && (packVariants.length > 10 || variantNodes.length > parseInt(trackLength / 60) * 10))) {
 				if(variantNodes.length > 0) {
 					squishVariants[squishVariants.length] = [];
 					squishVariants[0][0] = 0;
@@ -5888,6 +5888,10 @@ function removePvar() {
 		$(document.getElementById("ppMin")).unbind();
 		$(document.getElementById("ppPin")).unbind();
 		$(document.getElementById("ppSet")).unbind();
+		if(isMini_personalpannel == 1){
+			$('#showWindowBtn').remove();
+			isMini_personalpannel = 0;
+		}
 	}
 	XMLHttpReq.onreadystatechange = function() {
 		personalPannel.Pvar.id="";
@@ -6878,11 +6882,21 @@ function createPPOtherTrack(trackId, mode) {
 			modechangeBtnSpan_str = "";
 		}
 	}
-	trNode.style.background = ppBG;
+	var colorUsed = ppBG;
+	if(personalPannel.Pfanno.id && personalPannel.Pfanno.id == trackId){
+		trNode.style.background = pmBG;
+		colorUsed = pmBG;
+	} else if (personalPannel.Panno.id && trackId == personalPannel.Panno.id){
+		trNode.style.background = pmBG;
+		colorUsed = pmBG;
+	} else {
+		trNode.style.background = pdBG;
+		colorUsed = pdBG;
+	}
 	if(personalPinned){
-		trNode.innerHTML = "<td class=\"trackOperator\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"<span class=\"close\"></span></div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength+"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+		trNode.innerHTML = "<td class=\"trackOperator\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"<span class=\"close\"></span></div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+colorUsed+"\"></canvas></td><td class=\"trackContent\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength+"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
 	}else{
-		trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"<span class=\"close\"></span></div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+ppBG+"\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength+"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
+		trNode.innerHTML = "<td class=\"trackOperator cannotSortable\"><div style=\"width:50px;margin:0;padding:0;border:0;\">"+ modechangeBtnSpan_str +"<span class=\"close\"></span></div></td><td class=\"trackName\"><canvas width=\"100\" height=\"50\" style=\"background: "+colorUsed+"\"></canvas></td><td class=\"trackContent cannotSortable\"><div style=\"width:940px;overflow:hidden;padding:0;margin:0;border:0;\"><canvas width=\""+ trackLength+"\" height=\"50\" class=\"canvasTrackcontent\" title=\"shift+click and drag to zoom in\"></canvas></div></td>";
 	}
 	var canvasNodes = trNode.getElementsByTagName("canvas");
 	canvasNodes[0].onmouseover = mouseOver;
@@ -8741,8 +8755,9 @@ function trackItems_setting3(){//individualItems setting
 			XMLHttpReq6.send(null);
 			$(document.getElementById(trackId_temp+"_group_content")).css("display","none");
 			$(target.parentNode).css("display","none");
-//			target.parentNode.remove(); //sometimes appears error in firefox
-
+			target.parentNode.remove(); //sometimes appears error in firefox
+/*These codes are for display loaded track in reference track management
+ * Temporarily cancled.
 			var cookieStr;
 			if($.cookie("customTrackList")){
 				cookieStr = $.cookie("customTrackList");
@@ -8782,6 +8797,7 @@ function trackItems_setting3(){//individualItems setting
 				$.cookie("customTrackList", cookieStr);
 			}
 			trackItems_setting2();
+*/
 		};
 
 		group_content_divObj = document.createElement("div");
@@ -10343,6 +10359,8 @@ function addExIndividual(){
 		}
 	}
 	///////////////////
+/*These codes are for display loaded track in reference track management
+ * Temporarily cancled.
 	if(sucess){ //to add ExIndividual from 'select individual in trackItems array
 		var customTrackId = trackId;
 		var customTrackDisplayMode = "hide";
@@ -10377,6 +10395,7 @@ function addExIndividual(){
 		trackItems_setting2();
 	}
 	////////////////////////////
+	*/
 }
 function fill_example_pg(){
 	document.getElementById("pg_upload_name").value="test_1";

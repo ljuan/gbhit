@@ -60,6 +60,7 @@ public interface Consts{
 	public static final String XML_TAG_GROUP="group";
 	public static final String GROUP_CLASS_SEQ="Sequence";
 	public static final String GROUP_CLASS_USR="User";
+	public static final String GROUP_CLASS_EXI="Ex";
 	public static final String GROUP_CLASS_REP="Repeat";
 	public static final String GROUP_CLASS_GCC="GC";
 	public static final String GROUP_CLASS_GENE="Gene";
