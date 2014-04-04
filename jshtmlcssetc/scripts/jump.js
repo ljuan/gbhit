@@ -879,7 +879,7 @@ function showFastaSeq(canvas, canvas2, widthOfOneBase, fastaSeq, fastaId) {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.fillStyle = "#000000";
 
-		ctx.font = "12px Consolas,andale mono,courier,mono";
+//		ctx.font = "12px Consolas,andale mono,courier,mono";
 		ctx.textBaseline = "alphabetic";
 		//y is the base coordinate in y axis,textBaseline is bootom(default)
 		//bg_y is the y coordinate of the base_background

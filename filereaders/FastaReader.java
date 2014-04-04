@@ -76,6 +76,22 @@ public class FastaReader {
 		raf.read(bytes, 0, bytes.length);
 		return delEnterAndToUpperCase(bytes);
 	}
+	public String extract_seq2(String chr, long start, long end)
+			throws IOException {
+		Integer chr_info = seq_name.get(chr);
+		if(chr_info == null) return null;
+		start--;
+		end--;// Genomic coordinate is 1-based, java index is 0-based.
+
+		int bases1Line = (int) fasta_index[chr_info][2];
+		int enterLen = (int) (fasta_index[chr_info][3] - bases1Line);
+		start += (start / bases1Line) * enterLen;
+		end += (end / bases1Line) * enterLen;
+		byte[] bytes = new byte[(int) (end - start + 1)];
+		raf.seek(start + fasta_index[chr_info][1]);
+		raf.read(bytes, 0, bytes.length);
+		return delEnterAndToUpperCase2(bytes);
+	}
 
 	/**
 	 * Extract just one base fom <code>pos</code>. The base will be expressed in
@@ -112,6 +128,27 @@ public class FastaReader {
 				copy[index++] = b;
 			} else if (b >= 'a' && b <= 'z') {
 				copy[index++] = (byte) (b - 32);
+			}
+		}
+		return new String(copy, 0, index);
+	}
+	private String delEnterAndToUpperCase2(byte[] bytes) {
+		int len = bytes.length;
+		byte[] copy = new byte[len];
+		byte b = 0;
+		int index = 0;
+		for (int i = 0; i < len; i++) {
+			b = bytes[i];
+			if (b >= 'A' && b <= 'Z') {
+				copy[index++] = b;
+			} else if (b >= 'a' && b <= 'z') {
+				copy[index++] = (byte) (b - 32);
+			} else if (b == ' ' || b == '-') {
+				copy[index++] = b;
+			} else if (b == '\r'){
+				;
+			} else {
+				copy[index++] = b;
 			}
 		}
 		return new String(copy, 0, index);
@@ -153,7 +190,7 @@ public class FastaReader {
 			long end, String id, double bpp) throws IOException {
 		String seq = "";
 		if(bpp<=0.5)
-			seq = extract_seq(chr, start, end);
+			seq = extract_seq2(chr, start, end);
 		Element sequence = XmlWriter.append_text_element(doc, doc
 				.getElementsByTagName(Consts.DATA_ROOT).item(0),
 				Consts.XML_TAG_SEQ, seq);
