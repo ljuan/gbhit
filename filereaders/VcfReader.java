@@ -180,7 +180,7 @@ public class VcfReader {
 				while (Query.next() != null) {
 					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, samplesNum, selectedIndexes);
 					Variant[] vs_temp; 
-					if (sample_id != null && vcfSample.ifSelected(sample_id)) 
+					if (sample_id != null && vcfSample!=null && vcfSample.ifSelected(sample_id)) 
 						vs_temp = vcf.getVariants(vcfSample.getSelectedIndex(sample_id));
 					else 
 						vs_temp = vcf.getVariants();
