@@ -191,7 +191,7 @@ public class VcfReader {
 					if (!vs_list.isEmpty()) {
 						vs = new Variant[vs_list.size()];
 						vs_list.toArray(vs);
-						if (sample_id != null && vcfSample.ifSelected(sample_id)) 
+						if (sample_id != null && vcfSample!=null && vcfSample.ifSelected(sample_id)) 
 							variants[0].addVariant(vcf, vcfSample.getSelectedIndex(sample_id), vs);
 						else
 							variants[0].addVariant(vcf, -1, vs);
