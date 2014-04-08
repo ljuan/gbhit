@@ -6946,8 +6946,10 @@ function createPPOtherTrack(trackId, mode) {
 function removeTrack(trackId) {
 	var trackTable = document.getElementById("tableTrack");
 	var trNode = document.getElementById(trackId);
-	var rowIndex = trNode.rowIndex;
-	trackTable.deleteRow(rowIndex);
+	if(trNode != null){
+		var rowIndex = trNode.rowIndex;
+		trackTable.deleteRow(rowIndex);
+	}
 }
 
 var currentTrackItem;
@@ -7006,46 +7008,47 @@ function trackModeOnchange(track_Id, trackMode) {
 function handleOnchange(currentTrackItem) {
 	if(XMLHttpReq.readyState == 4) {
 		if(XMLHttpReq.status == 200) {
-			var XMLDoc = XMLHttpReq.responseXML;
-			if(currentTrackItem.mode != "hide") {
-				if(currentTrackItem.dataType == "FASTA"){
-					var widthOfOneBase = trackLength / searchLength;
-					var fastaNodes = XMLDoc.getElementsByTagName(xmlTagSeq);
-					var fastaId;
-					var fastaNode;
-					var fastaTrackNode = document.getElementById(currentTrackItem.id);
-					var fastaCanvasNode = fastaTrackNode.getElementsByTagName("canvas");
-					var i;
-					for(i=0;i<fastaNodes.length;i++){
-						fastaId = fastaNodes[i].getAttribute("id");
-						if(fastaId == currentTrackItem.id){
-							fastaNode = fastaNodes[i];
-							break;
+			var pattern = /<.*?>/g;
+			XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks="+currentTrackItem.id,false);
+			XMLHttpReq12.send(null);
+			var err_text=XMLHttpReq12.responseText.replace(pattern,"");
+//			XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
+//			XMLHttpReq12.send(null);
+			if(err_text != null && err_text != ""){
+				alert(err_text);
+				removeTrack(currentTrackItem.id);
+			}else{
+				var XMLDoc = XMLHttpReq.responseXML;
+				if(currentTrackItem.mode != "hide") {
+					if(currentTrackItem.dataType == "FASTA"){
+						var widthOfOneBase = trackLength / searchLength;
+						var fastaNodes = XMLDoc.getElementsByTagName(xmlTagSeq);
+						var fastaId;
+						var fastaNode;
+						var fastaTrackNode = document.getElementById(currentTrackItem.id);
+						var fastaCanvasNode = fastaTrackNode.getElementsByTagName("canvas");
+						var i;
+						for(i=0;i<fastaNodes.length;i++){
+							fastaId = fastaNodes[i].getAttribute("id");
+							if(fastaId == currentTrackItem.id){
+								fastaNode = fastaNodes[i];
+								break;
+							}
 						}
-					}
 
-					if(searchLength <= trackLength/10) {
-						showFastaSeq(fastaCanvasNode[1],fastaCanvasNode[0],widthOfOneBase, fastaNode.childNodes[0].nodeValue,fastaId);
-					}
-					else{
-						overScaleShow(fastaId);
-					}
-				}else if(currentTrackItem.dataType == "BAM") {
-					var readNodes = XMLDoc.getElementsByTagName(xmlTagReads);
-					var readsNode;
-					var readsId;
-					var i;
-					var refSeqTrackNode = document.getElementById(currentTrackItem.id);
-					var refSeqCanvasNodes = refSeqTrackNode.getElementsByTagName("canvas");
-					for( i = 0; i < readNodes.length; i++) {
-						readsId = readNodes[i].getAttribute(xmlAttributeId);
-						if(readsId == currentTrackItem.id) {
-							readsNode = readNodes[i];
-							break;
+						if(searchLength <= trackLength/10) {
+							showFastaSeq(fastaCanvasNode[1],fastaCanvasNode[0],widthOfOneBase, fastaNode.childNodes[0].nodeValue,fastaId);
 						}
-					}
-					if(i == readNodes.length) {
-						readNodes = XMLDoc.getElementsByTagName(xmlTagValues);
+						else{
+							overScaleShow(fastaId);
+						}
+					}else if(currentTrackItem.dataType == "BAM") {
+						var readNodes = XMLDoc.getElementsByTagName(xmlTagReads);
+						var readsNode;
+						var readsId;
+						var i;
+						var refSeqTrackNode = document.getElementById(currentTrackItem.id);
+						var refSeqCanvasNodes = refSeqTrackNode.getElementsByTagName("canvas");
 						for( i = 0; i < readNodes.length; i++) {
 							readsId = readNodes[i].getAttribute(xmlAttributeId);
 							if(readsId == currentTrackItem.id) {
@@ -7053,64 +7056,87 @@ function handleOnchange(currentTrackItem) {
 								break;
 							}
 						}
-						showPositiveValueCombine(refSeqCanvasNodes[0], refSeqCanvasNodes[1], readsNode, currentTrackItem.mode, "topdown", 70, 50);
-					} else {
-						showRead(refSeqCanvasNodes[0], refSeqCanvasNodes[1], readsNode, currentTrackItem.mode, false);
-					}
-				} else if(currentTrackItem.dataType == "VCF" || currentTrackItem.dataType == "GVF") {
-					var variantsNodes = XMLDoc.getElementsByTagName(xmlTagVariants);
-					var variantsId;
-					var variantsNode = null;
-					if(variantsNodes.length > 0) {
-						for(var i = 0; i < variantsNodes.length; i++) {
-							variantsId = variantsNodes[i].getAttribute(xmlAttributeId);
-							if(variantsId == currentTrackItem.id) {
-								variantsNode = variantsNodes[i];
-								break;
+						if(i == readNodes.length) {
+							readNodes = XMLDoc.getElementsByTagName(xmlTagValues);
+							for( i = 0; i < readNodes.length; i++) {
+								readsId = readNodes[i].getAttribute(xmlAttributeId);
+								if(readsId == currentTrackItem.id) {
+									readsNode = readNodes[i];
+									break;
+								}
 							}
+							showPositiveValueCombine(refSeqCanvasNodes[0], refSeqCanvasNodes[1], readsNode, currentTrackItem.mode, "topdown", 70, 50);
+						} else {
+							showRead(refSeqCanvasNodes[0], refSeqCanvasNodes[1], readsNode, currentTrackItem.mode, false);
 						}
-						if(variantsNode != null) {
-							var trackNode = document.getElementById(currentTrackItem.id);
-							var canvasNodes = trackNode.getElementsByTagName("canvas");
-							showVariant(canvasNodes[0], canvasNodes[1], variantsNode, currentTrackItem.mode);
+					} else if(currentTrackItem.dataType == "VCF" || currentTrackItem.dataType == "GVF") {
+						var variantsNodes = XMLDoc.getElementsByTagName(xmlTagVariants);
+						var variantsId;
+						var variantsNode = null;
+						if(variantsNodes.length > 0) {
+							for(var i = 0; i < variantsNodes.length; i++) {
+								variantsId = variantsNodes[i].getAttribute(xmlAttributeId);
+								if(variantsId == currentTrackItem.id) {
+									variantsNode = variantsNodes[i];
+									break;
+								}
+							}
+							if(variantsNode != null) {
+								var trackNode = document.getElementById(currentTrackItem.id);
+								var canvasNodes = trackNode.getElementsByTagName("canvas");
+								showVariant(canvasNodes[0], canvasNodes[1], variantsNode, currentTrackItem.mode);
+							} else {
+								overScaleShow(currentTrackItem.id);
+							}
 						} else {
 							overScaleShow(currentTrackItem.id);
 						}
-					} else {
-						overScaleShow(currentTrackItem.id);
-					}
-				} else if(currentTrackItem.dataType == "BED" || currentTrackItem.dataType == "BEDGZ" || currentTrackItem.dataType == "ANNO" || currentTrackItem.dataType == "GRF" || currentTrackItem.dataType == "GDF") {
-					var elementsNodes = XMLDoc.getElementsByTagName(xmlTagElements);
-					var geneNode;
-					var elementsId;
-					for(var i = 0; i < elementsNodes.length; i++) {
-						elementsId = elementsNodes[i].getAttribute(xmlAttributeId);
-						if(elementsId == currentTrackItem.id) {
-							geneNode = elementsNodes[i];
-							break;
+					} else if(currentTrackItem.dataType == "BED" || currentTrackItem.dataType == "BEDGZ" || currentTrackItem.dataType == "ANNO" || currentTrackItem.dataType == "GRF" || currentTrackItem.dataType == "GDF") {
+						var elementsNodes = XMLDoc.getElementsByTagName(xmlTagElements);
+						var geneNode;
+						var elementsId;
+						for(var i = 0; i < elementsNodes.length; i++) {
+							elementsId = elementsNodes[i].getAttribute(xmlAttributeId);
+							if(elementsId == currentTrackItem.id) {
+								geneNode = elementsNodes[i];
+								break;
+							}
 						}
-					}
-					var refSeqTrackNode = document.getElementById(currentTrackItem.id);
-					var refSeqCanvasNodes = refSeqTrackNode.getElementsByTagName("canvas");
-					showGene(refSeqCanvasNodes[0], refSeqCanvasNodes[1], geneNode, currentTrackItem.mode);
-				} else if(currentTrackItem.dataType == "BW" || currentTrackItem.dataType == "WIG") {
-					var elementsNodes = XMLDoc.getElementsByTagName(xmlTagValues);
-					var geneNode;
-					var elementsId;
-					for(var i = 0; i < elementsNodes.length; i++) {
-						elementsId = elementsNodes[i].getAttribute(xmlAttributeId);
-						if(elementsId == currentTrackItem.id) {
-							geneNode = elementsNodes[i];
-							break;
+						var refSeqTrackNode = document.getElementById(currentTrackItem.id);
+						var refSeqCanvasNodes = refSeqTrackNode.getElementsByTagName("canvas");
+						showGene(refSeqCanvasNodes[0], refSeqCanvasNodes[1], geneNode, currentTrackItem.mode);
+					} else if(currentTrackItem.dataType == "BW" || currentTrackItem.dataType == "WIG") {
+						var elementsNodes = XMLDoc.getElementsByTagName(xmlTagValues);
+						var geneNode;
+						var elementsId;
+						for(var i = 0; i < elementsNodes.length; i++) {
+							elementsId = elementsNodes[i].getAttribute(xmlAttributeId);
+							if(elementsId == currentTrackItem.id) {
+								geneNode = elementsNodes[i];
+								break;
+							}
 						}
+						var refSeqTrackNode = document.getElementById(currentTrackItem.id);
+						var refSeqCanvasNodes = refSeqTrackNode.getElementsByTagName("canvas");
+						showValueCombine(refSeqCanvasNodes[0], refSeqCanvasNodes[1], geneNode, currentTrackItem.mode, "downtop", 100, 50);
 					}
-					var refSeqTrackNode = document.getElementById(currentTrackItem.id);
-					var refSeqCanvasNodes = refSeqTrackNode.getElementsByTagName("canvas");
-					showValueCombine(refSeqCanvasNodes[0], refSeqCanvasNodes[1], geneNode, currentTrackItem.mode, "downtop", 100, 50);
 				}
-			}
 
-			hideLoadingImage(loadingId);
+				hideLoadingImage(loadingId);
+			}
+		}else{
+			var pattern = /<.*?>/g;
+			XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks="+currentTrackItem.id,false);
+			XMLHttpReq12.send(null);
+			var err_text=XMLHttpReq12.responseText.replace(pattern,"");
+//			XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
+//			XMLHttpReq12.send(null);
+			if(err_text==null||err_text==""){
+				alert("An error occurred while executing the query!\nPlease check the data format and data index.");
+			}else{
+				alert(err_text);
+			}
+			removeTrack(currentTrackItem.id);
 		}
 	}
 }
