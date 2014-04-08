@@ -795,6 +795,19 @@ public class Instance {
 		CfgReader.write_metalist(doc,check, "ErrorList");
 		return XmlWriter.xml2string(doc);
 	}
+	public String get_CheckValue(String trackname){
+		Annotations track=null;
+		if(Annos.containsKey(trackname))
+			track=Annos.get(trackname);
+		else if(Externals.containsKey(trackname))
+			track=Externals.get(trackname);
+		else if(trackname.startsWith("_")&&Pvar!=null&&Pvar.get_ID().equals(trackname.substring(1)))
+			track=Pvar;
+		if(track!=null)
+			return track.get_Check();
+		else
+			return null;
+	}
 	public String get_Individuals(){
 		ArrayList<String> individuals = new ArrayList<String>();
 		int i=0;

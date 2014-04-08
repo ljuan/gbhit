@@ -148,9 +148,10 @@ public class Interfaces extends HttpServlet{
 			ins.add_Externals(req.getParameter("tracks").split(","),req.getParameter("links").split(","), req.getParameter("types").split(","),req.getParameter("modes").split(","));
 			boolean valid = true;
 			String[] tracksname = req.getParameter("tracks").split(",");
-			for(int i=0;i<tracksname.length;i++)
-				if(ins.get_Check(tracksname[i])!=null)
+			for(int i=0;i<tracksname.length;i++){
+				if(ins.get_CheckValue(tracksname[i])!=null && !ins.get_CheckValue(tracksname[i]).equals(""))
 					valid = false;
+			}
 			if(valid)
 				a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
 			else
