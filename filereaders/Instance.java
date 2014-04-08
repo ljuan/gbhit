@@ -6,6 +6,7 @@ import static filereaders.Consts.VCF_HEADER_SAMPLE;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -155,6 +156,8 @@ public class Instance {
 			set_mode(tracks[i],Consts.MODE_HIDE);
 	}
 	public void add_Externals(String[] tracks,String[] links,String[] types,String[] modes){
+		boolean validurl = true;
+		String invalidlist= "";
 		for(int i=0;i<tracks.length;i++)
 			if(!Externals.containsKey(tracks[i])){
 				if(links[i].indexOf(";")>0){
@@ -164,14 +167,28 @@ public class Instance {
 						int colon=links_temp[j].indexOf(":");
 						links_table[j][0]=links_temp[j].substring(0, colon);
 						links_table[j][1]=links_temp[j].substring(colon+1);
+						if(links_table[j][1].startsWith("http://") || links_table[j][1].startsWith("ftp://") || links_table[j][1].startsWith("https://")){
+							if(!ifURLexists(links_table[j][1])){
+								validurl = false;
+								invalidlist+=links_table[j][1]+";";
+							}
+						}
 					}
 					Externals.put(tracks[i], new Annotations(tracks[i],links_table,types[i],modes[i],Consts.GROUP_CLASS_USR));
 				}
 				else{
+					if(links[i].startsWith("http://") || links[i].startsWith("ftp://") || links[i].startsWith("https://")){
+						if(!ifURLexists(links[i])){
+							validurl = false;
+							invalidlist+=links[i]+";";
+						}
+					}
 					Externals.put(tracks[i], new Annotations(tracks[i],links[i],types[i],modes[i],Consts.GROUP_CLASS_USR));
 				}
 				if(types[i].equals(Consts.FORMAT_VCF))
 					init_track(Externals.get(tracks[i])); 
+				if(!validurl)
+					((Annotations) Externals.get(tracks[i])).set_Check("The PGB cannot access the data file! The following file(s) may not be publicly accessible: "+invalidlist);
 			}
 	}
 	public void add_ExIndividuals(String[] tracks,String[] links,String[] types,String[] modes){
@@ -1266,6 +1283,18 @@ public class Instance {
 			return new String(myChar);
 		} catch (Exception e){
 			return null;
+		}
+	}
+	public static boolean ifURLexists(String URLName){
+		try{
+			HttpURLConnection.setFollowRedirects(false);
+			HttpURLConnection con = (HttpURLConnection) new URL(URLName).openConnection();
+			con.setRequestMethod("HEAD");
+			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			return false;
 		}
 	}
 }

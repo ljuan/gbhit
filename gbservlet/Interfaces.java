@@ -146,7 +146,15 @@ public class Interfaces extends HttpServlet{
 		}
 		else if (action.equals("addExternals")){
 			ins.add_Externals(req.getParameter("tracks").split(","),req.getParameter("links").split(","), req.getParameter("types").split(","),req.getParameter("modes").split(","));
-			a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
+			boolean valid = true;
+			String[] tracksname = req.getParameter("tracks").split(",");
+			for(int i=0;i<tracksname.length;i++)
+				if(ins.get_Check(tracksname[i])!=null)
+					valid = false;
+			if(valid)
+				a=ins.add_Tracks(req.getParameter("tracks").split(","), req.getParameter("modes").split(","));
+			else
+				ins.remove_Tracks(tracksname);
 		}
 		else if (action.equals("addExIndividuals")){
 			ins.add_ExIndividuals(req.getParameter("tracks").split(","),req.getParameter("links").split(","), req.getParameter("types").split(","),req.getParameter("modes").split(","));
