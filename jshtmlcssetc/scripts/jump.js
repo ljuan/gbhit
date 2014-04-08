@@ -6362,8 +6362,6 @@ function handle_addPvar_Request() {
 			XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks=_"+initPvar_superid,false);
 			XMLHttpReq12.send(null);
 			var err_text=XMLHttpReq12.responseText.replace(pattern,"");
-//			XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
-//			XMLHttpReq12.send(null);
 			if(err_text==null||err_text==""){
 				alert("An error occurred while executing the query!\nPlease check the data format and data index.");
 			}else{
@@ -7012,11 +7010,11 @@ function handleOnchange(currentTrackItem) {
 			XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks="+currentTrackItem.id,false);
 			XMLHttpReq12.send(null);
 			var err_text=XMLHttpReq12.responseText.replace(pattern,"");
-//			XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackId,false);
-//			XMLHttpReq12.send(null);
 			if(err_text != null && err_text != ""){
 				alert(err_text);
-				removeTrack(currentTrackItem.id);
+				if(currentTrackItem.mode != "hide"){
+					trackModeOnchange(currentTrackItem.id, "hide");
+				}
 			}else{
 				var XMLDoc = XMLHttpReq.responseXML;
 				if(currentTrackItem.mode != "hide") {
@@ -7136,7 +7134,9 @@ function handleOnchange(currentTrackItem) {
 			}else{
 				alert(err_text);
 			}
-			removeTrack(currentTrackItem.id);
+			if(currentTrackItem.mode != "hide"){
+				trackModeOnchange(currentTrackItem.id, "hide");
+			}
 		}
 	}
 }

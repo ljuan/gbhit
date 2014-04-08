@@ -1077,6 +1077,8 @@ public class Instance {
 	}
 	void append_track(Annotations track, Document doc,String mode) {
 		String path_temp=track.get_Path(Chr);
+		if(track.get_Check()!=null && !track.get_Check().equals(""))
+			return;
 		if(!mode.equals(Consts.MODE_HIDE) && path_temp!=null){
 			Element ele_temp=null;
 			String type_temp=track.get_Type();
