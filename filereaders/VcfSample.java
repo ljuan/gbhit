@@ -35,6 +35,7 @@ class VcfSample implements Serializable{
 			for (int i = 0; i < SampleNames.length; i++)
 				Samples.put(SampleNames[i], new BooleanIndex(false, i));
 		}
+		initPedigree(null);
 	}
 
 	public void setSamples(String selected_sample) {
@@ -172,9 +173,11 @@ class VcfSample implements Serializable{
 		Family(String ped){
 //			this.Roots = new HashMap<String, FamilyMember>();
 			this.Members = new HashMap<String, FamilyMember>();
-			String[] temp = ped.split("[\n\r]+");
-			for(int i=0;i<temp.length;i++)
-				addFamilyMember(temp[i]);
+			if(ped !=null){
+				String[] temp = ped.split("[\n\r]+");
+				for(int i=0;i<temp.length;i++)
+					addFamilyMember(temp[i]);
+			}
 			for(int i=0;i<SampleNames.length;i++)
 				if(!Members.containsKey(SampleNames[i]))
 					addFamilyMember(SampleNames[i],0);
