@@ -167,13 +167,13 @@ class VcfSample implements Serializable{
 			this.index = index;
 		}
 	}
-	private class Family {
+	private class Family implements Serializable{
 //		Map<String, FamilyMember> Roots;
 		Map<String, FamilyMember> Members;
 		Family(String ped){
 //			this.Roots = new HashMap<String, FamilyMember>();
 			this.Members = new HashMap<String, FamilyMember>();
-			if(ped !=null){
+			if(ped!=null){
 				String[] temp = ped.split("[\n\r]+");
 				for(int i=0;i<temp.length;i++)
 					addFamilyMember(temp[i]);
@@ -202,7 +202,7 @@ class VcfSample implements Serializable{
 		}
 		
 	}
-	private class FamilyMember {
+	private class FamilyMember implements Serializable{
 		String Family;
 		String id;
 		String Fid;
