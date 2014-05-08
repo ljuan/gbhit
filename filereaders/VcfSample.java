@@ -188,7 +188,7 @@ class VcfSample implements Serializable{
 			Members.put(fm.getID(), fm);
 		}
 		void addFamilyMember(String id,int sex){
-			FamilyMember fm = new FamilyMember("",id,sex);
+			FamilyMember fm = new FamilyMember("--",id,sex);
 			Members.put(fm.getID(), fm);
 		}
 		Element write_family2pedigree(Document doc,String track){
