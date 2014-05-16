@@ -3,6 +3,8 @@ package filereaders;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,14 +56,18 @@ class VcfSample implements Serializable{
 			selectedIndexes = null;
 			return;
 		}
-		selectedNames = new String[temp_selectedNames.size()];
-		temp_selectedNames.toArray(selectedNames);
-		selectedIndexes = new int[selectedNames.length];
+		selectedIndexes = new int[temp_selectedNames.size()];
 		BooleanIndex bi = null;
-		for (int i = 0; i < selectedNames.length; i++) {
-			bi = Samples.get(selectedNames[i]);
+		int i = 0;
+		while(i<temp_selectedNames.size()){
+			bi = Samples.get(temp_selectedNames.get(i));
 			bi.selected = true;
-			selectedIndexes[i] = bi.index;
+			selectedIndexes[i++] = bi.index;
+		}
+		Arrays.sort(selectedIndexes);
+		selectedNames = new String[selectedIndexes.length];
+		for(i=0;i<selectedIndexes.length;i++){
+			selectedNames[i] = SampleNames[selectedIndexes[i]];
 		}
 	}
 	public void loadPedigree(String filepath){
