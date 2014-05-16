@@ -27,7 +27,6 @@ public class VCFRecordSamples {
 			this.homos[i] = "";
 		}
 		this.samples = new String[len];
-		
 		for (int index = 0; index < len; index++) {
 			this.samples[index] = samples[index + 9];
 		}
