@@ -492,7 +492,7 @@ function list_individuals(){
 			radioObj.type = "radio";
 			radioObj.name = "indlist_select";
 			radioObj.id = id + "__indlist_select";
-			if(id == current_selected_individual){
+			if(id == csi){
 				radioObj.checked = true;
 			}
 			radioObj.onclick = function(event){
@@ -512,19 +512,19 @@ function select_a_individual(id){
 				families[individuals[id].family][id].idobj[temp_root].attr({fill:"#000"});
 			}
 			individuals[id].selected = false;
-			current_selected_individual = "--";
+			csi = "--";
 		} else {
-			if(individuals[current_selected_individual] != undefined){
-				for(var temp_root in families[individuals[current_selected_individual].family][current_selected_individual].idobj){
-					families[individuals[current_selected_individual].family][current_selected_individual].idobj[temp_root].attr({fill:"#000"});
+			if(individuals[csi] != undefined){
+				for(var temp_root in families[individuals[csi].family][csi].idobj){
+					families[individuals[csi].family][csi].idobj[temp_root].attr({fill:"#000"});
 				}
-				individuals[current_selected_individual].selected = false;
+				individuals[csi].selected = false;
 			}
 			for(var temp_root in families[individuals[id].family][id].idobj){
 				families[individuals[id].family][id].idobj[temp_root].attr({fill:"#F00"});
 			}
 			individuals[id].selected = true;
-			current_selected_individual = id;
+			csi = id;
 		}
 	}
 }
