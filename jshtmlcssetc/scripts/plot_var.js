@@ -566,18 +566,20 @@ function plot_variants(){
 	}
 
 	if(variants.length < l/font_height){
-		var current_pos = 0;
+		var current_pos = 0 - font_height;
 		for(var i = 0 ; i < variants.length ; i++){
 			var natual_pos = ((variants[i].to+variants[i].from)/2 - current_start)/(current_end - current_start + 1)*l;
 			var name_pos = natual_pos;
 			natual_pos += R_top;
 
-			if(name_pos < i*font_height){
-				name_pos = i*font_height;
-			} else if(name_pos > l - (variants.length - i + 1)*font_height){
-				name_pos = l - (variants.length - i + 1)*font_height;
-			} else if(name_pos < current_pos + font_height){
+			if(name_pos < current_pos + font_height){
 				name_pos = current_pos + font_height;
+			} else if(name_pos < i*font_height){
+				name_pos = i*font_height;
+			} else if(name_pos > l - (variants.length - i - 1)*font_height){
+				name_pos = l - (variants.length - i - 1)*font_height;
+//			} else if(name_pos < current_pos + font_height){
+//				name_pos = current_pos + font_height;
 			}
 			current_pos = name_pos;
 			name_pos += R_top;
@@ -807,10 +809,10 @@ function change_variant_color(vPointer,color){
 		var w = R_width - R_left - R_right;
 		var natual_pos = ((variants[vPointer].to+variants[vPointer].from)/2 - current_start)/(current_end - current_start + 1)*l + R_top;
 		variants[vPointer].point = [];
-		if(variants[vPointer].genotypes[0] == undefined || variants[vPointer].genotypes[0] == "0"){
+		if(variants[vPointer].genotypes[0] != undefined && variants[vPointer].genotypes[0] != "0"){
 			variants[vPointer].point[0] = R.ellipse(R_left+w/2-30,natual_pos,2,2).attr({fill:color,stroke:color});
 		}
-		if(variants[vPointer].genotypes[1] == undefined || variants[vPointer].genotypes[1] == "0"){
+		if(variants[vPointer].genotypes[1] != undefined && variants[vPointer].genotypes[1] != "0"){
 			variants[vPointer].point[1] = R.ellipse(R_left+w/2+30,natual_pos,2,2).attr({fill:color,stroke:color});
 		}
 	}

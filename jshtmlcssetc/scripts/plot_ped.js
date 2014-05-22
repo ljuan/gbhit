@@ -112,11 +112,16 @@ function correct_coord(root){
 	for(var i=0;i<height;i++){
 		var id1 = families[family].roots[root].levels[i][0];
 		var id2 = families[family].roots[root].levels[i][families[family].roots[root].levels[i].length-1];
+		var plus_temp = 0;
+		if(id2 == "0"){
+			id2 = families[family].roots[root].levels[i][families[family].roots[root].levels[i].length-2];
+			plus_temp = 2;
+		} 
 		if(families[family].roots[root].leftt > families[family][id1].x[root]){
 			families[family].roots[root].leftt = families[family][id1].x[root];
 		}
-		if(families[family].roots[root].rightt < families[family][id2].x[root]){
-			families[family].roots[root].rightt = families[family][id2].x[root];
+		if(families[family].roots[root].rightt < families[family][id2].x[root]+plus_temp){
+			families[family].roots[root].rightt = families[family][id2].x[root]+plus_temp;
 		}
 	}
 
@@ -142,9 +147,9 @@ function correct_coord(root){
 				return;
 			}
 			families[family][id].x[root] += offset;
-			if(families[family][id].sp != undefined && families[family][id].sp == "0"){
-				families[family][families[family][id].sp].x[root] += offset;
-			}
+//			if(families[family][id].sp != undefined && families[family][id].sp != "0"){
+//				families[family][families[family][id].sp].x[root] += offset;
+//			}
 	
 			if(families[family][id].fid != "0"){
 				if(families[family][families[family][id].fid].lmo == id){
@@ -171,7 +176,7 @@ function correct_coord(root){
 			}
 
 			families[family][id].x[root] += offset;
-			if(families[family][id].sp != undefined){
+			if(families[family][id].sp != undefined && families[family][id].sp != "0"){
 				families[family][families[family][id].sp].x[root] += offset;
 			}
 	
