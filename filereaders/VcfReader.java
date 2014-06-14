@@ -290,7 +290,7 @@ public class VcfReader {
 								if(vs.containsKey(temp[0]+":"+start+":"+end+":"+line_alts[j].substring(line_temp[3].length()))){
 									for(int n=0;n<sampleNames.length;n++){
 										int temp_len=line_temp[n+9].indexOf(":")==-1?line_temp[n+9].length():line_temp[n+9].indexOf(":");
-										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>0)
+										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>=0)
 											sampleVotes[n]++;
 									}
 									vs.remove(temp[0]+":"+start+":"+end+":"+line_alts[j].substring(line_temp[3].length()));
@@ -302,7 +302,7 @@ public class VcfReader {
 								if(vs.containsKey(temp[0]+":"+start+":"+end+":-")){
 									for(int n=0;n<sampleNames.length;n++){
 										int temp_len=line_temp[n+9].indexOf(":")==-1?line_temp[n+9].length():line_temp[n+9].indexOf(":");
-										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>0)
+										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>=0)
 											sampleVotes[n]++;
 									}
 									vs.remove(temp[0]+":"+start+":"+end+":-");
@@ -314,7 +314,7 @@ public class VcfReader {
 										if(vs.containsKey(temp[0]+":"+(start+k)+":"+(end+k)+":"+line_alts[j].charAt(k))){
 											for(int n=0;n<sampleNames.length;n++){
 												int temp_len=line_temp[n+9].indexOf(":")==-1?line_temp[n+9].length():line_temp[n+9].indexOf(":");
-												if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>0)
+												if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>=0)
 													sampleVotes[n]++;
 											}
 											vs.remove(temp[0]+":"+(start+k)+":"+(end+k)+":"+line_alts[j].charAt(k));
@@ -324,7 +324,7 @@ public class VcfReader {
 								if(vs.containsKey(temp[0]+":"+start+":"+end+":"+line_alts[j])){
 									for(int n=0;n<sampleNames.length;n++){
 										int temp_len=line_temp[n+9].indexOf(":")>0?line_temp[n+9].indexOf(":"):line_temp[n+9].length();
-										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>0)
+										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>=0)
 											sampleVotes[n]++;
 									}
 									vs.remove(temp[0]+":"+start+":"+end+":"+line_alts[j]);
