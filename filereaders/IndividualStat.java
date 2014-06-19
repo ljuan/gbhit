@@ -136,6 +136,36 @@ public class IndividualStat {
 		}
 		int[] range=Genes.binarySearchOverlap(chr, start, end);
 		CytoScores[i]=0;
+		if(method.equals("Family") && pvar.get_Type().equals(Consts.FORMAT_VCF) && pvar.has_Parameter(Consts.VCF_HEADER_SAMPLE) 
+			&& ((VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE)).ifTrioAvailable()){
+			VcfSample vcfSample = (VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE);
+			String set_b = vcfSample.getSelectedNames()[0];
+			String set_a = null;
+			String[] ps = vcfSample.getParents();
+			if(ps!=null)
+				set_a = ps[0]+":"+ps[1];
+			Element ele_var = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end);
+			if (ele_var.getElementsByTagName(Consts.XML_TAG_VARIANT).getLength()>0){
+				CytoScores[i]=(int)CytoScores[i]|1;
+				CytoScores[i]=(int)CytoScores[i]|1<<4;
+			}
+		}
+		/* For method == Family
+		 *-1 : Uninitialized
+		 * 0 : Unknown
+		 * 0x1  : has event |1
+		 * 0x2  : allele 1 |1<<1
+		 * 0x4  : allele 2 |1<<2
+		 * 0x8  : has Compound heterozygous |1<<3
+		 * 0x10 : has De novo mutation |1<<4
+		 * 0x20 : Coding region |1<<5
+		 * 0x40 : Non-synonymous |1<<6
+		 * 0x80 : Rare |1<<7
+		 * 0x100 : Reserved
+		 * 0x200 : Reserved
+		 * 0x400 : Reserved
+		 */
+		
 		if(range!=null)
 			for(int j=range[0];j<=range[1];j++){
 				int[] subrange=Genes.get_GeneRange(j);
@@ -150,10 +180,130 @@ public class IndividualStat {
 						ele_annos[k]=bar[k].write_ba2elements(doc, annos[k].get_ID(), chr, subrange[0]+1, subrange[1], 0.5);
 					GeneScores[j]=Math.round(calc_Score(doc, ref, ele_annos, ele_var, chr, Genes.get_GeneSymbol(j))*10)/10;
 				}
+				else if(method.equals("Family") && pvar.has_Parameter(Consts.VCF_HEADER_SAMPLE) 
+						&& ((VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE)).ifTrioAvailable()){
+					
+					Element[] ele_annos=new Element[annos.length];
+					NodeList[] ele_vars_temp=new NodeList[3];
+					Element[] ele_vars=new Element[3];
+					
+					for(int k=0;k<annos.length;k++)
+						ele_annos[k]=bar[k].write_ba2elements(doc, annos[k].get_ID(), chr, subrange[0]+1, subrange[1], 0.5);
+					
+					VcfSample vcfSample = (VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE);
+					String[] ps = vcfSample.getParents();
+					String o =  vcfSample.getSelectedNames()[0];
+					
+					String set_b = o;
+					String set_a = ps[0]+":"+ps[1];
+					ele_vars_temp[0] = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end).getElementsByTagName(Consts.XML_TAG_VARIANTS);
+					for(int v=0;v<ele_vars_temp[0].getLength();v++)
+						if(((Element)ele_vars_temp[0].item(v)).getAttribute(Consts.XML_TAG_ID).equals(o))
+							ele_vars[0] = (Element)ele_vars_temp[0].item(v);
+					
+					set_b = o+":"+ps[0];
+					set_a = ps[1];
+					ele_vars_temp[1] = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end).getElementsByTagName(Consts.XML_TAG_VARIANTS);
+					for(int v=0;v<ele_vars_temp[1].getLength();v++)
+						if(((Element)ele_vars_temp[1].item(v)).getAttribute(Consts.XML_TAG_ID).equals(ps[0]))
+							ele_vars[1] = (Element)ele_vars_temp[1].item(v);
+					
+					set_b = o+":"+ps[1];
+					set_a = ps[0];
+					ele_vars_temp[2] = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end).getElementsByTagName(Consts.XML_TAG_VARIANTS);
+					for(int v=0;v<ele_vars_temp[2].getLength();v++)
+						if(((Element)ele_vars_temp[2].item(v)).getAttribute(Consts.XML_TAG_ID).equals(ps[1]))
+							ele_vars[2] = (Element)ele_vars_temp[2].item(v);
+					
+					GeneScores[j]=(int)GeneScores[j]|calc_Mut(doc,ref,ele_annos,ele_vars,chr,Genes.get_GeneSymbol(j));
+				}
 				else
 					GeneScores[j]=Math.round(Annovar.score_vars(ele_var, method, chr, ref)*10)/10;
-				CytoScores[i]=CytoScores[i]>GeneScores[j]?CytoScores[i]:GeneScores[j];
+				
+				if(method.equals("Family") && pvar.has_Parameter(Consts.VCF_HEADER_SAMPLE) 
+						&& ((VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE)).ifTrioAvailable()){
+					CytoScores[i]=(int)CytoScores[i]|(int)GeneScores[j];
+				}
+				else
+					CytoScores[i]=CytoScores[i]>GeneScores[j]?CytoScores[i]:GeneScores[j];
 			}
+	}
+	int calc_Mut(Document doc, FastaReader rr, Element[] annos, Element[] pvars, String chr, String symbol){
+		int score = 0;
+		boolean maternal_comp = false;
+		boolean paternal_comp = false;
+		
+		for(int vs=0;vs<3;vs++){ 
+			// filter those 1|1 variants, which are highly improbable for both denovo mutation and compound heterozygous
+			NodeList var_temp = pvars[vs].getElementsByTagName(Consts.XML_TAG_VARIANT);
+			for(int v=0;v<var_temp.getLength();v++)
+				if(((Element)var_temp.item(v)).getAttribute(Consts.XML_TAG_HOMO).indexOf("0")<0)
+					pvars[vs].removeChild(var_temp.item(v));
+		}
+		
+		try{
+			Element[] pannos=new Element[annos.length];
+			
+			for(int type=0;type<3;type++){
+				for(int i=0;i<annos.length;i++){
+					VariantAnalysis ee = new VariantAnalysis(doc, rr, annos[i], null, pvars[type], chr);
+					pannos[i]=ee.easydeal();
+					ArrayList<Integer> temp_score=new ArrayList<Integer>();
+					for(int j=0;j<pannos[i].getChildNodes().getLength();j++){
+						Element current_ele=(Element) pannos[i].getChildNodes().item(j);
+						if(current_ele.getAttribute(Consts.XML_TAG_SYMBOL).equals(symbol)){
+							if(current_ele.getElementsByTagName(Consts.XML_TAG_STATUS).getLength()>0)
+								if(current_ele.getElementsByTagName(Consts.XML_TAG_STATUS).item(0).getTextContent().indexOf(Variant.LARGE_VARIANTION)>=0)
+									if(type == 0){
+										score = score|1;
+										score = score|1<<4;
+										score = score|1<<5;
+										score = score|1<<6;
+									}
+									else if (type == 1)
+										paternal_comp = true;
+									else if (type == 2)
+										maternal_comp = true;
+							NodeList vs = current_ele.getElementsByTagName(Consts.XML_TAG_VARIANT);
+							for(int k=0;k<vs.getLength();k++){
+								String letter=((Element)vs.item(k)).getElementsByTagName(Consts.XML_TAG_LETTER).item(0).getTextContent();
+								String[] letters=letter.split(":");
+								if (letter.indexOf("^")>=0||letter.indexOf("$")>=0||letter.indexOf("#")>=0
+										||letter.indexOf("(")>=0||letter.indexOf(")")>=0
+										||letter.indexOf("_")>=0||letters[0].length()!=letters[1].length()
+										||!letters[0].equals(letters[1])){
+									if(type == 0){
+										score = score|1;
+										score = score|1<<4;
+										score = score|1<<5;
+										score = score|1<<6;
+									}
+									else if (type == 1)
+										paternal_comp = true;
+									else if (type == 2)
+										maternal_comp = true;
+								}
+								else if(letters[0].equals(letters[1])){
+									if(type == 0){
+										score = score|1;
+										score = score|1<<4;
+										score = score|1<<5;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		if(paternal_comp && maternal_comp){
+			score = score|1;
+			score = score|1<<3;
+		}
+		return score;
 	}
 	float calc_Score(Document doc, FastaReader rr, Element[] annos, Element pvar, String chr, String symbol){
 		int score=0;

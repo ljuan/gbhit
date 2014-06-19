@@ -222,23 +222,49 @@ public class VcfReader {
 		HashMap<String, String> vs = new HashMap<String, String>();
 		String[] sampleNames = null;
 		int[] sampleVotes = null;
+		String[][] sampleGT = null;
 		VcfSample vcfSample = null;
 		int threshold = 0;
 		if (this.track.has_Parameter(VCF_HEADER_SAMPLE)) {
 			vcfSample = (VcfSample) this.track.get_Parameter(VCF_HEADER_SAMPLE);
 			sampleNames = vcfSample.getSampleNames();
 			sampleVotes = new int[sampleNames.length];
+			sampleGT = new String[sampleNames.length][];
 			for(int i=0;i<sampleVotes.length;i++)
 				sampleVotes[i] = 0;
 		}
 		else
 			return null;
-		String[] vs_temp = variants.split("[\n\r]");
+//		String[] vs_temp = variants.split("[\n\r]");
+		String[] vs_temp = variants.split(",");
+		
+		for(int i=0;i<sampleNames.length;i++){
+			sampleGT[i] = new String[vs_temp.length];
+			for(int j=0;j<vs_temp.length;j++){
+				sampleGT[i][j] = "";
+			}
+		}
+		
 		try {
 			for (int i=0;i<vs_temp.length;i++){
 				if(vs_temp[i]==null||vs_temp[i].equals(""))
 					continue;
-				String[] temp = vs_temp[i].split("\t");
+				
+/*			These codes recieve colon-seperated variants list*/
+			////////////////////	
+				String[] temp = vs_temp[i].split(":");
+				threshold++;
+				if(!temp[0].startsWith("chr")){
+					temp[0]="chr"+temp[0];
+					vs_temp[i] = "chr"+vs_temp[i];
+				}
+				int start = Integer.parseInt(temp[1]);
+				int end = Integer.parseInt(temp[2]);
+				vs.put(vs_temp[i], Consts.VARIANT_TYPE_SNV);
+			///////////////////	
+				
+/*			These codes recieve VCF lines for variants input	
+ * 				String[] temp = vs_temp[i].split("\t");
 				if(temp.length<5 || temp[4].equals("."))
 					continue;
 				threshold++;
@@ -268,12 +294,12 @@ public class VcfReader {
 						vs.put(temp[0]+":"+start+":"+end+":"+alts[j],Consts.VARIANT_TYPE_SNV);
 					}
 				}
-				
+*/				
 				String chrom = (Boolean) this.track.get_Parameter(VCF_CHROM_PREFIX) ? temp[0] : temp[0].substring(3);
 				if ("M".equalsIgnoreCase(chrom)) 
 					chrom = "MT";
 				end = start = Integer.parseInt(temp[1]);
-				TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + (start-5)	+ "-" + (start+5));
+				TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + (start-5)	+ "-" + (end+5));
 				
 				String line = "";
 				if (Query != null) {
@@ -282,6 +308,8 @@ public class VcfReader {
 						if(line_temp[4].equals(".") || line_temp.length<10 || !line_temp[8].startsWith("GT"))
 							continue;
 						String[] line_alts = line_temp[4].split(",");
+						
+						end = start = Integer.parseInt(line_temp[1]);
 						
 						for(int j=0;j<line_alts.length;j++){
 							if(line_temp[3].length() < line_alts[j].length()){
@@ -292,6 +320,7 @@ public class VcfReader {
 										int temp_len=line_temp[n+9].indexOf(":")==-1?line_temp[n+9].length():line_temp[n+9].indexOf(":");
 										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>=0)
 											sampleVotes[n]++;
+										sampleGT[n][i]=line_temp[n+9].substring(0,temp_len);
 									}
 									vs.remove(temp[0]+":"+start+":"+end+":"+line_alts[j].substring(line_temp[3].length()));
 								}
@@ -304,6 +333,7 @@ public class VcfReader {
 										int temp_len=line_temp[n+9].indexOf(":")==-1?line_temp[n+9].length():line_temp[n+9].indexOf(":");
 										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>=0)
 											sampleVotes[n]++;
+										sampleGT[n][i]=line_temp[n+9].substring(0,temp_len);
 									}
 									vs.remove(temp[0]+":"+start+":"+end+":-");
 								}
@@ -316,6 +346,7 @@ public class VcfReader {
 												int temp_len=line_temp[n+9].indexOf(":")==-1?line_temp[n+9].length():line_temp[n+9].indexOf(":");
 												if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>=0)
 													sampleVotes[n]++;
+												sampleGT[n][i]=line_temp[n+9].substring(0,temp_len);
 											}
 											vs.remove(temp[0]+":"+(start+k)+":"+(end+k)+":"+line_alts[j].charAt(k));
 										}
@@ -326,6 +357,7 @@ public class VcfReader {
 										int temp_len=line_temp[n+9].indexOf(":")>0?line_temp[n+9].indexOf(":"):line_temp[n+9].length();
 										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>=0)
 											sampleVotes[n]++;
+										sampleGT[n][i]=line_temp[n+9].substring(0,temp_len);
 									}
 									vs.remove(temp[0]+":"+start+":"+end+":"+line_alts[j]);
 								}
@@ -349,9 +381,17 @@ public class VcfReader {
 		int threshold_lim = threshold>4 ? threshold - 2 : 1;
 		ArrayList<String> result_temp = new ArrayList<String>();
 		for(int i=threshold;i>=threshold_lim;i--)
-			for(int j=0;j<sampleNames.length;j++)
-				if(sampleVotes[j]==i)
-					result_temp.add(sampleNames[j]+":"+i);
+			for(int j=0;j<sampleNames.length;j++){
+				if(sampleVotes[j]==i){
+					String temp_s = sampleNames[j]+":"+i+":";
+					for(int k=0;k<vs_temp.length;k++){
+						if(k>0)
+							temp_s+=";";
+						temp_s+=sampleGT[j][k];
+					}
+					result_temp.add(temp_s);
+				}
+			}
 		String[] result = new String[result_temp.size()];
 		result_temp.toArray(result);
 		return result;

@@ -60,7 +60,10 @@ function init_individual_vars(){
 			var to = veNodes[j].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
 			var letter = veNodes[j].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
 			var id = veNodes[j].getAttribute(xmlAttributeId);
-			while(variants[vPointer].from < from){
+			while(variants[vPointer].to > to && vPointer >= 0){
+				vPointer--;
+			}
+			while(variants[vPointer].from < from && vPointer < variants.length){
 				vPointer++;
 			}
 			if(from <= variants[vPointer].from && to >= variants[vPointer].to && id == variants[vPointer].id){
@@ -351,16 +354,16 @@ function show_denovo_muts(){
 					if(from <= variants[vPointer].from && to >= variants[vPointer].to && id == variants[vPointer].id){
 						if(vs_id == individuals[csi].fid){
 							variants[vPointer].paternal = "N";
-							var vartable = document.getElementById("varlist_table");
-							if(vartable != undefined){
-								vartable.rows[vPointer+1].cells[5].innerHTML="N";
-							}
+//							var vartable = document.getElementById("varlist_table");
+//							if(vartable != undefined){
+//								vartable.rows[vPointer+1].cells[5].innerHTML="N";
+//							}
 						}else if(vs_id == individuals[csi].mid){
 							variants[vPointer].maternal = "N";
-							var vartable = document.getElementById("varlist_table");
-							if(vartable != undefined){
-								vartable.rows[vPointer+1].cells[6].innerHTML="N";
-							}
+//							var vartable = document.getElementById("varlist_table");
+//							if(vartable != undefined){
+//								vartable.rows[vPointer+1].cells[6].innerHTML="N";
+//							}
 						}else if(vs_id == csi){
 							change_variant_color(vPointer,colD);
 						}
@@ -391,10 +394,10 @@ function show_maternal_vars(){
 					if(from <= variants[vPointer].from && to >= variants[vPointer].to && id == variants[vPointer].id){
 						if(vs_id == individuals[csi].fid){
 							variants[vPointer].paternal = "N";
-							var vartable = document.getElementById("varlist_table");
-							if(vartable != undefined){
-								vartable.rows[vPointer+1].cells[5].innerHTML="N";
-							}
+//							var vartable = document.getElementById("varlist_table");
+//							if(vartable != undefined){
+//								vartable.rows[vPointer+1].cells[5].innerHTML="N";
+//							}
 						}else if(vs_id == individuals[csi].mid){
 							variants[vPointer].maternal = "Y";
 						}else if(vs_id == csi){
@@ -427,10 +430,10 @@ function show_paternal_vars(){
 							variants[vPointer].paternal = "Y";
 						}else if(vs_id == individuals[csi].mid){
 							variants[vPointer].maternal = "N";
-							var vartable = document.getElementById("varlist_table");
-							if(vartable != undefined){
-								vartable.rows[vPointer+1].cells[6].innerHTML="N";
-							}
+//							var vartable = document.getElementById("varlist_table");
+//							if(vartable != undefined){
+//								vartable.rows[vPointer+1].cells[6].innerHTML="N";
+//							}
 						}else if(vs_id == csi){
 							change_variant_color(vPointer,colM);
 						}
@@ -499,8 +502,8 @@ function list_variants(){
 		"<th>Pos</th>"+
 		"<th>Letter</th>"+
 		"<th>Genotype</th>"+
-		"<th>Paternal</th>"+
-		"<th>Maternal</th>"+
+//		"<th>Paternal</th>"+
+//		"<th>Maternal</th>"+
 		"<th>Function</th>"+
 		"<th>Checked</th>";
 	for(var i=0 ; i<variants.length ; i++){ 
@@ -516,10 +519,10 @@ function list_variants(){
 		temp_td.innerHTML = variants[i].letter;
 		temp_td = temp_tr.insertCell(-1);
 		temp_td.innerHTML = variants[i].genotype;
-		temp_td = temp_tr.insertCell(-1);
-		temp_td.innerHTML = variants[i].paternal;
-		temp_td = temp_tr.insertCell(-1);
-		temp_td.innerHTML = variants[i].maternal;
+//		temp_td = temp_tr.insertCell(-1);
+//		temp_td.innerHTML = variants[i].paternal;
+//		temp_td = temp_tr.insertCell(-1);
+//		temp_td.innerHTML = variants[i].maternal;
 		temp_td = temp_tr.insertCell(-1);
 		temp_td.innerHTML = variants[i].functional;
 		temp_td = temp_tr.insertCell(-1);
@@ -962,7 +965,13 @@ function plot_genes(){
 					}
 				}
 			}
-			cstObj = R.text(x,R_top-sh,genes[symbols[css][cst]].id).attr({font:font_size2_text});
+			var strand = "";
+			if(genes[symbols[css][cst]].strand == "+"){
+				strand = ">";
+			} else if(genes[symbols[css][cst]].strand == "-"){
+				strand = "<";
+			}
+			cstObj = R.text(x,R_top-sh,genes[symbols[css][cst]].id+strand).attr({font:font_size2_text});
 		}
 	}
 	function draw_arrow(h1,level,direction){

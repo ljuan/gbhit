@@ -124,9 +124,29 @@ class VcfSample implements Serializable{
 	public boolean ifExists(String SampleName){
 		return Samples.containsKey(SampleName);
 	}
+	public boolean ifTrioAvailable(){
+		if(Pedigree != null && selectedNames!=null && selectedNames.length == 1
+				&& Pedigree.Members.containsKey(selectedNames[0]) 
+				&& Pedigree.Members.get(selectedNames[0]).ifSample()
+				&& Pedigree.Members.containsKey(Pedigree.Members.get(selectedNames[0]).Fid) 
+				&& Pedigree.Members.get(Pedigree.Members.get(selectedNames[0]).Fid).ifSample()
+				&& Pedigree.Members.containsKey(Pedigree.Members.get(selectedNames[0]).Mid) 
+				&& Pedigree.Members.get(Pedigree.Members.get(selectedNames[0]).Mid).ifSample())
+			return true;
+		else
+			return false;
+	}
 
 	public String[] getSelectedNames() {
 		return selectedNames;
+	}
+	public String[] getParents() {
+		if(ifTrioAvailable()){
+			String[] parents = {Pedigree.Members.get(selectedNames[0]).Fid, Pedigree.Members.get(selectedNames[0]).Mid};
+			return parents;
+		}
+		else
+			return null;
 	}
 
 	/**
