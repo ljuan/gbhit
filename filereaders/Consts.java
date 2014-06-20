@@ -109,6 +109,7 @@ public interface Consts{
 	public static final String XML_TAG_FRAME="Frame";
 	public static final String XML_TAG_SCORE="Score";
 	public static final String XML_TAG_EFFECT="e";
+	public static final String XML_TAG_MAXAF="MaxAF";
 	
 	public static final String XML_TAG_CYTOBANDS="Cbs";
 	public static final String XML_TAG_CYTOBAND="Cb";

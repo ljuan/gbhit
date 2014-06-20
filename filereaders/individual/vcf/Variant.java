@@ -31,13 +31,14 @@ public class Variant implements Comparable<Variant> {
 	private String type;// Attribute
 	private int from;// Tag
 	private int to;// Tag
-	private String letter;// Tag
+	private String letter=null;// Tag
 	private String toChr;// Tag
 	private String direction;// Tag
 	private String description;// Tag
 	private String homo;// //Attribute
 	private String dbsnpInfo;// Tag
 	private String sampleInfo;
+	private float maxAF = -1;
 	
 	private int effect = 0;//Attribute --added by Liran for record variant which has effect
 	/*
@@ -179,6 +180,14 @@ public class Variant implements Comparable<Variant> {
 	public String getHomo(){
 		return homo;
 	}
+	
+	public void setMaxAF(float maxAF){
+		this.maxAF = maxAF;
+	}
+	
+	public float getMaxAF(){
+		return maxAF;
+	}
 
 	public void setDbsnpInfo(String dbsnpInfo){
 		this.dbsnpInfo = dbsnpInfo;
@@ -239,6 +248,8 @@ public class Variant implements Comparable<Variant> {
 			XmlWriter.append_text_element(doc, v, XML_TAG_DBSNP, dbsnpInfo);
 		if (sampleInfo!= null)
 			XmlWriter.append_text_element(doc, v, XML_TAG_SAMPLEINFO, sampleInfo);
+		if (maxAF > 0)
+			XmlWriter.append_text_element(doc, v, XML_TAG_MAXAF, String.valueOf(maxAF));
 	}
 	
 	public static Variant convertElement2Variant(Element ele){
@@ -275,6 +286,9 @@ public class Variant implements Comparable<Variant> {
 	@Override
 	public int compareTo(Variant o) {
 		return (this.from != o.from) ? (this.from - o.from) : (this.to - o.to);
+	}
+	public boolean equals(Variant o){
+		return this.from == o.from && this.to == o.to && this.letter.equals(o.letter) && this.type.equals(o.type);
 	}
 	
 	public static Variant copy(Variant obj){

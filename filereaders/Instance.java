@@ -710,9 +710,11 @@ public class Instance {
 	public String set_ScoreMethod(String scoremeth){
 		if(Annovar.ScoreMeth.containsKey(scoremeth))
 			this.scoremeth=Annovar.ScoreMeth.get(scoremeth);
+		else if(scoremeth.equals("Family"))
+			this.scoremeth="Family";
 		else
 			this.scoremeth=null;
-		if(Pvar!=null && PvarID != null)
+		if(Pvar!=null && PvarID != null && !scoremeth.equals("Family"))
 			return add_Pvar(Pvar.get_ID(),Pvar.get_Mode(),PvarID);
 		return null;
 	}
@@ -724,6 +726,8 @@ public class Instance {
 				scoremethlist[0]="SIFT";
 			else if(scoremeth.equals("ljb_pp2"))
 				scoremethlist[0]="PolyPhen2";
+			else if(scoremeth.equals("Family"))
+				scoremethlist[0]="Family";
 			else
 				scoremethlist[0]="PGB";
 		else
@@ -1048,14 +1052,8 @@ public class Instance {
 			new GTFReader(path_temp);
 		else if(type_temp.equals(Consts.FORMAT_GVF))
 			new GVFReader(path_temp);
-		else if (type_temp.equals(Consts.FORMAT_VCF)){
-			VcfReader vr=new VcfReader(track,"chr1");
-			try{
-				vr.vcf_tb.TabixReaderClose();
-			} catch(Exception e){
-				e.printStackTrace();
-			}
-		}
+		else if (type_temp.equals(Consts.FORMAT_VCF))
+			new VcfReader(track,"chr1");
 		else if (type_temp.equals(Consts.FORMAT_BAM)){
 			try {
 				new BAMReader(path_temp);

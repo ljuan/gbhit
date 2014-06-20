@@ -18,8 +18,8 @@ import filereaders.individual.vcf.Vcf;
 import static filereaders.Consts.*;
 
 public class VcfReader {
-	TabixReaderForVCF vcf_tb;
 	private Annotations track = null;
+	private String Chr = null;
 	/**
 	 * limit of bpp
 	 */
@@ -28,6 +28,7 @@ public class VcfReader {
 	public VcfReader(Annotations track, String Chr) {
 		this.bppLimit = 0.5;
 		String check = null;
+		TabixReaderForVCF vcf_tb = null;
 		try {
 			if (track.has_Parameter(VCF_INDEX_LOCAL) && track.get_Parameter(VCF_INDEX_LOCAL) != null)
 				vcf_tb = new TabixReaderForVCF(track.get_Path(Chr),(String)track.get_Parameter(VCF_INDEX_LOCAL));
@@ -119,6 +120,7 @@ public class VcfReader {
 				track.initialize_Parameter(VCF_QUAL_LIMIT, "0", PARAMETER_TYPE_STRING);
 			}
 			this.track = track;
+			this.Chr = Chr;
 		} catch (IOException e) {
 			check = "Cannot access to the data/index file!";
 			track.set_Check(check);
@@ -127,6 +129,13 @@ public class VcfReader {
 			check = "Invalid data!";
 			track.set_Check(check);
 			e.printStackTrace();
+		} finally{
+			if(vcf_tb != null){
+				try {
+					vcf_tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
 		}
 	}
 
@@ -157,6 +166,7 @@ public class VcfReader {
 		int samplesNum = 0;
 		int[] selectedIndexes = null;
 		VcfSample vcfSample = null;
+		TabixReaderForVCF vcf_tb = null;
 
 		if (track.has_Parameter(VCF_HEADER_SAMPLE)) {
 			vcfSample = (VcfSample) track.get_Parameter(VCF_HEADER_SAMPLE);
@@ -173,6 +183,10 @@ public class VcfReader {
 			if ("M".equalsIgnoreCase(chrom)) {
 				chrom = "MT";
 			}
+			if (track.has_Parameter(VCF_INDEX_LOCAL) && track.get_Parameter(VCF_INDEX_LOCAL) != null)
+				vcf_tb = new TabixReaderForVCF(track.get_Path(chr),(String)track.get_Parameter(VCF_INDEX_LOCAL));
+			else
+				vcf_tb = new TabixReaderForVCF(track.get_Path(chr),null);
 			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start + "-" + end);
 			if (Query != null) {
 				ArrayList<Variant> vs_list = new ArrayList<Variant>();
@@ -219,6 +233,7 @@ public class VcfReader {
 		return e1;
 	}
 	public String[] write_individuals(String track, String variants){
+		TabixReaderForVCF vcf_tb = null;
 		HashMap<String, String> vs = new HashMap<String, String>();
 		String[] sampleNames = null;
 		int[] sampleVotes = null;
@@ -299,6 +314,10 @@ public class VcfReader {
 				if ("M".equalsIgnoreCase(chrom)) 
 					chrom = "MT";
 				end = start = Integer.parseInt(temp[1]);
+				if (this.track.has_Parameter(VCF_INDEX_LOCAL) && this.track.get_Parameter(VCF_INDEX_LOCAL) != null)
+					vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),(String)this.track.get_Parameter(VCF_INDEX_LOCAL));
+				else
+					vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),null);
 				TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + (start-5)	+ "-" + (end+5));
 				
 				String line = "";
@@ -398,6 +417,7 @@ public class VcfReader {
 	}
 	public Element write_intersection(Document doc, String track, String set_a, String chr, long start, long end){
 		float qualLimit = Float.parseFloat((String) (this.track.get_Parameter(VCF_QUAL_LIMIT)));
+		TabixReaderForVCF vcf_tb = null;
 		String[] filterLimit = getFilterLimit();
 
 		int samplesNum = 0;
@@ -432,6 +452,10 @@ public class VcfReader {
 			if ("M".equalsIgnoreCase(chrom)) {
 				chrom = "MT";
 			}
+			if (this.track.has_Parameter(VCF_INDEX_LOCAL) && this.track.get_Parameter(VCF_INDEX_LOCAL) != null)
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),(String)this.track.get_Parameter(VCF_INDEX_LOCAL));
+			else
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),null);
 			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start
 					+ "-" + end);
 			if (Query != null) {
@@ -473,6 +497,7 @@ public class VcfReader {
 	}
 	public Element write_difference(Document doc, String track, String set_a, String set_b, String chr, long start, long end){
 		float qualLimit = Float.parseFloat((String) (this.track.get_Parameter(VCF_QUAL_LIMIT)));
+		TabixReaderForVCF vcf_tb = null;
 		String[] filterLimit = getFilterLimit();
 
 		int samplesNum = 0;
@@ -530,6 +555,10 @@ public class VcfReader {
 			if ("M".equalsIgnoreCase(chrom)) {
 				chrom = "MT";
 			}
+			if (this.track.has_Parameter(VCF_INDEX_LOCAL) && this.track.get_Parameter(VCF_INDEX_LOCAL) != null)
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),(String)this.track.get_Parameter(VCF_INDEX_LOCAL));
+			else
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),null);
 			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start
 					+ "-" + end);
 			if (Query != null) {
@@ -569,9 +598,104 @@ public class VcfReader {
 		variants = null;
 		return e1;
 	}
+	public Element[] write_trio(Document doc, String chr, long start, long end){
+		float qualLimit = Float.parseFloat((String) (this.track.get_Parameter(VCF_QUAL_LIMIT)));
+		TabixReaderForVCF vcf_tb = null;
+		String[] filterLimit = getFilterLimit();
+
+		int samplesNum = 0;
+		VcfSample vcfSample_real = null;
+		VcfSample vcfSample = null;
+		String[] pids = null;
+		String oid = null;
+		int o=0,f=0,m=0;
+		int[] selectedIndexes = null;
+		String[] selectedNames = null;
+		Variants[] variants;
+		String mode=Consts.MODE_PACK;
+		double bpp = 0.5;
+
+		if (this.track.has_Parameter(VCF_HEADER_SAMPLE)) {
+			vcfSample_real = ((VcfSample) this.track.get_Parameter(VCF_HEADER_SAMPLE));
+			if(!vcfSample_real.ifTrioAvailable())
+				return null;
+			vcfSample = new VcfSample(vcfSample_real.getSampleNames());
+			oid = vcfSample_real.getSelectedNames()[0];
+			pids = vcfSample_real.getParents();
+			vcfSample.setSamples(oid+":"+pids[0]+":"+pids[1]);
+			samplesNum = 3;
+			selectedIndexes = vcfSample.getSelectedIndexes();
+			selectedNames=vcfSample.getSelectedNames();
+			for (int i=0 ; i<selectedNames.length ; i++){
+				if(selectedNames[i].equals(oid))
+					o = i;
+				else if(selectedNames[i].equals(pids[0]))
+					f = i;
+				else if(selectedNames[i].equals(pids[1]))
+					m = i;
+			}
+		}
+		else
+			return null;
+		
+		variants = new Variants[selectedIndexes.length];
+		int selectedLen = selectedIndexes.length;
+		
+		for (int i = 0; i < selectedLen; i++) {
+			variants[i] = new Variants(track.get_ID(), selectedNames[i], doc, mode, bpp, bppLimit, qualLimit, filterLimit);
+		}
+		
+		Vcf vcf = null;
+		try {
+			String chrom = (Boolean) this.track.get_Parameter(VCF_CHROM_PREFIX) ? chr : chr.substring(3);
+			if ("M".equalsIgnoreCase(chrom)) {
+				chrom = "MT";
+			}
+			if (this.track.has_Parameter(VCF_INDEX_LOCAL) && this.track.get_Parameter(VCF_INDEX_LOCAL) != null)
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),(String)this.track.get_Parameter(VCF_INDEX_LOCAL));
+			else
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),null);
+			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start	+ "-" + end);
+			if (Query != null) {
+				int len = variants.length;
+				Variant[][] vs = new Variant[len][];
+				while (Query.next() != null) {
+					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, samplesNum, selectedIndexes,true);
+					if (vcf.altIsDot())
+						continue;
+					if (vcf.shouldBeFilteredByQualLimit(qualLimit) || vcf.shouldBeFilteredByFilterLimit(filterLimit))
+						continue;
+					
+					vs = vcf.getVariants_trio(o,f,m);
+					if(vs == null)
+						continue;
+					for (int i = 0; i < len; i++) 
+						if (vs[i] != null)
+							variants[i].addVariant(vcf,i, vs[i]);
+					vs = null;
+				}
+			}
+		} catch (IOException e) {
+			this.track.set_Check("Cannot access to the data/index file!");
+			e.printStackTrace();
+		} finally{
+			if(vcf_tb != null){
+				try {
+					vcf_tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
+		}
+		Element[] e = new Element[3];
+		e[0] = variants[o].getVariantsElement();
+		e[1] = variants[f].getVariantsElement();
+		e[2] = variants[m].getVariantsElement();
+		return e;
+	}
 	public Element write_vcf2variants(Document doc, String track, String mode,
 			double bpp/* bases per pixel */, String chr, long start, long end) {
 		float qualLimit = Float.parseFloat((String) (this.track.get_Parameter(VCF_QUAL_LIMIT)));
+		TabixReaderForVCF vcf_tb = null;
 		String[] filterLimit = getFilterLimit();
 
 		int samplesNum = 0;
@@ -606,8 +730,11 @@ public class VcfReader {
 			if ("M".equalsIgnoreCase(chrom)) {
 				chrom = "MT";
 			}
-			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start
-					+ "-" + end);
+			if (this.track.has_Parameter(VCF_INDEX_LOCAL) && this.track.get_Parameter(VCF_INDEX_LOCAL) != null)
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),(String)this.track.get_Parameter(VCF_INDEX_LOCAL));
+			else
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),null);
+			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start	+ "-" + end);
 			if (Query != null) {
 				int len = variants.length;
 				Variant[] vs;

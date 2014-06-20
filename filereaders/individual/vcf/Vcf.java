@@ -67,6 +67,7 @@ public class Vcf {
 		PGInfos_M.put("IMPRECISE", new Integer(0));
 		PGInfos_M.put("END", new Integer(1));
 		PGInfos_M.put("SVLEN", new Integer(2));
+		PGInfos_M.put("MINAF", new Integer(3));
 
 		variantTypes.put(VARIANT_TYPE_SNV, VARIANT_TYPE_SNV);
 		variantTypes.put(VARIANT_TYPE_INSERTION, VARIANT_TYPE_INSERTION);
@@ -125,6 +126,12 @@ public class Vcf {
 	 *            samplesFilter=null
 	 */
 	public Vcf(char[] vcfInCharArray, int lenOfCharArray, int samplenum, int[] samplesFilter) {
+		init(vcfInCharArray, lenOfCharArray, samplenum, samplesFilter,false);
+	}
+	public Vcf(char[] vcfInCharArray, int lenOfCharArray, int samplenum, int[] samplesFilter, boolean isResolvInfo) {
+		init(vcfInCharArray, lenOfCharArray, samplenum, samplesFilter,isResolvInfo);
+	}
+	void init(char[] vcfInCharArray, int lenOfCharArray, int samplenum, int[] samplesFilter, boolean isResolvInfo) {
 		String[] temp = resolveVCFLine(vcfInCharArray, lenOfCharArray, samplenum, samplesFilter);
 		Chr = (temp[0].startsWith("chr") ? "" : "chr") + temp[0];
 		Pos = getIntValue(temp[1]);
@@ -150,7 +157,9 @@ public class Vcf {
 		if (samplesFilter != null) {
 			samples = new VCFRecordSamples(temp);
 		}
-		resolveInfo(samplenum == 0);
+		if(isResolvInfo)
+			resolveInfo(samplenum == 0);
+		
 		resolveAlt();
 	}
 
@@ -253,6 +262,8 @@ public class Vcf {
 				pgInfo.pgInfos[index] = true;
 
 			firstChar = keyValue[0].charAt(0);
+			char lastChar1 =keyValue[0].charAt(keyValue[0].length()-1);
+			char lastChar2 =keyValue[0].charAt(keyValue[0].length()-2);
 			if ('E' == firstChar) {
 				if ("END".equals(keyValue[0])) {
 					pgInfo.end = getIntValue(keyValue[1]);
@@ -261,6 +272,10 @@ public class Vcf {
 				if ("SVLEN".equals(keyValue[0])) {
 					pgInfo.svlen = getIntValue(keyValue[1]);
 				}
+			} else if ('F' == lastChar1 && 'A' == lastChar2) {
+				if(keyValue.length>1)
+					pgInfo.pgInfos[3] = true;
+					pgInfo.maxAF = pgInfo.maxAF<Float.parseFloat(keyValue[1])?Float.parseFloat(keyValue[1]):pgInfo.maxAF;
 			}
 		}
 
@@ -565,6 +580,9 @@ public class Vcf {
 	public String getSCS() {
 		return dbSnpInfo == null ? null : dbSnpInfo.SCS;
 	}
+	public float getMaxAF(){
+		return pgInfo == null ? null : pgInfo.maxAF;
+	}
 
 	public DBSnpInfo getDBSnpInfo() {
 		return dbSnpInfo == null ? null : dbSnpInfo;
@@ -676,6 +694,57 @@ public class Vcf {
 		if (len > 1) 
 			for(int i=0;i<indexlen;i++)
 				Arrays.sort(vs[i]);
+
+		return vs;
+	}
+	public Variant[][] getVariants_trio(int o, int f, int m) {
+		if (!samples.containGT())
+			return null;
+		
+		int[] vIndexeso = samples.getVariantIndexes(o);
+		int[] vIndexesf = samples.getVariantIndexes(f);
+		int[] vIndexesm = samples.getVariantIndexes(m);
+		
+		Variant[][] vs = new Variant[3][];
+		vs[0]=null;vs[1]=null;vs[2]=null;
+		if(vIndexeso != null && vIndexesf == null && vIndexesm == null){
+			vs[0]=new Variant[vIndexeso.length];
+			int len = 0;
+			for (int vIndex : vIndexeso) {
+				vs[0][len] = variants[vIndex - 1];
+				vs[0][len].setHomo(samples.getHome(o));
+				vs[0][len].setMaxAF(getMaxAF());
+				len++;
+			}
+			if (len > 1) 
+				Arrays.sort(vs[0]);
+		}
+		else if(vIndexeso != null && vIndexesf != null && vIndexesm == null){
+			vs[1]=new Variant[vIndexesf.length];
+			int len = 0;
+			for (int vIndex : vIndexesf) {
+				vs[1][len] = variants[vIndex - 1];
+				vs[1][len].setHomo(samples.getHome(f));
+				vs[1][len].setMaxAF(getMaxAF());
+				len++;
+			}
+			if (len > 1) 
+				Arrays.sort(vs[1]);
+		}
+		else if(vIndexeso != null && vIndexesf == null && vIndexesm != null){
+			vs[2]=new Variant[vIndexesm.length];
+			int len = 0;
+			for (int vIndex : vIndexesm) {
+				vs[2][len] = variants[vIndex - 1];
+				vs[2][len].setHomo(samples.getHome(m));
+				vs[2][len].setMaxAF(getMaxAF());
+				len++;
+			}
+			if (len > 1) 
+				Arrays.sort(vs[2]);
+		}
+		else
+			return null;
 
 		return vs;
 	}

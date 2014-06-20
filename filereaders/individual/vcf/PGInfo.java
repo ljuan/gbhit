@@ -5,7 +5,7 @@ public class PGInfo {
 	 * Every element map to PGInfos_M. True represent INFO contains the key,
 	 * false else.
 	 */
-	boolean[] pgInfos = new boolean[3];
+	boolean[] pgInfos = new boolean[4];
 	/**
 	 * The variant end base
 	 */
@@ -14,4 +14,6 @@ public class PGInfo {
 	 * Number of the variant bases
 	 */
 	int svlen = -1;
+	//minimum allele frequency
+	float maxAF = -1;
 }

@@ -136,18 +136,23 @@ public class IndividualStat {
 		}
 		int[] range=Genes.binarySearchOverlap(chr, start, end);
 		CytoScores[i]=0;
-		if(method.equals("Family") && pvar.get_Type().equals(Consts.FORMAT_VCF) && pvar.has_Parameter(Consts.VCF_HEADER_SAMPLE) 
-			&& ((VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE)).ifTrioAvailable()){
-			VcfSample vcfSample = (VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE);
-			String set_b = vcfSample.getSelectedNames()[0];
-			String set_a = null;
-			String[] ps = vcfSample.getParents();
-			if(ps!=null)
-				set_a = ps[0]+":"+ps[1];
-			Element ele_var = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end);
-			if (ele_var.getElementsByTagName(Consts.XML_TAG_VARIANT).getLength()>0){
-				CytoScores[i]=(int)CytoScores[i]|1;
-				CytoScores[i]=(int)CytoScores[i]|1<<4;
+		
+		boolean ifTrioAvailable = false;
+		VcfSample vcfSample = null;
+		if(method!=null && method.equals("Family") && pvar.get_Type().equals(Consts.FORMAT_VCF) && pvar.has_Parameter(Consts.VCF_HEADER_SAMPLE)){
+			vcfSample = (VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE);
+			ifTrioAvailable = vcfSample.ifTrioAvailable();
+			if(ifTrioAvailable){
+				String set_b = vcfSample.getSelectedNames()[0];
+				String set_a = null;
+				String[] ps = vcfSample.getParents();
+				if(ps!=null)
+					set_a = ps[0]+":"+ps[1];
+				Element ele_var = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end);
+				if (ele_var.getElementsByTagName(Consts.XML_TAG_VARIANT).getLength()>0){
+					CytoScores[i]=(int)CytoScores[i]|1;
+					CytoScores[i]=(int)CytoScores[i]|1<<4;
+				}
 			}
 		}
 		/* For method == Family
@@ -166,67 +171,49 @@ public class IndividualStat {
 		 * 0x400 : Reserved
 		 */
 		
-		if(range!=null)
+		if(range!=null){
+			VcfReader vr = null;
+			GVFReader gr = null;
+			if(pvar.get_Type().equals(Consts.FORMAT_VCF))
+				vr = new VcfReader(pvar,chr);
+			else if(pvar.get_Type().equals(Consts.FORMAT_GVF))
+				gr = new GVFReader(pvar.get_Path(chr));
 			for(int j=range[0];j<=range[1];j++){
+				GeneScores[j]=0;
 				int[] subrange=Genes.get_GeneRange(j);
 				Element ele_var=null;
-				if(pvar.get_Type().equals(Consts.FORMAT_GVF))
-					ele_var=new GVFReader(pvar.get_Path(chr)).write_gvf2variants(doc, pvar.get_ID(), chr, subrange[0]+1, subrange[1]);
-				else if(pvar.get_Type().equals(Consts.FORMAT_VCF))
-					ele_var=new VcfReader(pvar,chr).write_vcf2variants(doc, pvar.get_ID(), Consts.MODE_PACK, 0.5, chr, subrange[0]+1, subrange[1]);
 				if(method == null){
+					if(pvar.get_Type().equals(Consts.FORMAT_GVF))
+						ele_var=gr.write_gvf2variants(doc, pvar.get_ID(), chr, subrange[0]+1, subrange[1]);
+					else if(pvar.get_Type().equals(Consts.FORMAT_VCF))
+						ele_var=vr.write_vcf2variants(doc, pvar.get_ID(), Consts.MODE_PACK, 0.5, chr, subrange[0]+1, subrange[1]);
 					Element[] ele_annos=new Element[annos.length];
 					for(int k=0;k<annos.length;k++)
 						ele_annos[k]=bar[k].write_ba2elements(doc, annos[k].get_ID(), chr, subrange[0]+1, subrange[1], 0.5);
 					GeneScores[j]=Math.round(calc_Score(doc, ref, ele_annos, ele_var, chr, Genes.get_GeneSymbol(j))*10)/10;
 				}
-				else if(method.equals("Family") && pvar.has_Parameter(Consts.VCF_HEADER_SAMPLE) 
-						&& ((VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE)).ifTrioAvailable()){
-					
+				else if(ifTrioAvailable){
 					Element[] ele_annos=new Element[annos.length];
-					NodeList[] ele_vars_temp=new NodeList[3];
-					Element[] ele_vars=new Element[3];
-					
 					for(int k=0;k<annos.length;k++)
 						ele_annos[k]=bar[k].write_ba2elements(doc, annos[k].get_ID(), chr, subrange[0]+1, subrange[1], 0.5);
 					
-					VcfSample vcfSample = (VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE);
-					String[] ps = vcfSample.getParents();
-					String o =  vcfSample.getSelectedNames()[0];
-					
-					String set_b = o;
-					String set_a = ps[0]+":"+ps[1];
-					ele_vars_temp[0] = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end).getElementsByTagName(Consts.XML_TAG_VARIANTS);
-					for(int v=0;v<ele_vars_temp[0].getLength();v++)
-						if(((Element)ele_vars_temp[0].item(v)).getAttribute(Consts.XML_TAG_ID).equals(o))
-							ele_vars[0] = (Element)ele_vars_temp[0].item(v);
-					
-					set_b = o+":"+ps[0];
-					set_a = ps[1];
-					ele_vars_temp[1] = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end).getElementsByTagName(Consts.XML_TAG_VARIANTS);
-					for(int v=0;v<ele_vars_temp[1].getLength();v++)
-						if(((Element)ele_vars_temp[1].item(v)).getAttribute(Consts.XML_TAG_ID).equals(ps[0]))
-							ele_vars[1] = (Element)ele_vars_temp[1].item(v);
-					
-					set_b = o+":"+ps[1];
-					set_a = ps[0];
-					ele_vars_temp[2] = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end).getElementsByTagName(Consts.XML_TAG_VARIANTS);
-					for(int v=0;v<ele_vars_temp[2].getLength();v++)
-						if(((Element)ele_vars_temp[2].item(v)).getAttribute(Consts.XML_TAG_ID).equals(ps[1]))
-							ele_vars[2] = (Element)ele_vars_temp[2].item(v);
-					
+					Element[] ele_vars = vr.write_trio(doc, chr, subrange[0]+1, subrange[1]);
 					GeneScores[j]=(int)GeneScores[j]|calc_Mut(doc,ref,ele_annos,ele_vars,chr,Genes.get_GeneSymbol(j));
 				}
-				else
+				else{
+					if(pvar.get_Type().equals(Consts.FORMAT_GVF))
+						ele_var=gr.write_gvf2variants(doc, pvar.get_ID(), chr, subrange[0]+1, subrange[1]);
+					else if(pvar.get_Type().equals(Consts.FORMAT_VCF))
+						ele_var=vr.write_vcf2variants(doc, pvar.get_ID(), Consts.MODE_PACK, 0.5, chr, subrange[0]+1, subrange[1]);
 					GeneScores[j]=Math.round(Annovar.score_vars(ele_var, method, chr, ref)*10)/10;
-				
-				if(method.equals("Family") && pvar.has_Parameter(Consts.VCF_HEADER_SAMPLE) 
-						&& ((VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE)).ifTrioAvailable()){
-					CytoScores[i]=(int)CytoScores[i]|(int)GeneScores[j];
 				}
+				
+				if(ifTrioAvailable)
+					CytoScores[i]=(int)CytoScores[i]|(int)GeneScores[j];
 				else
 					CytoScores[i]=CytoScores[i]>GeneScores[j]?CytoScores[i]:GeneScores[j];
 			}
+		}
 	}
 	int calc_Mut(Document doc, FastaReader rr, Element[] annos, Element[] pvars, String chr, String symbol){
 		int score = 0;
@@ -235,6 +222,8 @@ public class IndividualStat {
 		
 		for(int vs=0;vs<3;vs++){ 
 			// filter those 1|1 variants, which are highly improbable for both denovo mutation and compound heterozygous
+			if(pvars[vs]==null)
+				continue;
 			NodeList var_temp = pvars[vs].getElementsByTagName(Consts.XML_TAG_VARIANT);
 			for(int v=0;v<var_temp.getLength();v++)
 				if(((Element)var_temp.item(v)).getAttribute(Consts.XML_TAG_HOMO).indexOf("0")<0)
@@ -245,6 +234,8 @@ public class IndividualStat {
 			Element[] pannos=new Element[annos.length];
 			
 			for(int type=0;type<3;type++){
+				if(pvars[type]==null)
+					continue;
 				for(int i=0;i<annos.length;i++){
 					VariantAnalysis ee = new VariantAnalysis(doc, rr, annos[i], null, pvars[type], chr);
 					pannos[i]=ee.easydeal();
