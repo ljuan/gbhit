@@ -139,13 +139,17 @@ public class IndividualStat {
 		
 		boolean ifTrioAvailable = false;
 		VcfSample vcfSample = null;
+		String oid = null;
 		if(method!=null && method.equals("Family") && pvar.get_Type().equals(Consts.FORMAT_VCF) && pvar.has_Parameter(Consts.VCF_HEADER_SAMPLE)){
 			vcfSample = (VcfSample)pvar.get_Parameter(Consts.VCF_HEADER_SAMPLE);
-			ifTrioAvailable = vcfSample.ifTrioAvailable();
+			if(vcfSample.getSelectedNames()!=null && vcfSample.getSelectedNames().length == 1){
+				oid = vcfSample.getSelectedNames()[0];
+				ifTrioAvailable = vcfSample.ifTrioAvailable(oid);
+			}
 			if(ifTrioAvailable){
-				String set_b = vcfSample.getSelectedNames()[0];
+				String set_b = oid;
 				String set_a = null;
-				String[] ps = vcfSample.getParents();
+				String[] ps = vcfSample.getParents(oid);
 				if(ps!=null)
 					set_a = ps[0]+":"+ps[1];
 				Element ele_var = new VcfReader(pvar,chr).write_difference(doc, pvar.get_ID(), set_a, set_b, chr, start, end);
@@ -197,7 +201,7 @@ public class IndividualStat {
 					for(int k=0;k<annos.length;k++)
 						ele_annos[k]=bar[k].write_ba2elements(doc, annos[k].get_ID(), chr, subrange[0]+1, subrange[1], 0.5);
 					
-					Element[] ele_vars = vr.write_trio(doc, chr, subrange[0]+1, subrange[1]);
+					Element[] ele_vars = vr.write_trio(doc, oid, chr, subrange[0]+1, subrange[1]);
 					GeneScores[j]=(int)GeneScores[j]|calc_Mut(doc,ref,ele_annos,ele_vars,chr,Genes.get_GeneSymbol(j));
 				}
 				else{

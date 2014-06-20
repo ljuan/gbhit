@@ -177,6 +177,15 @@ public class Interfaces extends HttpServlet{
 			int window_width=Integer.parseInt(req.getParameter("width"));
 			a=ins.refresh(chr, start, end, window_width);
 		}
+		else if (action.equals("trioAnalysis")){
+			String tracks=req.getParameter("tracks");
+			String chr=req.getParameter("chr");
+			String id=req.getParameter("id");
+			long start=Long.parseLong(req.getParameter("start"));
+			long end=Long.parseLong(req.getParameter("end"));
+
+			a=ins.get_TrioAnalysis(tracks, id, chr, start, end);
+		}
 		else if (action.equals("getStat")){
 			String filename=ins.save_Stat(session.getId());
 			if(filename!=null){

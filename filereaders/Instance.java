@@ -648,6 +648,24 @@ public class Instance {
 		}
 		return XmlWriter.xml2string(doc);
 	}
+	public String get_TrioAnalysis(String track, String id, String chr, long start, long end){
+		Document doc=XmlWriter.init(Consts.DATA_ROOT);
+		int chrid=check_chromosome(chr);
+		if(chrid>=0){
+			Chr=chr;
+			Coordinate=check_coordinate(chrid,start,end);
+			Annotations vt = null;
+			if (Externals.containsKey(track))
+				vt = Externals.get(track);
+			else if(Annos.containsKey(track))
+				vt = Annos.get(track);
+			if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
+				VcfReader vr = new VcfReader(vt, chr);
+				Element[] ele_temp = vr.write_trio(doc, id, chr, start, end);
+			}
+		}
+		return XmlWriter.xml2string(doc);
+	}
 	public String get_Difference(String track, String set_a, String set_b, String chr, long start, long end){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		int chrid=check_chromosome(chr);

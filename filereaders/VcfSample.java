@@ -124,14 +124,14 @@ class VcfSample implements Serializable{
 	public boolean ifExists(String SampleName){
 		return Samples.containsKey(SampleName);
 	}
-	public boolean ifTrioAvailable(){
-		if(Pedigree != null && selectedNames!=null && selectedNames.length == 1
-				&& Pedigree.Members.containsKey(selectedNames[0]) 
-				&& Pedigree.Members.get(selectedNames[0]).ifSample()
-				&& Pedigree.Members.containsKey(Pedigree.Members.get(selectedNames[0]).Fid) 
-				&& Pedigree.Members.get(Pedigree.Members.get(selectedNames[0]).Fid).ifSample()
-				&& Pedigree.Members.containsKey(Pedigree.Members.get(selectedNames[0]).Mid) 
-				&& Pedigree.Members.get(Pedigree.Members.get(selectedNames[0]).Mid).ifSample())
+	public boolean ifTrioAvailable(String id){
+		if(id!=null && Pedigree != null 
+		&& Pedigree.Members.containsKey(id) 
+		&& Pedigree.Members.get(id).ifSample()
+		&& Pedigree.Members.containsKey(Pedigree.Members.get(id).Fid) 
+		&& Pedigree.Members.get(Pedigree.Members.get(id).Fid).ifSample()
+		&& Pedigree.Members.containsKey(Pedigree.Members.get(id).Mid) 
+		&& Pedigree.Members.get(Pedigree.Members.get(id).Mid).ifSample())
 			return true;
 		else
 			return false;
@@ -140,9 +140,9 @@ class VcfSample implements Serializable{
 	public String[] getSelectedNames() {
 		return selectedNames;
 	}
-	public String[] getParents() {
-		if(ifTrioAvailable()){
-			String[] parents = {Pedigree.Members.get(selectedNames[0]).Fid, Pedigree.Members.get(selectedNames[0]).Mid};
+	public String[] getParents(String id) {
+		if(ifTrioAvailable(id)){
+			String[] parents = {Pedigree.Members.get(id).Fid, Pedigree.Members.get(id).Mid};
 			return parents;
 		}
 		else

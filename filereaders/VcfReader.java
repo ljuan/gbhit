@@ -598,7 +598,7 @@ public class VcfReader {
 		variants = null;
 		return e1;
 	}
-	public Element[] write_trio(Document doc, String chr, long start, long end){
+	public Element[] write_trio(Document doc, String oid, String chr, long start, long end){
 		float qualLimit = Float.parseFloat((String) (this.track.get_Parameter(VCF_QUAL_LIMIT)));
 		TabixReaderForVCF vcf_tb = null;
 		String[] filterLimit = getFilterLimit();
@@ -607,7 +607,6 @@ public class VcfReader {
 		VcfSample vcfSample_real = null;
 		VcfSample vcfSample = null;
 		String[] pids = null;
-		String oid = null;
 		int o=0,f=0,m=0;
 		int[] selectedIndexes = null;
 		String[] selectedNames = null;
@@ -617,11 +616,10 @@ public class VcfReader {
 
 		if (this.track.has_Parameter(VCF_HEADER_SAMPLE)) {
 			vcfSample_real = ((VcfSample) this.track.get_Parameter(VCF_HEADER_SAMPLE));
-			if(!vcfSample_real.ifTrioAvailable())
+			if(!vcfSample_real.ifTrioAvailable(oid))
 				return null;
 			vcfSample = new VcfSample(vcfSample_real.getSampleNames());
-			oid = vcfSample_real.getSelectedNames()[0];
-			pids = vcfSample_real.getParents();
+			pids = vcfSample_real.getParents(oid);
 			vcfSample.setSamples(oid+":"+pids[0]+":"+pids[1]);
 			samplesNum = 3;
 			selectedIndexes = vcfSample.getSelectedIndexes();
@@ -687,9 +685,9 @@ public class VcfReader {
 			}
 		}
 		Element[] e = new Element[3];
-		e[0] = variants[o].getVariantsElement();
-		e[1] = variants[f].getVariantsElement();
-		e[2] = variants[m].getVariantsElement();
+		e[0] = variants[0].getVariantsElement();
+		e[1] = variants[1].getVariantsElement();
+		e[2] = variants[2].getVariantsElement();
 		return e;
 	}
 	public Element write_vcf2variants(Document doc, String track, String mode,
