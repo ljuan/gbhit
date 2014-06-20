@@ -685,9 +685,9 @@ public class VcfReader {
 			}
 		}
 		Element[] e = new Element[3];
-		e[0] = variants[0].getVariantsElement();
-		e[1] = variants[1].getVariantsElement();
-		e[2] = variants[2].getVariantsElement();
+		e[0] = variants[o].getVariantsElement();
+		e[1] = variants[f].getVariantsElement();
+		e[2] = variants[m].getVariantsElement();
 		return e;
 	}
 	public Element write_vcf2variants(Document doc, String track, String mode,

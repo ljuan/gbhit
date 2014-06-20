@@ -37,7 +37,7 @@ public class Interfaces extends HttpServlet{
 		if (action.equals("getAssemblies")){
 			a=ins.get_Assemblies();
 		}
-		if (action.equals("getSession")){
+		else if (action.equals("getSession")){
 			a = session.getId();
 		}
 		else if (action.equals("getAnnotations")){
