@@ -610,6 +610,8 @@ public class Instance {
 			vt = Externals.get(track);
 		else if(Annos.containsKey(track))
 			vt = Annos.get(track);
+		else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
+			vt = Pvar;
 		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
 			Element ele_temp = ((VcfSample)vt.get_Parameter(VCF_HEADER_SAMPLE)).write_family2pedigree(doc, track);
 		}
@@ -622,6 +624,8 @@ public class Instance {
 			vt = Externals.get(track);
 		else if(Annos.containsKey(track))
 			vt = Annos.get(track);
+		else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
+			vt = Pvar;
 		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)){
 			VcfReader vr = new VcfReader(vt, "chr1");
 			indord = vr.write_individuals(track, vcfs);
@@ -641,6 +645,8 @@ public class Instance {
 				vt = Externals.get(track);
 			else if(Annos.containsKey(track))
 				vt = Annos.get(track);
+			else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
+				vt = Pvar;
 			if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
 				VcfReader vr = new VcfReader(vt, chr);
 				Element ele_temp = vr.write_intersection(doc, track, set_a, chr, start, end);
@@ -659,6 +665,8 @@ public class Instance {
 				vt = Externals.get(track);
 			else if(Annos.containsKey(track))
 				vt = Annos.get(track);
+			else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
+				vt = Pvar;
 			if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
 				VcfReader vr = new VcfReader(vt, chr);
 				Element[] ele_temp = vr.write_trio(doc, id, chr, start, end);
@@ -677,6 +685,8 @@ public class Instance {
 				vt = Externals.get(track);
 			else if(Annos.containsKey(track))
 				vt = Annos.get(track);
+			else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
+				vt = Pvar;
 			if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
 				VcfReader vr = new VcfReader(vt, chr);
 				Element ele_temp = vr.write_difference(doc, track, set_a, set_b, chr, start, end);
@@ -690,6 +700,8 @@ public class Instance {
 			vt = Externals.get(track);
 		else if(Annos.containsKey(track))
 			vt = Annos.get(track);
+		else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
+			vt = Pvar;
 		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE))
 			((VcfSample)vt.get_Parameter(VCF_HEADER_SAMPLE)).removePedigree();
 	}
@@ -699,6 +711,8 @@ public class Instance {
 			vt = Externals.get(track);
 		else if(Annos.containsKey(track))
 			vt = Annos.get(track);
+		else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
+			vt = Pvar;
 		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE))
 			((VcfSample)vt.get_Parameter(VCF_HEADER_SAMPLE)).initPedigree(ped);
 	}
@@ -708,6 +722,8 @@ public class Instance {
 			vt = Externals.get(track);
 		else if(Annos.containsKey(track))
 			vt = Annos.get(track);
+		else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
+			vt = Pvar;
 		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE))
 			((VcfSample)vt.get_Parameter(VCF_HEADER_SAMPLE)).loadPedigree(filepath);
 	}
