@@ -1,0 +1,359 @@
+/**
+ * @author Yafeng Hao, Liran Juan
+ */
+var xmlTagChrNum = "Chromosome";
+var xmlTagStart = "Start";
+var xmlTagEnd = "End";
+var xmlTagCytobands = "Cbs";
+var xmlTagCytoBand = "Cb";
+var xmlAttribute_gieStain = "gS";
+var xmlTagParameters = "Parameters";
+var xmlTagParameter = "Parameter";
+var xmlTagOptions = "Options";
+var xmlTagFrom = "F";
+var xmlTagTo = "T";
+
+var xmlGroupIG = "PersonalGenome";
+var xmlParamSample = "Samples";
+var xmlTagVariant = "V";
+var xmlTagVariants = "Vs";
+var xmlTagLetter = "B";
+var xmlAttributeId = "id";
+var xmlAttributeType = "Y";
+var xmlAttributeGenotype = "h";
+var xmlAttribute_dbSNPID = "dd";
+
+var xmlTagElement = "E";
+var xmlTagElements = "Es";
+var xmlTagSubElement = "S";
+var subElementTypeBoxValue = "X";
+var subElementTypeBandValue = "D";
+var subElementTypeLineValue = "L";
+var xmlTagDirection = "s";
+
+var trackname = "1000genome_ASW";
+var csi = "--"; // Current Selected Individual (id)
+var current_chr = "chr21";
+var current_start = 33031597;
+var current_end = 33041570;
+
+var csv= -1; // Current Selected Variant (index)
+
+var variants = [];
+var genes = [];
+var symbols = {};
+var css = 0; // Current Selected Symbol (index)
+var cssObj = null;
+var cst = 0; // Current Selected Transcript (gene index)
+var cstObj = null;
+var individuals = {};
+var families = {};
+var chrs = [];
+
+function jump() {
+	var chr_temp = document.getElementById("chrSelect").value;
+	var start_temp = document.getElementById("startInput").value;
+	var end_temp = document.getElementById("endInput").value;
+	if(chr_temp == undefined || chr_temp == null){
+		chr_temp = current_chr;
+	}
+	if(start_temp == undefined || start_temp == null){
+		start_temp = current_start;
+	}
+	if(end_temp == undefined || end_temp == null){
+		end_temp = current_end;
+	}
+	load_family_genome(chr_temp,start_temp,end_temp);
+}
+
+function createXMLHttpRequest() {
+	var xmlHttp = null;
+	try {
+		// Firefox, Opera 8.0+, Safari
+		xmlHttp = new XMLHttpRequest();
+	} catch (e) {
+		// Internet Explorer
+		try {
+			xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+		} catch (e) {
+			xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+	}
+	return xmlHttp;
+}
+var req = createXMLHttpRequest();
+var req2 = createXMLHttpRequest(); //for getPedigree
+var req3 = createXMLHttpRequest(); //for addPvar
+var req4 = createXMLHttpRequest(); //for getDifference f,m vs o
+var req5 = createXMLHttpRequest(); //for getDifference m,o vs f
+var req6 = createXMLHttpRequest(); //for getDifference f,o vs m
+
+var reqV = createXMLHttpRequest();
+
+var XMLHttpReq7 = createXMLHttpRequest();//for browse jump
+var XMLHttpReq8 = createXMLHttpRequest();//for BJW_upStat
+var XMLHttpReq10 = createXMLHttpRequest();//for BJW_scan
+
+var querry1 = "action=getChromosomes"; 
+req.open("GET","servlet/test.do?"+querry1,false);
+req.send(null);
+var chrs_temp = req.responseText.replace(/<.*?>/g,"").split(",");
+var chrs_map=[];
+var total=0;
+
+document.getElementById("chrSelect").innerHTML = "";
+
+for(var idx=0;idx<chrs_temp.length;idx++){
+	var chrtemp=chrs_temp[idx].split(":");
+	chrs[idx]={};
+	chrs[idx].name=chrtemp[0];
+	chrs[idx].lengthh=parseInt(chrtemp[1]);
+	chrs[idx].from=total+1;
+	chrs[idx].to=total+parseInt(chrtemp[1]);
+	chrs[idx].bands=[];
+	total=total+parseInt(chrtemp[1]);
+	chrs_map[chrtemp[0]]=idx;
+	var tempObj = document.createElement("option");
+	document.getElementById("chrSelect").appendChild(tempObj);
+	tempObj.innerHTML = chrtemp[0];
+}
+
+querry1 = "action=refresh&width=850&end="+current_end+"&start="+current_start+"&chr="+current_chr;
+req.open("GET","servlet/test.do?"+querry1,false);
+req.send(null);
+
+//var R_brd = Raphael("brd_genome", 530, 610);
+
+var R;
+var R_height = 870;
+var R_width = 600;
+var R_top = 80;
+var R_left = 30;
+var R_right = 100;
+var R_bottom = 20;
+var R_sremove = null;
+
+function load_vcf(){
+	if(document.getElementById("track_name").value!=null && document.getElementById("track_name").value!=""){
+		trackname = document.getElementById("track_name").value;
+	}
+	var link = document.getElementById("vcf_url").value;
+	if(link && link!=""){
+		var querry = "action=addExIndividuals&tracks=" + trackname + "&links=" + link + "&modes=pack&types=VCF";
+		req.open("GET","servlet/test.do?"+querry,false);
+		req.send(null);
+	}
+
+	var querry = "action=addPedigree&tracks=" + trackname;
+	var pedtext = document.getElementById("ped_rec").value;
+	if(pedtext && pedtext!=""){
+		var form = new FormData();
+		form.append("pedigree", pedtext);
+		form.append("enctype", "multipart/form-data");
+		req.open("POST","servlet/test.do?"+querry,false);
+		req.send(form);
+	}
+
+	load_individuals();
+}
+
+function load_individuals(){
+	req2.onreadystatechange = plan_pedigree;
+	individuals = {};
+	families = {};
+	var querry = "action=getPedigree&tracks=" + trackname;
+	document.getElementById("pedplot").innerHTML="";   
+	req2.open("GET","servlet/test.do?"+querry,true);
+	req2.send(null);
+}
+
+function load_family_genome(chr,start,end){
+	var sets4 = "";
+	var sets5 = "";
+	var sets6 = "";
+	if(individuals[csi] != null
+	&& individuals[csi].fid != "0"
+	&& individuals[csi].mid != "0"){
+		sets4 = individuals[csi].fid
+			+":"+individuals[csi].mid
+			+","+csi;
+		sets5 = individuals[csi].fid
+			+","+individuals[csi].mid
+			+":"+csi;
+		sets6 = individuals[csi].mid
+			+","+individuals[csi].fid
+			+":"+csi;
+	} else {
+		alert("The individual/parents data is not available!");
+		return;
+	}
+	var querry = "action=refresh&width=850&chr="+chr+"&start="+start+"&end="+end;
+	req.open("GET","servlet/test.do?"+querry,false);
+	req.send(null);
+
+	current_chr = req.responseXML.getElementsByTagName(xmlTagChrNum)[0].childNodes[0].nodeValue;
+	current_start = parseInt(req.responseXML.getElementsByTagName(xmlTagStart)[0].childNodes[0].nodeValue);
+	current_end = parseInt(req.responseXML.getElementsByTagName(xmlTagEnd)[0].childNodes[0].nodeValue);
+
+	document.getElementById("brwplot").innerHTML = "";
+	R = Raphael("brwplot",R_width+70,R_height);
+	R_sremove = spinner(R);
+	show_axis();
+	show_navigator();
+	
+	req3.onreadystatechange = show_vars;
+	querry = "action=addPvar&tracks="+trackname+"&modes=pack&id="+csi;
+	req3.open("GET","servlet/test.do?"+querry,true);
+	req3.send(null);
+}
+
+function funnypie(l) {
+	document.getElementById("piestat").innerHTML="";
+	var iDataInfo=[];
+	var iCodInfo=[];
+	var S=Raphael("piestat",400,l+30);
+	var SpathsD = S.set();
+	var SpathsC = S.set();
+	for(k=0;k<7;k++){
+		SpathsD.push(S.path().attr({segment: [200, 150, 130, 0, 0], stroke: "#fff"}));
+		SpathsC.push(S.path().attr({segment: [200, 430, 130, 0, 0], stroke: "#fff"}));
+	}
+	function changeStat(track, sample, region) {
+		iDataInfo=[];
+		iCodInfo=[];
+		for(k=0;k<7;k++){
+			iDataInfo[k]=Math.ceil(Math.random()*(100-0)+0);
+			iCodInfo[k]=Math.ceil(Math.random()*(150-25)+25);
+		}
+		animatePortion(1500,SpathsD,iDataInfo,200,150,130);
+		animatePortion(1500,SpathsC,iCodInfo,200,430,130);
+	}
+
+	S.customAttributes.segment = function (x, y, r, a1, a2) {
+		var flag = (a2 - a1) > 180,
+		clr = (a2 - a1) / 360;
+		a1 = (a1 % 360) * Math.PI / 180;
+		a2 = (a2 % 360) * Math.PI / 180;
+		return {
+			path: [["M", x, y], ["l", r * Math.cos(a1), r * Math.sin(a1)], ["A", r, r, 0, +flag, 1, x + r * Math.cos(a2), y + r * Math.sin(a2)], ["z"]],
+			fill: "hsb(" + clr + ", .75, .8)"
+		};
+	};
+	function animatePortion(ms,paths,data,x,y,r) {
+		var Sstart = 0,
+		Sval, Stotal=0;
+		for (k = 0; k < data.length; k++) {
+			Stotal+=data[k];
+		}
+		for (k = 0; k < data.length; k++) {
+			Sval = 360 / Stotal * data[k];
+			paths[k].animate({segment: [x, y, r, Sstart, Sstart += Sval]}, ms || 1500, "bounce");
+			paths[k].angle = Sstart - Sval / 2;
+			(function (p){
+				p[0].onmouseover = function(){
+					p.stop().animate({transform: "s1.1 1.1 "+x+" "+y},1500,"elastic");
+				};
+				p[0].onmouseout = function(){
+					p.stop().animate({transform: ""},1500,"elastic");
+				};
+			})(paths[k]);
+		}
+	}
+
+	changeStat("1000g","HG000000","chr21:33034500-33045600");
+	var cs_text = S.text(200,l+18,"changeStat").attr({font: "14px Candara",opacity:1}).attr({fill: "#222"});
+	var cs_button = S.rect(120,l+6,160,24,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	var animaTime=200;
+	(function (cs_button){
+		cs_button[0].style.cursor = "pointer";
+		cs_text[0].style.cursor = "pointer";
+		cs_button[0].onmouseover = function(){
+			cs_button.animate({fill:"#999"},animaTime);
+		};
+		cs_button[0].onclick = function(){
+			changeStat("1000g","HG000000","chr21:33034500-33045600");
+		};
+		cs_button[0].onmouseout = function(){
+			cs_button.animate({fill:"#666"},animaTime);
+		};
+	})(cs_button);
+}
+function setTabb(name){
+	if(name=="pedtree"){
+		document.getElementById("pedtree_li").className="hover";
+		document.getElementById("indlist_li").className="";
+		document.getElementById("pedtree").style.display="block";
+		document.getElementById("indlist").style.display="none";
+	} else if (name=="indlist"){
+		document.getElementById("pedtree_li").className="";
+		document.getElementById("indlist_li").className="hover";
+		document.getElementById("pedtree").style.display="none";
+		document.getElementById("indlist").style.display="block";
+	} else if (name=="varlist"){
+		document.getElementById("brdview_li").className="";
+		document.getElementById("brwview_li").className="";
+		document.getElementById("varlist_li").className="hover";
+		document.getElementById("brdview").style.display="none";
+		document.getElementById("brwview").style.display="none";
+		document.getElementById("varlist").style.display="block";
+	} else if (name=="brdview"){
+		document.getElementById("brdview_li").className="hover";
+		document.getElementById("brwview_li").className="";
+		document.getElementById("varlist_li").className="";
+		document.getElementById("brdview").style.display="block";
+		document.getElementById("brwview").style.display="none";
+		document.getElementById("varlist").style.display="none";
+	//	Rbrd_sremove = spinner(R_brd);
+		if(document.getElementById("brd_genome").innerHTML == ""){
+			loadChrBand();
+		}
+	//	Rbrd_sremove();
+	} else if (name=="brwview"){
+		document.getElementById("brdview_li").className="";
+		document.getElementById("brwview_li").className="hover";
+		document.getElementById("varlist_li").className="";
+		document.getElementById("brdview").style.display="none";
+		document.getElementById("brwview").style.display="block";
+		document.getElementById("varlist").style.display="none";
+	}
+}
+
+function spinner(S){
+	var sectorsCount = 10,
+	    color = "#000",
+	    width = 5,
+	    r1 = 10,
+	    r2 = 20,
+	    cx = r2 + width,
+	    cy = r2 + width,
+	    sectors = [],
+	    opacity = [],
+	    beta = 2 * Math.PI / sectorsCount,
+	    pathParams = {stroke: color, "stroke-width": width, "stroke-linecap": "round"};
+	Raphael.getColor.reset();
+	for (var i = 0; i < sectorsCount; i++) {
+	    var alpha = beta * i - Math.PI / 2,
+	   	 cos = Math.cos(alpha),
+	   	 sin = Math.sin(alpha);
+	    opacity[i] = 1 / sectorsCount * i;
+	    sectors[i] = S.path([["M", cx + r1 * cos, cy + r1 * sin], ["L", cx + r2 * cos, cy + r2 * sin]]).attr(pathParams);
+	    if (color == "rainbow") {
+			sectors[i].attr("stroke", Raphael.getColor());
+	    }
+	}
+	var tick;
+	(function ticker() {
+	     opacity.unshift(opacity.pop());
+	     for (var i = 0; i < sectorsCount; i++) {
+			sectors[i].attr("opacity", opacity[i]);
+	     }
+	     S.safari();
+	     tick = setTimeout(ticker, 1000 / sectorsCount);
+	 })();
+	return function () {
+	    clearTimeout(tick);
+	    for (var i = 0; i < sectorsCount; i++) {
+	    	sectors[i].hide();
+		}
+	}; 
+}

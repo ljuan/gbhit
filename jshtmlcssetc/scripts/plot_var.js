@@ -444,6 +444,45 @@ function show_paternal_vars(){
 	}
 }
 
+
+function show_colorful_vars(){
+	if(req5.readyState == 4) {
+		if(req5.status == 200) {
+			R_sremove();
+			var vsNodes = req5.responseXML.getElementsByTagName(xmlTagVariants);
+			//alert(req5.responseText);
+			for(var i = 0 ; i < vsNodes.length ; i++){
+				var vNodes = vsNodes[i].getElementsByTagName(xmlTagVariant);
+				var vs_id = vsNodes[i].getAttribute(xmlAttributeId);
+				var vPointer = 0;
+				for(var j = 0 ; j < vNodes.length ; j++){
+					var from = vNodes[j].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue;
+					var to = vNodes[j].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
+					var id = vNodes[j].getAttribute(xmlAttributeId);
+					while(variants[vPointer].from < from){
+						vPointer++;
+					}
+					if(from <= variants[vPointer].from && to >= variants[vPointer].to && id == variants[vPointer].id){
+						if(vs_id == individuals[csi].fid){
+							variants[vPointer].paternal = "Y";
+							variants[vPointer].maternal = "N";
+							change_variant_color(vPointer,colM);
+						}else if(vs_id == individuals[csi].mid){
+							variants[vPointer].paternal = "N"
+							variants[vPointer].maternal = "Y";
+							change_variant_color(vPointer,colP);
+						}else if(vs_id == csi){
+							variants[vPointer].paternal = "N";
+							variants[vPointer].maternal = "N";
+							change_variant_color(vPointer,colD);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 function show_vars(){
 	if(req3.readyState == 4) {
 		if(req3.status == 200) {
@@ -452,7 +491,8 @@ function show_vars(){
 			list_variants();
 			plot_variants();
 			plot_genes();
-
+			
+			/*
 			var sets4 = individuals[csi].fid
 					+":"+individuals[csi].mid
 					+","+csi;
@@ -462,7 +502,14 @@ function show_vars(){
 			var sets6 = individuals[csi].mid
 					+","+individuals[csi].fid
 					+":"+csi;
-		
+			*/
+
+			req5.onreadystatechange = show_colorful_vars;
+			querry = "action=trioAnalysis&tracks="+trackname+"&chr="+current_chr+"&start="+current_start+"&end="+current_end+"&id="+csi;
+			req5.open("GET","servlet/test.do?"+querry,true);
+			req5.send();
+			
+			/*
 			var form5 = new FormData();
 			form5.append("sets",sets5);
 			form5.append("enctype","multipart/form-data");
@@ -485,6 +532,7 @@ function show_vars(){
 			querry = "action=getDifference&tracks="+trackname+"&chr="+current_chr+"&start="+current_start+"&end="+current_end;
 			req4.open("POST","servlet/test.do?"+querry,true);
 			req4.send(form4);
+			*/
 		}
 	}
 }
@@ -581,8 +629,6 @@ function plot_variants(){
 				name_pos = i*font_height;
 			} else if(name_pos > l - (variants.length - i - 1)*font_height){
 				name_pos = l - (variants.length - i - 1)*font_height;
-//			} else if(name_pos < current_pos + font_height){
-//				name_pos = current_pos + font_height;
 			}
 			current_pos = name_pos;
 			name_pos += R_top;
@@ -695,8 +741,93 @@ function plot_variants(){
 	}
 }
 
+function show_same_collectionvar(){
+	if(reqV.readyState == 4) {
+		if(reqV.status == 200){
+			var xmlDoc=null;
+			var xmlString = reqV.responseText;
+			if(!window.DOMParser && window.ActiveXObject){
+				var xmlDomVersions = ['MSXML.2.DOMDocument.6.0','MSXML.2.DOMDocument.3.0','Microsoft.XMLDOM'];
+				for(var i=0;i<xmlDomVersions.length;i++){
+					try{
+						xmlDoc = new ActiveXObject(xmlDomVersions[i]);
+						xmlDoc.async = false;
+						xmlDoc.loadXML(xmlString); 
+						break;
+					}catch(e){
+					}
+				}
+			}
+			else if(window.DOMParser && document.implementation && document.implementation.createDocument){
+				try{
+					domParser = new  DOMParser();
+					xmlDoc = domParser.parseFromString(xmlString, 'text/xml');
+				}catch(e){
+				}
+			}
+			/*
+			var var_id;
+			for(var i in individuals){
+				if(individuals[i].selected){
+					var_id=i;
+					break;
+				}
+			}
+			*/
+			if(csi!=undefined){	
+				for(var family_member in families[individuals[csi].family]){
+					for(var temp_root in families[individuals[csi].family][csi].markobj){
+						if(family_member != "roots" && individuals[family_member].ifs == "true" && families[individuals[csi].family][family_member].markobj[temp_root] != undefined){
+							families[individuals[csi].family][family_member].markobj[temp_root].hide();
+						}
+					}
+				}
+				if(xmlDoc.getElementsByTagName("IndividualOrder")[0]!=null && xmlDoc.getElementsByTagName("IndividualOrder")[0].firstChild!=null){			
+				//	alert("OK, the value is " + xmlDoc.getElementsByTagName("IndividualOrder")[0].firstChild.nodeValue);
+					var collectionlist = xmlDoc.getElementsByTagName("IndividualOrder")[0].firstChild.nodeValue.split(",");
+					if(collectionlist!=null){
+						for(var j in collectionlist){
+							var id = collectionlist[j].substr(0,7);
+							var temp_str = collectionlist[j].substr(10,3);
+							if(individuals[id].ifs == "true" && individuals[id].family!= undefined && individuals[id].family==individuals[csi].family){
+								for(var temp_root in families[individuals[id].family][id].markobj){
+									if(families[individuals[id].family][id].markobj[temp_root] != undefined){
+										families[individuals[id].family][id].markobj[temp_root].attr({text:temp_str});
+										families[individuals[id].family][id].markobj[temp_root].show();
+									}
+								}														
+							}
+						}
+					}
+				}
+				else{
+					alert("Nothing!");
+				}
+			}
+		}
+	}
+}
+
 function select_a_variant(idx,color){
 	if(variants[idx] != undefined){
+		////////////////////insert request of searchIndividual
+		//alert(variants[idx].chr + ":"  + variants[idx].from + ":" + variants[idx].to + ":" + variants[idx].letter);
+		var varString;
+		if(variants[idx].letter=="--"){
+			varString = variants[idx].chr + ":"  + variants[idx].from + ":" + variants[idx].to + ":-";
+		}else{
+			varString = variants[idx].chr + ":"  + variants[idx].from + ":" + variants[idx].to + ":" + variants[idx].letter;
+		}
+		var formV = new FormData();
+		formV.append("variants",varString);
+		formV.append("enctype","multipart/form-data");
+		reqV.onreadystatechange = show_same_collectionvar;
+		querry = "action=searchIndividual&tracks="+trackname;
+		reqV.open("POST","servlet/test.do?"+querry,true);
+		reqV.send(formV);
+		
+		//////////////////////////////
+
 		var radioObj = document.getElementById(idx+"__varlist_select")
 		if(variants[idx].selected){
 			change_variant_color(idx,color);

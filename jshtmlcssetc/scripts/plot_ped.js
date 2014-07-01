@@ -83,8 +83,6 @@ function plan_pedigree() {
 			plot_families();
 			list_individuals();
 			///document.getElementById("divv").innerHTML="<xmp>"+req.responseText+"</xmp>";
-		} else {
-			//document.getElementById("divv").innerHTML=req.responseText;
 		}
 	}
 }
@@ -309,6 +307,8 @@ function plot_families(){
 	var height = height_unit*families.meta_heightt;
 	var width = width_unit*(families.meta_widthh+3);
 	var widthlimit = document.body.clientWidth*0.9*0.45<720?document.body.clientWidth*0.9*0.45:720;
+	var mark_lablesize = 9;
+	var mark_labletext = mark_lablesize + "px Candara";
 	if(width < widthlimit){
 		width = widthlimit;
 	}
@@ -401,6 +401,14 @@ function plot_families(){
 		families[individuals[id].family][id].idobj[root].attr({fill:"#000",font:"11px \"Trebuchet MS\", Arial, sans-serif","text-anchor":"end"});
 
 		if(id != "0" && individuals[id].ifs == "true"){
+			////////////////////////////////
+			if(families[individuals[id].family][id].markobj == undefined){
+				families[individuals[id].family][id].markobj = {};
+			}
+			families[individuals[id].family][id].markobj[root] = P.text(offset+families[individuals[id].family][id].x[root]*width_unit+19,baseline+families[individuals[id].family][id].y[root]*height_unit-r+20,"");
+			families[individuals[id].family][id].markobj[root].attr({fill:"#F00",font: mark_labletext,"font-weight":"bold"});
+			families[individuals[id].family][id].markobj[root].hide();
+			/////////////////////////////////
 			(function(root,id){
 				families[individuals[id].family][id].obj[root][0].style.cursor = "pointer";
 				families[individuals[id].family][id].idobj[root][0].style.cursor = "pointer";
@@ -531,5 +539,36 @@ function select_a_individual(id){
 			individuals[id].selected = true;
 			csi = id;
 		}
+		////////////////////////////////
+
+		for(var family_member in families[individuals[id].family]){
+			for(var temp_root in families[individuals[id].family][family_member].markobj){
+				if(family_member != "roots" && individuals[family_member].ifs == "true" && families[individuals[id].family][family_member].markobj[temp_root] != undefined){
+					families[individuals[id].family][family_member].markobj[temp_root].hide();
+				}
+			}
+		}
+		/*
+		for(var chr_num in chrs){
+			for(var band_num in chrs[chr_num].bands){
+				chrs[chr_num].bands[band_num].scoreobj[1].remove();
+				for(var objid in chrs[chr_num].bands[band_num].scoreobj){
+					if(chrs[chr_num].bands[band_num].scoreobj[objid][0]!=null){
+						chrs[chr_num].bands[band_num].scoreobj[objid].attr({fill:"#FFF","stroke-width":0,"fill-opacity":1});
+					}
+				}
+			}
+		}
+		*/
+		for(var chr_num in chrs){
+			for(var band_num in chrs[chr_num].bands){
+				for(var objid in chrs[chr_num].bands[band_num].scoreobj){
+					if(chrs[chr_num].bands[band_num].scoreobj[objid]!=undefined){
+						chrs[chr_num].bands[band_num].scoreobj[objid].attr({fill:"#FFF"});
+					}
+				}
+			}
+		}
+		///////////////////////////////
 	}
 }
