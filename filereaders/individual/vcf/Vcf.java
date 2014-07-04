@@ -701,7 +701,7 @@ public class Vcf {
 
 		return vs;
 	}
-	public Variant[][] getVariants_trio(int o, int f, int m) {
+	public Variant[][] getVariants_trio(int o, int f, int m, boolean scan) {
 		if (!samples.containGT())
 			return null;
 		
@@ -752,7 +752,7 @@ public class Vcf {
 			if (len > 1) 
 				Arrays.sort(vs[m]);
 		}
-	/*	else if(vIndexeso != null && vIndexesf != null && vIndexesm != null){
+		else if(!scan && vIndexeso != null && vIndexesf != null && vIndexesm != null){
 			boolean om = false;
 			boolean of = false;
 			if(mhomo.indexOf("0")<0 && ohomo.indexOf("0")>=0)
@@ -786,7 +786,7 @@ public class Vcf {
 			else
 				return null;
 		}
-	*/	else
+		else
 			return null;
 
 		return vs;

@@ -669,7 +669,7 @@ public class Instance {
 				vt = Pvar;
 			if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
 				VcfReader vr = new VcfReader(vt, chr);
-				Element[] ele_temp = vr.write_trio(doc, id, chr, start, end);
+				Element[] ele_temp = vr.write_trio(doc, id, chr, start, end, false);
 			}
 		}
 		return XmlWriter.xml2string(doc);

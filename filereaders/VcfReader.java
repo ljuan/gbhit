@@ -603,7 +603,7 @@ public class VcfReader {
 		variants = null;
 		return e1;
 	}
-	public Element[] write_trio(Document doc, String oid, String chr, long start, long end){
+	public Element[] write_trio(Document doc, String oid, String chr, long start, long end, boolean scan){
 		float qualLimit = Float.parseFloat((String) (this.track.get_Parameter(VCF_QUAL_LIMIT)));
 		TabixReaderForVCF vcf_tb = null;
 		String[] filterLimit = getFilterLimit();
@@ -669,7 +669,7 @@ public class VcfReader {
 					if (vcf.shouldBeFilteredByQualLimit(qualLimit) || vcf.shouldBeFilteredByFilterLimit(filterLimit))
 						continue;
 					
-					vs = vcf.getVariants_trio(o,f,m);
+					vs = vcf.getVariants_trio(o,f,m,scan);
 					if(vs == null)
 						continue;
 					for (int i = 0; i < len; i++) 
