@@ -709,6 +709,11 @@ public class Vcf {
 		int[] vIndexesf = samples.getVariantIndexes(f);
 		int[] vIndexesm = samples.getVariantIndexes(m);
 		
+		String ohomo = samples.getHome(o); 
+		String fhomo = samples.getHome(f);
+		String mhomo = samples.getHome(m);
+
+		
 		Variant[][] vs = new Variant[3][];
 		vs[0]=null;vs[1]=null;vs[2]=null;
 		if(vIndexeso != null && vIndexesf == null && vIndexesm == null){
@@ -748,29 +753,13 @@ public class Vcf {
 				Arrays.sort(vs[m]);
 		}
 		else if(vIndexeso != null && vIndexesf != null && vIndexesm != null){
-			boolean om = true;
-			boolean of = true;
-			for(int i = 0 ; i < vIndexeso.length ; i++){
-				for(int j = 0 ; j < vIndexesm.length ; j++)
-					if(vIndexeso[i] == vIndexesm[j])
-						of = false;
-				for(int j = 0 ; j < vIndexesf.length ; j++)
-					if(vIndexeso[i] == vIndexesf[j])
-						om = false;
-			}
-			if(om && of){
-				vs[o]=new Variant[vIndexeso.length];
-				int len = 0;
-				for (int vIndex : vIndexeso) {
-					vs[o][len] = variants[vIndex - 1];
-					vs[o][len].setHomo(samples.getHome(o));
-					vs[o][len].setMaxAF(getMaxAF());
-					len++;
-				}
-				if (len > 1) 
-					Arrays.sort(vs[o]);
-			}
-			else if(om){
+			boolean om = false;
+			boolean of = false;
+			if(mhomo.indexOf("0")<0 && ohomo.indexOf("0")>=0)
+				om = true;
+			else if(fhomo.indexOf("0")<0 && ohomo.indexOf("0")>=0)
+				of = true;
+			if(om){
 				vs[m]=new Variant[vIndexesm.length];
 				int len = 0;
 				for (int vIndex : vIndexesm) {
