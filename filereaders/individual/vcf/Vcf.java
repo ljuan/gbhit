@@ -273,9 +273,12 @@ public class Vcf {
 					pgInfo.svlen = getIntValue(keyValue[1]);
 				}
 			} else if ('F' == lastChar1 && 'A' == lastChar2) {
-				if(keyValue.length>1)
+				if(keyValue.length>1){
 					pgInfo.pgInfos[3] = true;
-					pgInfo.maxAF = pgInfo.maxAF<Float.parseFloat(keyValue[1])?Float.parseFloat(keyValue[1]):pgInfo.maxAF;
+					String[] afs = keyValue[1].split(",");
+					for(int i = 0 ; i < afs.length ; i++)
+						pgInfo.maxAF = pgInfo.maxAF<Float.parseFloat(afs[i])?Float.parseFloat(afs[i]):pgInfo.maxAF;
+				}
 			}
 		}
 
@@ -638,13 +641,14 @@ public class Vcf {
 		int[] vIndexes = samples.getVariantIndexes(index);
 		if (vIndexes == null)
 			return null;
-		Variant[] vs = new Variant[variants.length];
+		Variant[] vs = new Variant[vIndexes.length];
 		int len = 0;
 
 		for (int vIndex : vIndexes) {
 			vs[len] = variants[vIndex - 1];
 			vs[len++].setHomo(samples.getHome(index));
 		}
+		
 		if (len > 1) {
 			Arrays.sort(vs);
 		}
@@ -680,7 +684,7 @@ public class Vcf {
 				vIndexes[num++]=i;
 		Variant[][] vs = new Variant[indexlen][];
 		for(int i=0;i<indexlen;i++)
-			vs[i]=new Variant[variants.length];
+			vs[i]=new Variant[vIndexes.length];
 		
 		int len = 0;
 
@@ -743,6 +747,56 @@ public class Vcf {
 			if (len > 1) 
 				Arrays.sort(vs[m]);
 		}
+		else if(vIndexeso != null && vIndexesf != null && vIndexesm != null){
+			boolean om = true;
+			boolean of = true;
+			for(int i = 0 ; i < vIndexeso.length ; i++){
+				for(int j = 0 ; j < vIndexesm.length ; j++)
+					if(vIndexeso[i] == vIndexesm[j])
+						of = false;
+				for(int j = 0 ; j < vIndexesf.length ; j++)
+					if(vIndexeso[i] == vIndexesf[j])
+						om = false;
+			}
+			if(om && of){
+				vs[o]=new Variant[vIndexeso.length];
+				int len = 0;
+				for (int vIndex : vIndexeso) {
+					vs[o][len] = variants[vIndex - 1];
+					vs[o][len].setHomo(samples.getHome(o));
+					vs[o][len].setMaxAF(getMaxAF());
+					len++;
+				}
+				if (len > 1) 
+					Arrays.sort(vs[o]);
+			}
+			else if(om){
+				vs[m]=new Variant[vIndexesm.length];
+				int len = 0;
+				for (int vIndex : vIndexesm) {
+					vs[m][len] = variants[vIndex - 1];
+					vs[m][len].setHomo(samples.getHome(m));
+					vs[m][len].setMaxAF(getMaxAF());
+					len++;
+				}
+				if (len > 1) 
+					Arrays.sort(vs[m]);
+			}
+			else if(of){
+				vs[f]=new Variant[vIndexesf.length];
+				int len = 0;
+				for (int vIndex : vIndexesf) {
+					vs[f][len] = variants[vIndex - 1];
+					vs[f][len].setHomo(samples.getHome(f));
+					vs[f][len].setMaxAF(getMaxAF());
+					len++;
+				}
+				if (len > 1) 
+					Arrays.sort(vs[f]);
+			}
+			else
+				return null;
+		}
 		else
 			return null;
 
@@ -789,7 +843,7 @@ public class Vcf {
 		
 		Variant[][] vs = new Variant[indexes.length][];
 		for(int i=0;i<indexes.length;i++)
-			vs[i]=new Variant[variants.length];
+			vs[i]=new Variant[vIndexes.length];
 		
 		int len = 0;
 

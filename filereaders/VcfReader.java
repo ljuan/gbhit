@@ -1,5 +1,6 @@
 package filereaders;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -102,6 +103,10 @@ public class VcfReader {
 				track.set_Check(check);
 				if (samples != null){
 					track.initialize_Parameter(VCF_HEADER_SAMPLE, new VcfSample(samples), PARAMETER_TYPE_VCFSAMPLE);
+					
+					if(new File(track.get_Path(Chr)+".ped").exists())
+						((VcfSample)track.get_Parameter(VCF_HEADER_SAMPLE)).loadPedigree(track.get_Path(Chr)+".ped");
+					
 				/* This is for automatically select THE sample when load single sample VCF file, 
 				 * cooperate with the sentence in Instance add_Tracks VCF branch, 
 				 * which is also annotated in this version.
