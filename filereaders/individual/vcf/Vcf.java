@@ -752,7 +752,7 @@ public class Vcf {
 			if (len > 1) 
 				Arrays.sort(vs[m]);
 		}
-		else if(vIndexeso != null && vIndexesf != null && vIndexesm != null){
+	/*	else if(vIndexeso != null && vIndexesf != null && vIndexesm != null){
 			boolean om = false;
 			boolean of = false;
 			if(mhomo.indexOf("0")<0 && ohomo.indexOf("0")>=0)
@@ -786,7 +786,7 @@ public class Vcf {
 			else
 				return null;
 		}
-		else
+	*/	else
 			return null;
 
 		return vs;
