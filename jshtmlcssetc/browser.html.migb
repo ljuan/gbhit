@@ -1,0 +1,115 @@
+
+<html lang="en">
+	<head>
+		</style>
+		<link rel="stylesheet" type="text/css" href="./css/migb.css" />
+		<link rel="stylesheet" type="text/css" href="./css/jquery-ui-1.10.2.custom.min.css" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title id="browserTitle">Family Genome Browser</title>
+	</head>
+	<body>
+		<center>
+			<div class="overall">
+				<div style="clear:both">
+					<span id="web-name"><img src="./image/family4.png"/><b><i>Family Genome Browser</i></b></span>
+				</div>
+
+				<div class="titlee_right" style="float:right;clear:both">
+					<ul>
+						<li id="brdview_li" onclick="setTabb('brdview')" style="left:5%">Bird's Eye View</li>
+						<li id="brwview_li" onclick="setTabb('brwview')" class="hover" style="left:35%" >Browser View</li>
+						<li id="varlist_li" onclick="setTabb('varlist')" style="right:5%">Variants List</li>
+					</ul>
+				</div>
+
+				<div class="titlee" style="float:left;">Input Pedigree and Variants</div>
+				<div class="plott_right" style="float:right;">
+					<div id="brdview" style="display:none;">
+						<div id="brd_genome" style="float:left"></div>
+						<div id="brd_genelist" style="float:left;overflow:auto;max-height:820px"></div>
+					</div>
+					<div id="brwview" class="hover" style="overflow:auto">
+						<div id="navigators" style="width:100%;">
+							Gene Symbol:
+							<input id="search_field" size="7"/>
+							Or
+							<select id="chrSelect">
+							</select>
+							Start:
+							<input id="startInput" size="7"/>
+							End:
+							<input id="endInput" size="7"/>
+							<input class="submitt" type="submit" onclick="jump()" value="Go"/>
+						</div>
+						<div id="brwplot"></div>
+						<div id="detaillist" style="padding:5px; display:none; width:250px; background:#0000FF;">
+							<table id="detail_list" border="1px" style="color: #FFFFFF;border-collapse: collapse;">
+								<tbody id="detailtablebody"></tbody>
+							</table>
+						</div>
+						<div id="tip" style="padding:10px; display:none; width:250px; background:#0000FF;">
+							<table id="detailtable" border="1px" style="color: #FFFFFF;border-collapse: collapse;">
+								<tbody>
+									<tr>
+										<td style="font-size:12px">Scale:</td>
+										<td id="scale"  style="width:290px;font-size: 12px;word-break:break-all;"></td>
+									</tr>
+									<tr>
+										<td style="font-size:12px">Description:</td>
+										<td id="detail"  style="width:290px;font-size: 12px;word-break:break-all;"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div id="varlist" style="display:none"></div>
+				</div>
+
+				<div class="uploadd" style="height:250px;float:left;">
+					<table>
+						<tr>
+							<td>Name:</td>
+							<td><input id="track_name" size="45" placeholder="Please input data name here"/></td>
+						</tr>
+						<tr>
+							<td>URL:</td>
+							<td><input id="vcf_url" type="text" size="45" placeholder="Please input the URL of tabix compressed and indexed VCF file"/></td>
+						</tr>
+						<tr>
+							<td>Pedigree:</td>
+							<td><textarea id="ped_rec" rows="7" cols="45" placeholder="Please input the text of PED information"></textarea></td>
+						</tr>
+						<tr>
+							<td><input class="submitt" type="submit" onclick="load_vcf()" value="Load"/></td>
+							<td><input class="submitt" type="submit" onclick="load_family_genome('chr21',33031597,33041500)" value="Visualize"/></td>
+						</tr>
+					</table>
+					<span id="upload_success_vcf"></span>
+				</div>
+				<div class="blankblock" style="width:35%;float:left"></div>
+				<div class="titlee" style="float:left">
+					<ul>
+						<li id="pedtree_li" onclick="setTabb('pedtree')" class="hover" style="left:10%">Pedigree</li>
+						<li id="indlist_li" onclick="setTabb('indlist')" style="right:10%">Individual List</li>
+					</ul>
+				</div>
+				<div class="plott" style="float:left" style=" overflow:scroll; width:487px; height:606px;">
+					<div id="pedtree" class="hover">
+						<div id="pedplot"></div>
+					</div>
+					<div id="indlist" style="display:none"></div>
+				</div>
+			</div>
+
+		</center>
+		<script language="JavaScript" type="text/javascript" src="scripts/jquery-1.7.2-min.js"></script>
+		<script language="JavaScript" type="text/javascript" src="scripts/jquery-ui-1.10.2.custom.min.js"></script>
+		<script language="JavaScript" type="text/javascript" src="scripts/jump.js"></script>
+		<script language="JavaScript" type="text/javascript" src="scripts/autocomplete.js"></script>
+		<script language="JavaScript" type="text/javascript" src="scripts/plot_ped.js"></script>
+		<script language="JavaScript" type="text/javascript" src="scripts/plot_var.js"></script>
+		<script language="JavaScript" type="text/javascript" src="scripts/plot_brd.js"></script>
+		<script language="JavaScript" type="text/javascript" src="scripts/raphael-min.js"></script>
+		<div id="select_info" class="ui-front ui-corner-all" style="display:none; position:absolute; border: 1px #ccc solid"></div>
+	</body>
+</html>

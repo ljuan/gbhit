@@ -35,7 +35,7 @@ var trackname = "1000genome_ASW";
 var csi = "--"; // Current Selected Individual (id)
 var current_chr = "chr21";
 var current_start = 33031597;
-var current_end = 33041570;
+var current_end = 33041500;
 
 var csv= -1; // Current Selected Variant (index)
 
@@ -49,6 +49,7 @@ var cstObj = null;
 var individuals = {};
 var families = {};
 var chrs = [];
+var control_scanning;
 
 function jump() {
 	var chr_temp = document.getElementById("chrSelect").value;
@@ -111,6 +112,7 @@ for(var idx=0;idx<chrs_temp.length;idx++){
 	chrs[idx].from=total+1;
 	chrs[idx].to=total+parseInt(chrtemp[1]);
 	chrs[idx].bands=[];
+	chrs[idx].centromere = 0;
 	total=total+parseInt(chrtemp[1]);
 	chrs_map[chrtemp[0]]=idx;
 	var tempObj = document.createElement("option");
@@ -126,7 +128,7 @@ req.send(null);
 
 var R;
 var R_height = 870;
-var R_width = 600;
+var R_width = 650;
 var R_top = 80;
 var R_left = 30;
 var R_right = 100;
@@ -168,6 +170,10 @@ function load_individuals(){
 }
 
 function load_family_genome(chr,start,end){
+	if(end - start > 3000000){
+		alert("Outside the scope");
+		return;
+	}
 	var sets4 = "";
 	var sets5 = "";
 	var sets6 = "";
@@ -196,7 +202,7 @@ function load_family_genome(chr,start,end){
 	current_end = parseInt(req.responseXML.getElementsByTagName(xmlTagEnd)[0].childNodes[0].nodeValue);
 
 	document.getElementById("brwplot").innerHTML = "";
-	R = Raphael("brwplot",R_width+70,R_height);
+	R = Raphael("brwplot",R_width+100,R_height);
 	R_sremove = spinner(R);
 	show_axis();
 	show_navigator();

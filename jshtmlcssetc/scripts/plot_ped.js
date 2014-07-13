@@ -540,7 +540,11 @@ function select_a_individual(id){
 			csi = id;
 		}
 		////////////////////////////////
-
+		if(control_scanning!=undefined){
+			if(control_scanning==1){
+				control_scanning=0;
+			}
+		}
 		for(var family_member in families[individuals[id].family]){
 			for(var temp_root in families[individuals[id].family][family_member].markobj){
 				if(family_member != "roots" && individuals[family_member].ifs == "true" && families[individuals[id].family][family_member].markobj[temp_root] != undefined){
@@ -569,6 +573,8 @@ function select_a_individual(id){
 				}
 			}
 		}
+		//jump();
+		load_family_genome(current_chr,current_start,current_end);
 		///////////////////////////////
 	}
 }
