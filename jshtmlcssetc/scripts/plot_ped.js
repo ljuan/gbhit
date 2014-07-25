@@ -573,8 +573,9 @@ function select_a_individual(id){
 				}
 			}
 		}
-		//jump();
-		load_family_genome(current_chr,current_start,current_end);
+		if(individuals[id].selected){
+			load_family_genome(current_chr,current_start,current_end);
+		}
 		///////////////////////////////
 	}
 }
