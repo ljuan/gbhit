@@ -18,283 +18,232 @@ function plan_pedigree() {
 				individuals[id].affected = Pedigrees[i].getElementsByTagName("Affected")[0].firstChild.nodeValue;
 				individuals[id].ifs = Pedigrees[i].getAttribute("ifSample");
 				individuals[id].selected = false;
-
-				if(individuals[id].family != "--"){
-					if(families[individuals[id].family] == undefined){
-						families[individuals[id].family] = {};
-					}
-					if(families[individuals[id].family][id] == undefined){
-						families[individuals[id].family][id] = {};
-					}
-					families[individuals[id].family][id].id = id;
-					families[individuals[id].family][id].fid = individuals[id].fid;
-					families[individuals[id].family][id].mid = individuals[id].mid;
-					if(individuals[id].fid != "0"){
-						add_id_familist(id,individuals[id].fid);
-						families[individuals[id].family][individuals[id].fid].sp = individuals[id].mid;
-						families[individuals[id].family][individuals[id].fid].rmo = id;
-					}
-					if(individuals[id].mid != "0"){
-						add_id_familist(id,individuals[id].mid);
-						families[individuals[id].family][individuals[id].mid].sp = individuals[id].fid;
-						families[individuals[id].family][individuals[id].mid].rmo = id;
-					}
+				if(families[id] == undefined){
+					families[id] = {};
+				}
+				families[id].id = id;
+				families[id].fid = individuals[id].fid;
+				families[id].mid = individuals[id].mid;
+				if(individuals[id].fid != "0"){
+					add_id_familist(id,individuals[id].fid);
+					families[individuals[id].fid].sp = individuals[id].mid;
+					families[individuals[id].fid].rmo = id;
+				}
+				if(individuals[id].mid != "0"){
+					add_id_familist(id,individuals[id].mid);
+					families[individuals[id].mid].sp = individuals[id].fid;
+					families[individuals[id].mid].rmo = id;
 				}
 			}
-			families.meta_heightt = 0;
-			families.meta_widthh = 0;
-			for(var family_key in families){
-//				families[family_key].min_level = 0;
-//				families[family_key].max_level = 0;
-//				families[family_key].level =  {};
-				families[family_key].roots = {};
-				for(ind_key in families[family_key]){
-					if(ind_key != "min_level" && ind_key != "max_level" && ind_key!= "level" && ind_key!="roots"){
-//						search_level(families[family_key][ind_key].id,0);
+			families_meta_heightt = 0;
+			families_meta_widthh = 0;
+			families.roots = {};
+			for(ind_key in families){
+				if(ind_key != "min_level" && ind_key != "max_level" && ind_key!= "level" && ind_key!="roots"){
 					
-						if(families[family_key][ind_key].fid == "0" 
-						&& families[family_key][ind_key].mid == "0"
-						&& families[family_key][ind_key].sp != undefined
-						&& families[family_key][ind_key].sp != "0" 
-						&& families[family_key][families[family_key][ind_key].sp].fid == "0"
-						&& families[family_key][families[family_key][ind_key].sp].mid == "0"
-						&& families[family_key].roots[ind_key] == undefined
-						&& families[family_key].roots[families[family_key][ind_key].sp] == undefined){
+					if(families[ind_key].fid == "0" 
+					&& families[ind_key].mid == "0"
+					&& families[ind_key].sp != undefined
+					&& families[ind_key].sp != "0" 
+					&& families[families[ind_key].sp].fid == "0"
+					&& families[families[ind_key].sp].mid == "0"
+					&& families.roots[ind_key] == undefined
+					&& families.roots[families[ind_key].sp] == undefined){
 
+						families.roots[ind_key] = {};
+						families.roots[ind_key].levels = [];
+						families.roots[ind_key].leftt = 0;
+						families.roots[ind_key].rightt = 0;
+						families.roots[ind_key].height = 0;
 
-							families[family_key].roots[ind_key] = {};
-							families[family_key].roots[ind_key].levels = [];
-							families[family_key].roots[ind_key].leftt = 0;
-							families[family_key].roots[ind_key].rightt = 0;
-							families[family_key].roots[ind_key].height = 0;
+						search_offspring(ind_key,ind_key,0,1);
+						assign_coord(ind_key,ind_key,0,0);
+						correct_coord(ind_key);
 
-							search_offspring(ind_key,ind_key,0,1);
-							assign_coord(ind_key,ind_key,0,0);
-							correct_coord(ind_key);
-
-							families.meta_heightt += families[family_key].roots[ind_key].height + 1;
-							if(families.meta_widthh < families[family_key].roots[ind_key].rightt - families[family_key].roots[ind_key].leftt){
-								families.meta_widthh = families[family_key].roots[ind_key].rightt - families[family_key].roots[ind_key].leftt;
-							}
+						families_meta_heightt += families.roots[ind_key].height + 1;
+						if(families_meta_widthh < families.roots[ind_key].rightt - families.roots[ind_key].leftt){
+							families_meta_widthh = families.roots[ind_key].rightt - families.roots[ind_key].leftt;
 						}
 					}
 				}
 			}
 			plot_families();
 			list_individuals();
-			///document.getElementById("divv").innerHTML="<xmp>"+req.responseText+"</xmp>";
 		}
 	}
 }
 function correct_coord(root){
 	var family = individuals[root].family;
 	var pointers = [];
-	var height = families[family].roots[root].levels.length;
-	families[family].roots[root].height = height;
+	var height = families.roots[root].levels.length;
+	families.roots[root].height = height;
 	for(var i=0;i<height;i++){
-		for(var j=1;j<families[family].roots[root].levels[i].length;j++){
-			var id2 = families[family].roots[root].levels[i][j];
-			var id1 = families[family].roots[root].levels[i][j-1];
+		for(var j=1;j<families.roots[root].levels[i].length;j++){
+			var id2 = families.roots[root].levels[i][j];
+			var id1 = families.roots[root].levels[i][j-1];
 			var step = 2;
 			if(id2 == "0"){
 				continue;
 			} else if(id1 == "0"){
-				id1 = families[family].roots[root].levels[i][j-2];
+				id1 = families.roots[root].levels[i][j-2];
 				step+=2;
 			}
-			if(families[family][id2].x[root]<families[family][id1].x[root]+step){
-				move(id2,families[family][id1].x[root]+step-families[family][id2].x[root]);
+			if(families[id2].x[root]<families[id1].x[root]+step){
+				move(id2,families[id1].x[root]+step-families[id2].x[root]);
 			}
 		}
 	}
 	for(var i=0;i<height;i++){
-		var id1 = families[family].roots[root].levels[i][0];
-		var id2 = families[family].roots[root].levels[i][families[family].roots[root].levels[i].length-1];
+		var id1 = families.roots[root].levels[i][0];
+		var id2 = families.roots[root].levels[i][families.roots[root].levels[i].length-1];
 		var plus_temp = 0;
 		if(id2 == "0"){
-			id2 = families[family].roots[root].levels[i][families[family].roots[root].levels[i].length-2];
+			id2 = families.roots[root].levels[i][families.roots[root].levels[i].length-2];
 			plus_temp = 2;
 		} 
-		if(families[family].roots[root].leftt > families[family][id1].x[root]){
-			families[family].roots[root].leftt = families[family][id1].x[root];
+		if(families.roots[root].leftt > families[id1].x[root]){
+			families.roots[root].leftt = families[id1].x[root];
 		}
-		if(families[family].roots[root].rightt < families[family][id2].x[root]+plus_temp){
-			families[family].roots[root].rightt = families[family][id2].x[root]+plus_temp;
+		if(families.roots[root].rightt < families[id2].x[root]+plus_temp){
+			families.roots[root].rightt = families[id2].x[root]+plus_temp;
 		}
 	}
 
 	function move(id,offset){
-		if(families[family][id].fid != "0"){
-			if(families[family][families[family][id].fid].lmo == id){
-				move_1(families[family][id].fid,offset);
+		if(families[id].fid != "0"){
+			if(families[families[id].fid].lmo == id){
+				move_1(families[id].fid,offset);
 			} else {
-				move_1(families[family][id].fid,offset/2);
+				move_1(families[id].fid,offset/2);
 			}
 		}
-		if(families[family][id].mid != "0"){
-			if(families[family][families[family][id].mid].lmo == id){
-				move_1(families[family][id].mid,offset);
+		if(families[id].mid != "0"){
+			if(families[families[id].mid].lmo == id){
+				move_1(families[id].mid,offset);
 			} else {
-				move_1(families[family][id].mid,offset/2);
+				move_1(families[id].mid,offset/2);
 			}
 		}
 		move_2(id,offset);
 
 		function move_1(id,offset){//move parents
-			if(families[family][id].x[root] == undefined){
+			if(families[id].x[root] == undefined){
 				return;
 			}
-			families[family][id].x[root] += offset;
-//			if(families[family][id].sp != undefined && families[family][id].sp != "0"){
-//				families[family][families[family][id].sp].x[root] += offset;
+			families[id].x[root] += offset;
+//			if(families[id].sp != undefined && families[id].sp != "0"){
+//				families[families[id].sp].x[root] += offset;
 //			}
 	
-			if(families[family][id].fid != "0"){
-				if(families[family][families[family][id].fid].lmo == id){
-					move_1(families[family][id].fid,offset);
+			if(families[id].fid != "0"){
+				if(families[families[id].fid].lmo == id){
+					move_1(families[id].fid,offset);
 				} else {
-					move_1(families[family][id].fid,offset/2);
+					move_1(families[id].fid,offset/2);
 				}
 			}
-			if(families[family][id].mid != "0"){
-				if(families[family][families[family][id].mid].lmo == id){
-					move_1(families[family][id].mid,offset);
+			if(families[id].mid != "0"){
+				if(families[families[id].mid].lmo == id){
+					move_1(families[id].mid,offset);
 				} else {
-					move_1(families[family][id].mid,offset/2);
+					move_1(families[id].mid,offset/2);
 				}
 			}
 	
-			if(families[family][id].rb != undefined){
-				move_2(families[family][id].rb,offset);
+			if(families[id].rb != undefined){
+				move_2(families[id].rb,offset);
 			}
 		}
 		function move_2(id,offset){//move offsprings
-			if(families[family][id].x[root] == undefined){
+			if(families[id].x[root] == undefined){
 				return;
 			}
 
-			families[family][id].x[root] += offset;
-			if(families[family][id].sp != undefined && families[family][id].sp != "0"){
-				families[family][families[family][id].sp].x[root] += offset;
+			families[id].x[root] += offset;
+			if(families[id].sp != undefined && families[id].sp != "0"){
+				families[families[id].sp].x[root] += offset;
 			}
 	
-			if(families[family][id].lmo != undefined){
-				move_2(families[family][id].lmo,offset);
+			if(families[id].lmo != undefined){
+				move_2(families[id].lmo,offset);
 			}
-			if(families[family][id].rb != undefined){
-				move_2(families[family][id].rb,offset);
+			if(families[id].rb != undefined){
+				move_2(families[id].rb,offset);
 			}
 		}
 	}
 }
 function assign_coord(root,id,level,offset){
-	if(families[individuals[id].family][id].y == undefined){
-		families[individuals[id].family][id].y = {};
+	if(families[id].y == undefined){
+		families[id].y = {};
 	}
-	families[individuals[id].family][id].y[root] = level;
+	families[id].y[root] = level;
 
-	if(families[individuals[id].family][id].x == undefined){
-		families[individuals[id].family][id].x = {};
+	if(families[id].x == undefined){
+		families[id].x = {};
 	}
-	families[individuals[id].family][id].x[root] = offset;
+	families[id].x[root] = offset;
 
-	if(families[individuals[id].family][id].lmo != undefined){
-		assign_coord(root,families[individuals[id].family][id].lmo,level+1,
-		offset+2-families[individuals[id].family][id].offs);
+	if(families[id].lmo != undefined){
+		assign_coord(root,families[id].lmo,level+1,
+		offset+2-families[id].offs);
 	} 
 
-	if(families[individuals[id].family][id].sp != undefined){
+	if(families[id].sp != undefined){
 		offset+=2;
-		if(families[individuals[id].family][id].sp != "0"){
-			if(families[individuals[id].family][families[individuals[id].family][id].sp].x == undefined){
-				families[individuals[id].family][families[individuals[id].family][id].sp].x = {};
+		if(families[id].sp != "0"){
+			if(families[families[id].sp].x == undefined){
+				families[families[id].sp].x = {};
 			}
-			if(families[individuals[id].family][families[individuals[id].family][id].sp].y == undefined){
-				families[individuals[id].family][families[individuals[id].family][id].sp].y = {};
+			if(families[families[id].sp].y == undefined){
+				families[families[id].sp].y = {};
 			}
-			families[individuals[id].family][families[individuals[id].family][id].sp].x[root] = offset;
-			families[individuals[id].family][families[individuals[id].family][id].sp].y[root] = level;
+			families[families[id].sp].x[root] = offset;
+			families[families[id].sp].y[root] = level;
 		}
 	}
 
-	if(families[individuals[id].family][id].rb != undefined){
-		assign_coord(root,families[individuals[id].family][id].rb,level,offset+2);
+	if(families[id].rb != undefined){
+		assign_coord(root,families[id].rb,level,offset+2);
 	}
 }
 function search_offspring(root,id,level,brothers){
-	if(families[individuals[id].family].roots[root].levels[level] == undefined){
-		families[individuals[id].family].roots[root].levels[level] = [];
+	if(families.roots[root].levels[level] == undefined){
+		families.roots[root].levels[level] = [];
 	}
-	var curlength = families[individuals[id].family].roots[root].levels[level].length;
-	families[individuals[id].family].roots[root].levels[level][curlength] = id;
+	var curlength = families.roots[root].levels[level].length;
+	families.roots[root].levels[level][curlength] = id;
 	brothers++;
-	if(families[individuals[id].family][id].lmo != undefined){
-		families[individuals[id].family][id].offs = search_offspring(root,families[individuals[id].family][id].lmo,level+1,0);
+	if(families[id].lmo != undefined){
+		families[id].offs = search_offspring(root,families[id].lmo,level+1,0);
 	} else{
-		families[individuals[id].family][id].offs = 0;
+		families[id].offs = 0;
 	}
 
-	if(families[individuals[id].family][id].sp != undefined){
+	if(families[id].sp != undefined){
 		brothers++;
-		curlength = families[individuals[id].family].roots[root].levels[level].length;
-		families[individuals[id].family].roots[root].levels[level][curlength] = families[individuals[id].family][id].sp;
+		curlength = families.roots[root].levels[level].length;
+		families.roots[root].levels[level][curlength] = families[id].sp;
 	}
-	if(families[individuals[id].family][id].rb != undefined){
-		brothers = search_offspring(root,families[individuals[id].family][id].rb,level,brothers);
-	} else if(families[individuals[id].family][id].sp != undefined){
+	if(families[id].rb != undefined){
+		brothers = search_offspring(root,families[id].rb,level,brothers);
+	} else if(families[id].sp != undefined){
 		brothers--;
 	}
 	return brothers;
 }
-/* global tree levels
-function search_level(id,level){
-	if(families[individuals[id].family][id].level != undefined){
-		return;
-	}
-
-	families[individuals[id].family][id].level = level;
-
-	if(families[individuals[id].family].level[level.toString()] == undefined){
-		families[individuals[id].family].level[level.toString()] = 0;
-	}
-	families[individuals[id].family].level[level.toString()]++; 
-
-	if(families[individuals[id].family].min_level > level){
-		families[individuals[id].family].min_level = level;
-	}
-	if(families[individuals[id].family].max_level < level){
-		families[individuals[id].family].max_level = level;
-	}
-
-	if(families[individuals[id].family][id].lmo != undefined){
-		search_level(families[individuals[id].family][id].lmo,level+1);
-	}
-	if(families[individuals[id].family][id].rb != undefined){
-		search_level(families[individuals[id].family][id].rb,level);
-	}
-	if(families[individuals[id].family][id].fid != "0"){
-		search_level(families[individuals[id].family][id].fid,level-1);
-	}
-	if(families[individuals[id].family][id].mid != "0"){
-		search_level(families[individuals[id].family][id].mid,level-1);
-	}
-	if(families[individuals[id].family][id].sp != undefined && families[individuals[id].family][id].sp != "0"){
-		search_level(families[individuals[id].family][id].sp,level);
-	}
-}
-*/
 function add_id_familist(id,pid){//add lmo (left most offspring)/rb (right brother);
-	if(families[individuals[id].family][pid] == undefined){
-		families[individuals[id].family][pid] = {};
-		families[individuals[id].family][pid].lmo = id;
-	} else if (families[individuals[id].family][pid].lmo == undefined){
-		families[individuals[id].family][pid].lmo = id;
+	if(families[pid] == undefined){
+		families[pid] = {};
+		families[pid].lmo = id;
+	} else if (families[pid].lmo == undefined){
+		families[pid].lmo = id;
 	} else {
-		var family_list_temp = families[individuals[id].family][pid].lmo;
-		while(families[individuals[id].family][family_list_temp].rb!=undefined && families[individuals[id].family][family_list_temp].rb!=id){
-			family_list_temp = families[individuals[id].family][family_list_temp].rb;
+		var family_list_temp = families[pid].lmo;
+		while(families[family_list_temp].rb!=undefined && families[family_list_temp].rb!=id){
+			family_list_temp = families[family_list_temp].rb;
 		}
-		families[individuals[id].family][family_list_temp].rb=id;
+		families[family_list_temp].rb=id;
 	}
 }
 
@@ -304,8 +253,8 @@ function plot_families(){
 	var width_unit = 36;
 	var r = 10;
 	var baseline = height_unit/2;
-	var height = height_unit*families.meta_heightt;
-	var width = width_unit*(families.meta_widthh+3);
+	var height = height_unit*families_meta_heightt;
+	var width = width_unit*(families_meta_widthh+3);
 	var widthlimit = document.body.clientWidth*0.9*0.45<720?document.body.clientWidth*0.9*0.45:720;
 	var mark_lablesize = 9;
 	var mark_labletext = mark_lablesize + "px Candara";
@@ -315,75 +264,73 @@ function plot_families(){
 
 	var P = Raphael("pedplot",width,height);
 	var offset = 0;
-	for (var family_key in families){
-		for(var root in families[family_key].roots){
-			offset = 0;
-			if((families[family_key].roots[root].rightt-families[family_key].roots[root].leftt)*width_unit < widthlimit){
-				offset = (widthlimit - (families[family_key].roots[root].rightt-families[family_key].roots[root].leftt)*width_unit)/2 - families[family_key].roots[root].leftt*width_unit;
-			}else{
-				offset = (2 - families[family_key].roots[root].leftt) * width_unit;
-			}
-			plot_ped(root,root);
-			baseline += height_unit*(families[family_key].roots[root].height+1);
+	for(var root in families.roots){
+		offset = 0;
+		if((families.roots[root].rightt-families.roots[root].leftt)*width_unit < widthlimit){
+			offset = (widthlimit - (families.roots[root].rightt-families.roots[root].leftt)*width_unit)/2 - families.roots[root].leftt*width_unit;
+		}else{
+			offset = (2 - families.roots[root].leftt) * width_unit;
 		}
+		plot_ped(root,root);
+		baseline += height_unit*(families.roots[root].height+1);
 	}
 
 	function plot_ped(root,id){
 		plot_individual(root,id);
 		plot_relations(root,id);
-		if(families[individuals[id].family][id].sp != undefined){
-			if(families[individuals[id].family][id].sp != "0"){
-				plot_individual(root,families[individuals[id].family][id].sp);
+		if(families[id].sp != undefined){
+			if(families[id].sp != "0"){
+				plot_individual(root,families[id].sp);
 			} else {
 				plot_fake_sp(root,id);
 			}
 		}
-		if(families[individuals[id].family][id].lmo != undefined){
-			plot_ped(root,families[individuals[id].family][id].lmo);
+		if(families[id].lmo != undefined){
+			plot_ped(root,families[id].lmo);
 		}
-		if(families[individuals[id].family][id].rb != undefined){
-			plot_ped(root,families[individuals[id].family][id].rb);
+		if(families[id].rb != undefined){
+			plot_ped(root,families[id].rb);
 		}
 	}
 	
 	function plot_relations(root,id){
 		if(individuals[id].fid != "0" || individuals[id].mid != "0"){
-			P.path("M"+(offset+families[individuals[id].family][id].x[root]*width_unit)
-					+" "+(baseline+families[individuals[id].family][id].y[root]*height_unit-r)
-					+"L"+(offset+families[individuals[id].family][id].x[root]*width_unit)
-					+" "+(baseline+families[individuals[id].family][id].y[root]*height_unit-height_unit/2));
+			P.path("M"+(offset+families[id].x[root]*width_unit)
+					+" "+(baseline+families[id].y[root]*height_unit-r)
+					+"L"+(offset+families[id].x[root]*width_unit)
+					+" "+(baseline+families[id].y[root]*height_unit-height_unit/2));
 		}
-		if(families[individuals[id].family][id].sp != undefined){
-			P.path("M"+(offset+families[individuals[id].family][id].x[root]*width_unit+r)
-					+" "+(baseline+families[individuals[id].family][id].y[root]*height_unit)
-					+"L"+(offset+(families[individuals[id].family][id].x[root]+2)*width_unit-r)
-					+" "+(baseline+families[individuals[id].family][id].y[root]*height_unit));
+		if(families[id].sp != undefined){
+			P.path("M"+(offset+families[id].x[root]*width_unit+r)
+					+" "+(baseline+families[id].y[root]*height_unit)
+					+"L"+(offset+(families[id].x[root]+2)*width_unit-r)
+					+" "+(baseline+families[id].y[root]*height_unit));
 
 		}
-		if(families[individuals[id].family][id].lmo != undefined){
-			P.path("M"+(offset+(families[individuals[id].family][id].x[root]+1)*width_unit)
-					+" "+(baseline+families[individuals[id].family][id].y[root]*height_unit)
-					+"L"+(offset+(families[individuals[id].family][id].x[root]+1)*width_unit)
-					+" "+(baseline+families[individuals[id].family][id].y[root]*height_unit+height_unit/2));
-			var lmo = families[individuals[id].family][id].lmo;
-			var rmo = families[individuals[id].family][id].rmo;
+		if(families[id].lmo != undefined){
+			P.path("M"+(offset+(families[id].x[root]+1)*width_unit)
+					+" "+(baseline+families[id].y[root]*height_unit)
+					+"L"+(offset+(families[id].x[root]+1)*width_unit)
+					+" "+(baseline+families[id].y[root]*height_unit+height_unit/2));
+			var lmo = families[id].lmo;
+			var rmo = families[id].rmo;
 			if(lmo != rmo){
-				P.path("M"+(offset+families[individuals[id].family][lmo].x[root]*width_unit)
-						+" "+(baseline+families[individuals[id].family][id].y[root]*height_unit+height_unit/2)
-						+"L"+(offset+families[individuals[id].family][rmo].x[root]*width_unit)
-						+" "+(baseline+families[individuals[id].family][id].y[root]*height_unit+height_unit/2));
+				P.path("M"+(offset+families[lmo].x[root]*width_unit)
+						+" "+(baseline+families[id].y[root]*height_unit+height_unit/2)
+						+"L"+(offset+families[rmo].x[root]*width_unit)
+						+" "+(baseline+families[id].y[root]*height_unit+height_unit/2));
 			}
 		}
 	}
 
 	function plot_individual(root,id){
-		if(families[individuals[id].family][id].obj == undefined){
-			families[individuals[id].family][id].obj = {};
+		if(families[id].obj == undefined){
+			families[id].obj = {};
 		}
 		if(individuals[id].sex == "1"){
-			families[individuals[id].family][id].obj[root] = P.rect(offset+families[individuals[id].family][id].x[root]*width_unit-r,baseline+families[individuals[id].family][id].y[root]*height_unit-r,2*r,2*r,0);
+			families[id].obj[root] = P.rect(offset+families[id].x[root]*width_unit-r,baseline+families[id].y[root]*height_unit-r,2*r,2*r,0);
 		} else {
-			families[individuals[id].family][id].obj[root] = P.ellipse(offset+families[individuals[id].family][id].x[root]*width_unit,baseline+families[individuals[id].family][id].y[root]*height_unit,r,r);
+			families[id].obj[root] = P.ellipse(offset+families[id].x[root]*width_unit,baseline+families[id].y[root]*height_unit,r,r);
 		}
 
 		var color = "#FFF";
@@ -391,36 +338,36 @@ function plot_families(){
 			color = "#000";
 		}
 
-		families[individuals[id].family][id].obj[root].attr({fill:color,"fill-opacity":0.9,stroke:"#000"});
+		families[id].obj[root].attr({fill:color,"fill-opacity":0.9,stroke:"#000"});
 
-		if(families[individuals[id].family][id].idobj == undefined){
-			families[individuals[id].family][id].idobj = {};
+		if(families[id].idobj == undefined){
+			families[id].idobj = {};
 		}
 
-		families[individuals[id].family][id].idobj[root] = P.text(offset+families[individuals[id].family][id].x[root]*width_unit-2,baseline+families[individuals[id].family][id].y[root]*height_unit-r-6,id)
-		families[individuals[id].family][id].idobj[root].attr({fill:"#000",font:"11px \"Trebuchet MS\", Arial, sans-serif","text-anchor":"end"});
+		families[id].idobj[root] = P.text(offset+families[id].x[root]*width_unit-2,baseline+families[id].y[root]*height_unit-r-6,id)
+		families[id].idobj[root].attr({fill:"#000",font:"11px \"Trebuchet MS\", Arial, sans-serif","text-anchor":"end"});
 
 		if(id != "0" && individuals[id].ifs == "true"){
 			////////////////////////////////
-			if(families[individuals[id].family][id].markobj == undefined){
-				families[individuals[id].family][id].markobj = {};
+			if(families[id].markobj == undefined){
+				families[id].markobj = {};
 			}
-			families[individuals[id].family][id].markobj[root] = P.text(offset+families[individuals[id].family][id].x[root]*width_unit+19,baseline+families[individuals[id].family][id].y[root]*height_unit-r+20,"");
-			families[individuals[id].family][id].markobj[root].attr({fill:"#F00",font: mark_labletext,"font-weight":"bold"});
-			families[individuals[id].family][id].markobj[root].hide();
+			families[id].markobj[root] = P.text(offset+families[id].x[root]*width_unit+19,baseline+families[id].y[root]*height_unit-r+20,"");
+			families[id].markobj[root].attr({fill:"#F00",font: mark_labletext,"font-weight":"bold"});
+			families[id].markobj[root].hide();
 			/////////////////////////////////
 			(function(root,id){
-				families[individuals[id].family][id].obj[root][0].style.cursor = "pointer";
-				families[individuals[id].family][id].idobj[root][0].style.cursor = "pointer";
-				families[individuals[id].family][id].obj[root][0].onmouseover = function(){
-					families[individuals[id].family][id].obj[root].animate({fill:"#999"},200);
+				families[id].obj[root][0].style.cursor = "pointer";
+				families[id].idobj[root][0].style.cursor = "pointer";
+				families[id].obj[root][0].onmouseover = function(){
+					families[id].obj[root].animate({fill:"#999"},200);
 					P.safari();
 				};
-				families[individuals[id].family][id].obj[root][0].onmouseout = function(){
-					families[individuals[id].family][id].obj[root].animate({fill:color},200);
+				families[id].obj[root][0].onmouseout = function(){
+					families[id].obj[root].animate({fill:color},200);
 					P.safari();
 				};
-				families[individuals[id].family][id].obj[root][0].onclick = function(){
+				families[id].obj[root][0].onclick = function(){
 					select_a_individual(id);
 
 					var radioObj = document.getElementById(id+"__indlist_select");
@@ -442,9 +389,9 @@ function plot_families(){
 	function plot_fake_sp(root,id){
 		var temp;
 		if(individuals[id].sex == "1"){
-			temp = P.ellipse(offset+(families[individuals[id].family][id].x[root]+2)*width_unit,baseline+families[individuals[id].family][id].y[root]*height_unit,r,r);
+			temp = P.ellipse(offset+(families[id].x[root]+2)*width_unit,baseline+families[id].y[root]*height_unit,r,r);
 		} else {
-			temp = P.rect(offset+(families[individuals[id].family][id].x[root]+2)*width_unit-r,baseline+families[individuals[id].family][id].y[root]*height_unit-r,2*r,2*r,0);
+			temp = P.rect(offset+(families[id].x[root]+2)*width_unit-r,baseline+families[id].y[root]*height_unit-r,2*r,2*r,0);
 		}
 		temp.attr({fill:"#FFF","fill-opacity":0.9,stroke:"#000","stroke-dasharray":"--"});
 	}
@@ -521,20 +468,20 @@ function list_individuals(){
 function select_a_individual(id){
 	if(individuals[id] != undefined){
 		if(individuals[id].selected){
-			for(var temp_root in families[individuals[id].family][id].idobj){
-				families[individuals[id].family][id].idobj[temp_root].attr({fill:"#000"});
+			for(var temp_root in families[id].idobj){
+				families[id].idobj[temp_root].attr({fill:"#000"});
 			}
 			individuals[id].selected = false;
 			csi = "--";
 		} else {
 			if(individuals[csi] != undefined){
-				for(var temp_root in families[individuals[csi].family][csi].idobj){
-					families[individuals[csi].family][csi].idobj[temp_root].attr({fill:"#000"});
+				for(var temp_root in families[csi].idobj){
+					families[csi].idobj[temp_root].attr({fill:"#000"});
 				}
 				individuals[csi].selected = false;
 			}
-			for(var temp_root in families[individuals[id].family][id].idobj){
-				families[individuals[id].family][id].idobj[temp_root].attr({fill:"#F00"});
+			for(var temp_root in families[id].idobj){
+				families[id].idobj[temp_root].attr({fill:"#F00"});
 			}
 			individuals[id].selected = true;
 			csi = id;
@@ -545,25 +492,13 @@ function select_a_individual(id){
 				control_scanning=0;
 			}
 		}
-		for(var family_member in families[individuals[id].family]){
-			for(var temp_root in families[individuals[id].family][family_member].markobj){
-				if(family_member != "roots" && individuals[family_member].ifs == "true" && families[individuals[id].family][family_member].markobj[temp_root] != undefined){
-					families[individuals[id].family][family_member].markobj[temp_root].hide();
+		for(var family_member in families){
+			for(var temp_root in families[family_member].markobj){
+				if(family_member != "roots" && individuals[family_member].ifs == "true" && families[family_member].markobj[temp_root] != undefined){
+					families[family_member].markobj[temp_root].hide();
 				}
 			}
 		}
-		/*
-		for(var chr_num in chrs){
-			for(var band_num in chrs[chr_num].bands){
-				chrs[chr_num].bands[band_num].scoreobj[1].remove();
-				for(var objid in chrs[chr_num].bands[band_num].scoreobj){
-					if(chrs[chr_num].bands[band_num].scoreobj[objid][0]!=null){
-						chrs[chr_num].bands[band_num].scoreobj[objid].attr({fill:"#FFF","stroke-width":0,"fill-opacity":1});
-					}
-				}
-			}
-		}
-		*/
 		for(var chr_num in chrs){
 			for(var band_num in chrs[chr_num].bands){
 				for(var objid in chrs[chr_num].bands[band_num].scoreobj){

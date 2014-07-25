@@ -1,15 +1,15 @@
 /**
  * @author Yafeng Hao, Liran Juan
  */
-var colD = "#F00"; //denovo mut color
-var colD_hover = "#F77"; //denovo mut color hover
-var colP = "#0F0"; //paternal var color
-var colP_hover = "#7F7"; //paternal var color hover
-var colM = "#00F"; //maternal var color
-var colM_hover = "#77F"; //maternal var color
-var colO = "#000"; //black
-var colO_hover = "#777"; //black hover
-var colO_hover2 = "#CCC"; //black hover
+var colD = "#d73027"; //denovo mut color
+var colD_hover = "#f46d43"; //denovo mut color hover
+var colP = "#4575b4"; //paternal var color
+var colP_hover = "#74add1"; //paternal var color hover
+var colM = "#1a9850"; //maternal var color
+var colM_hover = "#66bd63"; //maternal var color
+var colO = "#000000"; //black
+var colO_hover = "#636363"; //black hover
+var colO_hover2 = "#bdbdbd"; //black hover
 
 ///////////////
 var restrictX;
@@ -46,6 +46,10 @@ function init_individual_vars(){
 		variants[i].genotypes = variants[i].genotype.split(splitter);
 
 		variants[i].type = vNodes[i].getAttribute(xmlAttributeType);
+
+		if(variants[i].id == undefined || variants[i].id == "." || variants[i].id ==""){
+			variants[i].id = "Unnamed "+variants[i].type;
+		}
 		variants[i].from = parseInt(vNodes[i].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue);
 		variants[i].to = parseInt(vNodes[i].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue);
 		variants[i].selected = false;
@@ -69,6 +73,12 @@ function init_individual_vars(){
 			var to = veNodes[j].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
 			var letter = veNodes[j].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
 			var id = veNodes[j].getAttribute(xmlAttributeId);
+			var type = veNodes[j].getAttribute(xmlAttributeType);
+
+			if(id == "."){
+				id = "Unnamed "+type;
+			}
+
 			while(variants[vPointer].to > to && vPointer >= 0){
 				vPointer--;
 			}
@@ -173,11 +183,59 @@ function show_axis(){
 	//axis_set.hide();
 	
 	var brwplotCanvas = $(document.getElementById("brwplot"));
-	var toucharea = R.rect(R_left-25, R_top - 1, 30, R_height - R_bottom - R_top + 1, 0).attr({stroke: "#000", fill: "#000", opacity: 0});
 	//var touch_x = restrictX - brwplotCanvas.position().left;
 	//var touch_y = restrictY - brwplotCanvas.position().top;
 	var markline = R.path("M"+(R_left-35)+","+R_top+" L"+(R_left+R_width)+","+R_top).attr({"stroke-dasharray": "-",stroke:"#000","stroke-width":1});
 	var marklable = R.text(R_left+1, R_top-8, "").attr({font:"8px  \"Trebuchet MS\", Arial, sans-serif"});
+	
+	var start_y, dis_y;
+	var searcharea = R.rect(R_left-30, R_top,R_width+35,1).attr({fill:"#ffe4b5", "stroke-width":0, "fill-opacity":0.4});
+	searcharea.hide();
+	var	start_line;
+	var toucharea = R.rect(R_left-25, R_top - 1, 50, R_height - R_bottom - R_top + 1, 0).attr({stroke: "#000", fill: "#000", opacity: 0, cursor: "move"});
+	toucharea.drag(dragmove, dragstart, dragend);
+	function dragstart(x,y) {
+		start_y = y - brwplotCanvas.position().top;
+		searcharea.animate({transform: "t0 "+(start_y-R_top)});
+		searcharea.show();
+		start_line = R.path("M"+(R_left-35)+","+start_y+" L"+(R_left+R_width)+","+start_y).attr({"stroke-dasharray": "-",stroke:"#000","stroke-width":1});
+	}
+	function dragmove(dx,dy) {
+		if(dy>0){
+			if(dy + start_y < R_height - R_bottom){
+				searcharea.animate({height: dy});
+				dis_y = dy;
+			}else{
+				searcharea.animate({height: (R_height - R_bottom - start_y)});
+				dis_y = R_height - R_bottom - start_y;
+			}			
+		}else if(dy<0){
+			if(dy + start_y > R_top){
+				searcharea.animate({transform: "t0 "+(start_y-R_top+dy)});
+				searcharea.animate({height: (0-dy)});
+				dis_y = dy;
+			}else{
+				searcharea.animate({transform: "t0 0"});
+				searcharea.animate({height: (start_y - R_top)});
+				dis_y = R_top - start_y;
+			}
+		}
+	}
+	function dragend() {
+		start_line.remove();
+		searcharea.hide();
+		var searchLength = current_end - current_start;
+		var index1 = Math.round(searchLength * (start_y-R_top)/(R_height-R_bottom-R_top) + current_start);;
+		var index2 = Math.round(searchLength * (start_y-R_top+dis_y)/(R_height-R_bottom-R_top) + current_start);;
+		if(dis_y>0){
+			load_family_genome(current_chr, index1, index2);
+		}else{
+			load_family_genome(current_chr, index2, index1);
+		}
+	}
+
+
+
 	markline.hide();
 	marklable.hide();
 	toucharea.mouseover(function(){
@@ -185,7 +243,7 @@ function show_axis(){
 		var touch_x = restrictX - brwplotCanvas.position().left;
 		var touch_y = restrictY - brwplotCanvas.position().top;
 		var searchLength = current_end - current_start;
-		var refSeqIndex = Math.round(searchLength * touch_y/(R_height-R_bottom-R_top) + current_start);
+		var refSeqIndex = Math.round(searchLength * (touch_y-R_top)/(R_height-R_bottom-R_top) + current_start);
 
 		markline.stop().animate({transform:"t"+(R_left-25)+" "+(touch_y-R_top)},0);
 		marklable.stop().animate({transform:"t"+(R_left+1)+" "+(touch_y-R_top)},0);
@@ -198,7 +256,7 @@ function show_axis(){
 		var touch_x = restrictX - brwplotCanvas.position().left;
 		var touch_y = restrictY - brwplotCanvas.position().top;
 		var searchLength = current_end - current_start;
-		var refSeqIndex = Math.round(searchLength * touch_y/(R_height-R_bottom-R_top) + current_start);
+		var refSeqIndex = Math.round(searchLength * (touch_y-R_top)/(R_height-R_bottom-R_top) + current_start);
 		markline.stop().animate({transform:"t"+(R_left-25)+" "+(touch_y-R_top)},0);
 		marklable.stop().animate({transform:"t"+(R_left+1)+" "+(touch_y-R_top)},0);
 		marklable.attr({text:refSeqIndex});
@@ -266,22 +324,22 @@ document.onclick = mouseMove;
 function show_navigator(){
 	var r1 = 10;
 	var r2 = 15;
-	var xp = R_width + 20;
+	var xp = R_width + 70;
 	var xm = R_width + 70;
-	var y = 30;
+	var y = 100;
 	var delta = 4;
 	var inner_l = 12;
 	var inner_w = 4;
 
 	var plus = R.set();
-	plus.push(R.ellipse(xp,y,r2,r2).attr({fill:colO_hover,stroke:colO_hover}));
-	plus.push(R.ellipse(xp,y,r1,r1).attr({fill:"#FFF",stroke:colO_hover}));
-	plus.push(R.rect(xp-inner_w/2, y-inner_l/2,inner_w,inner_l,0).attr({fill:colO_hover,"stroke-width":0}));
-	plus.push(R.rect(xp-inner_l/2, y-inner_w/2,inner_l,inner_w,0).attr({fill:colO_hover,"stroke-width":0}));
-	plus.push(R.path("M"+(xp+r1-delta)+","+(y+r1)+
-					" L"+(xp+r1-delta+r2)+","+(y+r1+r2)+
-					" L"+(xp+r1+r2)+","+(y+r1-delta+r2)+
-					" L"+(xp+r1)+","+(y+r1-delta)+"Z").attr({fill:colO_hover,"stroke-width":0}));
+	plus.push(R.ellipse(xp,y-40,r2,r2).attr({fill:colO_hover,stroke:colO_hover}));
+	plus.push(R.ellipse(xp,y-40,r1,r1).attr({fill:"#FFF",stroke:colO_hover}));
+	plus.push(R.rect(xp-inner_w/2, y-40-inner_l/2,inner_w,inner_l,0).attr({fill:colO_hover,"stroke-width":0}));
+	plus.push(R.rect(xp-inner_l/2, y-40-inner_w/2,inner_l,inner_w,0).attr({fill:colO_hover,"stroke-width":0}));
+	plus.push(R.path("M"+(xp+r1-delta)+","+(y-40+r1)+
+					" L"+(xp+r1-delta+r2)+","+(y-40+r1+r2)+
+					" L"+(xp+r1+r2)+","+(y-40+r1-delta+r2)+
+					" L"+(xp+r1)+","+(y-40+r1-delta)+"Z").attr({fill:colO_hover,"stroke-width":0}));
 
 	(function (obj){
 		for(var i = 0 ; i < obj.length ; i++){
@@ -544,6 +602,11 @@ function show_colorful_vars(){
 					var from = vNodes[j].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue;
 					var to = vNodes[j].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
 					var id = vNodes[j].getAttribute(xmlAttributeId);
+					var type = vNodes[j].getAttribute(xmlAttributeType);
+
+					if(id == "."){
+						id = "Unnamed "+type;
+					}
 					while(variants[vPointer].from < from){
 						vPointer++;
 					}
@@ -695,8 +758,8 @@ function plot_variants(){
 	var pixel_per_variant = 1;
 
 	if(variants[0] != undefined && variants[0].genotype.indexOf("|")>=0){
-		R.rect(R_left+w/2-15,R_top,10,l,5).attr({fill:colD_hover,stroke:colD_hover});
-		R.rect(R_left+w/2+5,R_top,10,l,5).attr({fill:colM_hover,stroke:colM_hover});
+		R.rect(R_left+w/2-15,R_top,10,l,5).attr({fill:colO_hover,stroke:colO_hover});
+		R.rect(R_left+w/2+5,R_top,10,l,5).attr({fill:colO_hover,stroke:colO_hover});
 	} else {
 		R.rect(R_left+w/2-5,R_top,10,l,5).attr({fill:colO_hover,stroke:colO_hover});
 	}
@@ -860,10 +923,10 @@ function show_same_collectionvar(){
 			}
 			*/
 			if(csi!=undefined){	
-				for(var family_member in families[individuals[csi].family]){
-					for(var temp_root in families[individuals[csi].family][csi].markobj){
-						if(family_member != "roots" && individuals[family_member].ifs == "true" && families[individuals[csi].family][family_member].markobj[temp_root] != undefined){
-							families[individuals[csi].family][family_member].markobj[temp_root].hide();
+				for(var family_member in families){
+					for(var temp_root in families[csi].markobj){
+						if(family_member != "roots" && individuals[family_member].ifs == "true" && families[family_member].markobj[temp_root] != undefined){
+							families[family_member].markobj[temp_root].hide();
 						}
 					}
 				}
@@ -874,11 +937,11 @@ function show_same_collectionvar(){
 						for(var j in collectionlist){
 							var id = collectionlist[j].substr(0,7);
 							var temp_str = collectionlist[j].substr(10,3);
-							if(individuals[id].ifs == "true" && individuals[id].family!= undefined && individuals[id].family==individuals[csi].family){
-								for(var temp_root in families[individuals[id].family][id].markobj){
-									if(families[individuals[id].family][id].markobj[temp_root] != undefined){
-										families[individuals[id].family][id].markobj[temp_root].attr({text:temp_str});
-										families[individuals[id].family][id].markobj[temp_root].show();
+							if(individuals[id].ifs == "true"){
+								for(var temp_root in families[id].markobj){
+									if(families[id].markobj[temp_root] != undefined){
+										families[id].markobj[temp_root].attr({text:temp_str});
+										families[id].markobj[temp_root].show();
 									}
 								}														
 							}
@@ -915,10 +978,10 @@ function select_a_variant(idx,color){
 
 		var radioObj = document.getElementById(idx+"__varlist_select")
 		if(variants[idx].selected){
-			for(var family_member in families[individuals[csi].family]){
-				for(var temp_root in families[individuals[csi].family][csi].markobj){
-					if(family_member != "roots" && individuals[family_member].ifs == "true" && families[individuals[csi].family][family_member].markobj[temp_root] != undefined){
-						families[individuals[csi].family][family_member].markobj[temp_root].hide();
+			for(var family_member in families){
+				for(var temp_root in families[csi].markobj){
+					if(family_member != "roots" && individuals[family_member].ifs == "true" && families[family_member].markobj[temp_root] != undefined){
+						families[family_member].markobj[temp_root].hide();
 					}
 				}
 			}
@@ -1164,13 +1227,13 @@ function plot_genes(){
 	var r1 = 15;
 	var r2 = 25;
 	var xm = R_width + 70;
-	var y = 200;
+	var y = (R_height-R_bottom-R_top)/2;
 	//var detail_icon = R.set();
 	var font_size2_text = "15px \"Trebuchet MS\", Arial, sans-serif";
 	var showflag = 0;
 	//detail_icon = R.path("M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M17.328,24.371h-2.707v-2.596h2.707V24.371zM17.328,19.003v0.858h-2.707v-1.057c0-3.19,3.63-3.696,3.63-5.963c0-1.034-0.924-1.826-2.134-1.826c-1.254,0-2.354,0.924-2.354,0.924l-1.541-1.915c0,0,1.519-1.584,4.137-1.584c2.487,0,4.796,1.54,4.796,4.136C21.156,16.208,17.328,16.627,17.328,19.003z").attr({fill: colO_hover, stroke: "none",cursor:"pointer"});	
 	detail_icon = R.path("M26.711,14.086L16.914,4.29c-0.778-0.778-2.051-0.778-2.829,0L4.29,14.086c-0.778,0.778-0.778,2.05,0,2.829l9.796,9.796c0.778,0.777,2.051,0.777,2.829,0l9.797-9.797C27.488,16.136,27.488,14.864,26.711,14.086zM14.702,8.981c0.22-0.238,0.501-0.357,0.844-0.357s0.624,0.118,0.844,0.353c0.221,0.235,0.33,0.531,0.33,0.885c0,0.306-0.101,1.333-0.303,3.082c-0.201,1.749-0.379,3.439-0.531,5.072H15.17c-0.135-1.633-0.301-3.323-0.5-5.072c-0.198-1.749-0.298-2.776-0.298-3.082C14.372,9.513,14.482,9.22,14.702,8.981zM16.431,21.799c-0.247,0.241-0.542,0.362-0.885,0.362s-0.638-0.121-0.885-0.362c-0.248-0.241-0.372-0.533-0.372-0.876s0.124-0.638,0.372-0.885c0.247-0.248,0.542-0.372,0.885-0.372s0.638,0.124,0.885,0.372c0.248,0.247,0.372,0.542,0.372,0.885S16.679,21.558,16.431,21.799z").attr({fill: colO_hover, stroke: "none",cursor:"pointer"});	
-	detail_icon.stop().animate({transform: "t"+(xm-15)+" "+y+" s1.4"});	
+	detail_icon.stop().animate({transform: "t"+(xm-65)+" "+y+" s2.0"});	
 	
 	/*detail_icon.push(R.ellipse(xm,y,r2,r2).attr({fill:colO_hover,stroke:colO_hover}));
 	detail_icon.push(R.ellipse(xm,y,r1,r1).attr({fill:"#FFF",stroke:colO_hover}));
@@ -1179,6 +1242,12 @@ function plot_genes(){
 	detail_icon.hide();
 	if(detail_list.length > 0){
 		detail_icon.show();
+		detail_icon.mouseover(function(){
+			detail_icon.attr({stroke:"#0FF","stroke-width":2});
+		});
+		detail_icon.mouseout(function(){
+			detail_icon.attr({stroke:"none"});
+		});
 		detail_icon.mousedown(function(){
 			var t=document.getElementById("detailtablebody");
 			t.innerHTML = "";
@@ -1209,8 +1278,6 @@ function plot_genes(){
 			document.getElementById("detail_list").style.fontSize="13px";  
 			if(rows.length>1){  
 				for(var i=1;i<rows.length;i++){  
-					$(document.getElementById("detailsource"+i)).css("cursor","pointer"); 
-					document.getElementById("detailsource"+i).style.textDecoration="underline";
 					(function(i){  
 						var obj=rows[i];
 						/*$(obj).css("cursor","pointer");
@@ -1223,6 +1290,8 @@ function plot_genes(){
 						};*/
 						var patternOMIM = /^.*,.*(\d{6}).*$/;
 						if(patternOMIM.test(detail_list[i-1].id)){
+							$(document.getElementById("detailsource"+i)).css("cursor","pointer"); 
+							document.getElementById("detailsource"+i).style.textDecoration="underline";
 							var OMIMentry = RegExp.$1;
 							obj.cells[2].onclick = function(){
 								window.open("http://omim.org/entry/"+OMIMentry);
@@ -1234,7 +1303,7 @@ function plot_genes(){
 								obj.cells[2].style.color="FFF";
 							};
 						}
-					})(i)  
+					})(i);  
 				}  
 			} 
 			$(document.getElementById("detaillist")).css("position", "absolute");
@@ -1391,18 +1460,26 @@ function plot_genes(){
 //					" L"+(h+2.5*sh*direction)+","+(v-sh/2)+
 //					" L"+(h+1*sh*direction)+","+(v-sh*1.5)+
 //					" L"+(h+1*sh*direction)+","+(v-sh)+
-//					" L"+h+","+(v-sh)+"Z").attr({fill:colO_hover,"stroke-width":0});
-		var arrow = R.path("M"+h+","+v+
-					" L"+(h+2*sh*direction)+","+(v-sh)+
-					" L"+h+","+(v-2*sh)+"Z").attr({fill:colO_hover,"stroke-width":0});
+//					" L"+h+","+(v-sh)+"Z").attr({fill:colO_hover,"stroke-width":0});					
+		if(direction==1){
+			var arrow = R.path("M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466zM13.665,25.725l-3.536-3.539l6.187-6.187l-6.187-6.187l3.536-3.536l9.724,9.723L13.665,25.725z");
+		}else {
+			var arrow = R.path("M16,30.534c8.027,0,14.534-6.507,14.534-14.534c0-8.027-6.507-14.534-14.534-14.534C7.973,1.466,1.466,7.973,1.466,16C1.466,24.027,7.973,30.534,16,30.534zM18.335,6.276l3.536,3.538l-6.187,6.187l6.187,6.187l-3.536,3.537l-9.723-9.724L18.335,6.276z");
+		}
+		arrow.attr({fill:colO_hover,stroke:"none"})
+		arrow.stop().animate({transform: "t"+ (h-15) +" "+ (v-25) +" s0.7"});
+		//			R.path("M"+h+","+v+
+		//			" L"+(h+2*sh*direction)+","+(v-sh)+
+		//			" L"+h+","+(v-2*sh)+"Z").attr({fill:colO_hover,"stroke-width":0});
+	
 		(function (obj){
 			obj[0].style.cursor = "pointer";
 			obj[0].onmouseover = function() {
-				obj.animate({fill:colO_hover2},100);
+				obj.attr({fill:colO_hover2});
 				R.safari();
 			};
 			obj[0].onmouseout = function() {
-				obj.animate({fill:colO_hover},100);
+				obj.attr({fill:colO_hover});
 				R.safari();
 			};
 			obj[0].onclick = function() {

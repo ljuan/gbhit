@@ -108,7 +108,7 @@ function loadChrBand(){
 	//#####################
 
 	var B = Raphael("brd_genome", 600, h+90);
-	var G = Raphael("brd_genelist",150,h);
+	var G = Raphael("brd_genelist",150,h+80);
 	
 //	Rbrd_sremove = spinner(B);
 	
@@ -134,7 +134,7 @@ function loadChrBand(){
 	var chrw = 50;
 	var bandw = 50;
 	var axisx = 550;
-	var interval = 20;
+	var interval = 80;
 
 	for(var idx=0;idx<chrs.length;idx++){
 		bands[idx] = [];
@@ -148,76 +148,77 @@ function loadChrBand(){
 		attr["fill"] = colorlist[chrs[idx].name];
 		attr["stroke-width"] = 0;
 		attr["fill-opacity"] = 0.8;
-		genome[idx]=B.rect(chrx,20+h*chrs[idx].from/total,chrw,h*(chrs[idx].to-chrs[idx].from)/total,3).attr(attr);
+		genome[idx]=B.rect(chrx,interval+h*chrs[idx].from/total,chrw,h*(chrs[idx].to-chrs[idx].from)/total,3).attr(attr);
 		attr["fill"] = "0-#999-#ddd";
 		attr["stroke-width"] = 0;
 		attr["fill-opacity"] = 0.3;
-		genome_rad[idx]=B.path("M"+(chrx+chrw+10)+","+(20+h*chrs[idx].from/total)+" L"+(bandx-10)+","+20+" L"+(bandx-10)+","+(20+h)+" L"+(chrx+chrw+10)+","+(20+h*chrs[idx].to/total)+"Z").attr(attr);
+		genome_rad[idx]=B.path("M"+(chrx+chrw+10)+","+(interval+h*chrs[idx].from/total)+" L"+(bandx-10)+","+interval+" L"+(bandx-10)+","+(interval+h)+" L"+(chrx+chrw+10)+","+(interval+h*chrs[idx].to/total)+"Z").attr(attr);
 		genome_rad[idx].hide();
-		chrlables[idx]=B.text(chrx-20,20+h*(chrs[idx].from+chrs[idx].to)/2/total,chrs[idx].name.replace("chr","").replace("M","MT")).attr({font:font_size2_text,opacity:1}).attr({fill:"#000"});
+		chrlables[idx]=B.text(chrx-20,interval+h*(chrs[idx].from+chrs[idx].to)/2/total,chrs[idx].name.replace("chr","").replace("M","MT")).attr({font:font_size2_text,opacity:1}).attr({fill:"#000"});
 		for(var i = 0 ; i < chrs[idx].bands.length ; i++){
-			bands[idx][i]=drawCyto(chrs[idx].bands[i].from, chrs[idx].bands[i].to, chrs[idx].centromere, chrs[idx].lengthh, h, bandw, bandx, 20, chrs[idx].bands[i].gieStain);
+			bands[idx][i]=drawCyto(chrs[idx].bands[i].from, chrs[idx].bands[i].to, chrs[idx].centromere, chrs[idx].lengthh, h, bandw, bandx, interval, chrs[idx].bands[i].gieStain);
 			bands[idx][i].hide();
 
 			attr["fill"] = "0-#999-#fff";
 			attr["stroke-width"] = 0;
 			attr["fill-opacity"] = 0.3;
-			bands_rad[idx][i]=B.path("M"+(bandx+bandw+20)+","+(20+h*chrs[idx].bands[i].from/chrs[idx].lengthh)+" L"+(axisx-10)+","+20+" L"+(axisx-10)+","+(20+h)+" L"+(bandx+bandw+20)+","+(20+h*chrs[idx].bands[i].to/chrs[idx].lengthh)+"Z").attr(attr);
+			bands_rad[idx][i]=B.path("M"+(bandx+bandw+20)+","+(interval+h*chrs[idx].bands[i].from/chrs[idx].lengthh)+" L"+(axisx-10)+","+interval+" L"+(axisx-10)+","+(interval+h)+" L"+(bandx+bandw+20)+","+(interval+h*chrs[idx].bands[i].to/chrs[idx].lengthh)+"Z").attr(attr);
 			bands_rad[idx][i].hide();
 
-			bandslables[idx][i]=B.text(bandx-20,20+h*(chrs[idx].bands[i].from+chrs[idx].bands[i].to)/2/chrs[idx].lengthh,chrs[idx].bands[i].id).attr({font:font_size_text}).attr({fill:"#000"});
+			bandslables[idx][i]=B.text(bandx-20,interval+h*(chrs[idx].bands[i].from+chrs[idx].bands[i].to)/2/chrs[idx].lengthh,chrs[idx].bands[i].id).attr({font:font_size_text}).attr({fill:"#000"});
 			bandslables[idx][i].hide();
 			if(chrs[idx].bands[i].scoreobj == undefined){
 				chrs[idx].bands[i].scoreobj = {};
 			}
-			bandsscore[idx][i]=drawScore(chrs[idx].bands[i].from, chrs[idx].bands[i].to, chrs[idx].lengthh, h, bandx+bandw+5, 20);
+			bandsscore[idx][i]=drawScore(chrs[idx].bands[i].from, chrs[idx].bands[i].to, chrs[idx].lengthh, h, bandx+bandw+5, interval);
 			bandsscore[idx][i].hide();
 			chrs[idx].bands[i].scoreobj[1] = bandsscore[idx][i];
 		}
 	}
 
 	var axis_set = B.set();
-	var axis = B.path("M"+axisx+",20 L"+axisx+","+(20+h)).attr({stroke:"#000","stroke-width":1});
+	var axis = B.path("M"+axisx+","+interval+" L"+axisx+","+(interval+h)).attr({stroke:"#000","stroke-width":1});
 	var cali = [];
 	var t_bot,t_top,t_first;
-	t_top = B.text(axisx-30,25,"").attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
-	t_bot = B.text(axisx-30,h+15,"").attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
-	t_first = B.text(axisx-30,20+h/10,"").attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
+	t_top = B.text(axisx-30,interval+5,"").attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
+	t_bot = B.text(axisx-30,h+interval-5,"").attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
+	t_first = B.text(axisx-30,interval+h/10,"").attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
 	axis_set.push(axis,t_bot,t_top,t_first);
 	for(var ca = 0 ; ca <= 100 ; ca++){
 		if(ca%10 == 0){
-			cali[ca] = B.path("M"+(axisx-20)+","+(ca/100*h+20)+" L"+axisx+","+(ca/100*h+20)).attr({stroke:"#000","stroke-width":1});
+			cali[ca] = B.path("M"+(axisx-20)+","+(ca/100*h+interval)+" L"+axisx+","+(ca/100*h+interval)).attr({stroke:"#000","stroke-width":1});
 		} else {
-			cali[ca] = B.path("M"+(axisx-10)+","+(ca/100*h+20)+" L"+axisx+","+(ca/100*h+20)).attr({stroke:"#000","stroke-width":1});
+			cali[ca] = B.path("M"+(axisx-10)+","+(ca/100*h+interval)+" L"+axisx+","+(ca/100*h+interval)).attr({stroke:"#000","stroke-width":1});
 		}
 	}
 
 	var gene_set = G.set();
 	var loc_set= B.set();
 
-//	var stop_text = B.text(l/2+35,20,"Stop").attr({font: "16px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#222"});
-//	var stop_button = B.rect(l/2+5,10,60,20,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
-//	//	B.circle(l/2,l/2,chrthick+5).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
-//	//var burrentt = B.text(70,20,"").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
-//	stop_text.hide();
-//	stop_button.hide();
-//	(function (stop_button){
-//		stop_button[0].style.cursor = "pointer";
-//		stop_text[0].style.cursor = "pointer";
-//		stop_button[0].onmouseover = function(){
-//			stop_button.animate({fill:"#999"},animaTime);
-//		};
-//		stop_button[0].onclick = function(){
-//			if(control_scanning==1){
-//				control_scanning=0;
-//				stop_button.hide();
-//				stop_text.hide();
-//			}
-//		};
-//		stop_button[0].onmouseout = function(){
-//			stop_button.animate({fill:"#666"},animaTime);
-//		};
-//	})(stop_button);
+	var stop_text = B.text(300,30,"Stop").attr({font: "16px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#222"});
+	//var stop_button = B.rect(270,20,60,20,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	var stop_button = B.ellipse(300,30,25,12).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	//	B.circle(l/2,l/2,chrthick+5).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	//var burrentt = B.text(70,20,"").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+	stop_text.hide();
+	stop_button.hide();
+	(function (stop_button){
+		stop_button[0].style.cursor = "pointer";
+		stop_text[0].style.cursor = "pointer";
+		stop_button[0].onmouseover = function(){
+			stop_button.animate({fill:"#999"},animaTime);
+		};
+		stop_button[0].onclick = function(){
+			if(control_scanning==1){
+				control_scanning=0;
+			stop_button.hide();
+				stop_text.hide();
+			}
+		};
+		stop_button[0].onmouseout = function(){
+			stop_button.animate({fill:"#666"},animaTime);
+		};
+	})(stop_button);
 	
 	var current=null;
 	var click=null;
@@ -226,80 +227,93 @@ function loadChrBand(){
 	var gurrent=null;
 	var glick=null;
 
-//	var scan_text = B.text(270,l-15,"Scan Functional Variants for Individual").attr({font: "16px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#000"});
-//	var error_warn=B.text(0,30,"").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
-//
-//	var scang_text = B.text(80,l+8,"Whole genome").attr({font: "14px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#222"});
-//	var scang_button = B.rect(5,l-4,160,24,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
-//	(function (scang_button){
-//		scang_button[0].style.cursor = "pointer";
-//		scang_text[0].style.cursor = "pointer";
-//		scang_button[0].onmouseover = function(){
-//			scang_button.animate({fill:"#999"},animaTime);
-//		};
-//		scang_button[0].onclick = function(){
-//			error_warn.remove();
-//			if(csi!=undefined && csi!="--"){
-//				stop_text.show();
-//				stop_button.show();
-//				getSingleCytoAsync(0,0,2);
-//			}
-//			else {
-//				error_warn=B.text(0,30,"Please load personal variants").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
-//			}
-//		};
-//		scang_button[0].onmouseout = function(){
-//			scang_button.animate({fill:"#666"},animaTime);
-//		};
-//	})(scang_button);
-//
-//	var scanc_text = B.text(260,l+8,"Current chromosome").attr({font: "14px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#222"});
-//	var scanc_button = B.rect(180,l-4,160,24,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
-//	(function (scanc_button){
-//		scanc_button[0].style.cursor = "pointer";
-//		scanc_text[0].style.cursor = "pointer";
-//		scanc_button[0].onmouseover = function(){
-//			scanc_button.animate({fill:"#999"},animaTime);
-//		};
-//		scanc_button[0].onclick = function(){
-//			error_warn.remove();
-//			if(click!=null && csi!=undefined && csi!="--"){
-//				stop_text.show();
-//				stop_button.show();
-//				getSingleCytoAsync(click,0,1);
-//			}
-//			else {
-//				error_warn=B.text(0,30,"Please load personal variants and select chromosome").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
-//			}
-//		};
-//		scanc_button[0].onmouseout = function(){
-//			scanc_button.animate({fill:"#666"},animaTime);
-//		};
-//	})(scanc_button);
-//
-//	var scanb_text = B.text(440,l+8,"Current cytoband").attr({font: "14px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#222"});
-//	var scanb_button = B.rect(360,l-4,160,24,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
-//	(function (scanb_button){
-//		scanb_button[0].style.cursor = "pointer";
-//		scanb_text[0].style.cursor = "pointer";
-//		scanb_button[0].onmouseover = function(){
-//			scanb_button.animate({fill:"#999"},animaTime);
-//		};
-//		scanb_button[0].onclick = function(){
-//			error_warn.remove();
-//			if(click!=null && blick!=null && csi!=undefined && csi!="--"){
-//				stop_text.show();
-//				stop_button.show();
-//				getSingleCytoAsync(click,blick,0);
-//			}
-//			else {
-//				error_warn=B.text(0,30,"Please load personal variants and select cytoband").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
-//			}
-//		};
-//		scanb_button[0].onmouseout = function(){
-//			scanb_button.animate({fill:"#666"},animaTime);
-//		};
-//	})(scanb_button);
+	var scan_text = B.text(380,8,"Scan Functional Variants for Individual").attr({font: "16px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#000"});
+	var error_warn=B.text(0,30,"").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+
+	var scang_text = B.text(chrx+25,60,"Scan").attr({font: "14px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#222"});
+	var scang_button = B.rect(chrx-20,50,chrw+40,24,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	var scang_arrow = B.path("M"+ (chrx+25) +" "+ 80 +",L"+ (chrx+35) +" "+ 74 +",L"+ (chrx+15) +" "+ 74 +"z").attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	(function (scang_button){
+		scang_button[0].style.cursor = "pointer";
+		scang_text[0].style.cursor = "pointer";
+		scang_button[0].onmouseover = function(){
+			scang_button.animate({fill:"#999"},animaTime);
+			scang_arrow.animate({fill:"#999"},animaTime);
+		};
+		scang_button[0].onclick = function(){
+		error_warn.remove();
+			if(csi!=undefined && csi!="--"){
+				stop_text.show();
+				stop_button.show();
+				getSingleCytoAsync(0,0,2);
+			}
+			else {
+				error_warn=B.text(0,30,"Please load personal variants").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+			}
+		};
+		scang_button[0].onmouseout = function(){
+			scang_button.animate({fill:"#666"},animaTime);
+			scang_arrow.animate({fill:"#666"},animaTime);
+			error_warn.hide();
+		};
+	})(scang_button);
+
+	var scanc_text = B.text(chrx+275,60,"chromosome").attr({font: "14px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#222"});
+	var scanc_button = B.rect(chrx+230,50,chrw+40,24,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	var scanc_arrow = B.path("M"+ (chrx+275) +" "+ 80 +",L"+ (chrx+285) +" "+ 74 +",L"+ (chrx+265) +" "+ 74 +"z").attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	
+	(function (scanc_button){
+		scanc_button[0].style.cursor = "pointer";
+		scanc_text[0].style.cursor = "pointer";
+		scanc_button[0].onmouseover = function(){
+			scanc_button.animate({fill:"#999"},animaTime);
+			scanc_arrow.animate({fill:"#999"},animaTime);
+		};
+		scanc_button[0].onclick = function(){
+			error_warn.remove();
+			if(click!=null && csi!=undefined && csi!="--"){
+				stop_text.show();
+				stop_button.show();
+				getSingleCytoAsync(click,0,1);
+			}
+			else {
+				error_warn=B.text(0,30,"Please load personal variants and select chromosome").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+			}
+		};
+		scanc_button[0].onmouseout = function(){
+			scanc_button.animate({fill:"#666"},animaTime);
+			scanc_arrow.animate({fill:"#666"},animaTime);
+			error_warn.hide();
+		};
+	})(scanc_button);
+
+	var scanb_text = B.text(chrx+475,60,"cytoband").attr({font: "14px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#222"});
+	var scanb_button = B.rect(chrx+430,50,chrw+40,24,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	var scanb_arrow = B.path("M"+ (chrx+475) +" "+ 80 +",L"+ (chrx+485) +" "+ 74 +",L"+ (chrx+465) +" "+ 74 +"z").attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
+	(function (scanb_button){
+		scanb_button[0].style.cursor = "pointer";
+		scanb_text[0].style.cursor = "pointer";
+		scanb_button[0].onmouseover = function(){
+			scanb_button.animate({fill:"#999"},animaTime);
+			scanb_arrow.animate({fill:"#999"},animaTime);
+		};
+		scanb_button[0].onclick = function(){
+			error_warn.remove();
+			if(click!=null && blick!=null && csi!=undefined && csi!="--"){
+				stop_text.show();
+				stop_button.show();
+				getSingleCytoAsync(click,blick,0);
+			}
+			else {
+				error_warn=B.text(0,30,"Please load personal variants and select cytoband").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+			}
+		};
+		scanb_button[0].onmouseout = function(){
+			scanb_button.animate({fill:"#666"},animaTime);
+			scanb_arrow.animate({fill:"#666"},animaTime);
+			error_warn.hide();
+		};
+	})(scanb_button);
 
 
 	for (var chrom in genome){
@@ -313,18 +327,26 @@ function loadChrBand(){
 					chrlables[current].animate({fill: "#000",font: font_size_text}, animaTime);
 					genome_rad[current].hide();
 					for(var i=0; i < chrs[current].bands.length; i++) {
-						bands[current][i].animate({fill: "#FFF", stroke: "#FFF"}, animaTime);
-						bands[current][i].hide();
-						bandsscore[current][i].hide();
+					bands[current][i].animate({fill: "#FFF", stroke: "#FFF"}, animaTime);
+					bands[current][i].hide();
+					bandsscore[current][i].hide();
 					}
 				}
-				if(click){
+				if(click&&click!=chrom){
 					chrlables[click].animate({fill: "#000",font:font_size_text}, animaTime);
 					genome_rad[click].hide();
 					for(var i=0; i < chrs[click].bands.length; i++) {
 						bands[click][i].animate({fill: "#FFF", stroke: "#FFF"}, animaTime);
 						bands[click][i].hide();
 						bandsscore[click][i].hide();
+					}
+					if(blick!=null){
+						bandslables[click][blick].hide();
+						bands_rad[click][blick].hide();
+						gene_set.hide();
+						t_top.hide();
+						t_bot.hide();
+						t_first.hide();
 					}
 				}
 				chrlables[chrom].animate({fill: chr.color,font:font_size_text}, animaTime);
@@ -358,6 +380,14 @@ function loadChrBand(){
 						bands[click][i].animate({fill: bcolor, stroke: "#666"}, animaTime);
 						bandsscore[click][i].show();
 					}
+					if(blick!=null){
+						bandslables[click][blick].show();
+						bands_rad[click][blick].show();
+						gene_set.show();
+						t_top.show();
+						t_bot.show();
+						t_first.show();
+					}
 				}
 				B.safari();
 			}; 
@@ -374,6 +404,8 @@ function loadChrBand(){
 							bd[0].onmouseover = null;
 							bd[0].onclick = null;
 							bd[0].onmouseout = null;
+							bandslables[click][i].hide();
+							bands_rad[click][i].hide();
 						})(bands[click][i],i);
 					}
 							t_top.hide();
@@ -394,23 +426,37 @@ function loadChrBand(){
 						var bcolor=colorlist[chrs[click].bands[i].gieStain];
 						bd[0].style.cursor = "pointer";
 						bd[0].onmouseover = function () {
+							if(burrent!=null){
+								bandslables[click][burrent].hide();
+								bands_rad[click][burrent].hide();
+							}
+							if(blick!=null&&blick!=i){
+								bandslables[click][blick].hide();
+								bands_rad[click][blick].hide();
+								gene_set.hide();
+								t_top.hide();
+								t_bot.hide();
+								t_first.hide();
+							}
 							bd.animate({fill: bd.color, stroke: "#ccc"}, animaTime);
 							bandslables[click][i].show();
 							bands_rad[click][i].show();
-							if(burrent){
-							}
-							if(blick){
-							}
 							B.safari();
 							burrent = i;
 						}; 
 						bd[0].onmouseout = function () {
 							bd.animate({fill: bcolor, stroke: "#666"}, animaTime);
-							bandslables[click][i].hide();
-							bands_rad[click][i].hide();
-							if(burrent && burrent != blick){
+							if(burrent!=null && burrent != blick){
+								bandslables[click][burrent].hide();
+								bands_rad[click][burrent].hide();
 							}
-							if(blick && burrent != blick){
+							if(blick!=null && burrent != blick){
+								bandslables[click][blick].show();
+								bands_rad[click][blick].show();
+								gene_set.show();
+								t_top.show();
+								t_bot.show();
+								t_first.show();
 							}
 							B.safari();
 						}; 
@@ -427,9 +473,9 @@ function loadChrBand(){
 							loc_set.clear();
 							blick = i;
 							
-							t_top = B.text(axisx-30,25,chrs[click].name+" : "+chrs[click].bands[blick].id+" : "+chrs[click].bands[blick].from).attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
-							t_bot = B.text(axisx-30,h+15,chrs[click].bands[blick].to).attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
-							t_first = B.text(axisx-30,20+h/10,(chrs[click].bands[blick].to-chrs[click].bands[blick].from+1)/10).attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
+							t_top = B.text(axisx-30,interval+5,chrs[click].bands[blick].from).attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
+							t_bot = B.text(axisx-30,h+interval-5,chrs[click].bands[blick].to).attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
+							t_first = B.text(axisx-30,interval+h/10,(chrs[click].bands[blick].to-chrs[click].bands[blick].from+1)/10).attr({font: font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill: "#000"});
 							//axis_set.show();
 							var urll="servlet/test.do?action=overlapGene&chr="+chrs[click].name+"&start="+chrs[click].bands[blick].from+"&end="+chrs[click].bands[blick].to;
 							XMLHttpReq7.open("GET","servlet/test.do?action=overlapGene&chr="+chrs[click].name+"&start="+chrs[click].bands[blick].from+"&end="+chrs[click].bands[blick].to,false);
@@ -455,8 +501,8 @@ function loadChrBand(){
 								}
 
 								ogeneso[gidx]= {};
-								ogeneso[gidx].text=G.text(10,(gidx*20+10+20),ogenes[gidx].id).attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
-								ogeneso[gidx].flag=G.rect(0,(gidx*20+20),8,20).attr({fill:cytoscore2color(ogenes[gidx].score),"stroke-width":0});
+								ogeneso[gidx].text=G.text(10,(gidx*20+interval),ogenes[gidx].id).attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+								ogeneso[gidx].flag=G.rect(0,(gidx*20+interval-10),8,20).attr({fill:cytoscore2color(ogenes[gidx].score),"stroke-width":0});
 								var gup=ogenes[gidx].from-chrs[click].bands[blick].from;
 								var gdown=ogenes[gidx].to-chrs[click].bands[blick].from;
 								var bandlen=chrs[click].bands[blick].to-chrs[click].bands[blick].from;
@@ -470,7 +516,7 @@ function loadChrBand(){
 								if(gdown>bandlen){
 									gdown=bandlen;
 								}
-								ogeneso[gidx].loc=B.path("M"+axisx+","+(20+h*gup/bandlen)+" L"+axisx+","+(20+h*gdown/bandlen)).attr({stroke:"#F00","stroke-width":8});
+								ogeneso[gidx].loc=B.path("M"+axisx+","+(interval+h*gup/bandlen)+" L"+axisx+","+(interval+h*gdown/bandlen)).attr({stroke:"#F00","stroke-width":8});
 								ogeneso[gidx].loc.hide();
 								gene_set.push(ogeneso[gidx].text);
 								gene_set.push(ogeneso[gidx].flag);
@@ -508,12 +554,16 @@ function loadChrBand(){
 										glick = gidx;
 										var inputsf=ogenes[gidx].from;
 										var inputet=ogenes[gidx].to;
-										setTabb("brwview");
 										document.getElementById("search_field").value=ogenes[gidx].id;
 										document.getElementById("chrSelect").value=chrs[click].name;
 										document.getElementById("startInput").value=inputsf.toString();
 										document.getElementById("endInput").value=inputet.toString();
-										jump();
+										if(individuals[csi] != null
+										&& individuals[csi].fid != "0"
+										&& individuals[csi].mid != "0"){
+											setTabb("brwview");
+											jump();
+										}
 											//chrs[click].name+":"+inputsf.toLocaleString().replace(/\.0+$/,"")+"-"+inputet.toLocaleString().replace(/\.0+$/,"");
 
 									};
@@ -530,7 +580,7 @@ function loadChrBand(){
 	function getSingleCytoAsync(c,b,mode) {
 		control_scanning=1;
 		var sremove = spinner(B);
-		var burrentt = B.text(70,20,"Scanning "+chrs[c].name+" : "+chrs[c].bands[b].id+" ...").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
+		var burrentt = B.text(70,30,"Scanning "+chrs[c].name+" : "+chrs[c].bands[b].id+" ...").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
 		var XMLHttpReq9 = createXMLHttpRequest();
 		XMLHttpReq9.open("GET","servlet/test.do?action=getCytoband&chr="+chrs[c].name+"&id="+chrs[c].bands[b].id,true);
 		XMLHttpReq9.onreadystatechange = returnedCytoScore;
@@ -546,6 +596,7 @@ function loadChrBand(){
 					}
 					chrs[c].bands[b].scoreobj[0].animate({fill: score2flag(score).color, "fill-opacity":score2flag(score).opacity},animaTime);
 					chrs[c].bands[b].scoreobj[0].animate({transform: score2flag(score).interRscale}, 500, "elastic");
+					chrs[c].bands[b].scoreobj[0].hide();
 					sremove();
 					burrentt.remove();
 					if(control_scanning==1&&click!=null&&blick!=null&&click==c&&blick==b){
