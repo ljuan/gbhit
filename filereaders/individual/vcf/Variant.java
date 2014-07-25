@@ -260,6 +260,8 @@ public class Variant implements Comparable<Variant> {
 		v.setHomo(homo);
 		if(ele.hasAttribute(XML_TAG_EFFECT))
 			v.setEffect(Integer.parseInt(ele.getAttribute(XML_TAG_EFFECT)));
+		if(ele.hasAttribute(XML_TAG_DBSNPID))
+			v.setDbsnpid(ele.getAttribute(XML_TAG_DBSNPID));
 		
 		NodeList children = ele.getChildNodes();
 		v.setFrom(Integer.parseInt(children.item(0).getTextContent()));
