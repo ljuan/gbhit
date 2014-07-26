@@ -39,6 +39,7 @@ function init_individual_vars(){
 		variants[i] = {};
 		variants[i].chr = current_chr;
 		variants[i].id = vNodes[i].getAttribute(xmlAttributeId);
+		variants[i].dd = vNodes[i].getAttribute("dd");
 
 		variants[i].genotype = vNodes[i].getAttribute(xmlAttributeGenotype);
 		var splitter = "|";
@@ -76,6 +77,23 @@ function init_individual_vars(){
 			var letter = veNodes[j].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
 			var id = veNodes[j].getAttribute(xmlAttributeId);
 			var type = veNodes[j].getAttribute(xmlAttributeType);
+
+			if(letter == "(" || letter == ")"){
+				letter = "ASS/DSS loss";
+			}else if (letter == "#"){
+				letter = "Frame shifting";
+			}else if (letter == "^"){
+				letter = "Initiator loss";
+			}else{
+				var texts = letter.split(":");
+				if(texts[0].indexOf("$") >= 0){
+					letter = "Stop loss";
+				}else if(texts[1].indexOf("$") >= 0){
+					letter = "Stop gain";
+				}else {
+					letter = texts[0] + "->" + texts[1];
+				}
+			}
 
 			if(id == "."){
 				id = "Unnamed "+type;
@@ -804,13 +822,20 @@ function plot_variants(){
 			variants[i].point = [];
 			variants[i].name = [];
 			variants[i].lines = [];
+
+			var name_text = variants[i].id;
+
+			if(variants[i].id.indexOf("Unnamed") == 0  && variants[i].dd && variants[i].dd.indexOf("rs") == 0){
+				name_text = variants[i].dd + "*";
+			}
+
 			if(variants[i].genotypes[0] == undefined || variants[i].genotypes[0] == "0"){
 				variants[i].point[0] = R.ellipse(R_left+w/2-30,natual_pos,2,2).attr({fill:"#FFF",stroke:colO});
 			}else{
 				variants[i].point[0] = R.ellipse(R_left+w/2-30,natual_pos,2,2).attr({fill:colO,stroke:colO});
 				variants[i].lines[0] = R.path("M"+(R_left+text_length+2)+","+name_pos+" L"+(R_left+text_length+20)+","+name_pos+" L"+(R_left+w/2-52)+","+natual_pos+" L"+(R_left+w/2-33)+","+natual_pos).attr({stroke:colO,opacity:1});
 
-				variants[i].name[0] = R.text(R_left+text_length,name_pos,variants[i].id).attr({font:font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill:colO,"font-weight":"normal"});
+				variants[i].name[0] = R.text(R_left+text_length,name_pos,name_text).attr({font:font_size2_text,opacity:1,"text-anchor":"end"}).attr({fill:colO,"font-weight":"normal"});
 
 				(function(idx){
 					variants[idx].name[0][0].style.cursor = "pointer";
@@ -835,7 +860,7 @@ function plot_variants(){
 				variants[i].point[1] = R.ellipse(R_left+w/2+30,natual_pos,2,2).attr({fill:colO,stroke:colO});
 				variants[i].lines[1] = R.path("M"+(R_left+w-text_length-2)+","+name_pos+" L"+(R_left+w-text_length-20)+","+name_pos+" L"+(R_left+w/2+52)+","+natual_pos+" L"+(R_left+w/2+33)+","+natual_pos).attr({stroke:colO,opacity:1});
 
-				variants[i].name[1] = R.text(R_left+w-text_length,name_pos,variants[i].id).attr({font:font_size2_text,opacity:1,"text-anchor":"start"}).attr({fill:colO});
+				variants[i].name[1] = R.text(R_left+w-text_length,name_pos,name_text).attr({font:font_size2_text,opacity:1,"text-anchor":"start"}).attr({fill:colO});
 
 				(function(idx){
 					variants[idx].name[1][0].style.cursor = "pointer";
@@ -1559,6 +1584,23 @@ function plot_genes(){
 			+" L"+(horizontal_line_offset+10)+","+natual_pos
 			+" L"+(horizontal_text_offset-10)+","+name_pos
 			+" L"+(horizontal_text_offset)+","+name_pos).attr({stroke:colO,opacity:1}));
+
+		if(letter == "(" || letter == ")"){
+			letter = "ASS/DSS loss";
+		}else if (letter == "#"){
+			letter = "Frame shifting";
+		}else if (letter == "^"){
+			letter = "Initiator loss";
+		}else{
+			var texts = letter.split(":");
+			if(texts[0].indexOf("$") >= 0){
+				letter = "Stop loss";
+			}else if(texts[1].indexOf("$") >= 0){
+				letter = "Stop gain";
+			}else {
+				letter = texts[0] + "->" + texts[1];
+			}
+		}
 
 		temp.push(R.text(horizontal_text_offset+2,name_pos,letter).attr({font:font_size2_text,"text-anchor":"start"}));
 		return temp;
