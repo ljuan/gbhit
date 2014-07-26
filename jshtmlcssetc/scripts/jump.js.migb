@@ -323,6 +323,11 @@ function setTabb(name){
 		document.getElementById("varlist").style.display="none";
 	}
 }
+function show_example(){
+	document.getElementById("track_name").value = "trio_example";
+	document.getElementById("vcf_url").value = "http://202.118.228.68/gbfiles/NA12878.trio.snp.vcf.gz";
+	document.getElementById("ped_rec").value = "trio NA12878 NA12891 NA12892 2 2\ntrio NA12891 0 0 1 2\ntrio NA12892 0 0 2 2";
+}
 
 function spinner(S){
 	var sectorsCount = 10,
