@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import filereaders.Consts;
 import filereaders.tools.StringSplit;
 
 
@@ -503,6 +504,12 @@ public class Vcf {
 				break;
 		}
 		String type = new String(cs, i + 1, j - i - 1);
+		if(type.equals("TRA"))
+			type = Consts.VARIANT_TYPE_BLS;
+		else if(type.startsWith("INS"))
+			type = Consts.VARIANT_TYPE_INSERTION;
+		else if(type.startsWith("CN"))
+			type = Consts.VARIANT_TYPE_CNV;
 
 		return variantTypes.containsKey(type) ? type : (i == 0 ? "OTH" : "INS");
 	}
@@ -721,7 +728,7 @@ public class Vcf {
 			int len = 0;
 			for (int vIndex : vIndexeso) {
 				vs[o][len] = variants[vIndex - 1];
-				vs[o][len].setHomo(samples.getHome(o));
+				vs[o][len].setHomo(ohomo);
 				vs[o][len].setMaxAF(getMaxAF());
 				len++;
 			}
@@ -733,7 +740,7 @@ public class Vcf {
 			int len = 0;
 			for (int vIndex : vIndexesf) {
 				vs[f][len] = variants[vIndex - 1];
-				vs[f][len].setHomo(samples.getHome(f));
+				vs[f][len].setHomo(fhomo);
 				vs[f][len].setMaxAF(getMaxAF());
 				len++;
 			}
@@ -745,7 +752,7 @@ public class Vcf {
 			int len = 0;
 			for (int vIndex : vIndexesm) {
 				vs[m][len] = variants[vIndex - 1];
-				vs[m][len].setHomo(samples.getHome(m));
+				vs[m][len].setHomo(mhomo);
 				vs[m][len].setMaxAF(getMaxAF());
 				len++;
 			}
@@ -757,14 +764,34 @@ public class Vcf {
 			boolean of = false;
 			if(mhomo.indexOf("0")<0 && ohomo.indexOf("0")>=0)
 				om = true;
-			else if(fhomo.indexOf("0")<0 && ohomo.indexOf("0")>=0)
+			if(fhomo.indexOf("0")<0 && ohomo.indexOf("0")>=0)
 				of = true;
-			if(om){
+			if(om && of){//father : 1|1, mother : 1|1, offspring : 0|1
+//we can say we do not know the whether the variant is inherited from mother or father
+				return null;
+				
+/* we can also say there is a de novo mutation in offspring.
+ * of course 99% this is a variant calling mistake,
+ * so we do not assign this variant as a de novo mutation
+ *				
+ *				vs[o]=new Variant[vIndexeso.length];
+ *				int len = 0;
+ *				for (int vIndex : vIndexeso) {
+ *					vs[o][len] = variants[vIndex - 1];
+ *					vs[o][len].setHomo(ohomo);
+ *					vs[o][len].setMaxAF(getMaxAF());
+ *					len++;
+ *				}
+ *				if (len > 1) 
+ *					Arrays.sort(vs[o]);
+ */
+			}
+			else if(om){
 				vs[m]=new Variant[vIndexesm.length];
 				int len = 0;
 				for (int vIndex : vIndexesm) {
 					vs[m][len] = variants[vIndex - 1];
-					vs[m][len].setHomo(samples.getHome(m));
+					vs[m][len].setHomo(mhomo);
 					vs[m][len].setMaxAF(getMaxAF());
 					len++;
 				}
@@ -776,7 +803,7 @@ public class Vcf {
 				int len = 0;
 				for (int vIndex : vIndexesf) {
 					vs[f][len] = variants[vIndex - 1];
-					vs[f][len].setHomo(samples.getHome(f));
+					vs[f][len].setHomo(fhomo);
 					vs[f][len].setMaxAF(getMaxAF());
 					len++;
 				}
