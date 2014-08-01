@@ -53,6 +53,7 @@ public interface Consts{
 	public static final String FORMAT_REF="REF";
 	public static final String FORMAT_SNP="SNP";
 	public static final String FORMAT_ANNOVAR="ANNOVAR";
+	public static final String FORMAT_LD="LD";
 	public static final String FORMAT_HGNC="HGNC";
 	public static final String FORMAT_ANNO="ANNO";
 	public static final String FORMAT_FUNCTIONANNO="FANNO";

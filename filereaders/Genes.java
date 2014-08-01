@@ -33,7 +33,7 @@ public class Genes{
 	private static Integer[] ChrEnds;
 	static {
 		int current_chr=-1;
-		File hgnc=new File(CfgReader.getBasicGenes(Consts.CURRENT_ASSEMBLY).get_Path());
+		File hgnc=new File(CfgReader.getBasic(Consts.CURRENT_ASSEMBLY,Consts.FORMAT_HGNC).get_Path());
 		ByteBufferChannel bbc=new ByteBufferChannel(hgnc,0,hgnc.length());
 		String[] temp=bbc.ToString(Consts.DEFAULT_ENCODE).split("\n");
 		ArrayList<String> ChrList_temp=new ArrayList<String>();

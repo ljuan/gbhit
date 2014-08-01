@@ -58,8 +58,8 @@ public class Instance {
 	}
 	void initialize(String Assembly){
 		this.Assembly=Assembly;
-		this.Ref=CfgReader.getBasicRef(Assembly);
-		this.Cyto=CfgReader.getBasicCyto(Assembly);
+		this.Ref=CfgReader.getBasic(Assembly,Consts.FORMAT_REF);
+		this.Cyto=CfgReader.getBasic(Assembly,Consts.FORMAT_CYTO);
 		try{
 			rr=new FastaReader(Ref.get_Path());
 		} catch(IOException e){
@@ -521,7 +521,7 @@ public class Instance {
 				GVFReader gr = new GVFReader(path_temp);
 				ele_temp=gr.get_detail(doc, track.get_ID(), id, Chr, start, end);
 				if(personal){
-					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, start, end, doc);
+					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasic(Assembly,Consts.FORMAT_SNP).get_Path(Chr), Chr, start, end, doc);
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
 					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
 				}
@@ -530,7 +530,7 @@ public class Instance {
 				VcfReader vr=new VcfReader(track,Chr);
 				ele_temp=vr.get_detail(doc, track, sample_id, id, Chr, start, end);
 				if(personal){
-					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, start, end, doc);
+					Element ele_var_temp=new Individual(ele_temp,true).mergeWithDBSNP(CfgReader.getBasic(Assembly,Consts.FORMAT_SNP).get_Path(Chr), Chr, start, end, doc);
 					doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ele_var_temp);
 					doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_temp);
 				}
@@ -983,7 +983,7 @@ public class Instance {
 				add_att_ifParam(track,ele_var);
 				if(PvarID!=null&&!track.get_ID().equals(PvarID))
 					ele_var.setAttribute(Consts.XML_TAG_ID, "_"+PvarID);
-				Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
+				Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasic(Assembly,Consts.FORMAT_SNP).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
 				if(scoremeth!=null){
 					Ele_var = Annovar.score_vars(doc, Ele_var, scoremeth, Chr, rr);
 					add_att_ifParam(track,Ele_var);
@@ -995,7 +995,7 @@ public class Instance {
 			GVFReader gr = new GVFReader(Pvar.get_Path(Chr));
 			Element ele_var=gr.write_gvf2variants(doc, "_"+track.get_ID(), Chr,Coordinate[0],Coordinate[1]);
 			add_att_ifParam(track,ele_var);
-			Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasicSnp(Assembly).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
+			Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasic(Assembly,Consts.FORMAT_SNP).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
 			if(scoremeth!=null){
 				Ele_var = Annovar.score_vars(doc, Ele_var, scoremeth, Chr, rr);
 				add_att_ifParam(track,Ele_var);

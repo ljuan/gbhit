@@ -25,7 +25,7 @@ class Annovar{
 	public final static Map<String, String> ScoreMeth = new HashMap<String, String>();
 	static String link;
 	static{
-		Annotations annovar = CfgReader.getBasicAnnovar(Consts.CURRENT_ASSEMBLY);
+		Annotations annovar = CfgReader.getBasic(Consts.CURRENT_ASSEMBLY,Consts.FORMAT_ANNOVAR);
 		link = annovar.get_Path();
 		ScoreMeth.put("PGB", null);
 		ScoreMeth.put("SIFT", "ljb_sift");
