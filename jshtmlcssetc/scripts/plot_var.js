@@ -48,6 +48,17 @@ function init_individual_vars(){
 		}
 		variants[i].genotypes = variants[i].genotype.split(splitter);
 
+		if(i > 0 && variants[i-1].genotypes[0]*variants[i-1].genotypes[1] > 1 
+		&& variants[i].genotypes[0]*variants[i].genotypes[1] > 1
+		&& (variants[i].dd == undefined && variants[i-1].dd == undefined
+		|| variants[i].dd != undefined && variants[i-1].dd != undefined 
+		&& variants[i].dd == variants[i-1].dd)){
+
+			variants[i-1].genotype = variants[i-1].genotype + "(" + variants[i-1].genotypes[0] + ")";
+			variants[i].genotype = variants[i].genotype + "(" + variants[i].genotypes[1] + ")";
+			variants[i-1].genotypes[1] = 0;
+			variants[i].genotypes[0] = 0;
+		}
 		variants[i].type = vNodes[i].getAttribute(xmlAttributeType);
 
 		if(variants[i].id == undefined || variants[i].id == "." || variants[i].id ==""){
@@ -56,6 +67,7 @@ function init_individual_vars(){
 		variants[i].from = parseInt(vNodes[i].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue);
 		variants[i].to = parseInt(vNodes[i].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue);
 		variants[i].selected = false;
+
 		if(vNodes[i].getElementsByTagName(xmlTagLetter).length > 0){
 			variants[i].letter = vNodes[i].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
 		} else {

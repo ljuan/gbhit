@@ -387,8 +387,11 @@ public class Vcf {
 				if (-1 != pgInfo.end) {
 					v.setTo(pgInfo.end);
 				} else {
-					v.setTo(Pos + pgInfo.svlen - 1);
+					v.setTo(Pos + Math.abs(pgInfo.svlen) - 1);
 				}
+			}
+			else{
+				v.setTo(Pos + 1);
 			}
 		}
 	}
@@ -882,11 +885,12 @@ public class Vcf {
 	 * 
 	 * @return
 	 */
-	public Variant[] getVariants() {
+	public Variant[] getVariants(boolean sort) {
 		if (variants == null || variants.length == 1)
 			return variants;
 		Variant[] vs = (Variant[]) variants.clone();
-		Arrays.sort(vs);
+		if(sort)
+			Arrays.sort(vs);
 		return vs;
 	}
 

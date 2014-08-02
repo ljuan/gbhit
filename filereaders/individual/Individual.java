@@ -108,7 +108,7 @@ public class Individual {
 				if (Query != null) {
 					while (Query.next() != null) {
 						vcf = new Vcf(tabix.lineInChars, tabix.numOfChar, 0, null);
-						variants = vcf.getVariants();
+						variants = vcf.getVariants(true);
 						if(variants == null){
 							continue;
 						}

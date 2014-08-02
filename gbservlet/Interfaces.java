@@ -186,6 +186,9 @@ public class Interfaces extends HttpServlet{
 
 			a=ins.get_TrioAnalysis(tracks, id, chr, start, end);
 		}
+		else if (action.equals("getLD")){
+			a=ins.get_LinkageDisequilibrium(req.getParameter("tracks"), req.getParameter("id"), Integer.parseInt(req.getParameter("start")), Integer.parseInt(req.getParameter("end")));
+		}
 		else if (action.equals("getStat")){
 			String filename=ins.save_Stat(session.getId());
 			if(filename!=null){

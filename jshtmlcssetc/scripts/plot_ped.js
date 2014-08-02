@@ -509,6 +509,7 @@ function select_a_individual(id){
 			}
 		}
 		if(individuals[id].selected){
+			setTabb("brwview");
 			load_family_genome(current_chr,current_start,current_end);
 		}
 		///////////////////////////////

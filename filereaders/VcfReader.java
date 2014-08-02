@@ -13,6 +13,7 @@ import filereaders.individual.vcf.TabixReaderForVCF;
 import filereaders.individual.vcf.Variant;
 import filereaders.individual.vcf.Variants;
 import filereaders.individual.vcf.Vcf;
+import filereaders.tools.StringSplit;
 
 
 
@@ -202,7 +203,7 @@ public class VcfReader {
 					if (sample_id != null && vcfSample!=null && vcfSample.ifSelected(sample_id)) 
 						vs_temp = vcf.getVariants(vcfSample.getSelectedIndex(sample_id));
 					else 
-						vs_temp = vcf.getVariants();
+						vs_temp = vcf.getVariants(true);
 					if (vs_temp != null)
 						for (int vs_i = 0; vs_i < vs_temp.length; vs_i++)
 							if (vcf!=null && vcf.getID().equals(id) && vs_temp[vs_i].getFrom() == start && vs_temp[vs_i].getTo() == end)
@@ -336,6 +337,7 @@ public class VcfReader {
 						end = start = Integer.parseInt(line_temp[1]);
 						
 						for(int j=0;j<line_alts.length;j++){
+							//need to add codes to process <INS> <INV> <TRA> <DEL> <DUP> <CNV> ...
 							if(line_temp[3].length() < line_alts[j].length()){
 								start += line_temp[3].length()-1;
 								end = start+1;
@@ -695,6 +697,242 @@ public class VcfReader {
 		e[2] = variants[m].getVariantsElement();
 		return e;
 	}
+	public String[] write_ld(String id, String chr, long start, long end, String Assembly) {
+		float qualLimit = Float.parseFloat((String) (this.track.get_Parameter(VCF_QUAL_LIMIT)));
+		TabixReaderForVCF vcf_tb = null;
+		String[] filterLimit = getFilterLimit();
+
+		int samplesNum = 0;
+		VcfSample vcfSample_real = null;
+		VcfSample vcfSample = null;
+		int[] selectedIndexes = null;
+
+		if (this.track.has_Parameter(VCF_HEADER_SAMPLE)) {
+			vcfSample_real = ((VcfSample) this.track.get_Parameter(VCF_HEADER_SAMPLE));
+			vcfSample = new VcfSample(vcfSample_real.getSampleNames());
+			vcfSample.setSamples(id);
+			samplesNum = 1;
+			selectedIndexes = vcfSample.getSelectedIndexes();
+		}
+		else
+			return null;
+		
+		if(selectedIndexes==null)
+			return null;
+		
+		ArrayList<String> result_temp = new ArrayList<String>();
+		
+		Vcf vcf = null;
+		try {
+			String chrom = (Boolean) this.track.get_Parameter(VCF_CHROM_PREFIX) ? chr : chr.substring(3);
+			if ("M".equalsIgnoreCase(chrom)) {
+				chrom = "MT";
+			}
+			if (this.track.has_Parameter(VCF_INDEX_LOCAL) && this.track.get_Parameter(VCF_INDEX_LOCAL) != null)
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),(String)this.track.get_Parameter(VCF_INDEX_LOCAL));
+			else
+				vcf_tb = new TabixReaderForVCF(this.track.get_Path(this.Chr),null);
+			
+			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start	+ "-" + end);
+			List<Vcf> vcfs = new ArrayList<Vcf>();
+			List<String[]> ld_all = new LdReader(CfgReader.getBasic(Assembly, Consts.FORMAT_LD).get_Path(chr)).write_ld2matrix(chr, start, end);
+			
+			StringSplit split = new StringSplit('\t');
+			if (Query != null && ld_all.size() > 0) {
+				HashMap<Integer,Integer> vsx = new HashMap<Integer,Integer>();
+				int i = 0;
+				while (Query.next() != null) {
+					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, samplesNum, selectedIndexes,true);
+					if (vcf.altIsDot())
+						continue;
+					if (vcf.shouldBeFilteredByQualLimit(qualLimit) || vcf.shouldBeFilteredByFilterLimit(filterLimit))
+						continue;
+					
+					vsx.put(Integer.parseInt(split.getResultByIndex(1)), i);
+					i++;
+					vcfs.add(vcf);
+				}
+				
+				String[] ld_temp = null;
+				StringSplit splitcomma = new StringSplit(',');
+				StringSplit splitslash = new StringSplit('/');
+				StringSplit splitpipe = new StringSplit('|');
+				String[] phase ;
+				String homo_temp;
+				String ref1 = null;
+				String ref2 = null;
+				int[] homo1 = {-2,-2};
+				int[] homo2 = {-2,-2};
+				
+				for(i = 0 ; i < ld_all.size() ; i++){
+					ld_temp = ld_all.get(i);
+					if(vsx.containsKey(Integer.parseInt(ld_temp[1])) && vsx.containsKey(Integer.parseInt(ld_temp[2]))){
+						int v1 = vsx.get(Integer.parseInt(ld_temp[1]));
+						int v2 = vsx.get(Integer.parseInt(ld_temp[2]));
+						ref1 = vcfs.get(v1).getRef();
+						ref2 = vcfs.get(v2).getRef();
+						String[] alts1 = new String[1];
+						String[] alts2 = new String[1];
+						alts1[0] = vcfs.get(v1).getAlt();
+						alts2[0] = vcfs.get(v2).getAlt();
+						
+						splitslash.split(ld_temp[3]);
+						phase = splitslash.getResult();
+						
+						int[] p0 = {-1,-1};
+						int[] p1 = {-1,-1};
+						
+						/* example: phase AT/CG
+						 * 
+						 * case1:
+						 * v1 ref:C alt:A
+						 * v2 ref:G alt:T
+						 * p0[0] = 1; p0[1] = 1
+						 * p1[0] = 0; p1[1] = 0
+						 * 
+						 * case2:
+						 * v1 ref:C alt:A
+						 * v2 ref:T alt:G
+						 * p0[0] = 1; p0[1] = 0
+						 * p1[0] = 0; p1[1] = 1
+						 * 
+						 * v1 1|1
+						 * v2 0|1
+						 * 
+						 * homo1[0] = 0; homo1[1] = 1
+						 * homo2[0] = 1; homo2[1] = 1
+						 * 
+						 * in case 1: allele 1 : no, allele 2 : yes
+						 * in case 2: allele 1 : yes, allele 2 : no
+						 * 
+						 * v1 1|0
+						 * v2 0|1
+						 * 
+						 * homo1[0] = 0; homo1[1] = 1
+						 * homo2[0] = 1; homo2[1] = 1
+						 * 
+						 * in case 1: allele 1 : no, allele 2 : no
+						 * in case 2: allele 1 : yes, allele 2 : yes 
+						 */
+						
+						//map(translate) ***phase data in ld*** to ref/alt genotype code in Vcf.
+						//thus we obtain the actual LD mates in Vcf ref/alt context
+						if(!Vcf.containChar(alts1[0], ',') && !Vcf.containChar(alts2[0], ',')){
+							if (phase[0].equals(alts1[0]+alts2[0]) && phase[1].equals(ref1+ref2)){
+								p0[0] = 1; p0[1] = 1; p1[0] = 0; p1[1] = 0;
+							}
+							else if (phase[0].equals(alts1[0]+ref2) && phase[1].equals(ref1+alts2[0])){
+								p0[0] = 1; p0[1] = 0; p1[0] = 0; p1[1] = 1;
+							}
+							else if (phase[0].equals(ref1+alts2[0]) && phase[1].equals(alts1[0]+ref2)){
+								p0[0] = 0; p0[1] = 1; p1[0] = 1; p1[1] = 0;
+							}
+							else if (phase[0].equals(ref1+ref2) && phase[1].equals(alts1[0]+alts2[0])){
+								p0[0] = 0; p0[1] = 0; p1[0] = 1; p1[1] = 1;
+							}
+						}
+						else {
+							splitcomma.split(alts1[0]);
+							alts1 = new String[splitcomma.getResultNum()+1];
+							alts1[0] = ref1;
+							for(int j = 0 ; j < alts1.length-1 ; j++)
+								alts1[j+1] = splitcomma.getResultByIndex(j);
+							
+							splitcomma.split(alts2[0]);
+							alts2 = new String[splitcomma.getResultNum()+1];
+							alts2[0] = ref2;
+							for(int j = 0 ; j < alts2.length-1 ; j++)
+								alts2[j+1] = splitcomma.getResultByIndex(j);
+							
+							for(int i1 = 0 ; i1 < alts1.length ; i1++)
+								for(int i2 = 0 ; i2 < alts2.length ; i2++){
+									if(phase[0].equals(alts1[i1]+alts2[i2])){
+										p0[0] = i1; p0[1] = i2;
+									}
+									if(phase[1].equals(alts1[i1]+alts2[i2])){
+										p1[0] = i1;	p1[1] = i2;
+									}
+								}
+						}
+						
+						//map(translate) ***sample genotype data in vcf sampleInfo*** to ref/alt genotype code in Vcf.
+						// v1
+						homo_temp = vcfs.get(v1).getVariants(0)[0].getHomo();
+						if(Vcf.containChar(homo_temp,'|')){
+							splitpipe.split(homo_temp);
+							homo1[0] = Integer.parseInt(splitpipe.getResultByIndex(0));
+							homo1[1] = Integer.parseInt(splitpipe.getResultByIndex(1));
+						} 
+						else if (Vcf.containChar(homo_temp, '/')){
+							splitslash.split(homo_temp);
+							homo1[0] = Integer.parseInt(splitslash.getResultByIndex(0));
+							homo1[1] = Integer.parseInt(splitslash.getResultByIndex(1));
+						}
+						else{
+							homo1[0] = Integer.parseInt(homo_temp);
+							homo1[1] = Integer.parseInt(homo_temp);
+						}
+						
+						//v2
+						homo_temp = vcfs.get(v2).getVariants(0)[0].getHomo();
+						if(Vcf.containChar(homo_temp,'|')){
+							splitpipe.split(homo_temp);
+							homo2[0] = Integer.parseInt(splitpipe.getResultByIndex(0));
+							homo2[1] = Integer.parseInt(splitpipe.getResultByIndex(1));
+						} 
+						else if (Vcf.containChar(homo_temp, '/')){
+							splitslash.split(homo_temp);
+							homo2[0] = Integer.parseInt(splitslash.getResultByIndex(0));
+							homo2[1] = Integer.parseInt(splitslash.getResultByIndex(1));
+						}
+						else{
+							homo2[0] = Integer.parseInt(homo_temp);
+							homo2[1] = Integer.parseInt(homo_temp);
+						}
+						
+						Variant[] vs1 = vcfs.get(v1).getVariants(false);
+						Variant[] vs2 = vcfs.get(v2).getVariants(false);
+						if(p0[0] == homo1[0] && p0[1] == homo2[0] || p1[0] == homo1[0] && p1[1] == homo2[0]){
+							//allele 1 yes
+							int idx1 = homo1[0]>0?homo1[0]-1:homo1[0];
+							int idx2 = homo2[0]>0?homo2[0]-1:homo2[0];
+							result_temp.add(
+									chr+":"+vs1[idx1].getFrom()+":"+vs1[idx1].getTo()+":"+vs1[idx1].getLetter()!=null?vs1[idx1].getLetter():"-"+";"+
+									chr+":"+vs2[idx2].getFrom()+":"+vs2[idx2].getTo()+":"+vs2[idx2].getLetter()!=null?vs2[idx2].getLetter():"-"+";"+
+									"0"+";"+
+									ld_temp[4]
+											);
+							
+						}
+						if(p0[0] == homo1[1] && p0[1] == homo2[1] || p1[0] == homo1[1] && p1[1] == homo2[1]){
+							//allele 2 yes
+							int idx1 = homo1[1]>0?homo1[1]-1:homo1[1];
+							int idx2 = homo2[1]>0?homo2[1]-1:homo2[1];
+							result_temp.add(
+									chr+":"+vs1[idx1].getFrom()+":"+vs1[idx1].getTo()+":"+vs1[idx1].getLetter()!=null?vs1[idx1].getLetter():"-"+";"+
+									chr+":"+vs2[idx2].getFrom()+":"+vs2[idx2].getTo()+":"+vs2[idx2].getLetter()!=null?vs2[idx2].getLetter():"-"+";"+
+									"1"+";"+
+									ld_temp[4]
+											);
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			this.track.set_Check("Cannot access to the data/index file!");
+			e.printStackTrace();
+		} finally{
+			if(vcf_tb != null){
+				try {
+					vcf_tb.TabixReaderClose();
+				} catch (IOException e) {
+				}
+			}
+		}
+		String[] result = new String[result_temp.size()];
+		result_temp.toArray(result);
+		return result;
+	}
 	public Element write_vcf2variants(Document doc, String track, String mode,
 			double bpp/* bases per pixel */, String chr, long start, long end) {
 		float qualLimit = Float.parseFloat((String) (this.track.get_Parameter(VCF_QUAL_LIMIT)));
@@ -760,7 +998,7 @@ public class VcfReader {
 					} else {
 						// DBSnp or Personal genomic VCF without choose any
 						// SAMPLEs, variants.length must be 1.
-						vs = vcf.getVariants();
+						vs = vcf.getVariants(true);
 						if (vs != null)
 							variants[0].addVariant(vcf,-1, vs);
 					}

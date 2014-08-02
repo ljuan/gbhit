@@ -627,19 +627,34 @@ public class Instance {
 		else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
 			vt = Pvar;
 		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)){
-			VcfReader vr = new VcfReader(vt, "chr1");
+			VcfReader vr = new VcfReader(vt, "chr1");//because only family genome browser use this method, and family genome browser only accepts single-file-vcf data
 			indord = vr.write_individuals(track, vcfs);
 		}
 		Document doc=XmlWriter.init(Consts.META_ROOT);
 		CfgReader.write_metalist(doc, indord, "IndividualOrder");
 		return XmlWriter.xml2string(doc);
 	}
+	public String get_LinkageDisequilibrium(String track, String id, long start, long end){
+		String[] ld = null;
+		Annotations vt = null;
+		if (Externals.containsKey(track))
+			vt = Externals.get(track);
+		else if(Annos.containsKey(track))
+			vt = Annos.get(track);
+		else if (Pvar!=null && track.startsWith("_") && track.substring(1).equals(Pvar.get_ID()))
+			vt = Pvar;
+		if(vt!=null&&vt.get_Type().equals(Consts.FORMAT_VCF)&&vt.has_Parameter(VCF_HEADER_SAMPLE)){
+			VcfReader vr = new VcfReader(vt, Chr);
+			ld = vr.write_ld(id, Chr, start, end, Assembly);
+		}
+		Document doc=XmlWriter.init(Consts.META_ROOT);
+		CfgReader.write_metalist(doc, ld, "LdMatrix");
+		return XmlWriter.xml2string(doc);
+	}
 	public String get_Intersection(String track, String set_a, String chr, long start, long end){
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		int chrid=check_chromosome(chr);
 		if(chrid>=0){
-			Chr=chr;
-			Coordinate=check_coordinate(chrid,start,end);
 			Annotations vt = null;
 			if (Externals.containsKey(track))
 				vt = Externals.get(track);
@@ -658,8 +673,6 @@ public class Instance {
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		int chrid=check_chromosome(chr);
 		if(chrid>=0){
-			Chr=chr;
-			Coordinate=check_coordinate(chrid,start,end);
 			Annotations vt = null;
 			if (Externals.containsKey(track))
 				vt = Externals.get(track);
@@ -678,8 +691,6 @@ public class Instance {
 		Document doc=XmlWriter.init(Consts.DATA_ROOT);
 		int chrid=check_chromosome(chr);
 		if(chrid>=0){
-			Chr=chr;
-			Coordinate=check_coordinate(chrid,start,end);
 			Annotations vt = null;
 			if (Externals.containsKey(track))
 				vt = Externals.get(track);
