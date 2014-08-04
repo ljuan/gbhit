@@ -3,11 +3,18 @@
 	<xs:element name="MetaDataExchange">
 		<xs:complexType>
 			<xs:sequence>
+<!--
+	 ',': top seperator
+	 ';': next seperator
+	 ':': internal seperator
+-->
 				<xs:element name="AssemblyList" type="xs:string" minOccurs="0"/>
 				<xs:element name="AnnotationList" type="xs:string" minOccurs="0"/>
 				<xs:element name="ChromosomeList" type="xs:string" minOccurs="0"/>
 				<xs:element name="IndividualList" type="xs:string" minOccurs="0"/>
 				<xs:element name="ScoreMethList" type="xs:string" minOccurs="0"/>
+				<xs:element name="IndividualOrder" type="xs:string" minOccurs="0"/>
+				<xs:element name="LdMatrix" type="xs:string" minOccurs="0"/>
 				<xs:element name="ErrorList" type="xs:string" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
