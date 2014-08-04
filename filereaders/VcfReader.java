@@ -737,7 +737,6 @@ public class VcfReader {
 			List<Vcf> vcfs = new ArrayList<Vcf>();
 			List<String[]> ld_all = new LdReader(CfgReader.getBasic(Assembly, Consts.FORMAT_LD).get_Path(chr)).write_ld2matrix(chr, start, end);
 			
-			StringSplit split = new StringSplit('\t');
 			if (Query != null && ld_all.size() > 0) {
 				HashMap<Integer,Integer> vsx = new HashMap<Integer,Integer>();
 				int i = 0;
@@ -748,7 +747,7 @@ public class VcfReader {
 					if (vcf.shouldBeFilteredByQualLimit(qualLimit) || vcf.shouldBeFilteredByFilterLimit(filterLimit))
 						continue;
 					
-					vsx.put(Integer.parseInt(split.getResultByIndex(1)), i);
+					vsx.put((int)vcf.getPos(), i);
 					i++;
 					vcfs.add(vcf);
 				}
@@ -769,6 +768,10 @@ public class VcfReader {
 					if(vsx.containsKey(Integer.parseInt(ld_temp[1])) && vsx.containsKey(Integer.parseInt(ld_temp[2]))){
 						int v1 = vsx.get(Integer.parseInt(ld_temp[1]));
 						int v2 = vsx.get(Integer.parseInt(ld_temp[2]));
+						Variant[] vs_cur1 = vcfs.get(v1).getVariants(0);
+						Variant[] vs_cur2 = vcfs.get(v2).getVariants(0);
+						if(vs_cur1 == null || vs_cur2 == null)
+							continue;
 						ref1 = vcfs.get(v1).getRef();
 						ref2 = vcfs.get(v2).getRef();
 						String[] alts1 = new String[1];
@@ -857,7 +860,7 @@ public class VcfReader {
 						
 						//map(translate) ***sample genotype data in vcf sampleInfo*** to ref/alt genotype code in Vcf.
 						// v1
-						homo_temp = vcfs.get(v1).getVariants(0)[0].getHomo();
+						homo_temp = vs_cur1[0].getHomo();
 						if(Vcf.containChar(homo_temp,'|')){
 							splitpipe.split(homo_temp);
 							homo1[0] = Integer.parseInt(splitpipe.getResultByIndex(0));
@@ -874,7 +877,7 @@ public class VcfReader {
 						}
 						
 						//v2
-						homo_temp = vcfs.get(v2).getVariants(0)[0].getHomo();
+						homo_temp = vs_cur2[0].getHomo();
 						if(Vcf.containChar(homo_temp,'|')){
 							splitpipe.split(homo_temp);
 							homo2[0] = Integer.parseInt(splitpipe.getResultByIndex(0));
@@ -897,8 +900,8 @@ public class VcfReader {
 							int idx1 = homo1[0]>0?homo1[0]-1:homo1[0];
 							int idx2 = homo2[0]>0?homo2[0]-1:homo2[0];
 							result_temp.add(
-									chr+":"+vs1[idx1].getFrom()+":"+vs1[idx1].getTo()+":"+vs1[idx1].getLetter()!=null?vs1[idx1].getLetter():"-"+";"+
-									chr+":"+vs2[idx2].getFrom()+":"+vs2[idx2].getTo()+":"+vs2[idx2].getLetter()!=null?vs2[idx2].getLetter():"-"+";"+
+									chr+":"+vs1[idx1].getFrom()+":"+vs1[idx1].getTo()+":"+(vs1[idx1].getLetter()!=null?vs1[idx1].getLetter():"-")+";"+
+									chr+":"+vs2[idx2].getFrom()+":"+vs2[idx2].getTo()+":"+(vs2[idx2].getLetter()!=null?vs2[idx2].getLetter():"-")+";"+
 									"0"+";"+
 									ld_temp[4]
 											);
@@ -909,8 +912,8 @@ public class VcfReader {
 							int idx1 = homo1[1]>0?homo1[1]-1:homo1[1];
 							int idx2 = homo2[1]>0?homo2[1]-1:homo2[1];
 							result_temp.add(
-									chr+":"+vs1[idx1].getFrom()+":"+vs1[idx1].getTo()+":"+vs1[idx1].getLetter()!=null?vs1[idx1].getLetter():"-"+";"+
-									chr+":"+vs2[idx2].getFrom()+":"+vs2[idx2].getTo()+":"+vs2[idx2].getLetter()!=null?vs2[idx2].getLetter():"-"+";"+
+									chr+":"+vs1[idx1].getFrom()+":"+vs1[idx1].getTo()+":"+(vs1[idx1].getLetter()!=null?vs1[idx1].getLetter():"-")+";"+
+									chr+":"+vs2[idx2].getFrom()+":"+vs2[idx2].getTo()+":"+(vs2[idx2].getLetter()!=null?vs2[idx2].getLetter():"-")+";"+
 									"1"+";"+
 									ld_temp[4]
 											);
