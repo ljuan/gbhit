@@ -22,6 +22,8 @@ var detail_icon;
 var functional_vnum = 0;
 function init_individual_vars(){
 	variants = [];
+	functional_v = {};
+	functional_vPointer = [];
 	genes = [];
 	symbols = [];
 	css = 0;
@@ -90,20 +92,22 @@ function init_individual_vars(){
 			var id = veNodes[j].getAttribute(xmlAttributeId);
 			var type = veNodes[j].getAttribute(xmlAttributeType);
 
+			var letter_trans = letter;
+
 			if(letter == "(" || letter == ")"){
-				letter = "ASS/DSS loss";
+				letter_trans = "ASS/DSS loss";
 			}else if (letter == "#"){
-				letter = "Frame shifting";
+				letter_trans = "Frame shifting";
 			}else if (letter == "^"){
-				letter = "Initiator loss";
+				letter_trans = "Initiator loss";
 			}else{
 				var texts = letter.split(":");
 				if(texts[0].indexOf("$") >= 0){
-					letter = "Stop loss";
+					letter_trans = "Stop loss";
 				}else if(texts[1].indexOf("$") >= 0){
-					letter = "Stop gain";
+					letter_trans = "Stop gain";
 				}else {
-					letter = texts[0] + "->" + texts[1];
+					letter_trans = texts[0] + "->" + texts[1];
 				}
 			}
 
@@ -119,11 +123,26 @@ function init_individual_vars(){
 			}
 			if(from <= variants[vPointer].from && to >= variants[vPointer].to && id == variants[vPointer].id){
 				if(variants[vPointer].functional == "--"){
-					variants[vPointer].functional = letter;
+					variants[vPointer].functional = letter_trans;
+					functional_v[from+":"+to+":"+letter] = vPointer;
 					functional_vnum++;
-				}else if(variants[vPointer].functional.indexOf(letter) < 0){
-					variants[vPointer].functional += ","+letter;
+					functional_vPointer[functional_vPointer.length] = vPointer;
+
+					variants[vPointer].functional_v = [];
+					variants[vPointer].functional_v[0] = {};
+					variants[vPointer].functional_v[0].from = from;
+					variants[vPointer].functional_v[0].to = to;
+					variants[vPointer].functional_v[0].letter = letter;
+				}else if(variants[vPointer].functional.indexOf(letter_trans) < 0){
+					variants[vPointer].functional += ","+letter_trans;
+					functional_v[from+":"+to+":"+letter] = vPointer;
 					functional_vnum++;
+
+					var fvidx = variants[vPointer].functional_v.length;
+					variants[vPointer].functional_v[fvidx] = {};
+					variants[vPointer].functional_v[fvidx].from = from;
+					variants[vPointer].functional_v[fvidx].to = to;
+					variants[vPointer].functional_v[fvidx].letter = letter;
 				}
 			}
 		}
@@ -176,36 +195,27 @@ function init_individual_vars(){
 				genes[j+enode_start].id = eNodes[j].getAttribute(xmlAttributeId);
 				genes[j+enode_start].omim = 1;*/
 			}
-			var subNodes = eNodes[j].getElementsByTagName(xmlTagSubElement);
-			if(subNodes.length > 0){
-				for(var sub = 0 ; sub < subNodes.length ; sub++){
-					var vNodes = subNodes[sub].getElementsByTagName(xmlTagVariant);
-					if(vNodes.length > 0){
-						var varstart = 0;
-						if(genes[j].vars == undefined){
-							genes[j].vars = [];
-						}else{
-							varstart = genes[j].vars.length;
-						}
-						for(var k = 0 ; k < vNodes.length ; k++){
-								genes[j].vars[varstart+k] = {};
-							if(genes[j].strand == "-"){
-								genes[j].vars[varstart+k].from = vNodes[vNodes.length-k-1].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue;
-								genes[j].vars[varstart+k].to = vNodes[vNodes.length-k-1].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
-								genes[j].vars[varstart+k].letter = vNodes[vNodes.length-k-1].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
-								genes[j].vars[varstart+k].id = vNodes[vNodes.length-k-1].getAttribute(xmlAttributeId);
-							} else {
-								genes[j].vars[varstart+k].from = vNodes[k].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue;
-								genes[j].vars[varstart+k].to = vNodes[k].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
-								genes[j].vars[varstart+k].letter = vNodes[k].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
-								genes[j].vars[varstart+k].id = vNodes[k].getAttribute(xmlAttributeId);
-							}
+			var vNodes = eNodes[j].getElementsByTagName(xmlTagVariant);
+			if(vNodes.length > 0){
+				if(genes[j].vars == undefined){
+					genes[j].vars = {};
+				}
+				for(var k = 0 ; k < vNodes.length ; k++){
+					var from = vNodes[k].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue;
+					var to = vNodes[k].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
+					var letter = vNodes[k].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
+					for(var fvidx = 0 ; fvidx < variants[functional_v[from+":"+to+":"+letter]].functional_v.length ; fvidx++){
+						if(from == variants[functional_v[from+":"+to+":"+letter]].functional_v[fvidx].from 
+						&& to == variants[functional_v[from+":"+to+":"+letter]].functional_v[fvidx].to 
+						&& letter == variants[functional_v[from+":"+to+":"+letter]].functional_v[fvidx].letter){
+							genes[j].vars[from+":"+to+":"+letter] = fvidx;
 						}
 					}
 				}
 			}
 		}
 	}
+	functional_vPointer.sort(sortNumber);
 }
 
 function show_axis(){
@@ -1215,6 +1225,30 @@ function plot_genes(){
 	var vari = 0;
 	var plotted_amino_var = {};
 	var current_pos = 0 - font_height;
+	for(var i = 0 ; i < functional_vPointer.length ; i++){
+		for(var fvidx = 0 ; fvidx < variants[functional_vPointer[i]].functional_v.length ; fvidx++){
+			var var_top = map_coord(l,variants[functional_vPointer[i]].functional_v[fvidx].from);
+			var var_bot = map_coord(l,variants[functional_vPointer[i]].functional_v[fvidx].to);
+			if(var_top == l || var_bot == 0){
+				continue;
+			}
+			var natual_pos = (var_top+var_bot)/2;
+			var name_pos = natual_pos;
+			natual_pos += R_top;
+			if(name_pos < current_pos + font_height){
+				name_pos = current_pos + font_height;
+			} else if(name_pos < vari*font_height){
+				name_pos = vari*font_height;
+			} else if(name_pos > l - (functional_vnum - vari - 1)*font_height){
+				name_pos = l - (functional_vnum - vari - 1)*font_height;
+			}
+			vari++;
+
+			current_pos = name_pos;
+			name_pos += R_top;
+			variants[functional_vPointer[i]].functional_v[fvidx].obj = draw_var(natual_pos,name_pos,l,box_width,variants[functional_vPointer[i]].functional_v[fvidx].letter);
+		}
+	}
 	for(var i = 0 ; i < genes.length ; i++){
 		genes[i].obj = R.set();
 		
@@ -1286,35 +1320,8 @@ function plot_genes(){
 			}
 		}
 		if(genes[i].vars != undefined){
-			for(var j = 0 ; j < genes[i].vars.length ; j++){
-				var var_top = map_coord(l,genes[i].vars[j].from);
-				var var_bot = map_coord(l,genes[i].vars[j].to);
-				if(var_top == l || var_bot == 0){
-					continue;
-				}
-				var natual_pos = (var_top+var_bot)/2;
-				var name_pos = natual_pos;
-				natual_pos += R_top;
-				if(plotted_amino_var[genes[i].vars[j].from+":"+genes[i].vars[j].to+":"+genes[i].vars[j].letter] == undefined){
-					if(name_pos < current_pos + font_height){
-						name_pos = current_pos + font_height;
-					} else if(name_pos < vari*font_height){
-						name_pos = vari*font_height;
-					} else if(name_pos > l - (functional_vnum - vari - 1)*font_height){
-						name_pos = l - (functional_vnum - vari - 1)*font_height;
-					}
-					vari++;
-					plotted_amino_var[genes[i].vars[j].from+":"+genes[i].vars[j].to+":"+genes[i].vars[j].letter] = name_pos;
-				} else {
-					name_pos = plotted_amino_var[genes[i].vars[j].from+":"+genes[i].vars[j].to+":"+genes[i].vars[j].letter];
-				}
-				current_pos = name_pos;
-				name_pos += R_top;
-
-				var temp = draw_var(natual_pos,name_pos,l,box_width,genes[i].vars[j].letter);
-				if(temp != null){
-					genes[i].obj.push(temp);
-				}
+			for(var fv in genes[i].vars){
+				genes[i].obj.push(variants[functional_v[fv]].functional_v[genes[i].vars[fv]].obj);
 			}
 		}
 	}
