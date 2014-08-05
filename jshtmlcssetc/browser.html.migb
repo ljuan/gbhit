@@ -26,7 +26,7 @@
 				<div class="plott_right" style="float:right;">
 					<div id="brdview" style="display:none;">
 						<div id="brd_genome" style="float:left"></div>
-						<div id="brd_genelist" style="float:left;overflow:auto;max-height:820px"></div>
+						<div id="brd_genelist" style="float:left;overflow:auto;height:890px"></div>
 					</div>
 					<div id="brwview" class="hover" style="overflow:auto">
 						<div id="navigators" style="width:100%;">
@@ -69,11 +69,11 @@
 					<table>
 						<tr>
 							<td>Name:</td>
-							<td><input id="track_name" size="45" placeholder="Please input data name here"/></td>
+							<td><input id="track_name" size="40" placeholder="Please input data name here"/></td>
 						</tr>
 						<tr>
 							<td>URL:</td>
-							<td><input id="vcf_url" type="text" size="45" placeholder="Please input the URL of tabix compressed and indexed VCF file"/></td>
+							<td><input id="vcf_url" type="text" size="40" placeholder="Please input the URL of tabix compressed and indexed VCF file"/></td>
 						</tr>
 						<tr>
 							<td>Pedigree:</td>
@@ -81,7 +81,7 @@
 						</tr>
 						<tr>
 							<td><input class="submitt" type="submit" onclick="load_vcf()" value="Load"/></td>
-							<td><input class="submitt" type="submit" onclick="load_family_genome('chr21',33031597,33041500)" value="Visualize"/></td>
+							<td><input class="submitt" type="submit" onclick="show_example()" value="Example"/></td>
 						</tr>
 					</table>
 					<span id="upload_success_vcf"></span>

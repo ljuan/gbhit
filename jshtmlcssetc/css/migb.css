@@ -1,0 +1,195 @@
+span#web-name{
+	color: #444;
+	float: center;
+	font: 32px "Trebuchet MS", Arial, sans-serif;
+/*	padding-top: 15px;*/
+	vertical-align: middle;
+}
+body{
+	background:#DDD;
+}
+.overall{
+	border: 1px;
+	margin: 3px;
+	padding: 2px;
+	color: #000000;
+	background: #DDD;
+	opacity: 1;
+	display: inline-block;
+	margin-left:auto;
+	margin-right:auto;
+	width:96%;
+	max-width:1500px;
+	min-width:1200px;
+	height:100%
+	font: 12px "Trebuchet MS", Arial, sans-serif;
+	text-align:left;
+	overflow:auto;
+}
+.titlee{
+	border: 1px solid #999;
+	border-bottom: 0px;
+	padding: 2px;
+	padding-bottom: 0px;
+	width:35%;
+	height:24px;
+	background:#999;
+	color: #FFF;
+	text-align:left;
+	font: 18px "Trebuchet MS", Arial, sans-serif;
+	position:relative;
+}
+.titlee ul{
+	list-style:none;
+	border: 0px solid #A00;
+	margin:0px 0px;
+	height:90%;
+	width:80%;
+}
+.titlee ul li{
+	border: 0px solid #666;
+	position:absolute;
+	bottom:0px;
+	float:left;
+	background: #666;
+	display:block;
+	cursor:pointer;
+	width:40%;
+	text-align:center;
+	color:#FFF;
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+}
+.titlee ul li.hover{
+	border: 0px solid #FFF;
+	background: #FFF;
+	color: #666;
+}
+.titlee_right{
+	border: 1px solid #999;
+	border-bottom: 0px;
+	padding: 2px;
+	padding-bottom: 0px;
+	width:60%;
+	height:24px;
+	background:#999;
+	color: #FFF;
+	text-align:left;
+	font: 18px "Trebuchet MS", Arial, sans-serif;
+	position:relative;
+}
+.titlee_right ul{
+	list-style:none;
+	border: 0px solid #A00;
+	margin:0px 0px;
+	height:90%;
+	width:90%;
+}
+.titlee_right ul li{
+	border: 0px solid #666;
+	position:absolute;
+	bottom:0px;
+	float:left;
+	background: #666;
+	display:block;
+	cursor:pointer;
+	width:30%;
+	text-align:center;
+	color:#FFF;
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+}
+.titlee_right ul li.hover{
+	border: 0px solid #FFF;
+	background: #FFF;
+	color: #666;
+}
+.blankblock{
+	border: 1px;
+	padding: 2px;
+	height:10px;
+}
+.uploadd{
+	border: 1px solid #999;
+	border-top: 0px;
+	padding: 2px;
+	color: #000000;
+	background: #FFF;
+	opacity: 1;
+	display: inline-block;
+	width:35%;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
+	text-align:left;
+	overflow:auto;
+}
+.plott{
+	border: 1px solid #999;
+	border-top: 0px;
+	padding: 2px;
+	color: #000000;
+	background: #FFF;
+	opacity: 1;
+	display: inline-block;
+	width:35%;
+	height:600px;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
+	text-align:left;
+	overflow:auto;
+}
+.plott_right{
+	border: 1px solid #999;
+	border-top: 0px;
+	padding: 2px;
+	color: #000000;
+	background: #FFF;
+	opacity: 1;
+	display: inline-block;
+	width:60%;
+	height:895px;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
+	text-align:left;
+	overflow:auto;
+}
+.listt_table{
+	width: 100%;
+	border:1px;
+	align: center;
+	valign: middle;
+}
+.submitt{
+}
+
+.ui-autocomplete {
+	width: 250px;
+	overflow-y: auto;
+	/* prevent horizontal scrollbar */
+	overflow-x: hidden;
+	white-space: nowrap;
+}
+#select_info{
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-bottom:5px;
+	background-color: #fff;
+	float:right;
+}
+#gene_info_name{
+	font: larger bolder Georgia, "Times New Roman", Times, serif;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+#gene_info_table{
+	width: 100%;
+	border:0;
+	font: small Arial, Helvetica, sans-serif;
+}
+/* IE 6 doesn't support max-height
+ * we use height instead, but this forces the menu to always be this tall
+ */
+* html .ui-autocomplete {
+	height: 300px;
+}
+
+.ui-corner-all{
+	font-size: 14px;
+}

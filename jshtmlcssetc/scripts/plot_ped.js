@@ -255,9 +255,9 @@ function plot_families(){
 	var baseline = height_unit/2;
 	var height = height_unit*families_meta_heightt;
 	var width = width_unit*(families_meta_widthh+3);
-	var widthlimit = document.body.clientWidth*0.9*0.45<720?document.body.clientWidth*0.9*0.45:720;
+	var widthlimit = document.body.clientWidth*0.96*0.35<540?document.body.clientWidth*0.96*0.35:540;
 	var mark_lablesize = 9;
-	var mark_labletext = mark_lablesize + "px Candara";
+	var mark_labletext = mark_lablesize + "px Trebuchet MS";
 	if(width < widthlimit){
 		width = widthlimit;
 	}

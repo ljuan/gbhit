@@ -174,32 +174,19 @@ function load_family_genome(chr,start,end){
 		alert("Outside the scope");
 		return;
 	}
-	var sets4 = "";
-	var sets5 = "";
-	var sets6 = "";
-	if(individuals[csi] != null
-	&& individuals[csi].fid != "0"
-	&& individuals[csi].mid != "0"){
-		sets4 = individuals[csi].fid
-			+":"+individuals[csi].mid
-			+","+csi;
-		sets5 = individuals[csi].fid
-			+","+individuals[csi].mid
-			+":"+csi;
-		sets6 = individuals[csi].mid
-			+","+individuals[csi].fid
-			+":"+csi;
-	} else {
-		alert("The individual/parents data is not available!");
+	if(individuals[csi] == null){
+		alert("The individual data is not available!");
 		return;
 	}
-	var querry = "action=refresh&width=850&chr="+chr+"&start="+start+"&end="+end;
-	req.open("GET","servlet/test.do?"+querry,false);
-	req.send(null);
-
-	current_chr = req.responseXML.getElementsByTagName(xmlTagChrNum)[0].childNodes[0].nodeValue;
-	current_start = parseInt(req.responseXML.getElementsByTagName(xmlTagStart)[0].childNodes[0].nodeValue);
-	current_end = parseInt(req.responseXML.getElementsByTagName(xmlTagEnd)[0].childNodes[0].nodeValue);
+	if(chr != current_chr || start != current_start || current_end != current_end){
+		var querry = "action=refresh&width=850&chr="+chr+"&start="+start+"&end="+end;
+		req.open("GET","servlet/test.do?"+querry,false);
+		req.send(null);
+	
+		current_chr = req.responseXML.getElementsByTagName(xmlTagChrNum)[0].childNodes[0].nodeValue;
+		current_start = parseInt(req.responseXML.getElementsByTagName(xmlTagStart)[0].childNodes[0].nodeValue);
+		current_end = parseInt(req.responseXML.getElementsByTagName(xmlTagEnd)[0].childNodes[0].nodeValue);
+	}
 
 	document.getElementById("brwplot").innerHTML = "";
 	R = Raphael("brwplot",R_width+100,R_height);
@@ -213,77 +200,6 @@ function load_family_genome(chr,start,end){
 	req3.send(null);
 }
 
-function funnypie(l) {
-	document.getElementById("piestat").innerHTML="";
-	var iDataInfo=[];
-	var iCodInfo=[];
-	var S=Raphael("piestat",400,l+30);
-	var SpathsD = S.set();
-	var SpathsC = S.set();
-	for(k=0;k<7;k++){
-		SpathsD.push(S.path().attr({segment: [200, 150, 130, 0, 0], stroke: "#fff"}));
-		SpathsC.push(S.path().attr({segment: [200, 430, 130, 0, 0], stroke: "#fff"}));
-	}
-	function changeStat(track, sample, region) {
-		iDataInfo=[];
-		iCodInfo=[];
-		for(k=0;k<7;k++){
-			iDataInfo[k]=Math.ceil(Math.random()*(100-0)+0);
-			iCodInfo[k]=Math.ceil(Math.random()*(150-25)+25);
-		}
-		animatePortion(1500,SpathsD,iDataInfo,200,150,130);
-		animatePortion(1500,SpathsC,iCodInfo,200,430,130);
-	}
-
-	S.customAttributes.segment = function (x, y, r, a1, a2) {
-		var flag = (a2 - a1) > 180,
-		clr = (a2 - a1) / 360;
-		a1 = (a1 % 360) * Math.PI / 180;
-		a2 = (a2 % 360) * Math.PI / 180;
-		return {
-			path: [["M", x, y], ["l", r * Math.cos(a1), r * Math.sin(a1)], ["A", r, r, 0, +flag, 1, x + r * Math.cos(a2), y + r * Math.sin(a2)], ["z"]],
-			fill: "hsb(" + clr + ", .75, .8)"
-		};
-	};
-	function animatePortion(ms,paths,data,x,y,r) {
-		var Sstart = 0,
-		Sval, Stotal=0;
-		for (k = 0; k < data.length; k++) {
-			Stotal+=data[k];
-		}
-		for (k = 0; k < data.length; k++) {
-			Sval = 360 / Stotal * data[k];
-			paths[k].animate({segment: [x, y, r, Sstart, Sstart += Sval]}, ms || 1500, "bounce");
-			paths[k].angle = Sstart - Sval / 2;
-			(function (p){
-				p[0].onmouseover = function(){
-					p.stop().animate({transform: "s1.1 1.1 "+x+" "+y},1500,"elastic");
-				};
-				p[0].onmouseout = function(){
-					p.stop().animate({transform: ""},1500,"elastic");
-				};
-			})(paths[k]);
-		}
-	}
-
-	changeStat("1000g","HG000000","chr21:33034500-33045600");
-	var cs_text = S.text(200,l+18,"changeStat").attr({font: "14px Candara",opacity:1}).attr({fill: "#222"});
-	var cs_button = S.rect(120,l+6,160,24,3).attr({fill:"#666",stroke:"#999",opacity:0.5,"stroke-width":0});
-	var animaTime=200;
-	(function (cs_button){
-		cs_button[0].style.cursor = "pointer";
-		cs_text[0].style.cursor = "pointer";
-		cs_button[0].onmouseover = function(){
-			cs_button.animate({fill:"#999"},animaTime);
-		};
-		cs_button[0].onclick = function(){
-			changeStat("1000g","HG000000","chr21:33034500-33045600");
-		};
-		cs_button[0].onmouseout = function(){
-			cs_button.animate({fill:"#666"},animaTime);
-		};
-	})(cs_button);
-}
 function setTabb(name){
 	if(name=="pedtree"){
 		document.getElementById("pedtree_li").className="hover";

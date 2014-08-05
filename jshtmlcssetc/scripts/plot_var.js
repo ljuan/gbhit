@@ -320,17 +320,27 @@ function show_axis(){
 	});
 
 	if(individuals[csi] != undefined){
-		var color = "#FFF";
-		if(individuals[individuals[csi].fid].affected == "1"){
-			color = colO;
+		var color = colO;
+		if(individuals[csi].fid != "0" && individuals[csi].mid != "0"){
+			color = "#FFF";
+			if(individuals[individuals[csi].fid].affected == "1"){
+				color = colO;
+			}
+			R.rect(R_left+w/2+20,5,20,20,0).attr({fill:color,stroke:colO,"stroke-width":1});
+	
+			color = "#FFF";
+			if(individuals[individuals[csi].mid].affected == "1"){
+				color = colO;
+			}
+			R.ellipse(R_left+w/2-30,15,10,10).attr({fill:color,stroke:colO,"stroke-width":1});
+			R.path("M"+(R_left+w/2-20)+",15 L"+(R_left+w/2+20)+",15").attr({stroke:colO,"stroke-width":1});
+			R.path("M"+(R_left+w/2)+",15 L"+(R_left+w/2)+","+(R_top-25)).attr({stroke:colO,"stroke-width":1});
+	
+			R.text(R_left+w/2+42,15,individuals[csi].fid).attr({font:font_size2_text,fill:colP,"text-anchor":"start"});
+			R.text(R_left+w/2-42,15,individuals[csi].mid).attr({font:font_size2_text,fill:colM,"text-anchor":"end"});
+			color = colD;
 		}
-		R.rect(R_left+w/2+20,5,20,20,0).attr({fill:color,stroke:colO,"stroke-width":1});
-
-		color = "#FFF";
-		if(individuals[individuals[csi].mid].affected == "1"){
-			color = colO;
-		}
-		R.ellipse(R_left+w/2-30,15,10,10).attr({fill:color,stroke:colO,"stroke-width":1});
+		R.text(R_left+w/2+12,R_top-15,csi).attr({font:font_size2_text,fill:color,"text-anchor":"start"});
 
 		color = "#FFF";
 		if(individuals[csi].affected == "1"){
@@ -342,12 +352,6 @@ function show_axis(){
 			R.ellipse(R_left+w/2,R_top-15,10,10).attr({fill:color,stroke:colO,"stroke-width":1});
 		}
 
-		R.path("M"+(R_left+w/2-20)+",15 L"+(R_left+w/2+20)+",15").attr({stroke:colO,"stroke-width":1});
-		R.path("M"+(R_left+w/2)+",15 L"+(R_left+w/2)+","+(R_top-25)).attr({stroke:colO,"stroke-width":1});
-
-		R.text(R_left+w/2+42,15,individuals[csi].fid).attr({font:font_size2_text,fill:colP,"text-anchor":"start"});
-		R.text(R_left+w/2-42,15,individuals[csi].mid).attr({font:font_size2_text,fill:colM,"text-anchor":"end"});
-		R.text(R_left+w/2+12,R_top-15,csi).attr({font:font_size2_text,fill:colD,"text-anchor":"start"});
 	}
 }
 ////////////////////////////////////////////////////////////////////
@@ -701,12 +705,14 @@ function show_vars(){
 					+","+individuals[csi].fid
 					+":"+csi;
 			*/
-
-			req5.onreadystatechange = show_colorful_vars;
-			querry = "action=trioAnalysis&tracks="+trackname+"&chr="+current_chr+"&start="+current_start+"&end="+current_end+"&id="+csi;
-			req5.open("GET","servlet/test.do?"+querry,true);
-			req5.send();
-			
+			if(individuals[csi].fid != "0" && individuals[csi].mid != "0"){
+				req5.onreadystatechange = show_colorful_vars;
+				querry = "action=trioAnalysis&tracks="+trackname+"&chr="+current_chr+"&start="+current_start+"&end="+current_end+"&id="+csi;
+				req5.open("GET","servlet/test.do?"+querry,true);
+				req5.send();
+			}else{
+				R_sremove();
+			}
 			/*
 			var form5 = new FormData();
 			form5.append("sets",sets5);
@@ -981,8 +987,8 @@ function show_same_collectionvar(){
 			*/
 			if(csi!=undefined){	
 				for(var family_member in families){
-					for(var temp_root in families[csi].markobj){
-						if(family_member != "roots" && individuals[family_member].ifs == "true" && families[family_member].markobj[temp_root] != undefined){
+					if(family_member != "roots" && individuals[family_member].ifs == "true" && families[family_member].markobj != undefined){
+						for(var temp_root in families[family_member].markobj){
 							families[family_member].markobj[temp_root].hide();
 						}
 					}
@@ -1036,8 +1042,8 @@ function select_a_variant(idx,color){
 		var radioObj = document.getElementById(idx+"__varlist_select")
 		if(variants[idx].selected){
 			for(var family_member in families){
-				for(var temp_root in families[csi].markobj){
-					if(family_member != "roots" && individuals[family_member].ifs == "true" && families[family_member].markobj[temp_root] != undefined){
+				if(family_member != "roots" && individuals[family_member].ifs == "true" && families[family_member].markobj != undefined){
+					for(var temp_root in families[family_member].markobj){
 						families[family_member].markobj[temp_root].hide();
 					}
 				}
@@ -1048,9 +1054,13 @@ function select_a_variant(idx,color){
 			if(variants[idx].name != undefined){
 				if(variants[idx].genotypes[0] != undefined && variants[idx].genotypes[0] != "0"){
 					variants[idx].name[0].attr({"font-weight":"normal"});
+					variants[idx].point[0].attr({"stroke-width":1});
+					variants[idx].lines[0].attr({"stroke-width":1});
 				}
 				if(variants[idx].genotypes[1] != undefined && variants[idx].genotypes[1] != "0"){
 					variants[idx].name[1].attr({"font-weight":"normal"});
+					variants[idx].point[1].attr({"stroke-width":1});
+					variants[idx].lines[1].attr({"stroke-width":1});
 				}
 			}
 			csv = -1;
@@ -1083,9 +1093,13 @@ function select_a_variant(idx,color){
 				if(variants[csv].name != undefined){
 					if(variants[csv].genotypes[0] != undefined && variants[csv].genotypes[0] != "0"){
 						variants[csv].name[0].attr({"font-weight":"normal"});
+						variants[csv].point[0].attr({"stroke-width":1});
+						variants[csv].lines[0].attr({"stroke-width":1});
 					}
 					if(variants[csv].genotypes[1] != undefined && variants[csv].genotypes[1] != "0"){
 						variants[csv].name[1].attr({"font-weight":"normal"});
+						variants[csv].point[1].attr({"stroke-width":1});
+						variants[csv].lines[1].attr({"stroke-width":1});
 					}
 				}
 			}
@@ -1095,9 +1109,13 @@ function select_a_variant(idx,color){
 			if(variants[idx].name != undefined){
 				if(variants[idx].genotypes[0] != undefined && variants[idx].genotypes[0] != "0"){
 					variants[idx].name[0].attr({"font-weight":"bolder"});
+					variants[idx].point[0].attr({"stroke-width":2});
+					variants[idx].lines[0].attr({"stroke-width":2});
 				}
 				if(variants[idx].genotypes[1] != undefined && variants[idx].genotypes[1] != "0"){
 					variants[idx].name[1].attr({"font-weight":"bolder"});
+					variants[idx].point[1].attr({"stroke-width":2});
+					variants[idx].lines[1].attr({"stroke-width":2});
 				}
 			}
 			csv = idx;
