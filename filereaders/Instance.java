@@ -995,7 +995,7 @@ public class Instance {
 				if(PvarID!=null&&!track.get_ID().equals(PvarID))
 					ele_var.setAttribute(Consts.XML_TAG_ID, "_"+PvarID);
 				Ele_var = new Individual(ele_var).mergeWithDBSNP(CfgReader.getBasic(Assembly,Consts.FORMAT_SNP).get_Path(Chr), Chr, Coordinate[0], Coordinate[1], doc);
-				if(scoremeth!=null){
+				if(scoremeth!=null && !scoremeth.equals("Family")){
 					Ele_var = Annovar.score_vars(doc, Ele_var, scoremeth, Chr, rr);
 					add_att_ifParam(track,Ele_var);
 				}

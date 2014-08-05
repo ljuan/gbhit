@@ -142,7 +142,7 @@ class Annovar{
 			if(v.getType().equals(Consts.VARIANT_TYPE_SNV))
 				bw.write(chr_simple+"\t"+v.getFrom()+"\t"+v.getTo()+"\t"+fr.extract_char(chr, v.getFrom())+"\t"+v.getLetter()+"\n");
 			else if(v.getType().equals(Consts.VARIANT_TYPE_INSERTION))
-				if(v.getLetter().length()<50)
+				if(v.getLetter()!=null && v.getLetter().length()<50)
 					bw.write(chr_simple+"\t"+v.getFrom()+"\t"+v.getFrom()+"\t-\t"+v.getLetter()+"\n");
 			else if(v.getType().equals(Consts.VARIANT_TYPE_DELETION))
 				if(v.getTo()-v.getFrom()<50)
