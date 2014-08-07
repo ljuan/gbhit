@@ -446,12 +446,8 @@ public class VcfReader {
 			variants[0] = new Variants(track, null, doc, mode, bpp, bppLimit, -1, null);
 		} else {
 			// Personal Genemic VCF
-			variants = new Variants[selectedIndexes.length];
-			String[] selectedNames = vcfSample.getSelectedNames();
-			int selectedLen = selectedIndexes.length;
-			for (int i = 0; i < selectedLen; i++) {
-				variants[i] = new Variants(track, selectedNames[i], doc, mode, bpp, bppLimit, qualLimit, filterLimit);
-			}
+			variants = new Variants[1];
+			variants[0] = new Variants(track, "Intersection", doc, mode, bpp, bppLimit, qualLimit, filterLimit);
 		}
 		Vcf vcf = null;
 		try {
@@ -466,8 +462,7 @@ public class VcfReader {
 			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start
 					+ "-" + end);
 			if (Query != null) {
-				int len = variants.length;
-				Variant[][] vs = new Variant[len][];
+				Variant[] vs = null;
 				boolean siNotNull = selectedIndexes != null;
 				while (Query.next() != null) {
 					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, samplesNum, selectedIndexes);
@@ -478,11 +473,8 @@ public class VcfReader {
 					if (!vcf.isDBSnp() && siNotNull) {
 						// Personal Genemic VCF
 						vs = vcf.getVariants_intersection(selectedIndexes.length);
-						if(vs == null)
-							continue;
-						for (int i = 0; i < len; i++) 
-							if (vs[i] != null)
-								variants[i].addVariant(vcf,i, vs[i]);
+						if (vs != null)
+							variants[0].addVariant(vcf,-1, vs);
 						vs = null;
 					} 
 				}
@@ -549,12 +541,8 @@ public class VcfReader {
 			variants[0] = new Variants(track, null, doc, mode, bpp, bppLimit, -1, null);
 		} else {
 			// Personal Genemic VCF
-			variants = new Variants[selectedIndexes.length];
-			String[] selectedNames = vcfSample.getSelectedNames();
-			int selectedLen = selectedIndexes.length;
-			for (int i = 0; i < selectedLen; i++) {
-				variants[i] = new Variants(track, selectedNames[i], doc, mode, bpp, bppLimit, qualLimit, filterLimit);
-			}
+			variants = new Variants[1];
+			variants[0] = new Variants(track, "Difference", doc, mode, bpp, bppLimit, qualLimit, filterLimit);
 		}
 		Vcf vcf = null;
 		try {
@@ -569,8 +557,7 @@ public class VcfReader {
 			TabixReaderForVCF.Iterator Query = vcf_tb.query(chrom + ":" + start
 					+ "-" + end);
 			if (Query != null) {
-				int len = variants.length;
-				Variant[][] vs = new Variant[len][];
+				Variant[] vs = null;
 				boolean siNotNull = selectedIndexes != null && selectedIndexes_a != null && selectedIndexes_b != null;
 				while (Query.next() != null) {
 					vcf = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, samplesNum, selectedIndexes);
@@ -581,11 +568,8 @@ public class VcfReader {
 					if (!vcf.isDBSnp() && siNotNull) {
 						// Personal Genome VCF
 						vs = vcf.getVariants_difference(selectedIndexes_a,selectedIndexes_b);
-						if(vs == null)
-							continue;
-						for (int i = 0; i < len; i++) 
-							if (vs[i] != null)
-								variants[i].addVariant(vcf,i, vs[i]);
+						if (vs != null)
+							variants[0].addVariant(vcf,-1, vs);
 						vs = null;
 					} 
 				}

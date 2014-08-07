@@ -665,11 +665,9 @@ public class Vcf {
 
 		return vs;
 	}
-	public Variant[][] getVariants_intersection(int indexlen) {
+	public Variant[] getVariants_intersection(int indexlen) {
 		if (!samples.containGT()){
-			Variant[][] vs=new Variant[1][];
-			vs[0]=variants;
-			return vs;
+			return variants;
 		}
 		int[] votes={0,0,0,0,0,0,0,0,0,0};
 		
@@ -692,22 +690,15 @@ public class Vcf {
 		for(int i=0;i<10;i++)
 			if(votes[i]==indexlen)
 				vIndexes[num++]=i;
-		Variant[][] vs = new Variant[indexlen][];
-		for(int i=0;i<indexlen;i++)
-			vs[i]=new Variant[vIndexes.length];
+		Variant[] vs = new Variant[vIndexes.length];
 		
 		int len = 0;
 
 		for (int vIndex : vIndexes) {
-			for(int i=0;i<indexlen;i++){
-				vs[i][len] = Variant.copy(variants[vIndex - 1]);
-				vs[i][len].setHomo(samples.getHome(i));
-			}
-			len++;
+			vs[len++] = variants[vIndex - 1];
 		}
 		if (len > 1) 
-			for(int i=0;i<indexlen;i++)
-				Arrays.sort(vs[i]);
+			Arrays.sort(vs);
 
 		return vs;
 	}
@@ -821,11 +812,9 @@ public class Vcf {
 
 		return vs;
 	}
-	public Variant[][] getVariants_difference(int[] indexes_a,int[] indexes_b) {
+	public Variant[] getVariants_difference(int[] indexes_a,int[] indexes_b) {
 		if (!samples.containGT()){
-			Variant[][] vs=new Variant[1][];
-			vs[0]=variants;
-			return vs;
+			return variants;
 		}
 		boolean[] votes_a={true,true,true,true,true,true,true,true,true,true};
 		int[] votes_b={0,0,0,0,0,0,0,0,0,0};
@@ -860,22 +849,15 @@ public class Vcf {
 		System.arraycopy(indexes_a, 0, indexes, 0, indexes_a.length);
 		System.arraycopy(indexes_b, 0, indexes, indexes_a.length, indexes_b.length);
 		
-		Variant[][] vs = new Variant[indexes.length][];
-		for(int i=0;i<indexes.length;i++)
-			vs[i]=new Variant[vIndexes.length];
+		Variant[] vs = new Variant[vIndexes.length];
 		
 		int len = 0;
 
 		for (int vIndex : vIndexes) {
-			for(int i=0;i<indexes.length;i++){
-				vs[i][len] = Variant.copy(variants[vIndex - 1]);
-				vs[i][len].setHomo(samples.getHome(indexes[i]));
-			}
-			len++;
+			vs[len++] = Variant.copy(variants[vIndex - 1]);
 		}
 		if (len > 1) 
-			for(int i=0;i<indexes.length;i++)
-				Arrays.sort(vs[i]);
+			Arrays.sort(vs);
 
 		return vs;
 	}
