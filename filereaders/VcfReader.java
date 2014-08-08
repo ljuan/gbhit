@@ -337,8 +337,24 @@ public class VcfReader {
 						end = start = Integer.parseInt(line_temp[1]);
 						
 						for(int j=0;j<line_alts.length;j++){
-							//need to add codes to process <INS> <INV> <TRA> <DEL> <DUP> <CNV> ...
-							if(line_temp[3].length() < line_alts[j].length()){
+							if(line_alts[j].indexOf("<")>=0){
+							//process <INS> <INV> <TRA> <DEL> <DUP> <CNV> ...
+								Variant var  = new Vcf(vcf_tb.lineInChars, vcf_tb.numOfChar, 0, null).getVariants(false)[0];
+								if (var==null)
+									continue;
+								start = var.getFrom();
+								end = var.getTo();
+								if(vs.containsKey(temp[0]+":"+start+":"+end+":-")){
+									for(int n=0;n<sampleNames.length;n++){
+										int temp_len=line_temp[n+9].indexOf(":")==-1?line_temp[n+9].length():line_temp[n+9].indexOf(":");
+										if(line_temp[n+9].substring(0,temp_len).indexOf(String.valueOf(j+1))>=0)
+											sampleVotes[n]++;
+										sampleGT[n][i]=line_temp[n+9].substring(0,temp_len);
+									}
+									vs.remove(temp[0]+":"+start+":"+end+":-");
+								}
+							}
+							else if(line_temp[3].length() < line_alts[j].length()){
 								start += line_temp[3].length()-1;
 								end = start+1;
 								if(vs.containsKey(temp[0]+":"+start+":"+end+":"+line_alts[j].substring(line_temp[3].length()))){
