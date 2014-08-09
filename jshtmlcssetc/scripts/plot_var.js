@@ -10,10 +10,10 @@ var colM_hover = "#66bd63"; //maternal var color
 var colO = "#000000"; //black
 var colO_hover = "#636363"; //black hover
 var colO_hover2 = "#bdbdbd"; //black hover
-var colInter = "#c51b7d";//intersection color
-var colInter_hover = "#e9a3c9";//intersection color hover
-var colDiff = "#c51b7d";//difference color
-var colDiff_hover = "#e9a3c9";//difference color hover
+var colInter = "#542788";//intersection color
+var colInter_hover = "#998ec3";//intersection color hover
+var colDiff = "#542788";//difference color
+var colDiff_hover = "#998ec3";//difference color hover
 
 ///////////////
 var restrictX;

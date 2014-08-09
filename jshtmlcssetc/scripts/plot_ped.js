@@ -35,6 +35,13 @@ function plan_pedigree() {
 					families[individuals[id].mid].rmo = id;
 				}
 			}
+
+			ind_ids = [];
+			for(var id in individuals){
+				ind_ids[ind_ids.length] = id;
+			}
+			ind_ids.sort();
+
 			families_meta_heightt = 0;
 			families_meta_widthh = 0;
 			families.roots = {};
@@ -412,7 +419,9 @@ function list_individuals(){
 		"<th>Gender</th>"+
 		"<th>Affected</th>"+
 		"<th>Checked</th>";
-	for(var id in individuals){
+
+	for(var i = 0 ; i < ind_ids.length ; i++){
+		var id = ind_ids[i];
 		var father = "--";
 		var mother = "--";
 		var gender = "Female";

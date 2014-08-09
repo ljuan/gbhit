@@ -31,7 +31,7 @@ var subElementTypeBandValue = "D";
 var subElementTypeLineValue = "L";
 var xmlTagDirection = "s";
 
-var trackname = "1000genome_ASW";
+var trackname = "1000g_p3_hasrel";
 var csi = "--"; // Current Selected Individual (id)
 var current_chr = "chr21";
 var current_start = 33031597;
@@ -40,6 +40,11 @@ var current_end = 33041500;
 var csv= -1; // Current Selected Variant (index)
 
 var variants = [];
+var variants_byid = {};
+var functional_v = {};
+var functional_vPointer = [];
+var compared_individuals = {};
+var compare_method = "trioAnalysis";
 var genes = [];
 var symbols = {};
 var css = 0; // Current Selected Symbol (index)
@@ -47,6 +52,7 @@ var cssObj = null;
 var cst = 0; // Current Selected Transcript (gene index)
 var cstObj = null;
 var individuals = {};
+var ind_ids = []; //sorted individual ids
 var families = {};
 var chrs = [];
 var control_scanning;
@@ -86,8 +92,11 @@ var req = createXMLHttpRequest();
 var req2 = createXMLHttpRequest(); //for getPedigree
 var req3 = createXMLHttpRequest(); //for addPvar
 var req4 = createXMLHttpRequest(); //for getDifference f,m vs o
+///////////
 var req5 = createXMLHttpRequest(); //for getDifference m,o vs f
+////////// now is show colorful vars
 var req6 = createXMLHttpRequest(); //for getDifference f,o vs m
+var req7 = createXMLHttpRequest(); //for getLD
 
 var reqV = createXMLHttpRequest();
 
@@ -121,6 +130,10 @@ for(var idx=0;idx<chrs_temp.length;idx++){
 }
 
 querry1 = "action=refresh&width=850&end="+current_end+"&start="+current_start+"&chr="+current_chr;
+req.open("GET","servlet/test.do?"+querry1,false);
+req.send(null);
+
+querry1 = "action=initPvar&tracks="+trackname+"&id=NA19685";
 req.open("GET","servlet/test.do?"+querry1,false);
 req.send(null);
 
@@ -160,9 +173,18 @@ function load_vcf(){
 }
 
 function load_individuals(){
+	if(document.getElementById("track_name").value==null || document.getElementById("track_name").value==""){
+		if(trackname != null && trackname != ""){
+			document.getElementById("track_name").value = trackname;
+		}else{
+			return;
+		}
+	}
 	req2.onreadystatechange = plan_pedigree;
 	individuals = {};
+	compared_individuals = {};
 	families = {};
+	compare_method = "trioAnalysis";
 	var querry = "action=getPedigree&tracks=" + trackname;
 	document.getElementById("pedplot").innerHTML="";   
 	req2.open("GET","servlet/test.do?"+querry,true);
@@ -174,8 +196,8 @@ function load_family_genome(chr,start,end){
 		alert("Outside the scope");
 		return;
 	}
-	if(individuals[csi] == null){
-		alert("The individual data is not available!");
+	if(individuals[csi] == undefined || individuals[csi] == null){
+		alert("Please select an available individual.");
 		return;
 	}
 	if(chr != current_chr || start != current_start || current_end != current_end){
@@ -239,6 +261,91 @@ function setTabb(name){
 		document.getElementById("varlist").style.display="none";
 	}
 }
+function close_shared_different(){
+	document.getElementById("SD_window").style.display = "none";
+}
+function call_shared_different(){
+	var topp = $("#brwplot").position().top + R_top;
+	var leftt = $("#brwplot").position().left + R_left + (R_width-R_left-R_right)/2 + 10;
+	$(document.getElementById("SD_window")).css("display","block");
+	$(document.getElementById("SD_window")).css("top",topp);
+	$(document.getElementById("SD_window")).css("left",leftt);
+	document.getElementById("shared_different").innerHTML = "";
+	var temp = document.createElement("table");
+	document.getElementById("shared_different").appendChild(temp);
+	temp.className = "listt_table";
+	temp.id = "share_diff_table";
+
+	var temp_tr = temp.insertRow(-1);
+	temp_tr.innerHTML = 
+		"<th rowspan=\"2\">Highlight</th>"+
+		"<th></th>"+
+		"<th>shared</th>"+
+		"<th rowspan=\"2\">variants with:</th>";
+	var radioObj = document.createElement("input");
+	temp_tr.cells[1].appendChild(radioObj);
+	radioObj.type = "radio";
+	radioObj.name = "share_diff_select";
+	radioObj.id = "getIntersection_select";
+	if(compare_method == "getIntersection"){
+		radioObj.checked = true;
+	}
+	radioObj.onclick = function(event){
+		var target = event.target || event.srcElement;
+		var id = target.getAttribute("id").split("_")[0];
+		compare_method = id;
+	}
+
+	temp_tr = temp.insertRow(-1);
+	temp_tr.innerHTML =
+		"<th></th>"+
+		"<th>different</th>";
+	radioObj = document.createElement("input");
+	temp_tr.cells[0].appendChild(radioObj);
+	radioObj.type = "radio";
+	radioObj.name = "share_diff_select";
+	radioObj.id = "getDifference_select";
+	if(compare_method == "getDifference"){
+		radioObj.checked = true;
+	}
+	radioObj.onclick = function(event){
+		var target = event.target || event.srcElement;
+		var id = target.getAttribute("id").split("_")[0];
+		compare_method = id;
+	}
+
+	for(var i = 0 ; i < ind_ids.length ; i++){
+		var id = ind_ids[i];
+		if(id == csi){
+			continue;
+		}
+		temp_tr = temp.insertRow(-1);
+		temp_tr.innerHTML = "<td colspan=\"3\"></td><td></td>";
+		temp_tr.cells[0].innerHTML = id;
+		var checkboxObj = document.createElement("input");
+		temp_tr.cells[1].appendChild(checkboxObj);
+		checkboxObj.type = "checkbox";
+		checkboxObj.name = "share_diff_indlist";
+		checkboxObj.id = id+"__shared_diff_indlist";
+		checkboxObj.value = id;
+		if(compared_individuals[id] != undefined){
+			checkboxObj.checked = true;
+		}
+		checkboxObj.onclick = function(event){
+			var bol = $("input[type=checkbox][name=share_diff_indlist]:checked").length >= 9;
+			$("input[type=checkbox][name=share_diff_indlist]").not(":checked").attr("disabled",bol);
+			var target = event.target || event.srcElement;
+			if(compared_individuals[target.getAttribute("id").split("__")[0]] != undefined){
+				delete compared_individuals[target.getAttribute("id").split("__")[0]];
+			}else{
+				compared_individuals[target.getAttribute("id").split("__")[0]] = 1;
+			}
+		}
+	}
+	var bol = $("input[type=checkbox][name=share_diff_indlist]:checked").length >= 9;
+	$("input[type=checkbox][name=share_diff_indlist]").not(":checked").attr("disabled",bol);
+}
+
 function show_example(){
 	document.getElementById("track_name").value = "trio_example";
 	document.getElementById("vcf_url").value = "http://202.118.228.68/gbfiles/NA12878.trio.snp.vcf.gz";
@@ -283,4 +390,7 @@ function spinner(S){
 	    	sectors[i].hide();
 		}
 	}; 
+}
+function sortNumber (a,b) {
+	return a - b;
 }
