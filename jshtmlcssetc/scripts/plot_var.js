@@ -732,7 +732,14 @@ function clear_colorful_vars(){
 	}
 }
 function highlight_vars(){
-	var len = $("input[type=checkbox][name=share_diff_indlist]:checked").length;
+	var len = 0;
+	for(id in compared_individuals){
+		if(id == csi){
+			delete compared_individuals[id];
+		}else{
+			len++;
+		}
+	}
 	clear_colorful_vars();
 	close_shared_different();
 	if((compare_method == "getDifference" || compare_method == "getIntersection") 
@@ -1282,6 +1289,8 @@ function select_a_variant(idx,color){
 }
 
 function change_variant_color(vPointer,color){
+	var l = R_height - R_top - R_bottom;
+	var w = R_width - R_left - R_right;
 	if(variants[vPointer].name != undefined){
 
 		var color2 = colO_hover;
@@ -1336,7 +1345,7 @@ function change_variant_color(vPointer,color){
 			})(vPointer,color);
 		}
 	}
-	if(variants[vPointer].point != undefined){
+	if(variants[vPointer].point != undefined && variants.length < l/3){
 		if(variants[vPointer].genotypes[0] != undefined && variants[vPointer].genotypes[0] != "0"){
 			variants[vPointer].point[0].attr({fill:color,stroke:color}).toFront();
 		}
@@ -1344,8 +1353,6 @@ function change_variant_color(vPointer,color){
 			variants[vPointer].point[1].attr({fill:color,stroke:color}).toFront();
 		}
 	} else if(color != colO){
-		var l = R_height - R_top - R_bottom;
-		var w = R_width - R_left - R_right;
 		var natual_pos = ((variants[vPointer].to+variants[vPointer].from)/2 - current_start)/(current_end - current_start + 1)*l + R_top;
 		variants[vPointer].point = [];
 		if(variants[vPointer].genotypes[0] != undefined && variants[vPointer].genotypes[0] != "0"){
@@ -1354,10 +1361,16 @@ function change_variant_color(vPointer,color){
 		if(variants[vPointer].genotypes[1] != undefined && variants[vPointer].genotypes[1] != "0"){
 			variants[vPointer].point[1] = R.ellipse(R_left+w/2+30,natual_pos,2,2).attr({fill:color,stroke:color});
 		}
-	} else if(variants.length > (R_height - R_top - R_bottom)/3){
-		variants[vPointer].point[0].remove();
-		variants[vPointer].point[1].remove();
-		variants[vPointer].point = undefined;
+	} else if(variants.length >= l/3){
+		if(variants[vPointer].point != undefined){
+			if(variants[vPointer].point[0] != undefined){
+				variants[vPointer].point[0].remove();
+			}
+			if(variants[vPointer].point[1] != undefined){
+				variants[vPointer].point[1].remove();
+			}
+			delete variants[vPointer].point;
+		}
 	}
 	if(variants[vPointer].lines != undefined){
 		if(variants[vPointer].genotypes[0] != undefined && variants[vPointer].genotypes[0] != "0"){
