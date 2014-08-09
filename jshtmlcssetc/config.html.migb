@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<root>
+	<Assembly id="hg19">
+		<Anno id="Reference" group="Basic">
+			<Path>/home/ljuan/gbdata/hg19/hg19.noMT.fa</Path>
+			<Default>dense</Default>
+			<Format>REF</Format>
+		</Anno>
+		<Anno id="cytoBand" group="Basic">
+			<Path>/home/ljuan/gbdata/hg19/cytoBand.hg19.noMT.txt</Path>
+			<Default>dense</Default>
+			<Format>CYTO</Format>
+		</Anno>
+		<Anno id="Snp" group="Basic">
+			<Path>/home/ljuan/gbdata/hg19/dbsnp141.hg19.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>SNP</Format>
+		</Anno>
+		<Anno id="Genes" group="Basic">
+			<Path>/home/ljuan/gbdata/hg19/hgnc.hg19.sorted.txt</Path>
+			<Default>hide</Default>
+			<Format>HGNC</Format>
+		</Anno>
+		<Anno id="Annovar" group="Basic">
+			<Path>/home/ljuan/gbdata/annovar/</Path>
+			<Default>hide</Default>
+			<Format>ANNOVAR</Format>
+		</Anno>
+		<Anno id="1000g_p3_LD" group="Basic">
+			<Path key="chr1">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr1.hg19.ld.gz</Path>
+			<Path key="chr2">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr2.hg19.ld.gz</Path>
+			<Path key="chr3">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr3.hg19.ld.gz</Path>
+			<Path key="chr4">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr4.hg19.ld.gz</Path>
+			<Path key="chr5">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr5.hg19.ld.gz</Path>
+			<Path key="chr6">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr6.hg19.ld.gz</Path>
+			<Path key="chr7">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr7.hg19.ld.gz</Path>
+			<Path key="chr8">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr8.hg19.ld.gz</Path>
+			<Path key="chr9">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr9.hg19.ld.gz</Path>
+			<Path key="chr10">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr10.hg19.ld.gz</Path>
+			<Path key="chr11">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr11.hg19.ld.gz</Path>
+			<Path key="chr12">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr12.hg19.ld.gz</Path>
+			<Path key="chr13">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr13.hg19.ld.gz</Path>
+			<Path key="chr14">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr14.hg19.ld.gz</Path>
+			<Path key="chr15">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr15.hg19.ld.gz</Path>
+			<Path key="chr16">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr16.hg19.ld.gz</Path>
+			<Path key="chr17">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr17.hg19.ld.gz</Path>
+			<Path key="chr18">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr18.hg19.ld.gz</Path>
+			<Path key="chr19">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr19.hg19.ld.gz</Path>
+			<Path key="chr20">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr20.hg19.ld.gz</Path>
+			<Path key="chr21">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr21.hg19.ld.gz</Path>
+			<Path key="chr22">/home/ljuan/gbdata/hg19/1000g/1000g_phase3_LD/1000genome_phase3.chr22.hg19.ld.gz</Path>
+			<Default>hide</Default>
+			<Format>LD</Format>
+		</Anno>
+		<Anno id="refGene" group="Gene">
+			<Path>/home/ljuan/gbdata/hg19/refGene.hg19.sorted.anno.gz</Path>
+			<Default>pack</Default>
+			<Format>ANNO</Format>
+		</Anno>
+		<Anno id="knownGene" group="Gene">
+			<Path>/home/ljuan/gbdata/hg19/knownGene.hg19.sorted.anno.gz</Path>
+			<Default>dense</Default>
+			<Format>ANNO</Format>
+		</Anno>
+		<Anno id="ensemblGene" group="Gene">
+			<Path>/home/ljuan/gbdata/hg19/ensGene.hg19.sorted.anno.gz</Path>
+			<Default>dense</Default>
+			<Format>ANNO</Format>
+		</Anno>
+		<Anno id="trio" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/NA12878.trio.snp.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="1000g_p3_hasrel" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/1000g/HAS_REL.phase3_shapeit2_mvncall_integrated_v2.20130502.genotypes.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="fakefamily" group="Personal Genome">
+			<Path>/home/ljuan/gbdata/hg19/fakefamily.vcf.gz</Path>
+			<Default>hide</Default>
+			<Format>VCF</Format>
+		</Anno>
+		<Anno id="OMIM" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/OMIM2Disease.hg19.sorted.gdf.gz</Path>
+			<Default>pack</Default>
+			<Format>GDF</Format>
+		</Anno>
+		<Anno id="PharmGKB" group="Disease">
+			<Path>/home/ljuan/gbdata/hg19/PharmGKB.hg19.sorted.gdf.gz</Path>
+			<Default>hide</Default>
+			<Format>GDF</Format>
+		</Anno>
+	</Assembly>
+</root>

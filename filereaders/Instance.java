@@ -1060,9 +1060,11 @@ public class Instance {
 				gr3 = new GDFReader(Pclns.get(track.get_ID()).get_Path(Chr));
 				Element ele_cln=gr3.write_gdf2elements(doc, "_"+track.get_ID(), Chr,(int) Coordinate[0],(int) Coordinate[1]);
 				add_att_ifParam(track,ele_cln);
+				//////////////// Cancelled in Family genome browser//////////////
 				GdfElementSelector ges=new GdfElementSelector(doc,Ele_anno,Ele_var);
 				doc.getElementsByTagName(DATA_ROOT).item(0).appendChild(ges.select(ele_cln));
 				doc.getElementsByTagName(DATA_ROOT).item(0).removeChild(ele_cln);
+				/////////////////////////////////////////////////////////////////
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

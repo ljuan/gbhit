@@ -172,17 +172,53 @@ body{
 	padding-bottom:5px;
 	background-color: #fff;
 	float:right;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
+}
+#ui-id-1{
+	font: 12px "Trebuchet MS", Arial, sans-serif;
 }
 #gene_info_name{
-	font: larger bolder Georgia, "Times New Roman", Times, serif;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
 #gene_info_table{
 	width: 100%;
 	border:0;
-	font: small Arial, Helvetica, sans-serif;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
 }
+#shared_different{
+	padding-left: 10px;
+	padding-right: 10px;
+	background-color: #DDD;
+	max-height:500px;
+	overflow-y:auto;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
+}
+#SD_submit{
+	padding-left: 10px;
+	padding-right: 10px;
+	background-color: #DDD;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
+	text-align:center;
+}
+#SD_window{
+	background-color: #DDD;
+	float:right;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
+}
+#gdflist{
+	padding:5px;
+	width:250px;
+	background:#636363;
+	font: 12px "Trebuchet MS", Arial, sans-serif;
+}
+#gdf_list{
+	color:#FFFFFF;
+	border-collapse:collapse;
+}
+
+
 /* IE 6 doesn't support max-height
  * we use height instead, but this forces the menu to always be this tall
  */

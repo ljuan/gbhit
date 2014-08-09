@@ -42,25 +42,6 @@
 							<input class="submitt" type="submit" onclick="jump()" value="Go"/>
 						</div>
 						<div id="brwplot"></div>
-						<div id="detaillist" style="padding:5px; display:none; width:250px; background:#0000FF;">
-							<table id="detail_list" border="1px" style="color: #FFFFFF;border-collapse: collapse;">
-								<tbody id="detailtablebody"></tbody>
-							</table>
-						</div>
-						<div id="tip" style="padding:10px; display:none; width:250px; background:#0000FF;">
-							<table id="detailtable" border="1px" style="color: #FFFFFF;border-collapse: collapse;">
-								<tbody>
-									<tr>
-										<td style="font-size:12px">Scale:</td>
-										<td id="scale"  style="width:290px;font-size: 12px;word-break:break-all;"></td>
-									</tr>
-									<tr>
-										<td style="font-size:12px">Description:</td>
-										<td id="detail"  style="width:290px;font-size: 12px;word-break:break-all;"></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
 					</div>
 					<div id="varlist" style="display:none"></div>
 				</div>
@@ -110,6 +91,19 @@
 		<script language="JavaScript" type="text/javascript" src="scripts/plot_var.js"></script>
 		<script language="JavaScript" type="text/javascript" src="scripts/plot_brd.js"></script>
 		<script language="JavaScript" type="text/javascript" src="scripts/raphael-min.js"></script>
+		<script language="JavaScript" type="text/javascript">
+			load_individuals();
+		</script>
 		<div id="select_info" class="ui-front ui-corner-all" style="display:none; position:absolute; border: 1px #ccc solid"></div>
+		<div id="SD_window" class= "ui-front ui-corner-all" style="display:none;position:absolute; border: 1px #aaa solid">
+			<div id="shared_different" style="clear:both"></div>
+			<div id="SD_submit" style="border: 1px #aaa solid"><input class="submitt" type="submit" onclick="highlight_vars()" value="Submit"/></div>
+
+		</div>
+		<div id="gdflist" style="display:none;">
+			<table id="gdf_list" border="1px">
+				<tbody id="gdftablebody"></tbody>
+			</table>
+		</div>
 	</body>
 </html>
