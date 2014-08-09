@@ -921,19 +921,7 @@ function list_variants(){
 		radioObj.onclick = function(event){
 			var target = event.target || event.srcElement;
 			var idx = target.getAttribute("id").split("__")[0];
-			var color = colO;
-			if(compare_method == "getIntersection"){
-				color = colInter;
-			}else if(compare_method == "getDifference"){
-				color = colDiff;
-			}else if(variants[idx].paternal == "N" && variants[idx].maternal == "N"){
-				color = colD;
-			}else if(variants[idx].paternal == "N"){
-				color = colP;
-			}else if(variants[idx].maternal == "N"){
-				color = colM;
-			}
-			select_a_variant(idx,color);
+			select_a_variant(idx);
 		};
 	}
 }
@@ -1001,7 +989,7 @@ function plot_variants(){
 						R.safari();
 					};
 					variants[idx].name[0][0].onclick = function(){
-						select_a_variant(idx,colO);
+						select_a_variant(idx);
 						R.safari();
 					};
 				})(i);
@@ -1026,7 +1014,7 @@ function plot_variants(){
 						R.safari();
 					};
 					variants[idx].name[1][0].onclick = function(){
-						select_a_variant(idx,colO);
+						select_a_variant(idx);
 						R.safari();
 					};
 				})(i);
@@ -1154,7 +1142,7 @@ function show_same_collectionvar(){
 	}
 }
 
-function select_a_variant(idx,color){
+function select_a_variant(idx){
 	if(variants[idx] != undefined){
 		////////////////////insert request of searchIndividual
 		/*alert(variants[idx].chr + ":"  + variants[idx].from + ":" + variants[idx].to + ":" + variants[idx].letter);
@@ -1183,7 +1171,6 @@ function select_a_variant(idx,color){
 					}
 				}
 			}
-			change_variant_color(idx,color);
 			variants[idx].selected = false;
 			radioObj.checked = false;
 			if(variants[idx].name != undefined){
@@ -1223,19 +1210,6 @@ function select_a_variant(idx,color){
 			reqV.open("POST","servlet/test.do?"+querry,true);
 			reqV.send(formV);
 			if(csv>=0 && variants[csv] != undefined){
-				var color2 = colO;
-				if(compare_method == "getIntersection"){
-					color2 = colInter;
-				}else if(compare_method == "getDifference"){
-					color2 = colDiff;
-				}else if(variants[csv].paternal == "N" && variants[csv].maternal == "N"){
-					color2 = colD;
-				}else if(variants[csv].paternal == "N"){
-					color2 = colM;
-				}else if(variants[csv].maternal == "N"){
-					color2 = colP;
-				}
-				change_variant_color(csv,color2);
 				variants[csv].selected = false;
 			
 				if(variants[csv].name != undefined){
@@ -1259,7 +1233,6 @@ function select_a_variant(idx,color){
 					}
 				}
 			}
-			change_variant_color(idx,color);
 			variants[idx].selected = true;
 			radioObj.checked = true;
 			if(variants[idx].name != undefined){
@@ -1320,7 +1293,7 @@ function change_variant_color(vPointer,color){
 					R.safari();
 				};
 				variants[idx].name[0][0].onclick = function(){
-					select_a_variant(idx,color);
+					select_a_variant(idx);
 					R.safari();
 				};
 			})(vPointer,color);
@@ -1339,7 +1312,7 @@ function change_variant_color(vPointer,color){
 					R.safari();
 				};
 				variants[idx].name[1][0].onclick = function(){
-					select_a_variant(idx,color);
+					select_a_variant(idx);
 					R.safari();
 				};
 			})(vPointer,color);
