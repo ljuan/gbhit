@@ -1189,9 +1189,9 @@ function show_same_collectionvar(){
 							var id_info = collectionlist[j].split(":");
 							if(individuals[id_info[0]].ifs == "true"){
 								for(var temp_root in families[id_info[0]].markobj){
-									if(families[id].markobj[temp_root] != undefined){
-										families[id].markobj[temp_root].attr({text:id_info[2]});
-										families[id].markobj[temp_root].show();
+									if(families[id_info[0]].markobj[temp_root] != undefined){
+										families[id_info[0]].markobj[temp_root].attr({text:id_info[2]});
+										families[id_info[0]].markobj[temp_root].show();
 									}
 								}														
 							}
