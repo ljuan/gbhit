@@ -91,6 +91,88 @@ function init_individual_vars(){
 
 	var esNodes = req3.responseXML.getElementsByTagName(xmlTagElements);
 	var enode_start = 0;
+
+	function match_functional_variants(vPointer, from, to, letter, id){
+		var letter_trans = letter;
+
+		if(letter == "(" || letter == ")"){
+			letter_trans = "ASS/DSS loss";
+		}else if (letter == "#"){
+			letter_trans = "Frame shifting";
+		}else if (letter == "^"){
+			letter_trans = "Initiator loss";
+		}else{
+			var texts = letter.split(":");
+			if(texts[0].indexOf("$") >= 0){
+				letter_trans = "Stop loss";
+			}else if(texts[1].indexOf("$") >= 0){
+				letter_trans = "Stop gain";
+			}else {
+				letter_trans = texts[0] + "->" + texts[1];
+			}
+		}
+
+		while(vPointer > 0 && variants[vPointer].to > to){
+			vPointer--;
+		}
+		while(vPointer < variants.length-1 && variants[vPointer].from < from){
+			vPointer++;
+		}
+		if(from <= variants[vPointer].from && to >= variants[vPointer].to && id == variants[vPointer].id){
+			if(functional_v[from+":"+to+":"+letter] == undefined){
+				functional_v[from+":"+to+":"+letter] = vPointer;
+				functional_vnum++;
+				var fvidx = 0; 
+				if(variants[vPointer].functional == "--"){
+					//variants[vPointer] has function for the first time
+					variants[vPointer].functional = letter_trans;
+					variants[vPointer].functional_v = [];
+					functional_vPointer[functional_vPointer.length] = vPointer;
+				}else{
+					//variants[vPointer] may play different roles in different allele/transcript
+					variants[vPointer].functional += ","+letter_trans;
+					fvidx = variants[vPointer].functional_v.length;
+				}
+				variants[vPointer].functional_v[fvidx] = {};
+				variants[vPointer].functional_v[fvidx].from = from;
+				variants[vPointer].functional_v[fvidx].to = to;
+				variants[vPointer].functional_v[fvidx].letter = letter;
+			}
+		}else if(from <= variants[vPointer].from && to >= variants[vPointer].to){
+			while(vPointer > 0 && from <= variants[vPointer-1].from && to >= variants[vPointer-1].to){
+				vPointer--;
+			}
+			while(vPointer < variants.length && from <= variants[vPointer].from && to >= variants[vPointer].to){
+				if(id == variants[vPointer].id){
+					if(functional_v[from+":"+to+":"+letter] == undefined){
+						functional_v[from+":"+to+":"+letter] = vPointer;
+						functional_vnum++;
+						var fvidx = 0; 
+						if(variants[vPointer].functional == "--"){
+							//variants[vPointer] has function for the first time
+							variants[vPointer].functional = letter_trans;
+							variants[vPointer].functional_v = [];
+							functional_vPointer[functional_vPointer.length] = vPointer;
+						}else{
+							//variants[vPointer] may play different roles in different allele/transcript
+							variants[vPointer].functional += ","+letter_trans;
+							fvidx = variants[vPointer].functional_v.length;
+						}
+						variants[vPointer].functional_v[fvidx] = {};
+						variants[vPointer].functional_v[fvidx].from = from;
+						variants[vPointer].functional_v[fvidx].to = to;
+						variants[vPointer].functional_v[fvidx].letter = letter;
+					}
+					return vPointer;
+				} else {
+					vPointer++;
+				}
+			}
+			return vPointer-1;
+		}
+		return vPointer;
+	}
+
 	for(var i = 0 ; i < esNodes.length ; i++){
 		var veNodes = esNodes[i].getElementsByTagName(xmlTagVariant);
 		var vPointer = 0;
@@ -101,57 +183,22 @@ function init_individual_vars(){
 			var id = veNodes[j].getAttribute(xmlAttributeId);
 			var type = veNodes[j].getAttribute(xmlAttributeType);
 
-			var letter_trans = letter;
-
-			if(letter == "(" || letter == ")"){
-				letter_trans = "ASS/DSS loss";
-			}else if (letter == "#"){
-				letter_trans = "Frame shifting";
-			}else if (letter == "^"){
-				letter_trans = "Initiator loss";
-			}else{
-				var texts = letter.split(":");
-				if(texts[0].indexOf("$") >= 0){
-					letter_trans = "Stop loss";
-				}else if(texts[1].indexOf("$") >= 0){
-					letter_trans = "Stop gain";
-				}else {
-					letter_trans = texts[0] + "->" + texts[1];
-				}
-			}
-
 			if(id == "."){
 				id = "Unnamed "+type;
 			}
-
-			while(variants[vPointer].to > to && vPointer >= 0){
-				vPointer--;
-			}
-			while(variants[vPointer].from < from && vPointer < variants.length){
-				vPointer++;
-			}
-			if(from <= variants[vPointer].from && to >= variants[vPointer].to && id == variants[vPointer].id){
-				if(variants[vPointer].functional == "--"){
-					variants[vPointer].functional = letter_trans;
-					functional_v[from+":"+to+":"+letter] = vPointer;
-					functional_vnum++;
-					functional_vPointer[functional_vPointer.length] = vPointer;
-
-					variants[vPointer].functional_v = [];
-					variants[vPointer].functional_v[0] = {};
-					variants[vPointer].functional_v[0].from = from;
-					variants[vPointer].functional_v[0].to = to;
-					variants[vPointer].functional_v[0].letter = letter;
-				}else if(variants[vPointer].functional.indexOf(letter_trans) < 0){
-					variants[vPointer].functional += ","+letter_trans;
-					functional_v[from+":"+to+":"+letter] = vPointer;
-					functional_vnum++;
-
-					var fvidx = variants[vPointer].functional_v.length;
-					variants[vPointer].functional_v[fvidx] = {};
-					variants[vPointer].functional_v[fvidx].from = from;
-					variants[vPointer].functional_v[fvidx].to = to;
-					variants[vPointer].functional_v[fvidx].letter = letter;
+			if(from.indexOf(";")<0 && to.indexOf(";")<0){
+				match_functional_variants(vPointer, from, to, letter, id);
+			} else {
+				var froms = from.split(";");
+				var tos = to.split(";");
+				if(type == "DEL" && tos[1] - froms[0] < 50){
+					match_functional_variants(vPointer, froms[0], tos[1], letter, id);
+				}else{
+					for(var junc_var = 0 ; junc_var < froms.length ; junc_var++){
+						if(froms[junc_var]>=current_start && tos[junc_var]<=current_end){
+							vPointer = match_functional_variants(vPointer, froms[junc_var], tos[junc_var], letter, id);
+						}
+					}
 				}
 			}
 		}
@@ -213,12 +260,30 @@ function init_individual_vars(){
 					var from = vNodes[k].getElementsByTagName(xmlTagFrom)[0].childNodes[0].nodeValue;
 					var to = vNodes[k].getElementsByTagName(xmlTagTo)[0].childNodes[0].nodeValue;
 					var letter = vNodes[k].getElementsByTagName(xmlTagLetter)[0].childNodes[0].nodeValue;
-					for(var fvidx = 0 ; fvidx < variants[functional_v[from+":"+to+":"+letter]].functional_v.length ; fvidx++){
-						if(from == variants[functional_v[from+":"+to+":"+letter]].functional_v[fvidx].from 
-						&& to == variants[functional_v[from+":"+to+":"+letter]].functional_v[fvidx].to 
-						&& letter == variants[functional_v[from+":"+to+":"+letter]].functional_v[fvidx].letter){
-							genes[j].vars[from+":"+to+":"+letter] = fvidx;
+					if(from.indexOf(";")>0 || to.indexOf(";")>0){
+						var froms = from.split(";");
+						var tos = to.split(";");
+						if(functional_v[froms[0] + ":" + tos[0] + ":" + letter] != undefined){
+							from = froms[0];
+							to = tos[0];
+						} else if (functional_v[froms[1] + ":" + tos[1] + ":" + letter] != undefined){
+							from = froms[1];
+							to = tos[1];
+						} else if (functional_v[froms[0] + ":" + tos[1] + ":" + letter] != undefined){
+							from = froms[0];
+							to = tos[1];
 						}
+					}
+					if(variants[functional_v[from + ":" + to + ":" + letter]] != undefined){
+						for(var fvidx = 0 ; fvidx < variants[functional_v[from+":"+to+":"+letter]].functional_v.length ; fvidx++){
+							if(from == variants[functional_v[from+":"+to+":"+letter]].functional_v[fvidx].from 
+							&& to == variants[functional_v[from+":"+to+":"+letter]].functional_v[fvidx].to 
+							&& letter == variants[functional_v[from+":"+to+":"+letter]].functional_v[fvidx].letter){
+								genes[j].vars[from+":"+to+":"+letter] = fvidx;
+							}
+						}
+					}else{
+//						alert(from + ":" + to + ":" + letter);
 					}
 				}
 			}
@@ -865,8 +930,8 @@ function show_ld_relationships(){
 					}
 					variants[variants_byid[ld[0]]].lds.push(obj_temp);
 					variants[variants_byid[ld[1]]].lds.push(obj_temp);
-					obj_temp.hide(); // for hide all lds in start, and show lds when select an individual
-//					all_lds.push(obj_temp); //for show all lds in start, and hide inconnected lds when select an individual
+//					obj_temp.hide(); // for hide all lds in start, and show lds when select an individual
+					all_lds.push(obj_temp); //for show all lds in start, and hide inconnected lds when select an individual
 				}
 			}
 		}
@@ -1121,12 +1186,11 @@ function show_same_collectionvar(){
 					var collectionlist = xmlDoc.getElementsByTagName("IndividualOrder")[0].firstChild.nodeValue.split(",");
 					if(collectionlist!=null){
 						for(var j in collectionlist){
-							var id = collectionlist[j].substr(0,7);
-							var temp_str = collectionlist[j].substr(10,3);
-							if(individuals[id].ifs == "true"){
-								for(var temp_root in families[id].markobj){
+							var id_info = collectionlist[j].split(":");
+							if(individuals[id_info[0]].ifs == "true"){
+								for(var temp_root in families[id_info[0]].markobj){
 									if(families[id].markobj[temp_root] != undefined){
-										families[id].markobj[temp_root].attr({text:temp_str});
+										families[id].markobj[temp_root].attr({text:id_info[2]});
 										families[id].markobj[temp_root].show();
 									}
 								}														
@@ -1189,7 +1253,7 @@ function select_a_variant(idx){
 						variants[idx].functional_v[fvidx].obj.attr({"font-weight":"normal","stroke-width":1});
 					}
 				}
-	//			all_lds.show();
+				all_lds.show();
 				if(variants[idx].lds != undefined){
 					variants[idx].lds.hide();
 				}
@@ -1251,7 +1315,7 @@ function select_a_variant(idx){
 						variants[idx].functional_v[fvidx].obj.attr({"font-weight":"bolder","stroke-width":2});
 					}
 				}
-		//		all_lds.hide();
+				all_lds.hide();
 				if(variants[idx].lds != undefined){
 					variants[idx].lds.show();
 				}
@@ -1716,16 +1780,16 @@ function plot_genes(){
 	}
 
 	function draw_box(from,to,l,box_width){
-		var sub_top = map_coord(l,from);
-		var sub_bot = map_coord(l,to);
+		var sub_top = map_coord(l,parseInt(from));
+		var sub_bot = map_coord(l,parseInt(to)+1);
 		if(sub_top == l || sub_bot == 0){
 			return null;
 		}
 		return R.rect(R_width-R_right+10,R_top+sub_top,box_width,sub_bot-sub_top,0).attr({fill:colO,stroke:colO});
 	}
 	function draw_triangle(from,to,l,strand,box_width){
-		var sub_top = map_coord(l,from);
-		var sub_bot = map_coord(l,to);
+		var sub_top = map_coord(l,parseInt(from));
+		var sub_bot = map_coord(l,parseInt(to)+1);
 		if(strand == "+"){
 			return R.path("M"+(R_width-R_right+10)+","+(R_top+sub_bot)+" L"+(R_width-R_right+10+box_width)+","+(R_top+sub_bot)+" L"+(R_width-R_right+10+box_width/2)+","+(R_top+sub_bot+box_width)+" Z").attr({fill:colO});
 		} else if (strand == "-"){
@@ -1735,8 +1799,8 @@ function plot_genes(){
 		}
 	}
 	function draw_band(from,to,l,band_width,box_width){
-		var sub_top = map_coord(l,from);
-		var sub_bot = map_coord(l,to);
+		var sub_top = map_coord(l,parseInt(from));
+		var sub_bot = map_coord(l,parseInt(to)+1);
 		var slimmer = (box_width-band_width)/2;
 		if(sub_top == l || sub_bot == 0){
 			return null;
@@ -1744,8 +1808,8 @@ function plot_genes(){
 		return R.rect(R_width-R_right+10+slimmer,R_top+sub_top,band_width,sub_bot-sub_top,0).attr({fill:colO,stroke:colO});
 	}
 	function draw_line(from,to,l,strand,box_width){
-		var sub_top = map_coord(l,from);
-		var sub_bot = map_coord(l,to);
+		var sub_top = map_coord(l,parseInt(from));
+		var sub_bot = map_coord(l,parseInt(to)+1);
 		var mid_point_x = R_width-R_right+10+box_width/2;
 		if(sub_top == l || sub_bot == 0){
 			return null;
