@@ -316,7 +316,7 @@ function call_shared_different(){
 
 	for(var i = 0 ; i < ind_ids.length ; i++){
 		var id = ind_ids[i];
-		if(id == csi){
+		if(id == csi || individuals[id].ifs == "false"){
 			continue;
 		}
 		temp_tr = temp.insertRow(-1);

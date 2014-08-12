@@ -149,9 +149,9 @@ function loadChrBand(){
 		attr["stroke-width"] = 0;
 		attr["fill-opacity"] = 0.8;
 		genome[idx]=B.rect(chrx,interval+h*chrs[idx].from/total,chrw,h*(chrs[idx].to-chrs[idx].from)/total,3).attr(attr);
-		attr["fill"] = "0-#999-#ddd";
+		attr["fill"] = "0-#bbb-#eee";
 		attr["stroke-width"] = 0;
-		attr["fill-opacity"] = 0.3;
+		attr["fill-opacity"] = 0.2;
 		genome_rad[idx]=B.path("M"+(chrx+chrw+10)+","+(interval+h*chrs[idx].from/total)+" L"+(bandx-10)+","+interval+" L"+(bandx-10)+","+(interval+h)+" L"+(chrx+chrw+10)+","+(interval+h*chrs[idx].to/total)+"Z").attr(attr);
 		genome_rad[idx].hide();
 		chrlables[idx]=B.text(chrx-20,interval+h*(chrs[idx].from+chrs[idx].to)/2/total,chrs[idx].name.replace("chr","").replace("M","MT")).attr({font:font_size2_text,opacity:1}).attr({fill:"#000"});
@@ -159,9 +159,9 @@ function loadChrBand(){
 			bands[idx][i]=drawCyto(chrs[idx].bands[i].from, chrs[idx].bands[i].to, chrs[idx].centromere, chrs[idx].lengthh, h, bandw, bandx, interval, chrs[idx].bands[i].gieStain);
 			bands[idx][i].hide();
 
-			attr["fill"] = "0-#999-#fff";
+			attr["fill"] = "0-#bbb-#eee";
 			attr["stroke-width"] = 0;
-			attr["fill-opacity"] = 0.3;
+			attr["fill-opacity"] = 0.2;
 			bands_rad[idx][i]=B.path("M"+(bandx+bandw+20)+","+(interval+h*chrs[idx].bands[i].from/chrs[idx].lengthh)+" L"+(axisx-10)+","+interval+" L"+(axisx-10)+","+(interval+h)+" L"+(bandx+bandw+20)+","+(interval+h*chrs[idx].bands[i].to/chrs[idx].lengthh)+"Z").attr(attr);
 			bands_rad[idx][i].hide();
 
