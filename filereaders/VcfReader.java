@@ -895,7 +895,7 @@ public class VcfReader {
 						
 						Variant[] vs1 = vcfs.get(v1).getVariants(false);
 						Variant[] vs2 = vcfs.get(v2).getVariants(false);
-						if(p0[0] == homo1[0] && p0[1] == homo2[0] || p1[0] == homo1[0] && p1[1] == homo2[0]){
+						if((p0[0] == homo1[0] && p0[1] == homo2[0] || p1[0] == homo1[0] && p1[1] == homo2[0]) && (homo1[0] != 0 || homo2[0] != 0)){
 							//allele 1 yes
 							int idx1 = homo1[0]>0?homo1[0]-1:homo1[0];
 							int idx2 = homo2[0]>0?homo2[0]-1:homo2[0];
@@ -907,7 +907,7 @@ public class VcfReader {
 											);
 							
 						}
-						if(p0[0] == homo1[1] && p0[1] == homo2[1] || p1[0] == homo1[1] && p1[1] == homo2[1]){
+						if((p0[0] == homo1[1] && p0[1] == homo2[1] || p1[0] == homo1[1] && p1[1] == homo2[1]) && (homo1[1] != 0 || homo2[1] != 0)){
 							//allele 2 yes
 							int idx1 = homo1[1]>0?homo1[1]-1:homo1[1];
 							int idx2 = homo2[1]>0?homo2[1]-1:homo2[1];
