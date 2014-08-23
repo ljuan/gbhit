@@ -470,7 +470,7 @@ public class Interfaces extends HttpServlet{
 			}
 			if(ftemp1!=null && ftemp2!=null){
 				links[0]=filepath;
-				ins.add_Externals(tracks,links,types,modes);
+				ins.add_ExIndividuals(tracks,links,types,modes);
 			}
 		}
 		PrintWriter out;
