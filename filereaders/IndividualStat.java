@@ -146,6 +146,8 @@ public class IndividualStat {
 				oid = vcfSample.getSelectedNames()[0];
 				ifTrioAvailable = vcfSample.ifTrioAvailable(oid);
 			}
+			/*
+			 * This is for de novo mutations in non-coding region. 
 			if(ifTrioAvailable){
 				String set_b = oid;
 				String set_a = null;
@@ -158,6 +160,7 @@ public class IndividualStat {
 					CytoScores[i]=(int)CytoScores[i]|1<<4;
 				}
 			}
+			 */
 		}
 		/* For method == Family
 		 *-1 : Uninitialized
