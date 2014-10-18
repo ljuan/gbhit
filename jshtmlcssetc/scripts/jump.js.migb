@@ -56,7 +56,177 @@ var ind_ids = []; //sorted individual ids
 var families = {};
 var chrs = [];
 var control_scanning;
+var refSNPurl = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?searchType=adhoc_search&type=rs&rs=";
+var OMIMurl = "http://omim.org/entry/";
+var seqstr = "";
+var xmlTagSeq = "Sequence";
+var btn_set;
+var geneflag_set;
 
+var genome = [];
+var bands = [];
+
+function display_tracknamelist(){
+	if(document.getElementById("select_plugin").style.display == "none"){
+		call_tracknamelist();
+	}else{
+		$(document.getElementById("select_plugin")).css("display", "none");
+		$(document.getElementById("maskselect")).css("display", "none");
+	//	document.getElementById('track_name').value = trackname;
+	}
+}
+
+function hide_tracknamelist(){
+	$(document.getElementById("select_plugin")).css("display", "none");
+	$(document.getElementById("maskselect")).css("display", "none");
+}
+
+function call_tracknamelist(){
+	var topp = $("#select_btn").position().top + 23;
+	var leftt = $("#select_btn").position().left - 356;
+	
+	var IfrRef = document.getElementById("maskselect");
+	var DivRef = document.getElementById("select_plugin");
+	
+	$(document.getElementById("select_plugin")).css("display","block");
+	$(document.getElementById("select_plugin")).css("top",topp);
+	$(document.getElementById("select_plugin")).css("left",leftt);
+	document.getElementById('track_name').value = "";
+
+	var selectobj = document.getElementById('select_trackname');
+	selectobj.innerHTML = "";
+	var removereq = createXMLHttpRequest();
+	var namereq = createXMLHttpRequest();
+	namereq.open("GET","servlet/test.do?action=getExIndividuals",false);
+	namereq.send(null);
+	var namelist=namereq.responseText.replace(/<.*?>/g,"").split(",");
+	if(namelist.length > 0 && namelist[0]!=""){
+		var temp_trow = selectobj.insertRow(-1);
+		temp_trow.innerHTML = "<td colspan=\"2\">---------- Uploaded data ----------</td>";
+		temp_trow.cells[0].align = "center";
+		temp_trow.cells[0].style.fontSize = "13px";
+		temp_trow.style.backgroundColor="#eee";
+		for(var i=0; i<namelist.length; i++){
+			(function(i){ 
+				var temp_tr = selectobj.insertRow(-1);
+				temp_tr.innerHTML = "<td style=\"text-indent:10px\" width=\"350\"></td><td></td>";
+				temp_tr.style.fontSize = "13px";
+				temp_tr.cells[0].style.cursor = "pointer";
+				temp_tr.onmouseover = function(){
+					temp_tr.style.backgroundColor="#ccc";
+					temp_tr.cells[0].style.fontWeight="bold";
+				};
+				temp_tr.onmouseout = function(){
+					temp_tr.style.backgroundColor="";
+					temp_tr.cells[0].style.fontWeight="normal";
+				};
+				
+				temp_tr.cells[0].innerHTML = namelist[i].split(":")[0];
+				temp_tr.cells[0].onclick = function(){
+					document.getElementById('track_name').value= temp_tr.cells[0].innerHTML;
+					document.getElementById('vcf_url').value="";
+					document.getElementById('pg_upload_file').innerHTML="";
+					document.getElementById('pg_upload_file2').innerHTML="";
+					document.getElementById('ped_rec').value="";
+					display_tracknamelist();
+					load_vcf();
+				};
+				temp_tr.cells[0].onmouseover = function(){
+					temp_tr.cells[0].style.color="#666";
+				};
+				temp_tr.cells[0].onmouseout = function(){
+					temp_tr.cells[0].style.color="#000";
+				};
+				
+				
+				temp_tr.cells[1].innerHTML = '<input style="width:16px;height:16px" type="image" src="./image/delete.png">';
+				//temp_tr.cells[1].style.color="#999";
+				temp_tr.cells[1].align = "center";
+				temp_tr.cells[1].style.cursor = "pointer";
+				temp_tr.cells[1].onclick = function(){
+					if(trackname == temp_tr.cells[0].innerHTML){
+						document.getElementById("pedplot").innerHTML = "";
+						document.getElementById("brwplot").innerHTML = "";
+						document.getElementById("varlist").innerHTML = "";
+						document.getElementById("indlist").innerHTML = "";
+						document.getElementById('vcf_url').value="";
+						document.getElementById('pg_upload_file').innerHTML="";
+						document.getElementById('pg_upload_file2').innerHTML="";
+						document.getElementById('ped_rec').value="";
+						if(btn_set != null){
+							btn_set.hide();
+						}
+						csi="--";
+						trackname = "";
+					}
+					removereq.open("GET","servlet/test.do?action=removeExternals&tracks="+temp_tr.cells[0].innerHTML,false);
+					removereq.send(null);
+					display_tracknamelist();
+					display_tracknamelist();
+				};
+				temp_tr.cells[1].onmouseover = function(){
+					temp_tr.cells[0].style.color=colD;
+					temp_tr.cells[1].style.borderStyle="groove";
+				};
+				temp_tr.cells[1].onmouseout = function(){
+					temp_tr.cells[0].style.color="#000";
+					temp_tr.cells[1].style.borderStyle="";
+				};
+			})(i);
+		}
+	}
+	
+	var examplereq = createXMLHttpRequest();
+	examplereq.open("GET","servlet/test.do?action=getIndividuals",false);
+	examplereq.send(null);
+	var examplelist=examplereq.responseText.replace(/<.*?>/g,"").split(",");
+	if(examplelist.length > 0 && examplelist[0]!="")
+	{	
+		var temp_trow = selectobj.insertRow(-1);
+		temp_trow.innerHTML = "<td colspan=\"2\">----------- Built-in data -----------</td>";
+		temp_trow.cells[0].align = "center";
+		temp_trow.cells[0].style.fontSize = "13px";
+		temp_trow.style.backgroundColor="#eee";
+		for(var i=0; i<examplelist.length; i++){
+			(function(i){ 
+				var temp_tr = selectobj.insertRow(-1);
+				temp_tr.style.fontSize = "13px";
+				temp_tr.onmouseover = function(){
+					temp_tr.style.backgroundColor="#ccc";
+				};
+				temp_tr.onmouseout = function(){
+					temp_tr.style.backgroundColor="";
+				};
+				temp_tr.innerHTML = "<td style=\"text-indent:10px\" colspan=\"2\"></td>";
+				temp_tr.cells[0].style.cursor = "pointer";
+				temp_tr.cells[0].innerHTML = examplelist[i].split(":")[0];
+				temp_tr.cells[0].onclick = function(){
+					document.getElementById('track_name').value= temp_tr.cells[0].innerHTML;
+					document.getElementById('vcf_url').value="";
+					document.getElementById('pg_upload_file').innerHTML="";
+					document.getElementById('pg_upload_file2').innerHTML="";
+					document.getElementById('ped_rec').value="";
+					display_tracknamelist();
+					load_vcf();
+				};
+				temp_tr.cells[0].onmouseover = function(){
+					temp_tr.cells[0].style.color="#666";
+					temp_tr.cells[0].style.fontWeight="bold";
+				};
+				temp_tr.cells[0].onmouseout = function(){
+					temp_tr.cells[0].style.color="#000";
+					temp_tr.cells[0].style.fontWeight="normal";
+				};
+			})(i);
+		}
+	}
+	IfrRef.style.width = DivRef.offsetWidth;
+	IfrRef.style.height = DivRef.offsetHeight;
+	IfrRef.style.top = DivRef.style.top;
+	IfrRef.style.left = DivRef.style.left;
+	IfrRef.style.zIndex = DivRef.style.zIndex - 1;
+	IfrRef.style.display = "block";
+}
 function jump() {
 	var chr_temp = document.getElementById("chrSelect").value;
 	var start_temp = document.getElementById("startInput").value;
@@ -70,6 +240,17 @@ function jump() {
 	if(end_temp == undefined || end_temp == null){
 		end_temp = current_end;
 	}
+	/*var temp_chr = parseInt(chr_temp.substr(3))-1;
+	if(start_temp > end_temp || start_temp < chrs[temp_chr].from || start_temp > chrs[temp_chr].to || end_temp < chrs[temp_chr].from || end_temp > chrs[temp_chr].to){
+		start_temp = chrs[temp_chr].from;
+		document.getElementById("startInput").value = chrs[temp_chr].from;
+		if(chrs[temp_chr].to > chrs[temp_chr].from + 3000000){
+			end_temp = chrs[temp_chr].from+3000000;
+		}else{
+			end_temp = chrs[temp_chr].to;
+		}
+		document.getElementById("endInput").value = chrs[temp_chr].to;
+	}*/
 	load_family_genome(chr_temp,start_temp,end_temp);
 }
 
@@ -103,6 +284,7 @@ var reqV = createXMLHttpRequest();
 var XMLHttpReq7 = createXMLHttpRequest();//for browse jump
 var XMLHttpReq8 = createXMLHttpRequest();//for BJW_upStat
 var XMLHttpReq10 = createXMLHttpRequest();//for BJW_scan
+var XMLHttpReq12 = createXMLHttpRequest();//for checking trackname when uploading track
 
 var querry1 = "action=getChromosomes"; 
 req.open("GET","servlet/test.do?"+querry1,false);
@@ -139,6 +321,7 @@ req.send(null);
 
 //var R_brd = Raphael("brd_genome", 530, 610);
 
+
 var R;
 var R_height = 870;
 var R_width = 650;
@@ -153,12 +336,43 @@ function load_vcf(){
 		trackname = document.getElementById("track_name").value;
 	}
 	var link = document.getElementById("vcf_url").value;
-	if(link && link!=""){
-		var querry = "action=addExIndividuals&tracks=" + trackname + "&links=" + link + "&modes=pack&types=VCF";
-		req.open("GET","servlet/test.do?"+querry,false);
-		req.send(null);
-	}
+	
+	var ifurl = document.getElementById("url_of_url_or_upload").checked;
+	var ifupload = document.getElementById("upload_of_url_or_upload").checked;
 
+	var fileObj = document.getElementById("pg_upload_file").files[0];
+	var fileObj2 = document.getElementById("pg_upload_file2").files[0];
+
+	var indslist;
+	var inds_temp;
+
+	req.open("GET","servlet/test.do?action=getAnnotations",false);
+	req.send(null);
+	indslist=req.responseText.replace(/<.*?>/g,"");
+	inds_temp=indslist.split(",");
+	var ifexists = false;
+	if(inds_temp!=null && inds_temp[0]!=""){
+		for(var idx=0;idx<inds_temp.length;idx++){
+			var ind_temp=inds_temp[idx].split(":");
+			if(trackname == ind_temp[1]){
+				ifexists = true;
+			}
+		}
+	}
+	req.open("GET","servlet/test.do?action=getExternals",false);
+	req.send(null);
+	indslist=req.responseText.replace(/<.*?>/g,"");
+	inds_temp=indslist.split(",");
+	if(inds_temp!=null && inds_temp[0]!=""){
+		for(var idx=0;idx<inds_temp.length;idx++){
+			var ind_temp=inds_temp[idx].split(":");
+			if(trackname == ind_temp[1]){
+				ifexists = true;
+			}
+		}
+	}
+	var sucess = false;
+	
 	var querry = "action=addPedigree&tracks=" + trackname;
 	var pedtext = document.getElementById("ped_rec").value;
 	if(pedtext && pedtext!=""){
@@ -169,7 +383,108 @@ function load_vcf(){
 		req.send(form);
 	}
 
-	load_individuals();
+	if(ifurl && link && link!="" && link!=null){
+		if(trackname!=""){
+			if(trackname.substring(0,1)=='_'){
+				alert("The track name cannot start with '_'.");
+			}else if(ifexists){
+				alert("The track name exists.");
+			}else{
+				var querry = "action=addExIndividuals&tracks=" + trackname + "&links=" + link + "&modes=pack&types=VCF";
+				req.open("GET","servlet/test.do?"+querry,false);
+				req.send(null);
+
+				XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks="+trackname,false);
+				XMLHttpReq12.send(null);
+				var err_text=XMLHttpReq12.responseText.replace(/<.*?>/g,"");
+				if(err_text==null||err_text==""){
+					sucess = true;
+					var querry = "action=addPedigree&tracks=" + trackname;
+					var pedtext = document.getElementById("ped_rec").value;
+					if(pedtext && pedtext!=""){
+						var form = new FormData();
+						form.append("pedigree", pedtext);
+						form.append("enctype", "multipart/form-data");
+						req.open("POST","servlet/test.do?"+querry,false);
+						req.send(form);
+					}
+					load_individuals();
+				}else{
+					XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackname,false);
+					XMLHttpReq12.send(null);
+					alert(err_text);
+				}
+			}
+		}
+	}else if(ifupload && fileObj!=null && fileObj2!=null){
+		if(trackname!=""){ 
+			if(trackname.substring(0,1)=='_'){
+				alert("The track name cannot start with '_'.");
+			}else if(ifexists){
+				alert("The track name exists.");
+			}else if(fileObj.size>20*1000*1000 || fileObj2.size>20*1000*1000){
+				alert("The file is too large.");
+			}else{
+				onProgressHandler = function(event) {
+					if(event.lengthComputable) {
+						var howmuch = (event.loaded / event.total) * 100;
+						document.getElementById("uprogress").innerHTML = Math.floor(howmuch)+"% Completed";
+					} else {
+						console.log("Can't determine the size of the file.");
+					}
+				}
+				var onLoadHandler = function() {
+					document.getElementById("uprogress").innerHTML = "100% Completed";
+				}
+				var onErrorHandler = function() {
+					document.getElementById("uprogress").innerHTML = "Upload Failed.";
+				}
+				req.upload.addEventListener('progress', onProgressHandler, false);
+				req.upload.addEventListener('load', onLoadHandler, false);
+				req.upload.addEventListener('error', onErrorHandler, false);
+				var onReadyStateHandlerUprogress = function(event) {
+					if(event.target.readyState == 4){
+			//			control_upexternal=0;
+						XMLHttpReq12.open("GET","servlet/test.do?action=getCheck&tracks="+trackname,false);
+						XMLHttpReq12.send(null);
+						var err_text=XMLHttpReq12.responseText.replace(/<.*?>/g,"");
+						if(event.target.status == 200){
+							if(err_text==null||err_text==""){
+								sucess = true;
+								//trackItems_setting3();
+								load_individuals();
+							//	load_family_genome(current_chr,current_start,current_end);
+							}else{
+								XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackname,false);
+								XMLHttpReq12.send(null);
+								alert(err_text);
+							}	
+						}else{
+							XMLHttpReq12.open("GET","servlet/test.do?action=removeExternals&tracks="+trackname,false);
+							XMLHttpReq12.send(null);
+							if(err_text==null||err_text==""){
+								alert("Unknown error");
+							}else{
+								alert(err_text);
+							}
+						}
+					}
+				}
+				var form = new FormData();
+				form.append("file", fileObj);
+				form.append("file", fileObj2);
+				form.append("enctype", "multipart/form-data");
+				req.open("POST","servlet/test.do?action=upExternal&modes=hide&tracks="+trackname+"&types=VCF",true);
+				//control_upexternal=1;
+				req.onreadystatechange = onReadyStateHandlerUprogress;
+				req.send(form);
+			}
+		}else{
+			alert("Please fill all required parameters.");
+		}
+	}else if(trackname!=""){
+		load_individuals();
+	}
 }
 
 function load_individuals(){
@@ -200,7 +515,7 @@ function load_family_genome(chr,start,end){
 		alert("Please select an available individual.");
 		return;
 	}
-	if(chr != current_chr || start != current_start || current_end != current_end){
+	if(chr != current_chr || start != current_start || end != current_end){
 		var querry = "action=refresh&width=850&chr="+chr+"&start="+start+"&end="+end;
 		req.open("GET","servlet/test.do?"+querry,false);
 		req.send(null);
@@ -208,6 +523,9 @@ function load_family_genome(chr,start,end){
 		current_chr = req.responseXML.getElementsByTagName(xmlTagChrNum)[0].childNodes[0].nodeValue;
 		current_start = parseInt(req.responseXML.getElementsByTagName(xmlTagStart)[0].childNodes[0].nodeValue);
 		current_end = parseInt(req.responseXML.getElementsByTagName(xmlTagEnd)[0].childNodes[0].nodeValue);
+		if(current_end - current_start < 425 && current_end - current_start > 0){
+			seqstr = req.responseXML.getElementsByTagName(xmlTagSeq)[0].childNodes[0].nodeValue;
+		}
 	}
 
 	document.getElementById("brwplot").innerHTML = "";
@@ -247,11 +565,31 @@ function setTabb(name){
 		document.getElementById("brdview").style.display="block";
 		document.getElementById("brwview").style.display="none";
 		document.getElementById("varlist").style.display="none";
-	//	Rbrd_sremove = spinner(R_brd);
+		
+		if(individuals[csi] != undefined && btn_set != null){
+			if(individuals[csi].fid == "0" ||  individuals[csi].mid == "0"){
+				btn_set.hide();
+			}else{
+				btn_set.show();
+			}
+		}
+		
 		if(document.getElementById("brd_genome").innerHTML == ""){
 			loadChrBand();
 		}
-	//	Rbrd_sremove();
+		/*var temp_chr = parseInt(current_chr.substr(3))-1;
+		genome[temp_chr][0].onmouseover();
+		genome[temp_chr][0].onclick();
+		for(var i = 0 ; i < chrs[temp_chr].bands.length ; i++){
+			if(chrs[temp_chr].bands[i].from < current_start && chrs[temp_chr].bands[i].to > current_end){
+				bands[temp_chr][i][0].onmouseover();
+				bands[temp_chr][i][0].onclick();
+			}
+		}*/
+		/*genome[20][0].onmouseover();
+		genome[20][0].onclick();
+		bands[20][i][0].onmouseover();
+		bands[20][i][0].onclick();*/
 	} else if (name=="brwview"){
 		document.getElementById("brdview_li").className="";
 		document.getElementById("brwview_li").className="hover";
@@ -260,6 +598,38 @@ function setTabb(name){
 		document.getElementById("brwview").style.display="block";
 		document.getElementById("varlist").style.display="none";
 	}
+}
+function close_select_method(){
+	document.getElementById("select_method").style.display = "none";
+}
+function call_select_method(){
+	var topp = $("#brwplot").position().top + R_top;
+	var leftt = $("#brwplot").position().left + R_left + (R_width-R_left-R_right)/2 + 10;
+	$(document.getElementById("select_method")).css("display","block");
+	$(document.getElementById("select_method")).css("top",topp);
+	$(document.getElementById("select_method")).css("left",leftt);
+	var temp_others = document.getElementById("highlight_others");
+	var temp_parents = document.getElementById("highlight_parents");
+	temp_others.style.cursor = "pointer";
+	temp_parents.style.cursor = "pointer";
+	temp_others.onclick = function(){
+		call_shared_different();
+	};
+	temp_others.onmouseover = function(){
+		temp_others.style.color="#636363";
+	};
+	temp_others.onmouseout = function(){
+		temp_others.style.color="000";
+	};
+	temp_parents.onclick = function(){
+		call_compared_parents();
+	};
+	temp_parents.onmouseover = function(){
+		temp_parents.style.color="#636363";
+	};
+	temp_parents.onmouseout = function(){
+		temp_parents.style.color="000";
+	};
 }
 function close_shared_different(){
 	document.getElementById("SD_window").style.display = "none";
@@ -270,12 +640,17 @@ function call_shared_different(){
 	$(document.getElementById("SD_window")).css("display","block");
 	$(document.getElementById("SD_window")).css("top",topp);
 	$(document.getElementById("SD_window")).css("left",leftt);
+	/*
 	document.getElementById("shared_different").innerHTML = "";
 	var temp = document.createElement("table");
 	document.getElementById("shared_different").appendChild(temp);
 	temp.className = "listt_table";
 	temp.id = "share_diff_table";
-
+	temp.border = "1px #aaa solid";
+	temp.rules = "rows";
+	*/
+	var temp = document.getElementById("share_diff_table");
+	temp.innerHTML = "";
 	var temp_tr = temp.insertRow(-1);
 	temp_tr.innerHTML = 
 		"<th rowspan=\"2\">Highlight</th>"+
@@ -319,11 +694,19 @@ function call_shared_different(){
 		if(id == csi || individuals[id].ifs == "false"){
 			continue;
 		}
-		temp_tr = temp.insertRow(-1);
-		temp_tr.innerHTML = "<td colspan=\"3\"></td><td></td>";
-		temp_tr.cells[0].innerHTML = id;
+		(function(i){
+		var temp_trow = temp.insertRow(-1);
+		temp_trow.innerHTML = "<td colspan=\"3\"></td><td></td>";
+		temp_trow.cells[0].innerHTML = id;
 		var checkboxObj = document.createElement("input");
-		temp_tr.cells[1].appendChild(checkboxObj);
+		temp_trow.cells[1].appendChild(checkboxObj);
+		temp_trow.cells[1].align = "center";
+		temp_trow.onmouseover = function(){
+			temp_trow.style.backgroundColor="#DFEBF2";
+		};
+		temp_trow.onmouseout = function(){
+			temp_trow.style.backgroundColor="";
+		};
 		checkboxObj.type = "checkbox";
 		checkboxObj.name = "share_diff_indlist";
 		checkboxObj.id = id+"__shared_diff_indlist";
@@ -341,9 +724,11 @@ function call_shared_different(){
 				compared_individuals[target.getAttribute("id").split("__")[0]] = 1;
 			}
 		}
+		})(i);
 	}
 	var bol = $("input[type=checkbox][name=share_diff_indlist]:checked").length >= 9;
 	$("input[type=checkbox][name=share_diff_indlist]").not(":checked").attr("disabled",bol);
+	close_select_method();
 }
 
 function show_example(){
@@ -355,9 +740,9 @@ function show_example(){
 function spinner(S){
 	var sectorsCount = 10,
 	    color = "#000",
-	    width = 5,
-	    r1 = 10,
-	    r2 = 20,
+	    width = 4,
+	    r1 = 8,
+	    r2 = 15,
 	    cx = r2 + width,
 	    cy = r2 + width,
 	    sectors = [],
