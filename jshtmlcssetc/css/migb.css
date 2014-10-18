@@ -20,7 +20,7 @@ body{
 	margin-right:auto;
 	width:96%;
 	max-width:1500px;
-	min-width:1200px;
+	min-width:1280px;
 	height:100%
 	font: 12px "Trebuchet MS", Arial, sans-serif;
 	text-align:left;
@@ -131,7 +131,7 @@ body{
 	opacity: 1;
 	display: inline-block;
 	width:35%;
-	height:600px;
+	height:568px;
 	font: 12px "Trebuchet MS", Arial, sans-serif;
 	text-align:left;
 	overflow:auto;

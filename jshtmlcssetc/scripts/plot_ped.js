@@ -7,75 +7,80 @@ function plan_pedigree() {
 		if (req2.status == 200){
 			var XMLDoc = req2.responseXML;
 			var Pedigrees = XMLDoc.getElementsByTagName("Member");
-			for(var i = 0;i < Pedigrees.length;i++){
-				var id = Pedigrees[i].getAttribute(xmlAttributeId);
-				individuals[id] = {};
-				individuals[id].id = id;
-				individuals[id].family = Pedigrees[i].getElementsByTagName("Family")[0].firstChild.nodeValue;
-				individuals[id].fid = Pedigrees[i].getElementsByTagName("Father")[0].firstChild.nodeValue;
-				individuals[id].mid = Pedigrees[i].getElementsByTagName("Mother")[0].firstChild.nodeValue;
-				individuals[id].sex = Pedigrees[i].getElementsByTagName("Sex")[0].firstChild.nodeValue;
-				individuals[id].affected = Pedigrees[i].getElementsByTagName("Affected")[0].firstChild.nodeValue;
-				individuals[id].ifs = Pedigrees[i].getAttribute("ifSample");
-				individuals[id].selected = false;
-				if(families[id] == undefined){
-					families[id] = {};
+			if(Pedigrees.length!=0){
+				for(var i = 0;i < Pedigrees.length;i++){
+					var id = Pedigrees[i].getAttribute(xmlAttributeId);
+					individuals[id] = {};
+					individuals[id].id = id;
+					individuals[id].family = Pedigrees[i].getElementsByTagName("Family")[0].firstChild.nodeValue;
+					individuals[id].fid = Pedigrees[i].getElementsByTagName("Father")[0].firstChild.nodeValue;
+					individuals[id].mid = Pedigrees[i].getElementsByTagName("Mother")[0].firstChild.nodeValue;
+					individuals[id].sex = Pedigrees[i].getElementsByTagName("Sex")[0].firstChild.nodeValue;
+					individuals[id].affected = Pedigrees[i].getElementsByTagName("Affected")[0].firstChild.nodeValue;
+					individuals[id].ifs = Pedigrees[i].getAttribute("ifSample");
+					individuals[id].selected = false;
+					individuals[id].gtmark = "--";
+					if(families[id] == undefined){
+						families[id] = {};
+					}
+					families[id].id = id;
+					families[id].fid = individuals[id].fid;
+					families[id].mid = individuals[id].mid;
+					if(individuals[id].fid != "0"){
+						add_id_familist(id,individuals[id].fid);
+						families[individuals[id].fid].sp = individuals[id].mid;
+						families[individuals[id].fid].rmo = id;
+					}
+					if(individuals[id].mid != "0"){
+						add_id_familist(id,individuals[id].mid);
+						families[individuals[id].mid].sp = individuals[id].fid;
+						families[individuals[id].mid].rmo = id;
+					}
 				}
-				families[id].id = id;
-				families[id].fid = individuals[id].fid;
-				families[id].mid = individuals[id].mid;
-				if(individuals[id].fid != "0"){
-					add_id_familist(id,individuals[id].fid);
-					families[individuals[id].fid].sp = individuals[id].mid;
-					families[individuals[id].fid].rmo = id;
+	
+				ind_ids = [];
+				for(var id in individuals){
+					ind_ids[ind_ids.length] = id;
 				}
-				if(individuals[id].mid != "0"){
-					add_id_familist(id,individuals[id].mid);
-					families[individuals[id].mid].sp = individuals[id].fid;
-					families[individuals[id].mid].rmo = id;
-				}
-			}
+				ind_ids.sort();
 
-			ind_ids = [];
-			for(var id in individuals){
-				ind_ids[ind_ids.length] = id;
-			}
-			ind_ids.sort();
-
-			families_meta_heightt = 0;
-			families_meta_widthh = 0;
-			families.roots = {};
-			for(ind_key in families){
-				if(ind_key != "min_level" && ind_key != "max_level" && ind_key!= "level" && ind_key!="roots"){
+				families_meta_heightt = 0;
+				families_meta_widthh = 0;
+				families.roots = {};
+				for(ind_key in families){
+					if(ind_key != "min_level" && ind_key != "max_level" && ind_key!= "level" && ind_key!="roots"){
 					
-					if(families[ind_key].fid == "0" 
-					&& families[ind_key].mid == "0"
-					&& families[ind_key].sp != undefined
-					&& families[ind_key].sp != "0" 
-					&& families[families[ind_key].sp].fid == "0"
-					&& families[families[ind_key].sp].mid == "0"
-					&& families.roots[ind_key] == undefined
-					&& families.roots[families[ind_key].sp] == undefined){
+						if(families[ind_key].fid == "0" 
+						&& families[ind_key].mid == "0"
+						&& families[ind_key].sp != undefined
+						&& families[ind_key].sp != "0" 
+						&& families[families[ind_key].sp].fid == "0"
+						&& families[families[ind_key].sp].mid == "0"
+						&& families.roots[ind_key] == undefined
+						&& families.roots[families[ind_key].sp] == undefined){
 
-						families.roots[ind_key] = {};
-						families.roots[ind_key].levels = [];
-						families.roots[ind_key].leftt = 0;
-						families.roots[ind_key].rightt = 0;
-						families.roots[ind_key].height = 0;
+							families.roots[ind_key] = {};
+							families.roots[ind_key].levels = [];
+							families.roots[ind_key].leftt = 0;
+							families.roots[ind_key].rightt = 0;
+							families.roots[ind_key].height = 0;
 
-						search_offspring(ind_key,ind_key,0,1);
-						assign_coord(ind_key,ind_key,0,0);
-						correct_coord(ind_key);
-
-						families_meta_heightt += families.roots[ind_key].height + 1;
-						if(families_meta_widthh < families.roots[ind_key].rightt - families.roots[ind_key].leftt){
-							families_meta_widthh = families.roots[ind_key].rightt - families.roots[ind_key].leftt;
+							search_offspring(ind_key,ind_key,0,1);
+							assign_coord(ind_key,ind_key,0,0);
+							correct_coord(ind_key);
+	
+							families_meta_heightt += families.roots[ind_key].height + 1;
+							if(families_meta_widthh < families.roots[ind_key].rightt - families.roots[ind_key].leftt){
+								families_meta_widthh = families.roots[ind_key].rightt - families.roots[ind_key].leftt;
+							}
 						}
 					}
 				}
+				plot_families();
+				list_individuals();
+			}else{
+				alert("There is no individuals!");
 			}
-			plot_families();
-			list_individuals();
 		}
 	}
 }
@@ -262,7 +267,7 @@ function plot_families(){
 	var baseline = height_unit/2;
 	var height = height_unit*families_meta_heightt;
 	var width = width_unit*(families_meta_widthh+3);
-	var widthlimit = document.body.clientWidth*0.96*0.35<540?document.body.clientWidth*0.96*0.35:540;
+	var widthlimit = document.body.clientWidth*0.96*0.35<510?document.body.clientWidth*0.96*0.35:510;
 	var mark_lablesize = 9;
 	var mark_labletext = mark_lablesize + "px Trebuchet MS";
 	if(width < widthlimit){
@@ -283,8 +288,9 @@ function plot_families(){
 	}
 
 	function plot_ped(root,id){
-		plot_individual(root,id);
+		//plot_individual(root,id);
 		plot_relations(root,id);
+		plot_individual(root,id);
 		if(families[id].sp != undefined){
 			if(families[id].sp != "0"){
 				plot_individual(root,families[id].sp);
@@ -336,8 +342,18 @@ function plot_families(){
 		}
 		if(individuals[id].sex == "1"){
 			families[id].obj[root] = P.rect(offset+families[id].x[root]*width_unit-r,baseline+families[id].y[root]*height_unit-r,2*r,2*r,0);
-		} else {
+		} else if(individuals[id].sex == "2"){
 			families[id].obj[root] = P.ellipse(offset+families[id].x[root]*width_unit,baseline+families[id].y[root]*height_unit,r,r);
+		} else{
+			families[id].obj[root] = P.path("M"+(offset+families[id].x[root]*width_unit)
+						+" "+(baseline+families[id].y[root]*height_unit-1.4*r)
+						+"L"+(offset+families[id].x[root]*width_unit+1.4*r)
+						+" "+(baseline+families[id].y[root]*height_unit)
+						+"L"+(offset+families[id].x[root]*width_unit)
+						+" "+(baseline+families[id].y[root]*height_unit+1.4*r)
+						+"L"+(offset+families[id].x[root]*width_unit-1.4*r)
+						+" "+(baseline+families[id].y[root]*height_unit)
+						+"Z").attr({"stroke-width":1.5});
 		}
 
 		var color = "#FFF";
@@ -345,7 +361,7 @@ function plot_families(){
 			color = "#000";
 		}
 
-		families[id].obj[root].attr({fill:color,"fill-opacity":0.9,stroke:"#000"});
+		families[id].obj[root].attr({fill:color,"fill-opacity":1,stroke:"#000"});
 
 		if(families[id].idobj == undefined){
 			families[id].idobj = {};
@@ -360,8 +376,8 @@ function plot_families(){
 				families[id].markobj = {};
 			}
 			families[id].markobj[root] = P.text(offset+families[id].x[root]*width_unit+19,baseline+families[id].y[root]*height_unit-r+20,"");
-			families[id].markobj[root].attr({fill:"#F00",font: mark_labletext,"font-weight":"bold"});
-			families[id].markobj[root].hide();
+			families[id].markobj[root].attr({fill:"#000",font: mark_labletext,"font-weight":"bold"});
+			//families[id].markobj[root].hide();
 			/////////////////////////////////
 			(function(root,id){
 				families[id].obj[root][0].style.cursor = "pointer";
@@ -418,59 +434,78 @@ function list_individuals(){
 		"<th>Mother</th>"+
 		"<th>Gender</th>"+
 		"<th>Affected</th>"+
-		"<th>Checked</th>";
+		"<th>Checked</th>"+
+		"<th>GT</th>";
 
 	for(var i = 0 ; i < ind_ids.length ; i++){
 		var id = ind_ids[i];
 		var father = "--";
 		var mother = "--";
-		var gender = "Female";
-		var affected = "Unaffected";
-
-		if(individuals[id].fid != "0"){
-			father = individuals[id].fid;
-		}
-		if(individuals[id].mid != "0"){
-			mother = individuals[id].mid;
-		}
-		if(individuals[id].sex == "1"){
-			gender = "Male";
-		}
-		if(individuals[id].affected == "1"){
-			affected = "Affected";
-		} 
-		temp_tr = temp.insertRow(-1);
-		temp_tr.style.background = "#CCC";
-		var temp_td = temp_tr.insertCell(-1);
-		temp_td.innerHTML = individuals[id].family;
-		temp_td = temp_tr.insertCell(-1);
-		temp_td.innerHTML = id;
-		temp_td = temp_tr.insertCell(-1);
-		temp_td.innerHTML = father;
-		temp_td = temp_tr.insertCell(-1);
-		temp_td.innerHTML = mother;
-		temp_td = temp_tr.insertCell(-1);
-		temp_td.innerHTML = gender;
-		temp_td = temp_tr.insertCell(-1);
-		temp_td.innerHTML = affected;
-		temp_td = temp_tr.insertCell(-1);
-
+		var gender = "--";
+		var affected = "no";
 		if(individuals[id].ifs == "true"){
-			var radioObj = document.createElement("input");
-			temp_td.appendChild(radioObj);
-			radioObj.type = "radio";
-			radioObj.name = "indlist_select";
-			radioObj.id = id + "__indlist_select";
-			if(id == csi){
-				radioObj.checked = true;
+			if(individuals[id].fid != "0"){
+				father = individuals[id].fid;
 			}
-			radioObj.onclick = function(event){
-				var target = event.target || event.srcElement;
-				var id = target.getAttribute("id").split("__")[0];
-				select_a_individual(id);
-			};
-		} else {
-			temp_td.innerHTML = "--";
+			if(individuals[id].mid != "0"){
+				mother = individuals[id].mid;
+			}
+			if(individuals[id].sex == "1"){
+				gender = "Male";
+			}
+			if(individuals[id].sex == "2"){
+				gender = "Female";
+			}
+			if(individuals[id].affected == "1"){
+				affected = "yes";
+			} 
+			temp_tr = temp.insertRow(-1);
+			temp_tr.style.background = "#CCC";
+			var temp_td = temp_tr.insertCell(-1);
+			temp_td.innerHTML = individuals[id].family;
+			temp_td.align = "center";
+			temp_td = temp_tr.insertCell(-1);
+			temp_td.innerHTML = id;
+			temp_td.align = "center";
+			temp_td = temp_tr.insertCell(-1);
+			temp_td.innerHTML = father;
+			temp_td.align = "center";
+			temp_td = temp_tr.insertCell(-1);
+			temp_td.innerHTML = mother;
+			temp_td.align = "center";
+			temp_td = temp_tr.insertCell(-1);
+			temp_td.innerHTML = gender;
+			temp_td.align = "center";
+			temp_td = temp_tr.insertCell(-1);
+			temp_td.innerHTML = affected;
+			temp_td.align = "center";
+			temp_td = temp_tr.insertCell(-1);
+			temp_td.align = "center";
+
+			if(individuals[id].ifs == "true"){
+				var radioObj = document.createElement("input");
+				temp_td.appendChild(radioObj);
+				radioObj.type = "radio";
+				radioObj.name = "indlist_select";
+				radioObj.id = id + "__indlist_select";
+				if(id == csi){
+					radioObj.checked = true;
+				}
+				radioObj.onclick = function(event){
+					var target = event.target || event.srcElement;
+					var id = target.getAttribute("id").split("__")[0];
+					select_a_individual(id);
+				};
+			} else {
+				temp_td.innerHTML = "--";
+			}
+			temp_td = temp_tr.insertCell(-1);
+			temp_td.align = "center";
+			//for(var root in families.roots){
+			//	if(families[id].markobj != undefined && families[id].markobj[root] != undefined){
+			temp_td.innerHTML = individuals[id].gtmark;
+			//	}
+			//	}
 		}
 	}
 }
@@ -501,13 +536,18 @@ function select_a_individual(id){
 				control_scanning=0;
 			}
 		}
+		if(geneflag_set != undefined && geneflag_set != null){
+			geneflag_set.remove();
+		}
 		for(var family_member in families){
 			for(var temp_root in families[family_member].markobj){
 				if(family_member != "roots" && individuals[family_member].ifs == "true" && families[family_member].markobj[temp_root] != undefined){
-					families[family_member].markobj[temp_root].hide();
+					//families[family_member].markobj[temp_root].hide();
+					families[family_member].markobj[temp_root].attr({text:"",fill:"#000"});
 				}
 			}
 		}
+		list_individuals();
 		for(var chr_num in chrs){
 			for(var band_num in chrs[chr_num].bands){
 				for(var objid in chrs[chr_num].bands[band_num].scoreobj){

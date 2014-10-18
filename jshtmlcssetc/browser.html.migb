@@ -26,19 +26,22 @@
 				<div class="plott_right" style="float:right;">
 					<div id="brdview" style="display:none;">
 						<div id="brd_genome" style="float:left"></div>
-						<div id="brd_genelist" style="float:left;overflow:auto;height:890px"></div>
+						<div style="float:left">
+							<div id="brd_occupy" style="overflow:auto;width:150px;height:75px"></div>
+							<div id="brd_genelist" style="overflow:auto;height:810px"></div>
+						</div>
 					</div>
 					<div id="brwview" class="hover" style="overflow:auto">
 						<div id="navigators" style="width:100%;">
 							Gene Symbol:
-							<input id="search_field" size="7"/>
+							<input style="font-family:Trebuchet MS, Arial, sans-serif; width:75px" id="search_field" size="7"/>
 							Or
-							<select id="chrSelect">
+							<select style="font-family:Trebuchet MS, Arial, sans-serif" id="chrSelect">
 							</select>
 							Start:
-							<input id="startInput" size="7"/>
+							<input style="font-family:Trebuchet MS, Arial, sans-serif; width:75px" id="startInput" size="7"/>
 							End:
-							<input id="endInput" size="7"/>
+							<input style="font-family:Trebuchet MS, Arial, sans-serif; width:75px" id="endInput" size="7"/>
 							<input class="submitt" type="submit" onclick="jump()" value="Go"/>
 						</div>
 						<div id="brwplot"></div>
@@ -46,21 +49,41 @@
 					<div id="varlist" style="display:none"></div>
 				</div>
 
-				<div class="uploadd" style="height:250px;float:left;">
-					<table>
+				<div class="uploadd" style="height:280px;float:left;">
+					<table style="font:15px Candara, Arial, Helvetica, sans-serif">
 						<tr>
-							<td>Name:</td>
-							<td><input id="track_name" size="40" placeholder="Please input data name here"/></td>
+							<td colspan="2" width="100" align="center">Track Name:</td>
+							<td>
+								<input style="width:352px;margin-left:2px; font-family:Trebuchet MS, Arial, sans-serif" id="track_name" size="40" onfocus="hide_tracknamelist();" placeholder="Please input data name here"/>
+							</td>
+							<td>
+								<input style="width:25px;height:24px; margin-left:-4px;" id="select_btn" type="image" src="./image/down.png" onclick="display_tracknamelist();"/>
+							</td>
 						</tr>
 						<tr>
+							<td width="30" align="center"><input id="url_of_url_or_upload" name="url_or_upload" type="radio" checked></td>
 							<td>URL:</td>
-							<td><input id="vcf_url" type="text" size="40" placeholder="Please input the URL of tabix compressed and indexed VCF file"/></td>
+							<td colspan="2"><input style="width:377px;margin-left:2px;font-family:Trebuchet MS, Arial, sans-serif" id="vcf_url" type="text" size="40" placeholder="Please input the URL of tabix compressed and indexed VCF file"/></td>
 						</tr>
 						<tr>
-							<td>Pedigree:</td>
-							<td><textarea id="ped_rec" rows="7" cols="45" placeholder="Please input the text of PED information"></textarea></td>
+							<td width="30" align="center"><input id="upload_of_url_or_upload" name="url_or_upload" type="radio"></td>
+							<td>Data File:</td>
+							<td colspan="2"><input style="font-family:Trebuchet MS, Arial, sans-serif; border: 1px #aaa solid" id="pg_upload_file" type="file">(less than 20MB)</td>
 						</tr>
 						<tr>
+							<td></td>
+							<td style="width:66px">Index File:</td>
+							<td colspan="2"><input style="font-family:Trebuchet MS, Arial, sans-serif; border: 1px #aaa solid" id="pg_upload_file2" type="file"></td>
+						</tr>
+						<tr>
+							<td colspan="3"><center><span id="uprogress"></span></center></td>
+						</tr>
+						<tr>
+							<td colspan="2" align="center">Pedigree:</td>
+							<td colspan="2"><textarea style="width:377px;margin-left:2px;font-family:Trebuchet MS, Arial, sans-serif" id="ped_rec" rows="5" cols="45" placeholder="Please input the text of PED information"></textarea></td>
+						</tr>
+						<tr>
+							<td></td>
 							<td><input class="submitt" type="submit" onclick="load_vcf()" value="Load"/></td>
 							<td><input class="submitt" type="submit" onclick="show_example()" value="Example"/></td>
 						</tr>
@@ -74,7 +97,7 @@
 						<li id="indlist_li" onclick="setTabb('indlist')" style="right:10%">Individual List</li>
 					</ul>
 				</div>
-				<div class="plott" style="float:left" style=" overflow:scroll; width:487px; height:606px;">
+				<div class="plott" style="float:left" style=" overflow:scroll; width:487px; height:586px;">
 					<div id="pedtree" class="hover">
 						<div id="pedplot"></div>
 					</div>
@@ -95,15 +118,40 @@
 			load_individuals();
 		</script>
 		<div id="select_info" class="ui-front ui-corner-all" style="display:none; position:absolute; border: 1px #ccc solid"></div>
+		<div id="select_method" class="ui-front ui-corner-all" style="display:none; background:#ddd; position:absolute; border: 1px #aaa solid">
+			<div id="select_method_pannel" style="border: 1px #aaa solid" align="right"><input type="button" style="border:0px; outline:none; cursor:pointer; background:00000000; color:black; font-weight:800" onclick="close_select_method()" value="Close"/></div>
+			<table border="0px">
+				<tr>
+					<td id="highlight_others">Highlight variants with others</td>
+				</tr>
+				<tr>
+					<td id="highlight_parents">Highlight variants with parents</td>
+				<tr>
+			</table>
+		</div>
 		<div id="SD_window" class= "ui-front ui-corner-all" style="display:none;position:absolute; border: 1px #aaa solid">
-			<div id="shared_different" style="clear:both"></div>
-			<div id="SD_submit" style="border: 1px #aaa solid"><input class="submitt" type="submit" onclick="highlight_vars()" value="Submit"/></div>
+			<div id="SD_pannel" style="border: 1px #aaa solid" align="right"><input type="button" style="border:0px; outline:none; cursor:pointer; font-weight:bold" onclick="close_shared_different()" value="Close"/></div>
+			<div id="shared_different" style="border: 1px #aaa solid; clear:both">
+				<table id="share_diff_table" class="listt_table" border="0" bordercolor="#ccc" style="border: 0px #aaa solid" cellspacing="0" cellpadding="0">
+				</table>
+			</div>
+			<div id="SD_submit" style="border: 1px #aaa solid">
+				<input class="submitt" type="submit" onclick="highlight_vars()" value="Submit"/>
+			</div>
 
 		</div>
 		<div id="gdflist" style="display:none;">
-			<table id="gdf_list" border="1px">
+			<div id="gdf_pannel" style="border: 1px" align="right"><input type="button" style="border:0px; outline:none; cursor:pointer; background:00000000; color:white; font-weight:800" onclick="close_gdflist()" value="Close"/></div>
+			<table id="gdf_list" border="1px" style="border: 0px #aaa solid;">
 				<tbody id="gdftablebody"></tbody>
 			</table>
 		</div>
+		<div id="select_plugin" class= "ui-front ui-corner-all" style="display:none;position:absolute;z-index:100; border: 1px #aaa solid; background-color:#FFFFFF">
+			<div style="border: 1px #aaa solid; clear:both">
+				<table id="select_trackname" class="listt_table" border="0" bordercolor="#ccc" style="border: 0px #aaa solid; width:374px; font-family:Trebuchet MS, Arial, sans-serif;" cellspacing="0" cellpadding="0">
+				</table>
+			</div>
+		</div>
+		<iframe id="maskselect" style="display:none;position:absolute; top:0px; left:0px; " frameborder="0" src="about:blank"></iframe>
 	</body>
 </html>

@@ -74,6 +74,8 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 					querry="action="+param5+"&scoremeth="+param4;
 				} else if(param5 == "getIntersection" || param5 == "getDifference"){
 					querry="action="+param5+"&tracks="+param4+"&chr="+param1+"&start="+param2+"&end="+param3;
+				} else if(param5 == "trioAnalysis"){
+					querry="action="+param5+"&tracks="+param4+"&chr="+param1+"&start="+param2+"&end="+param3+"&id="+document.getElementById("moretext").value;
 				} else if(param5 == "searchIndividual"){
 					querry="action="+param5+"&tracks="+param4;
 				}
@@ -175,7 +177,7 @@ xmp {white-space:pre-wrap;word-wrap:break-word;word-break:break-all;}
 	<table width=80% border=1 valign="middle" align="center">
 		<tr>
 			<th>Input</th>
-			<th>update<br>refresh<br>getIntersection<br>getDifference</th>
+			<th>update<br>refresh<br>getIntersection<br>getDifference<br>trioAnalysis</th>
 			<th>getDetail</th>
 			<th>addExternals<br>addExIndividuals<br>upExternal</th>
 			<th>setParams</th>

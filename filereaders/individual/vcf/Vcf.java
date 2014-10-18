@@ -334,7 +334,7 @@ public class Vcf {
 		}
 		// <INS> or C<ctg1>, only Personal Genemic VCF will appear.
 		if (containChar(Alt, '<')) {
-			resolveLtGt();
+			resolveLtGt(containChar(Alt, ','));
 		}
 		// G]17:198982], only Personal Genemic VCF will appear.
 		else if (containChar(Alt, ']')) {
@@ -368,30 +368,41 @@ public class Vcf {
 	/**
 	 * Call this function when Alt appears as &lt;INS&gt; or C&lt;ctg1&gt;
 	 */
-	private void resolveLtGt() {
+	private void resolveLtGt(boolean containComma) {
 		String type = takeOutAltType();
+		String[] many = null;
 
-		variants = new Variant[1];
-		variants[0] = new Variant();
-		Variant v = variants[0];
-		v.setId(ID);
-		v.setType(type);
-		if (VARIANT_TYPE_INSERTION.equals(type)) {
-			// big INS
-			v.setFrom(Pos);
-			v.setTo(Pos + 1);
+		if (!containComma) {
+			many = new String[1];
+			many[0] = Alt;
 		} else {
-			// big DEL, INV, CNV, OTH, DUP
-			v.setFrom(Pos + 1);
-			if (pgInfo != null) {
-				if (-1 != pgInfo.end) {
-					v.setTo(pgInfo.end);
-				} else {
-					v.setTo(Pos + Math.abs(pgInfo.svlen) - 1);
-				}
-			}
-			else{
+			many = new StringSplit(',').split(Alt).getResult();
+		}
+
+		variants = new Variant[many.length];
+		for (int i = 0; i < variants.length; i++) {
+			variants[i] = new Variant();
+			Variant v = variants[i];
+			v.setId(ID);
+			v.setType(type);
+			v.setLetter(many[i]);
+			if (VARIANT_TYPE_INSERTION.equals(type)) {
+				// big INS
+				v.setFrom(Pos);
 				v.setTo(Pos + 1);
+			} else {
+				// big DEL, INV, CNV, OTH, DUP
+				v.setFrom(Pos + 1);
+				if (pgInfo != null) {
+					if (-1 != pgInfo.end) {
+						v.setTo(pgInfo.end);
+					} else {
+						v.setTo(Pos + Math.abs(pgInfo.svlen) - 1);
+					}
+				}
+				else{
+					v.setTo(Pos + 1);
+				}
 			}
 		}
 	}
@@ -655,6 +666,8 @@ public class Vcf {
 		int len = 0;
 
 		for (int vIndex : vIndexes) {
+//			if(vIndex > variants.length)
+//				vIndex = variants.length;
 			vs[len] = variants[vIndex - 1];
 			vs[len++].setHomo(samples.getHome(index));
 		}
