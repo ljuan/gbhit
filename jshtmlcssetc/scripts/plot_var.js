@@ -2144,14 +2144,16 @@ function plot_genes(){
 				var reqHGNC = createXMLHttpRequest();
 				reqHGNC.open("GET","servlet/test.do?action=getGene&gene="+symbols[css][0],false);
 				reqHGNC.send(null);
-				var hgnc_id = reqHGNC.responseXML.getElementsByTagName("HGNC")[0].innerHTML;
+				var hgnc_id = reqHGNC.responseXML.getElementsByTagName("HGNC")[0].childNodes[0].nodeValue;
 				window.open(hgnc_url+hgnc_id);
 			};
 			cssObj[0].onmouseover = function (){
+				cssObj[0].style.textDecoration = "underline";
 				cssObj.attr({fill:colO_hover2});
 			};
 			cssObj[0].onmouseout = function (){
 			//	cssObj.attr({"font-weight":"normal"});
+				cssObj[0].style.textDecoration = "";
 				cssObj.attr({fill:"#000"});
 			};
 		}
@@ -2208,10 +2210,12 @@ function plot_genes(){
 			};
 			cstObj[0].onmouseover = function (){
 				//cstObj.attr({font:font_size1_text,"font-weight":"bolder"});
+				cstObj[0].style.textDecoration = "underline";
 				cstObj.attr({fill:colO_hover2});
 			};
 			cstObj[0].onmouseout = function (){
 				//cstObj.attr({font:font_size2_text,"font-weight":"normal"});
+				cstObj[0].style.textDecoration = "";
 				cstObj.attr({fill:"#000"});
 			};
 		}

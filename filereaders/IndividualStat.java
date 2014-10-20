@@ -224,8 +224,8 @@ public class IndividualStat {
 	}
 	int calc_Mut(Document doc, FastaReader rr, Element[] annos, Element[] pvars, String chr, String symbol){
 		int score = 0;
-		boolean maternal_comp = false;
-		boolean paternal_comp = false;
+		int paternal_comp = 0;
+		int maternal_comp = 0;
 		
 		for(int vs=0;vs<3;vs++){ 
 			// filter those 1|1 variants, which are highly improbable for both denovo mutation and compound heterozygous
@@ -246,7 +246,6 @@ public class IndividualStat {
 				for(int i=0;i<annos.length;i++){
 					VariantAnalysis ee = new VariantAnalysis(doc, rr, annos[i], null, pvars[type], chr);
 					pannos[i]=ee.easydeal();
-					ArrayList<Integer> temp_score=new ArrayList<Integer>();
 					for(int j=0;j<pannos[i].getChildNodes().getLength();j++){
 						Element current_ele=(Element) pannos[i].getChildNodes().item(j);
 						if(current_ele.getAttribute(Consts.XML_TAG_SYMBOL).equals(symbol)){
@@ -259,9 +258,9 @@ public class IndividualStat {
 										score = score|1<<6;
 									}
 									else if (type == 1)
-										paternal_comp = true;
+										paternal_comp = paternal_comp|1<<j;
 									else if (type == 2)
-										maternal_comp = true;
+										maternal_comp = maternal_comp|1<<j;
 							NodeList vs = current_ele.getElementsByTagName(Consts.XML_TAG_VARIANT);
 							for(int k=0;k<vs.getLength();k++){
 								String letter=((Element)vs.item(k)).getElementsByTagName(Consts.XML_TAG_LETTER).item(0).getTextContent();
@@ -277,9 +276,9 @@ public class IndividualStat {
 										score = score|1<<6;
 									}
 									else if (type == 1)
-										paternal_comp = true;
+										paternal_comp = paternal_comp|1<<j;
 									else if (type == 2)
-										maternal_comp = true;
+										maternal_comp = maternal_comp|1<<j;
 								}
 								else if(letters[0].equals(letters[1])){
 									if(type == 0){
@@ -297,7 +296,8 @@ public class IndividualStat {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		if(paternal_comp && maternal_comp){
+		if((paternal_comp & maternal_comp) > 0){
+			//still may have bug because for transcripts number > 32
 			score = score|1;
 			score = score|1<<3;
 		}

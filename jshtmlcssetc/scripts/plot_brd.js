@@ -356,8 +356,10 @@ function loadChrBand(){
 						attr["fill"] = "0-#bbb-#eee";
 						attr["stroke-width"] = 0;
 						attr["fill-opacity"] = 0.2;
-						bands_rad[chrom][i]=B.path("M"+(bandx+bandw+14)+","+(interval+h*chrs[chrom].bands[i].from/chrs[chrom].lengthh)+" L"+(axisx-10)+","+interval+" L"+(axisx-10)+","+(interval+h)+" L"+(bandx+bandw+14)+","+(interval+h*chrs[chrom].bands[i].to/chrs[chrom].lengthh)+"Z").attr(attr);
-						bands_rad[chrom][i].hide();
+						if(bands_rad[chrom][i]==undefined){
+							bands_rad[chrom][i]=B.path("M"+(bandx+bandw+14)+","+(interval+h*chrs[chrom].bands[i].from/chrs[chrom].lengthh)+" L"+(axisx-10)+","+interval+" L"+(axisx-10)+","+(interval+h)+" L"+(bandx+bandw+14)+","+(interval+h*chrs[chrom].bands[i].to/chrs[chrom].lengthh)+"Z").attr(attr);
+							bands_rad[chrom][i].hide();
+						}
 						if(bandslables[chrom][i]==undefined){
 							bandslables[chrom][i]=B.text(bandx-20,interval+h*(chrs[chrom].bands[i].from+chrs[chrom].bands[i].to)/2/chrs[chrom].lengthh,chrs[chrom].bands[i].id).attr({font:font_size_text}).attr({fill:"#000"});
 							bandslables[chrom][i].hide();
@@ -682,6 +684,8 @@ function loadChrBand(){
 							}
 							bandsscore[c][b] = chrs[c].bands[b].scoreobj[1];
 							//bandslables[c][b]=drawText(bandfrom,bandto,chromlen,radius+chrthick+dis_chr2band+bandthick,(-dis_lable2chr-10),chrs[c].bands[b].id,font_size2);
+							bands_rad[c][b]=B.path("M"+(bandx+bandw+14)+","+(interval+h*chrs[c].bands[b].from/chrs[c].lengthh)+" L"+(axisx-10)+","+interval+" L"+(axisx-10)+","+(interval+h)+" L"+(bandx+bandw+14)+","+(interval+h*chrs[c].bands[b].to/chrs[c].lengthh)+"Z").attr({fill:"0-#bbb-#eee","stroke-width":0,"fill-opacity":0.2});
+							bands_rad[c][b].hide();
 							bandslables[c][b]=B.text(bandx-20,interval+h*(chrs[c].bands[b].from+chrs[c].bands[b].to)/2/chrs[c].lengthh,chrs[c].bands[b].id).attr({font:font_size_text}).attr({fill:"#000"});
 							bandslables[c][b].hide();
 							bandsscore[c][b].hide();
