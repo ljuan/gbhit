@@ -57,18 +57,13 @@
 			<Default>pack</Default>
 			<Format>ANNO</Format>
 		</Anno>
-		<Anno id="trio" group="Personal Genome">
+		<Anno id="NA12878_trio_unphased" group="Personal Genome">
 			<Path>/fgbdata/hg19/NA12878.trio.snp.vcf.gz</Path>
 			<Default>hide</Default>
 			<Format>VCF</Format>
 		</Anno>
-		<Anno id="1000g_p3_hasrel" group="Personal Genome">
+		<Anno id="1000genomes_phase3_related_individuals_autosomes" group="Personal Genome">
 			<Path>/fgbdata/hg19/1000g/HAS_REL.phase3_shapeit2_mvncall_integrated_v2.20130502.genotypes.vcf.gz</Path>
-			<Default>hide</Default>
-			<Format>VCF</Format>
-		</Anno>
-		<Anno id="fakefamily" group="Personal Genome">
-			<Path>/fgbdata/hg19/fakefamily.vcf.gz</Path>
 			<Default>hide</Default>
 			<Format>VCF</Format>
 		</Anno>
