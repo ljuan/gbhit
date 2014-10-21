@@ -31,7 +31,7 @@ var subElementTypeBandValue = "D";
 var subElementTypeLineValue = "L";
 var xmlTagDirection = "s";
 
-var trackname = "1000g_p3_hasrel";
+var trackname = "1000genomes_phase3_related_individuals_autosomes";
 var csi = "--"; // Current Selected Individual (id)
 var current_chr = "chr1";
 var current_start = 44583293;
