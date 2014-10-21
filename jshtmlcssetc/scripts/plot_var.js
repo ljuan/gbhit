@@ -118,7 +118,9 @@ function init_individual_vars(){
 			letter_trans = "Initiator loss";
 		}else{
 			var texts = letter.split(":");
-			if(texts[0].indexOf("$") >= 0){
+			if(texts[0].indexOf("$") >= 0 && texts[1].indexOf("$") >= 0){
+				letter_trans = "Stop -> Stop";
+			}else if(texts[0].indexOf("$") >= 0){
 				letter_trans = "Stop loss";
 			}else if(texts[1].indexOf("$") >= 0){
 				letter_trans = "Stop gain";
@@ -551,10 +553,10 @@ function initlegend(){
 	var lg_y = R_height-R_bottom+1;
 	
 	var greenobj = R.rect(lg_x,lg_y,15,15,0).attr({fill:colM,"stroke-width":0});
-	var lg_green = R.text(lg_x+20,lg_y+7,"Inherited from mother").attr({fill:colO,font:lg_font,"text-anchor":"start"});	
+	var lg_green = R.text(lg_x+20,lg_y+7,"Maternal variants").attr({fill:colO,font:lg_font,"text-anchor":"start"});	
 	
 	blueobj = R.rect(lg_x+lg_gap*2,lg_y,15,15,0).attr({fill:colP,"stroke-width":0});
-	lg_blue = R.text(lg_x+20+lg_gap*2,lg_y+7,"Inherited from father").attr({fill:colO,font:lg_font,"text-anchor":"start"});	
+	lg_blue = R.text(lg_x+20+lg_gap*2,lg_y+7,"Paternal variants").attr({fill:colO,font:lg_font,"text-anchor":"start"});	
 	
 	blackobj = R.rect(lg_x+lg_gap,lg_y,15,15,0).attr({fill:colD,"stroke-width":0});
 	lg_black = R.text(lg_x+20+lg_gap,lg_y+7,"De nove mutation").attr({fill:colO,font:lg_font,"text-anchor":"start"});	
@@ -1151,7 +1153,7 @@ function show_colorful_vars(){
 			}*/
 			legendset.show();
 			blueobj.attr({fill:colP});
-			lg_blue.attr({text:"Inherited from father"});
+			lg_blue.attr({text:"Paternal variants"});
 			lg_black.attr({text:"De nove mutation"});
 			blackobj.attr({fill:colD});
 			legendset_share_diff.animate({transform:"t0 0"})
@@ -2290,7 +2292,9 @@ function plot_genes(){
 			letter = "Initiator loss";
 		}else{
 			var texts = letter.split(":");
-			if(texts[0].indexOf("$") >= 0){
+			if(texts[0].indexOf("$") >= 0 && texts[1].indexOf("$") >= 0){
+				letter = "Stop -> Stop";
+			}else if(texts[0].indexOf("$") >= 0){
 				letter = "Stop loss";
 			}else if(texts[1].indexOf("$") >= 0){
 				letter = "Stop gain";

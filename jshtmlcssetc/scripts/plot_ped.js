@@ -353,7 +353,7 @@ function plot_families(){
 						+" "+(baseline+families[id].y[root]*height_unit+1.4*r)
 						+"L"+(offset+families[id].x[root]*width_unit-1.4*r)
 						+" "+(baseline+families[id].y[root]*height_unit)
-						+"Z").attr({"stroke-width":1.5});
+						+"Z").attr({"stroke-width":1});
 		}
 
 		var color = "#FFF";

@@ -228,9 +228,9 @@ function loadChrBand(){
 	var gurrent=null;
 	var glick=null;
 
-	var scan_text0 = B.text(120,15,"Scan").attr({font: "16px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#000"});
+	var scan_text0 = B.text(107,15,"Detect").attr({font: "16px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#000"});
 	var scan_text1 = B.text(370,15,"mutation and compound heterozygous variants").attr({font: "16px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#000"});
-	var scan_text2 = B.text(170,15,"de novo").attr({font: "italic 16px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#000"});
+	var scan_text2 = B.text(165,15,"de novo").attr({font: "italic 16px Trebuchet MS, Arial, sans-serif",opacity:1}).attr({fill: "#000"});
 	var error_warn=B.text(0,30,"").attr({font:font_size2_text, opacity:1, "text-anchor":"start"}).attr({fill:"#000"});
 	var scan_text = B.set();
 	scan_text.push(scan_text0,scan_text1,scan_text2);
@@ -929,9 +929,9 @@ function loadChrBand(){
 			return null;
 		}
 	}*/
-	genome[20][0].onmouseover();
-	genome[20][0].onclick();
-	bands[20][9][0].onmouseover();
-	bands[20][9][0].onclick();
+	genome[0][0].onmouseover();
+	genome[0][0].onclick();
+	bands[0][14][0].onmouseover();
+	bands[0][14][0].onclick();
 }
 

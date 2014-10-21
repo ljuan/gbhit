@@ -33,9 +33,9 @@ var xmlTagDirection = "s";
 
 var trackname = "1000g_p3_hasrel";
 var csi = "--"; // Current Selected Individual (id)
-var current_chr = "chr21";
-var current_start = 33031597;
-var current_end = 33041500;
+var current_chr = "chr1";
+var current_start = 44583293;
+var current_end = 44601361;
 
 var csv= -1; // Current Selected Variant (index)
 
@@ -732,9 +732,9 @@ function call_shared_different(){
 }
 
 function show_example(){
-	document.getElementById("track_name").value = "trio_example";
-	document.getElementById("vcf_url").value = "http://202.118.228.68/gbfiles/NA12878.trio.snp.vcf.gz";
-	document.getElementById("ped_rec").value = "trio NA12878 NA12891 NA12892 2 2\ntrio NA12891 0 0 1 2\ntrio NA12892 0 0 2 2";
+	document.getElementById("track_name").value = "Example";
+	document.getElementById("vcf_url").value = "http://mlg.hit.edu.cn/FGB/Example.vcf.gz";
+	document.getElementById("ped_rec").value = "m008	NA19660	P660A	P660B	2	0\nm008	NA19661	0	0	1	0\nm008	NA19662	NA19661	NA19660	2	0\nm012	NA19663	0	0	2	0\nm012	NA19664	P664A	P664B	1	0\nm012	NA19665	NA19664	NA19663	2	0\n2382	NA19672	P660A	P660B	2	0\n2382	NA19674	0	NA19672	1	0\nm011	NA19684	0	0	2	0\nm011	NA19685	NA19661	NA19660	1	0\nm011	NA19686	NA19685	NA19684	2	0\nF0	P660A	GF19660	GM19660	0	0\nF0	P660B	0	0	0	0\nF0	GF19660	0	0	1	0\nF0	GM19660	0	0	2	0\nF0	P664A	GF19660	GM19660	0	0\nF0	P664B	0	0	0	0";
 }
 
 function spinner(S){

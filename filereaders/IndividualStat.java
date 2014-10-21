@@ -265,7 +265,7 @@ public class IndividualStat {
 							for(int k=0;k<vs.getLength();k++){
 								String letter=((Element)vs.item(k)).getElementsByTagName(Consts.XML_TAG_LETTER).item(0).getTextContent();
 								String[] letters=letter.split(":");
-								if (letter.indexOf("^")>=0||letter.indexOf("$")>=0||letter.indexOf("#")>=0
+								if (letter.indexOf("^")>=0||(letter.indexOf("$")>=0&&!letters[0].equals(letters[1]))||letter.indexOf("#")>=0
 										||letter.indexOf("(")>=0||letter.indexOf(")")>=0
 										||letter.indexOf("_")>=0||letters[0].length()!=letters[1].length()
 										||!letters[0].equals(letters[1])){
@@ -296,7 +296,7 @@ public class IndividualStat {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		if((paternal_comp & maternal_comp) > 0){
+		if((paternal_comp & maternal_comp) != 0){
 			//still may have bug because for transcripts number > 32
 			score = score|1;
 			score = score|1<<3;
